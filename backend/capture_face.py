@@ -1,12 +1,16 @@
 import cv2
 import os
+import sys
 
 def capture_reference_face(output_path="reference.jpg"):
     """
     Opens the webcam and captures a frame when the user presses 's' or 'Space'.
     Saves the frame to the specified output path.
     """
-    cap = cv2.VideoCapture(0)
+    if sys.platform == "darwin":
+        cap = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
+    else:
+        cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("Error: Could not open webcam.")

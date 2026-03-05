@@ -1,0 +1,4 @@
+ cd desktop
+ cd ada_v2
+ .\venv\Scripts\Activate
+ npm run dev

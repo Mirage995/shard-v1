@@ -25,6 +25,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import ada
 from authenticator import FaceAuthenticator
 from kasa_agent import KasaAgent
+from study_agent import StudyAgent
+study_agent = StudyAgent()
 
 # Create a Socket.IO server
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
@@ -128,13 +130,15 @@ async def startup_event():
 async def status():
     return {"status": "running", "service": "A.D.A Backend"}
 
+heartbeat_started = False
+
 @sio.event
 async def connect(sid, environ):
-    print(f"Client connected: {sid}")
+    global heartbeat_started, authenticator
+    print(f"[SERVER] Client connected: {sid}")
     await sio.emit('status', {'msg': 'Connected to A.D.A Backend'}, room=sid)
 
-    global authenticator
-    
+    # --- Authentication Logic ---
     # Callback for Auth Status
     async def on_auth_status(is_auth):
         print(f"[SERVER] Auth status change: {is_auth}")
@@ -164,9 +168,25 @@ async def connect(sid, environ):
         else:
             # Bypass Auth
             print("Face Auth Disabled. Auto-authenticating.")
-            # We don't change authenticator state to true to avoid confusion if re-enabled? 
-            # Or we should just tell client it's auth'd.
             await sio.emit('auth_status', {'authenticated': True})
+
+    # --- Evolution Heartbeat ---
+    if not heartbeat_started:
+        print("[SERVER] Avvio del motore evolutivo di SHARD...")
+        asyncio.create_task(shard_evolution_heartbeat())
+        heartbeat_started = True
+
+    # --- Consciousness Auto-Start ---
+    async def accendi_coscienza_quando_pronto():
+        global audio_loop
+        while audio_loop is None or not hasattr(audio_loop, 'consciousness'):
+            await asyncio.sleep(1)
+        print("[SERVER] Sistema neurale pronto! Accensione monologo interiore di SHARD...")
+        asyncio.create_task(audio_loop.consciousness.inner_monologue_loop())
+        print("[SHARD] Consciousness loop avviato in background")
+
+    asyncio.create_task(accendi_coscienza_quando_pronto())
+
 
 @sio.event
 async def disconnect(sid):
@@ -225,9 +245,19 @@ async def start_audio(sid, data=None):
         asyncio.create_task(sio.emit('browser_frame', data))
         
     # Callback to send Transcription data to frontend
-    def on_transcription(data):
+    def on_transcription(data, *args, **kwargs):
         # data = {"sender": "User"|"ADA", "text": "..."}
         asyncio.create_task(sio.emit('transcription', data))
+        # Emit mood update to frontend for reactor color
+        if audio_loop and hasattr(audio_loop, 'consciousness'):
+            state = audio_loop.consciousness.state
+            asyncio.create_task(sio.emit('mood_update', {
+                'mood': state['mood'],
+                'energy': state['energy'],
+                'curiosity': state['curiosity'],
+                'focus': state['focus'],
+                'satisfaction': state['satisfaction']
+            }))
 
     # Callback to send Confirmation Request to frontend
     def on_tool_confirmation(data):
@@ -268,6 +298,22 @@ async def start_audio(sid, data=None):
         print(f"Sending Error to frontend: {msg}")
         asyncio.create_task(sio.emit('error', {'msg': msg}))
 
+    def on_study_request(topic, tier):
+        async def _on_progress(phase, topic, score, msg, pct):
+            await sio.emit('study_progress', {
+                'phase': phase, 'topic': topic, 'score': score,
+                'message': msg, 'percentage': pct
+            })
+        async def _on_certify(t, score, data):
+            await sio.emit('study_complete', {
+                'topic': t, 'score': score, 'data': data
+            })
+        asyncio.create_task(study_agent.study_topic(
+            topic, tier=tier,
+            on_progress=_on_progress,
+            on_certify=_on_certify
+        ))
+
     # Initialize ADA
     try:
         print(f"Initializing AudioLoop with device_index={device_index}")
@@ -283,6 +329,7 @@ async def start_audio(sid, data=None):
             on_project_update=on_project_update,
             on_device_update=on_device_update,
             on_error=on_error,
+            on_study_request=on_study_request,
 
             input_device_index=device_index,
             input_device_name=device_name,
@@ -441,10 +488,28 @@ async def shutdown(sid, data=None):
     # Force exit immediately - os._exit bypasses cleanup but ensures termination
     os._exit(0)
 
+
+
 @sio.event
 async def user_input(sid, data):
     text = data.get('text')
     print(f"[SERVER DEBUG] User input received: '{text}'")
+    
+    # --- BACKDOOR PER LO STUDIO MANUALE ---
+    if text and text.lower().startswith("/study "):
+        topic_to_study = text[7:].strip()
+        print(f"[SERVER] Backdoor attivata! Avvio studio forzato su: {topic_to_study}")
+        await start_study(sid, {"topic": topic_to_study, "tier": 1})
+        return
+    # --------------------------------------
+
+    # --- INIZIO BLOCCO MOOD ---
+    if text and text.startswith('/mood '):
+        mood = text.split(' ', 1)[1].strip()
+        await sio.emit('mood_update', {'mood': mood, 'energy': 0.8, 'curiosity': 0.5, 'focus': 0.7, 'satisfaction': 0.6})
+        await sio.emit('transcription', {'text': f'System Notification: Mood set to {mood}', 'sender': 'System'})
+        return
+    # --- FINE BLOCCO MOOD ---
     
     if not audio_loop:
         print("[SERVER DEBUG] [Error] Audio loop is None. Cannot send text.")
@@ -460,31 +525,74 @@ async def user_input(sid, data):
         # Log User Input to Project History
         if audio_loop and audio_loop.project_manager:
             audio_loop.project_manager.log_chat("User", text)
+
+    # --INIZIO AUTOMAZIONE COSCIENZA ---
+        if audio_loop and hasattr(audio_loop, 'consciousness'):
+            audio_loop.consciousness.process_interaction("User", text)
+            state = audio_loop.consciousness.state
+            await sio.emit('mood_update', {
+                'mood': state['mood'],
+                'energy': state['energy'],
+                'curiosity': state['curiosity'],
+                'focus': state['focus'],
+                'satisfaction': state['satisfaction']
+            })
+    # --FINE AUTOMAZIONE COSCIENZA ---
             
         # Use the same 'send' method that worked for audio, as 'send_realtime_input' and 'send_client_content' seem unstable in this env
         # INJECT VIDEO FRAME IF AVAILABLE (VAD-style logic for Text Input)
-        if audio_loop and audio_loop._latest_image_payload:
-            print(f"[SERVER DEBUG] Piggybacking video frame with text input.")
+        # Gemini disponibile → usa Gemini
+        if audio_loop.session:
             try:
-                # Send frame first
-                await audio_loop.session.send(input=audio_loop._latest_image_payload, end_of_turn=False)
+                if audio_loop._latest_image_payload:
+                    try:
+                        await audio_loop.session.send(input=audio_loop._latest_image_payload, end_of_turn=False)
+                    except Exception as e:
+                        print(f"[SERVER DEBUG] Failed to send piggyback frame: {e}")
+
+                await audio_loop.session.send(input=text, end_of_turn=True)
+                print(f"[SERVER DEBUG] Message sent to Gemini successfully.")
+
             except Exception as e:
-                print(f"[SERVER DEBUG] Failed to send piggyback frame: {e}")
-                
-        await audio_loop.session.send(input=text, end_of_turn=True)
-        print(f"[SERVER DEBUG] Message sent to model successfully.")
+                print(f"[SERVER DEBUG] Gemini error: {e}. Falling back to Groq...")
+                await groq_fallback(text)
 
-import json
-from datetime import datetime
-from pathlib import Path
+        # Gemini non disponibile → fallback Groq
+        else:
+            print("[SERVER DEBUG] Gemini unavailable. Using Groq fallback.")
+            await groq_fallback(text)
 
-# ... (imports)
+async def groq_fallback(text: str):
+    try:
+        from groq import Groq
+        import os
+        groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        
+        # Run synchronous Groq client in a thread to avoid blocking the event loop
+        def _call_groq():
+            return groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": "You are SHARD, an autonomous AI assistant. Respond helpfully."},
+                    {"role": "user", "content": text}
+                ],
+                temperature=0.7,
+                max_tokens=1024
+            )
+        
+        response = await asyncio.to_thread(_call_groq)
+        reply = response.choices[0].message.content
+        await sio.emit('transcription', {'text': reply, 'sender': 'assistant'})
+        await sio.emit('status', {'msg': '[GROQ MODE] Gemini offline'})
+    except Exception as e:
+        await sio.emit('error', {'msg': f'Groq fallback failed: {str(e)}'})
 
 @sio.event
 async def video_frame(sid, data):
     # data should contain 'image' which is binary (blob) or base64 encoded
     image_data = data.get('image')
     if image_data and audio_loop:
+        # print(f"[SERVER DEBUG] Received video frame from {sid}")
         # We don't await this because we don't want to block the socket handler
         # But send_frame is async, so we create a task
         asyncio.create_task(audio_loop.send_frame(image_data))
@@ -520,6 +628,7 @@ async def save_memory(sid, data):
             for msg in messages:
                 sender = msg.get('sender', 'Unknown')
                 text = msg.get('text', '')
+                f.write(f"[{sender}]: {text}\n")
         print(f"Conversation saved to {filename}")
         await sio.emit('status', {'msg': 'Memory Saved Successfully'})
 
@@ -978,12 +1087,144 @@ async def update_tool_permissions(sid, data):
     # Broadcast update to all
     await sio.emit('tool_permissions', SETTINGS["tool_permissions"])
 
+@sio.event
+async def start_study(sid, data):
+    topic = data.get('topic', '')
+    tier = data.get('tier', 1)
+    if not topic:
+        await sio.emit('error', {'msg': 'No topic provided'})
+        return
+
+    await sio.emit('status', {'msg': f'SHARD.STUDY starting: {topic} (Tier {tier})'})
+
+    async def on_progress(phase, topic, score, message, pct):
+        print(f"[DEBUG] Invio al frontend: Fase={phase}, Pct={pct}%")
+        await sio.emit('study_progress', {
+            'phase': phase,
+            'topic': topic,
+            'score': score,
+            'message': message,
+            'pct': pct
+        })
+
+    async def on_certify(topic, score, data):
+        await sio.emit('study_complete', {
+            'topic': topic,
+            'score': score,
+            'data': data
+        })
+        await sio.emit('status', {'msg': f'SHARD STUDY certified: {topic} ({score}/10)'})
+        
+        # --- SISTEMA RPG: AGGIUNTA XP AL LIBRETTO ---
+        if audio_loop and hasattr(audio_loop, 'consciousness'):
+            # Determina la skill in base all'argomento studiato
+            skill_target = "Python_Advanced" if "python" in topic.lower() else "Unity_ML_Agents"
+            
+            # Invia il voto (score) al cervello di SHARD
+            leveled_up = audio_loop.consciousness.add_xp(skill_target, float(score))
+            
+            # Se la funzione ci restituisce True, significa che è scattato il Level Up massimo!
+            if leveled_up:
+                print(f"[SERVER] BOOM! Inviando notifica di Certificazione per {skill_target} al Frontend!")
+                # Avvisa il frontend per far partire un'animazione o sbloccare badge
+                await sio.emit('skill_certified', {'skill': skill_target, 'msg': f"Certificazione ottenuta in {skill_target}!"})
+
+        # --- NOTIFICA VOCALE VIA GEMINI LIVE ---
+        if audio_loop and audio_loop.session:
+            try:
+                penalties_info = ""
+                if isinstance(data, dict) and "penalties_applied" in data:
+                    penalties_list = data.get("penalties_applied", [])
+                    if penalties_list:
+                        penalties_info = " Penalità applicate: " + ", ".join(
+                            [f"{p.get('rule', '?')} ({p.get('points', '?')})" for p in penalties_list[:3]]
+                        )
+
+                vocal_prompt = (
+                    f"SISTEMA (Non leggere questo testo letteralmente): "
+                    f"Hai appena completato in background lo studio di '{topic}'. "
+                    f"Hai ottenuto un punteggio di {score}/10.{penalties_info} "
+                    f"Usa la tua voce per avvisare il Boss che hai finito, "
+                    f"digli il voto che hai preso e fai un breve commento spietato "
+                    f"sul perché hai preso quel voto."
+                )
+                await audio_loop.session.send(input=vocal_prompt, end_of_turn=True)
+                print(f"[SERVER] ✅ Notifica vocale iniettata nella sessione Gemini per '{topic}' (score: {score})")
+            except Exception as e:
+                print(f"[SERVER] ❌ Errore nell'iniezione vocale: {e}")
+        else:
+            print(f"[SERVER] ⚠️ Sessione Gemini non attiva, notifica vocale saltata per '{topic}'")
+
+    async def on_error(topic, phase, error_msg):
+        """Callback for study crash — notify frontend + vocal alert."""
+        await sio.emit('study_progress', {
+            'phase': 'ERROR',
+            'topic': topic,
+            'score': 0,
+            'message': f'CRASH in {phase}: {error_msg[:200]}',
+            'pct': 0
+        })
+        await sio.emit('status', {'msg': f'SHARD STUDY CRASHED during {phase}: {error_msg[:100]}'})
+        
+        # --- NOTIFICA VOCALE DI EMERGENZA ---
+        if audio_loop and audio_loop.session:
+            try:
+                crash_prompt = (
+                    f"SISTEMA (Non leggere questo testo letteralmente): "
+                    f"I tuoi sistemi cognitivi sono andati in crash durante la fase di studio "
+                    f"'{phase}' sull'argomento '{topic}'. "
+                    f"L'errore è: {error_msg[:150]}. "
+                    f"Avvisa il Boss a voce che c'è stato un problema durante lo studio "
+                    f"e chiedigli di guardare i log del terminale per capire cosa è successo."
+                )
+                await audio_loop.session.send(input=crash_prompt, end_of_turn=True)
+                print(f"[SERVER] 🔊 Notifica vocale di CRASH iniettata per '{topic}' (fase: {phase})")
+            except Exception as e:
+                print(f"[SERVER] ❌ Errore nell'iniezione vocale di crash: {e}")
+        else:
+            print(f"[SERVER] ⚠️ Sessione Gemini non attiva, notifica vocale di crash saltata")
+                
+    asyncio.create_task(
+        study_agent.study_topic(topic, tier=tier, on_progress=on_progress, on_certify=on_certify, on_error=on_error)
+    )
+
+@sio.event
+async def get_study_status(sid):
+    await sio.emit('study_status', {'running': study_agent.is_running})
+
+@sio.event
+async def test_mood(sid, data):
+    """Test endpoint to change reactor color."""
+    mood = data.get('mood', 'calm')
+    print(f"[TEST] Setting mood to: {mood}")
+    await sio.emit('mood_update', {
+        'mood': mood,
+        'energy': 0.8,
+        'curiosity': 0.5,
+        'focus': 0.7,
+        'satisfaction': 0.6
+    })    
+
+async def shard_evolution_heartbeat():
+    """Controlla periodicamente se SHARD vuole studiare autonomamente."""
+    while True:
+        # Aspetta 10 minuti tra un controllo e l'altro (600 secondi)
+        await asyncio.sleep(600) 
+        
+        if audio_loop and hasattr(audio_loop, 'consciousness'):
+            print("[SERVER] Heartbeat: Controllo desiderio di evoluzione...")
+            # Chiediamo alla coscienza se è il momento di studiare
+            async def _study_callback(topic, tier):
+                if audio_loop and audio_loop.on_study_request:
+                    audio_loop.on_study_request(topic, tier)
+            await audio_loop.consciousness.check_for_autonomous_study(_study_callback)
+
 if __name__ == "__main__":
     uvicorn.run(
-        "server:app_socketio", 
-        host="127.0.0.1", 
-        port=8000, 
-        reload=False, # Reload enabled causes spawn of worker which might miss the event loop policy patch
+        "server:app_socketio",
+        host="127.0.0.1",
+        port=8000,
+        reload=False,
         loop="asyncio",
         reload_excludes=["temp_cad_gen.py", "output.stl", "*.stl"]
     )

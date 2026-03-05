@@ -1,0 +1,118 @@
+{
+  "sorting algorithm tier 1": {
+    "requires": [],
+    "acquired": "2026-03-04T23:59:25.438647",
+    "source_topic": "sorting algorithm tier 1"
+  },
+  "perceptron": {
+    "requires": [],
+    "acquired": "2026-03-05T00:18:42.726885",
+    "source_topic": "Perceptron"
+  },
+  "binary search": {
+    "requires": [],
+    "acquired": "2026-03-05T00:59:16.315548",
+    "source_topic": "binary search"
+  },
+  "binary search algorithm": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.316693",
+    "source_topic": "binary search"
+  },
+  "divide-and-conquer strategy": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.317644",
+    "source_topic": "binary search"
+  },
+  "logarithmic time complexity o(log n)": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.318615",
+    "source_topic": "binary search"
+  },
+  "sorted data prerequisite": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.319580",
+    "source_topic": "binary search"
+  },
+  "linear search comparison": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.320770",
+    "source_topic": "binary search"
+  },
+  "safe_code_execution": {
+    "requires": [
+      "binary search"
+    ],
+    "acquired": "2026-03-05T00:59:16.324100",
+    "source_topic": "binary search"
+  },
+  "impossible quantum topic 999": {
+    "requires": [],
+    "acquired": "2026-03-05T01:17:51.054758",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "quantum impossible differential attacks": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.055838",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "impossible differentials in cryptography": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.056610",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "quantum speedup in key recovery": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.057386",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "post-quantum security margin": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.058326",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "quantized inertia theory": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.059157",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "numerical_computation": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.061644",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "test_driven_development": {
+    "requires": [
+      "impossible quantum topic 999"
+    ],
+    "acquired": "2026-03-05T01:17:51.062635",
+    "source_topic": "impossible quantum topic 999"
+  },
+  "implementazione python da zero di un perceptron": {
+    "requires": [],
+    "acquired": "2026-03-05T17:58:16.067631",
+    "source_topic": "Implementazione Python da zero di un Perceptron"
+  }
+}

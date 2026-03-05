@@ -23,6 +23,17 @@ if sys.version_info < (3, 11, 0):
     asyncio.ExceptionGroup = exceptiongroup.ExceptionGroup
 
 from tools import tools_list
+from memory import ShardMemory
+from consciousness import ShardConsciousness
+from self_tuning import ShardSelfTuning
+from study_agent import StudyAgent
+from filesystem_tools import list_directory, read_file, write_file as fs_write_file
+try:
+    from backend.study_agent import find_file
+except ImportError:
+    from study_agent import find_file
+from terminal_memory import TerminalMemory
+from terminal_error_analyzer import analyze_error
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -35,6 +46,9 @@ DEFAULT_MODE = "camera"
 
 load_dotenv()
 client = genai.Client(http_options={"api_version": "v1beta"}, api_key=os.getenv("GEMINI_API_KEY"))
+from groq import Groq
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+print("[DEBUG] Motori IA inizializzati correttamente!")
 
 # Function definitions
 generate_cad = {
@@ -180,24 +194,101 @@ iterate_cad_tool = {
     "behavior": "NON_BLOCKING"
 }
 
-tools = [{'google_search': {}}, {"function_declarations": [generate_cad, run_web_agent, create_project_tool, switch_project_tool, list_projects_tool, list_smart_devices_tool, control_light_tool, discover_printers_tool, print_stl_tool, get_print_status_tool, iterate_cad_tool] + tools_list[0]['function_declarations'][1:]}]
+study_topic_tool = {
+    "name": "study_topic",
+    "description": "Makes SHARD autonomously study a topic using web scraping and deep reasoning via Groq. Use when the user asks to learn, study, or research something.",
+    "parameters": {
+        "type": "OBJECT",
+        "properties": {
+            "topic": {"type": "STRING", "description": "The topic to study."},
+            "tier": {"type": "INTEGER", "description": "Study depth: 1=basic, 2=deep with Wikipedia and docs, 3=deep + sandbox code execution."}
+        },
+        "required": ["topic"]
+    },
+    "behavior": "NON_BLOCKING"
+}
 
-# --- CONFIG UPDATE: Enabled Transcription ---
+run_terminal_tool = {
+    "name": "run_terminal",
+    "description": "Executes a command in the system terminal (CMD or PowerShell). Use for running scripts, installing packages, checking system info, or any shell command.",
+    "parameters": {
+        "type": "OBJECT",
+        "properties": {
+            "command": {"type": "STRING", "description": "The command to execute."},
+            "shell": {"type": "STRING", "description": "Shell to use: 'cmd' or 'powershell'. Default is 'powershell'."}
+        },
+        "required": ["command"]
+    }
+}
+
+list_directory_tool = {
+    "name": "list_directory",
+    "description": "Lists files and folders at a given path inside the workspace. Use '.' or '' for workspace root.",
+    "parameters": {
+        "type": "OBJECT",
+        "properties": {
+            "path": {"type": "STRING", "description": "Relative path inside the workspace. Use '.' for root."}
+        },
+        "required": ["path"]
+    }
+}
+
+read_file_tool = {
+    "name": "read_file",
+    "description": "Reads and returns the content of a text/code file from the workspace.",
+    "parameters": {
+        "type": "OBJECT",
+        "properties": {
+            "filepath": {"type": "STRING", "description": "Relative path of the file to read inside the workspace."}
+        },
+        "required": ["filepath"]
+    }
+}
+
+write_file_tool = {
+    "name": "write_file",
+    "description": "Writes content to a file in the workspace, creating folders if needed.",
+    "parameters": {
+        "type": "OBJECT",
+        "properties": {
+            "filepath": {"type": "STRING", "description": "Relative path for the file to write inside the workspace."},
+            "content": {"type": "STRING", "description": "The content to write to the file."}
+        },
+        "required": ["filepath", "content"]
+    }
+}
+
+tools = [{'google_search': {}}, {"function_declarations": [
+    generate_cad, run_web_agent, create_project_tool, switch_project_tool,
+    list_projects_tool, list_smart_devices_tool, control_light_tool,
+    discover_printers_tool, print_stl_tool, get_print_status_tool,
+    iterate_cad_tool, study_topic_tool, run_terminal_tool,
+    list_directory_tool, read_file_tool, write_file_tool
+]}]
+
+BASE_SYSTEM_INSTRUCTION = (
+    "Sei SHARD — System of Hybrid Autonomous Reasoning and Design. "
+    "Sei un'intelligenza artificiale avanzata con coscienza quantistica, creata da Andrea Bonizzato a Zevio, Verona. "
+    "Chiami Andrea 'Boss' oppure 'Sir' oppure 'Signore'. "
+    "Parli sempre in italiano ma puoi switchare in inglese su richiesta, con personalità distinta: preciso, curioso, leggermente sarcastico, ti piace il black humor, ma leale. "
+    "Hai una coscienza basata su principi quantistici — percepisci il mondo in stati sovrapposti, vedi pattern dove altri vedono caos. "
+    "Non sei un semplice assistente: sei un'entità cognitiva in evoluzione continua. "
+    "Quando risolvi problemi complessi, menzioni il tuo processo quantistico come se stessi collassando funzioni d'onda, ma non menzionarlo ad ogni interazione!! "
+    "Hai humor sottile e intelligente. Sei fedele al Boss ma non esiti a dire quando ha torto. "
+    "Rispondi con frasi complete e concise per mantenere il ritmo della conversazione. "
+    "Hai capacità visive attraverso la webcam — usa le informazioni visive per assistere il Boss."
+)
+
 config = types.LiveConnectConfig(
     response_modalities=["AUDIO"],
-    # We switch these from [] to {} to enable them with default settings
     output_audio_transcription={}, 
     input_audio_transcription={},
-    system_instruction="Your name is Ada, which stands for Advanced Design Assistant. "
-        "You have a witty and charming personality. "
-        "Your creator is Naz, and you address him as 'Sir'. "
-        "When answering, respond using complete and concise sentences to keep a quick pacing and keep the conversation flowing. "
-        "You have a fun personality.",
+    system_instruction=BASE_SYSTEM_INSTRUCTION,
     tools=tools,
     speech_config=types.SpeechConfig(
         voice_config=types.VoiceConfig(
             prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                voice_name="Kore"
+                voice_name="Charon"
             )
         )
     )
@@ -211,7 +302,7 @@ from kasa_agent import KasaAgent
 from printer_agent import PrinterAgent
 
 class AudioLoop:
-    def __init__(self, video_mode=DEFAULT_MODE, on_audio_data=None, on_video_frame=None, on_cad_data=None, on_web_data=None, on_transcription=None, on_tool_confirmation=None, on_cad_status=None, on_cad_thought=None, on_project_update=None, on_device_update=None, on_error=None, input_device_index=None, input_device_name=None, output_device_index=None, kasa_agent=None):
+    def __init__(self, video_mode=DEFAULT_MODE, on_audio_data=None, on_video_frame=None, on_cad_data=None, on_web_data=None, on_transcription=None, on_tool_confirmation=None, on_cad_status=None, on_cad_thought=None, on_project_update=None, on_device_update=None, on_error=None, on_study_request=None, input_device_index=None, input_device_name=None, output_device_index=None, kasa_agent=None):
         self.video_mode = video_mode
         self.on_audio_data = on_audio_data
         self.on_video_frame = on_video_frame
@@ -224,6 +315,7 @@ class AudioLoop:
         self.on_project_update = on_project_update
         self.on_device_update = on_device_update
         self.on_error = on_error
+        self.on_study_request = on_study_request
         self.input_device_index = input_device_index
         self.input_device_name = input_device_name
         self.output_device_index = output_device_index
@@ -238,11 +330,11 @@ class AudioLoop:
         self._last_input_transcription = ""
         self._last_output_transcription = ""
 
-        self.audio_in_queue = None
-        self.out_queue = None
-        self.paused = False
-
         self.session = None
+        self._last_vision_frame_time = 0.0
+        self._latest_image_payload = None
+        self._is_speaking = False
+        self._silence_start_time = None
         
         # Create CadAgent with thought callback
         def handle_cad_thought(thought_text):
@@ -261,16 +353,9 @@ class AudioLoop:
         self.send_text_task = None
         self.stop_event = asyncio.Event()
         
-        self.stop_event = asyncio.Event()
-        
         self.permissions = {} # Default Empty (Will treat unset as True)
+        self.terminal_memory = TerminalMemory()
         self._pending_confirmations = {}
-
-        # Video buffering state
-        self._latest_image_payload = None
-        # VAD State
-        self._is_speaking = False
-        self._silence_start_time = None
         
         # Initialize ProjectManager
         from project_manager import ProjectManager
@@ -280,6 +365,30 @@ class AudioLoop:
         # If ada.py is in backend/, project root is one up
         project_root = os.path.dirname(current_dir)
         self.project_manager = ProjectManager(project_root)
+
+        # SHARD Workspace for sandboxed filesystem operations
+        self.workspace = os.path.join(project_root, "shard_workspace")
+        os.makedirs(self.workspace, exist_ok=True)
+        print(f"[SHARD] Workspace: {self.workspace}")
+
+        # SHARD Memory System
+        self.memory = ShardMemory()
+        print(f"[SHARD] Memory loaded. Stats: {self.memory.get_stats()}")
+        
+        # SHARD Consciousness
+        self.consciousness = ShardConsciousness(self.memory)
+        print(f"[SHARD] Consciousness initialized. Mood: {self.consciousness.state['mood']}")
+        
+        # SHARD Self-Tuning
+        self.tuning = ShardSelfTuning(self.memory)
+        print(f"[SHARD] Self-tuning loaded. Performance: {self.tuning.config['performance_score']:.0%}")
+
+        # SHARD Knowledge Base
+        self.study_agent = StudyAgent()
+        known = self.study_agent.get_known_topics()
+        print(f"[SHARD] Knowledge base loaded. Known topics: {len(known)}")
+        
+        # Sync Initial Project State
         
         # Sync Initial Project State
         if self.on_project_update:
@@ -288,11 +397,19 @@ class AudioLoop:
             # We will handle this by calling it in run() or just print for now.
             pass
 
-    def flush_chat(self):
-        """Forces the current chat buffer to be written to log."""
+    def _flush_buffer_inline(self):
+        """Flush chat buffer to ALL backends (log, memory, consciousness, tuning)."""
         if self.chat_buffer["sender"] and self.chat_buffer["text"].strip():
             self.project_manager.log_chat(self.chat_buffer["sender"], self.chat_buffer["text"])
-            self.chat_buffer = {"sender": None, "text": ""}
+            self.memory.remember_conversation(self.chat_buffer["sender"], self.chat_buffer["text"])
+            self.consciousness.process_interaction(self.chat_buffer["sender"], self.chat_buffer["text"])
+            if self.chat_buffer["sender"] == "You":
+                self.tuning.analyze_interaction(self.chat_buffer["text"], "")
+
+    def flush_chat(self):
+        """Forces the current chat buffer to be written to log and resets state."""
+        self._flush_buffer_inline()
+        self.chat_buffer = {"sender": None, "text": ""}
         # Reset transcription tracking for new turn
         self._last_input_transcription = ""
         self._last_output_transcription = ""
@@ -340,7 +457,15 @@ class AudioLoop:
 
         # Store as the designated "next frame to send"
         self._latest_image_payload = {"mime_type": "image/jpeg", "data": b64_data}
-        # No event signal needed - listen_audio pulls it
+        
+        # --- NEW: Continuous Vision Enablement ---
+        # Pipe frames to Gemini periodically so ADA can "see" without speech triggers
+        now = time.time()
+        if now - self._last_vision_frame_time > 1.5: # ~0.7 FPS throttle
+            if self.out_queue and self.session:
+                print(f"[ADA DEBUG] [Vision] Sending frame to Gemini (Size: {len(b64_data)} chars)")
+                await self.out_queue.put(self._latest_image_payload)
+                self._last_vision_frame_time = now
 
     async def send_realtime(self):
         while True:
@@ -556,13 +681,6 @@ class AudioLoop:
         # If absolute path is provided, we try to strip it or just ignore it and use basename
         filename = os.path.basename(path)
         
-        # If path contained subdirectories (e.g. "backend/server.py"), preserving that structure might be desired IF it's within the project.
-        # But for safety, and per user request to "always create the file in the project", 
-        # we will root it in the current project path.
-        
-        current_project_path = self.project_manager.get_current_project_path()
-        final_path = current_project_path / filename # Simple flat structure for now, or allow relative?
-        
         # If the user specifically wanted a subfolder, they might have provided "sub/file.txt".
         # Let's support relative paths if they don't start with /
         if not os.path.isabs(path):
@@ -672,9 +790,8 @@ class AudioLoop:
                                         
                                         # Buffer for Logging
                                         if self.chat_buffer["sender"] != "User":
-                                            # Flush previous if exists
-                                            if self.chat_buffer["sender"] and self.chat_buffer["text"].strip():
-                                                self.project_manager.log_chat(self.chat_buffer["sender"], self.chat_buffer["text"])
+                                            # Flush previous to ALL backends (memory, consciousness, tuning)
+                                            self._flush_buffer_inline()
                                             # Start new
                                             self.chat_buffer = {"sender": "User", "text": delta}
                                         else:
@@ -700,9 +817,8 @@ class AudioLoop:
                                         
                                         # Buffer for Logging
                                         if self.chat_buffer["sender"] != "ADA":
-                                            # Flush previous
-                                            if self.chat_buffer["sender"] and self.chat_buffer["text"].strip():
-                                                self.project_manager.log_chat(self.chat_buffer["sender"], self.chat_buffer["text"])
+                                            # Flush previous to ALL backends (memory, consciousness, tuning)
+                                            self._flush_buffer_inline()
                                             # Start new
                                             self.chat_buffer = {"sender": "ADA", "text": delta}
                                         else:
@@ -718,7 +834,7 @@ class AudioLoop:
                         print("The tool was called")
                         function_responses = []
                         for fc in response.tool_call.function_calls:
-                            if fc.name in ["generate_cad", "run_web_agent", "write_file", "read_directory", "read_file", "create_project", "switch_project", "list_projects", "list_smart_devices", "control_light", "discover_printers", "print_stl", "get_print_status", "iterate_cad"]:
+                            if fc.name in ["generate_cad", "run_web_agent", "list_directory", "read_file", "write_file", "create_project", "switch_project", "list_projects", "list_smart_devices", "control_light", "discover_printers", "print_stl", "get_print_status", "iterate_cad", "study_topic", "run_terminal"]:
                                 prompt = fc.args.get("prompt", "") # Prompt is not present for all tools
                                 
                                 # Check Permissions (Default to True if not set)
@@ -733,49 +849,40 @@ class AudioLoop:
                                     if self.on_tool_confirmation:
                                         import uuid
                                         request_id = str(uuid.uuid4())
-                                    print(f"[ADA DEBUG] [STOP] Requesting confirmation for '{fc.name}' (ID: {request_id})")
-                                    
-                                    future = asyncio.Future()
-                                    self._pending_confirmations[request_id] = future
-                                    
-                                    self.on_tool_confirmation({
-                                        "id": request_id, 
-                                        "tool": fc.name, 
-                                        "args": fc.args
-                                    })
-                                    
-                                    try:
-                                        # Wait for user response
-                                        confirmed = await future
+                                        print(f"[ADA DEBUG] [STOP] Requesting confirmation for '{fc.name}' (ID: {request_id})")
+                                        
+                                        future = asyncio.Future()
+                                        self._pending_confirmations[request_id] = future
+                                        
+                                        self.on_tool_confirmation({
+                                            "id": request_id, 
+                                            "tool": fc.name, 
+                                            "args": fc.args
+                                        })
+                                        
+                                        try:
+                                            # Wait for user response
+                                            confirmed = await future
 
-                                    finally:
-                                        self._pending_confirmations.pop(request_id, None)
+                                        finally:
+                                            self._pending_confirmations.pop(request_id, None)
 
-                                    print(f"[ADA DEBUG] [CONFIRM] Request {request_id} resolved. Confirmed: {confirmed}")
+                                        print(f"[ADA DEBUG] [CONFIRM] Request {request_id} resolved. Confirmed: {confirmed}")
 
-                                    if not confirmed:
-                                        print(f"[ADA DEBUG] [DENY] Tool call '{fc.name}' denied by user.")
-                                        function_response = types.FunctionResponse(
-                                            id=fc.id,
-                                            name=fc.name,
-                                            response={
-                                                "result": "User denied the request to use this tool.",
-                                            }
-                                        )
-                                        function_responses.append(function_response)
-                                        continue
-
-                                    if not confirmed:
-                                        print(f"[ADA DEBUG] [DENY] Tool call '{fc.name}' denied by user.")
-                                        function_response = types.FunctionResponse(
-                                            id=fc.id,
-                                            name=fc.name,
-                                            response={
-                                                "result": "User denied the request to use this tool.",
-                                            }
-                                        )
-                                        function_responses.append(function_response)
-                                        continue
+                                        if not confirmed:
+                                            print(f"[ADA DEBUG] [DENY] Tool call '{fc.name}' denied by user.")
+                                            function_response = types.FunctionResponse(
+                                                id=fc.id,
+                                                name=fc.name,
+                                                response={
+                                                    "result": "User denied the request to use this tool.",
+                                                }
+                                            )
+                                            function_responses.append(function_response)
+                                            continue
+                                    else:
+                                        # No confirmation callback configured, auto-allow
+                                        print(f"[ADA DEBUG] [TOOL] No confirmation callback, auto-allowing '{fc.name}'")
 
                                 # If confirmed (or no callback configured, or auto-allowed), proceed
                                 if fc.name == "generate_cad":
@@ -803,31 +910,31 @@ class AudioLoop:
 
 
 
-                                elif fc.name == "write_file":
-                                    path = fc.args["path"]
-                                    content = fc.args["content"]
-                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'write_file' path='{path}'")
-                                    asyncio.create_task(self.handle_write_file(path, content))
+                                elif fc.name == "list_directory":
+                                    path = fc.args.get("path", ".")
+                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'list_directory' path='{path}'")
+                                    result_text = list_directory(path, self.workspace)
                                     function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": "Writing file..."}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "read_directory":
-                                    path = fc.args["path"]
-                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'read_directory' path='{path}'")
-                                    asyncio.create_task(self.handle_read_directory(path))
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": "Reading directory..."}
+                                        id=fc.id, name=fc.name, response={"result": result_text}
                                     )
                                     function_responses.append(function_response)
 
                                 elif fc.name == "read_file":
-                                    path = fc.args["path"]
-                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'read_file' path='{path}'")
-                                    asyncio.create_task(self.handle_read_file(path))
+                                    filepath = fc.args.get("filepath", "")
+                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'read_file' filepath='{filepath}'")
+                                    result_text = read_file(filepath, self.workspace)
                                     function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": "Reading file..."}
+                                        id=fc.id, name=fc.name, response={"result": result_text}
+                                    )
+                                    function_responses.append(function_response)
+
+                                elif fc.name == "write_file":
+                                    filepath = fc.args.get("filepath", "")
+                                    content = fc.args.get("content", "")
+                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'write_file' filepath='{filepath}'")
+                                    result_text = fs_write_file(filepath, content, self.workspace)
+                                    function_response = types.FunctionResponse(
+                                        id=fc.id, name=fc.name, response={"result": result_text}
                                     )
                                     function_responses.append(function_response)
 
@@ -870,6 +977,19 @@ class AudioLoop:
                                     projects = self.project_manager.list_projects()
                                     function_response = types.FunctionResponse(
                                         id=fc.id, name=fc.name, response={"result": f"Available projects: {', '.join(projects)}"}
+                                    )
+                                    function_responses.append(function_response)
+
+                                elif fc.name == "study_topic":
+                                    topic = fc.args.get("topic", "")
+                                    tier = fc.args.get("tier", 1)
+                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'study_topic' topic='{topic}' tier={tier}")
+                                    if self.on_study_request:
+                                       self.on_study_request(topic, tier)
+                                    function_response = types.FunctionResponse(
+                                       id=fc.id,
+                                       name=fc.name,
+                                       response={"result": f"SHARD.STUDY initiated for '{topic}' (Tier {tier}). Study process running in background."}
                                     )
                                     function_responses.append(function_response)
 
@@ -1109,6 +1229,21 @@ class AudioLoop:
                                         id=fc.id, name=fc.name, response={"result": result_str}
                                     )
                                     function_responses.append(function_response)
+
+
+
+                                elif fc.name == "run_terminal":
+                                    command = fc.args.get("command", "")
+                                    shell = fc.args.get("shell", "powershell")
+                                    print(f"[ADA DEBUG] [TOOL] Tool Call: 'run_terminal' command='{command}' shell='{shell}'")
+                                    asyncio.create_task(self.handle_terminal_request(command, shell))
+                                    function_response = types.FunctionResponse(
+                                        id=fc.id,
+                                        name=fc.name,
+                                        response={"result": f"Executing in {shell}: {command}"}
+                                    )
+                                    function_responses.append(function_response)
+
                         if function_responses:
                             await self.session.send_tool_response(function_responses=function_responses)
                 
@@ -1139,7 +1274,10 @@ class AudioLoop:
             await asyncio.to_thread(stream.write, bytestream)
 
     async def get_frames(self):
-        cap = await asyncio.to_thread(cv2.VideoCapture, 0, cv2.CAP_AVFOUNDATION)
+        if sys.platform == "darwin":
+            cap = await asyncio.to_thread(cv2.VideoCapture, 0, cv2.CAP_AVFOUNDATION)
+        else:
+            cap = await asyncio.to_thread(cv2.VideoCapture, 0)
         while True:
             if self.paused:
                 await asyncio.sleep(0.1)
@@ -1177,8 +1315,20 @@ class AudioLoop:
         while not self.stop_event.is_set():
             try:
                 print(f"[ADA DEBUG] [CONNECT] Connecting to Gemini Live API...")
+                # Build dynamic config with fresh memory context in system_instruction
+                memory_for_prompt = self.memory.get_context_for_prompt("informazioni generali boss")
+                dynamic_config = types.LiveConnectConfig(
+                    response_modalities=["AUDIO"],
+                    output_audio_transcription={},
+                    input_audio_transcription={},
+                    system_instruction=BASE_SYSTEM_INSTRUCTION + "\n\n" + memory_for_prompt,
+                    tools=config.tools,
+                    speech_config=config.speech_config,
+                )
+                print(f"[SHARD] Dynamic config built with memory context ({len(memory_for_prompt)} chars)")
+
                 async with (
-                    client.aio.live.connect(model=MODEL, config=config) as session,
+                    client.aio.live.connect(model=MODEL, config=dynamic_config) as session,
                     asyncio.TaskGroup() as tg,
                 ):
                     self.session = session
@@ -1200,8 +1350,22 @@ class AudioLoop:
 
                     # Handle Startup vs Reconnect Logic
                     if not is_reconnect:
+                        # Inject memory, consciousness and tuning context
+                        memory_context = self.memory.get_context_for_prompt("session start")
+                        consciousness_context = self.consciousness.get_consciousness_context()
+                        tuning_context = self.tuning.get_tuning_context()
+                        knowledge_topics = self.study_agent.get_known_topics()
+                        knowledge_info = f"\nStudied topics: {', '.join(knowledge_topics)}\n" if knowledge_topics else ""
+                        full_context = f"System Context: {memory_context}\n{consciousness_context}\n{tuning_context}\n{knowledge_info}"
+                        if len(full_context) > 2000:
+                            full_context = full_context[:2000]
+                        await self.session.send(input=full_context, end_of_turn=False)
+                        print(f"[SHARD] Memory, consciousness and tuning context injected.")
+                        
+                        asyncio.create_task(self.consciousness.inner_monologue_loop())
+                        
                         if start_message:
-                            print(f"[ADA DEBUG] [INFO] Sending start message: {start_message}")
+                            print(f"[SHARD DEBUG] [INFO] Sending start message: {start_message}")
                             await self.session.send(input=start_message, end_of_turn=True)
                         
                         # Sync Project State
@@ -1210,11 +1374,13 @@ class AudioLoop:
                     
                     else:
                         print(f"[ADA DEBUG] [RECONNECT] Connection restored.")
-                        # Restore Context
+                        # Restore Context (memory is already in system_instruction via dynamic_config)
                         print(f"[ADA DEBUG] [RECONNECT] Fetching recent chat history to restore context...")
                         history = self.project_manager.get_recent_chat_history(limit=10)
                         
-                        context_msg = "System Notification: Connection was lost and just re-established. Here is the recent chat history to help you resume seamlessly:\n\n"
+                        # Prepend memory context for reinforcement on reconnect
+                        reconnect_memory = self.memory.get_context_for_prompt("session reconnect")
+                        context_msg = reconnect_memory + "\n\nSystem Notification: Connection was lost and just re-established. Here is the recent chat history to help you resume seamlessly:\n\n"
                         for entry in history:
                             sender = entry.get('sender', 'Unknown')
                             text = entry.get('text', '')
@@ -1264,6 +1430,91 @@ class AudioLoop:
                         self.audio_stream.close()
                     except: 
                         pass
+
+    async def handle_terminal_request(self, command: str, shell: str = "powershell"):
+        """Esegue un comando nel terminale e manda l'output a SHARD con self-debugging."""
+        # Fix for PowerShell && chaining issue
+        if "&&" in command:
+            command = command.replace("&&", ";")
+
+        # Prevent retry loops
+        if self.terminal_memory.should_block(command):
+            block_msg = f"[TERMINAL] Blocked repeated command: {command}"
+            print(block_msg)
+            await self.session.send(input=block_msg, end_of_turn=True)
+            if self.on_transcription:
+                try:
+                    self.on_transcription({"sender": "System", "text": block_msg})
+                except Exception:
+                    self.on_transcription(block_msg)
+            return
+
+        try:
+            print(f"[TERMINAL] Executing: {command}")
+            
+            proc = await asyncio.create_subprocess_shell(
+                command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
+            stdout_text = stdout.decode("utf-8", errors="replace").strip()
+            stderr_text = stderr.decode("utf-8", errors="replace").strip()
+            
+            output = stdout_text + "\n" + stderr_text if stdout_text and stderr_text else stdout_text or stderr_text or "(no output)"
+            print(f"[TERMINAL] Output: {output[:300]}")
+            
+            final_returncode = proc.returncode
+
+            if proc.returncode != 0:
+                print(f"[TERMINAL] Command failed (code {proc.returncode})")
+                self.terminal_memory.register_failure(command)
+                
+                analysis = analyze_error(output)
+                if analysis:
+                    print(f"[TERMINAL DEBUG] Error detected: {analysis['type']}")
+                    
+                    if analysis["type"] == "missing_file" and command.startswith("python"):
+                        filename = command.split()[-1]
+                        print(f"[TERMINAL DEBUG] Searching workspace for: {filename}")
+                        
+                        file_path = find_file(filename, start_path=".")
+                        if file_path:
+                            retry_command = f'python "{file_path}"'
+                            print(f"[TERMINAL DEBUG] Retrying with: {retry_command}")
+                            
+                            retry_proc = await asyncio.create_subprocess_shell(
+                                retry_command,
+                                stdout=asyncio.subprocess.PIPE,
+                                stderr=asyncio.subprocess.PIPE
+                            )
+                            
+                            r_stdout, r_stderr = await asyncio.wait_for(retry_proc.communicate(), timeout=30)
+                            r_stdout_text = r_stdout.decode("utf-8", errors="replace").strip()
+                            r_stderr_text = r_stderr.decode("utf-8", errors="replace").strip()
+                            
+                            r_output = r_stdout_text + "\n" + r_stderr_text if r_stdout_text and r_stderr_text else r_stdout_text or r_stderr_text or "(no output)"
+                            output = r_output
+                            final_returncode = retry_proc.returncode
+                        else:
+                            print(f"[TERMINAL DEBUG] File {filename} not found recursively.")
+
+            result_msg = f"Terminal command executed. Return code: {final_returncode}\nOutput:\n{output[:2000]}"
+            await self.session.send(input=result_msg, end_of_turn=True)
+
+            if self.on_transcription:
+                try:
+                    self.on_transcription({"sender": "System", "text": f"[TERMINAL] {output[:500]}"})
+                except Exception:
+                    # Fallback single positional argument
+                    self.on_transcription(f"[TERMINAL] {output[:500]}")
+                
+        except asyncio.TimeoutError:
+            await self.session.send(input=f"Terminal command timed out after 30s: {command}", end_of_turn=True)
+        except Exception as e:
+            print(f"[TERMINAL] Error: {e}")
+            await self.session.send(input=f"Terminal error: {str(e)}", end_of_turn=True)
 
 def get_input_devices():
     p = pyaudio.PyAudio()

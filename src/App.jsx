@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import Visualizer from './components/Visualizer';
 import TopAudioBar from './components/TopAudioBar';
 import CadWindow from './components/CadWindow';
+import StudyWidget from './components/StudyWidget';
 import BrowserWindow from './components/BrowserWindow';
 import ChatModule from './components/ChatModule';
 import ToolsModule from './components/ToolsModule';
@@ -15,7 +16,7 @@ import AuthLock from './components/AuthLock';
 import KasaWindow from './components/KasaWindow';
 import PrinterWindow from './components/PrinterWindow';
 import SettingsWindow from './components/SettingsWindow';
-
+import CircuitBackground from './components/CircuitBackground';
 
 
 const socket = io('http://localhost:8000');
@@ -48,6 +49,7 @@ function App() {
     const [isMuted, setIsMuted] = useState(true); // Mic state DEFAULT MUTED
     const [isVideoOn, setIsVideoOn] = useState(false); // Video state
     const [messages, setMessages] = useState([]);
+    const [shardMood, setShardMood] = useState('calm');
     const [inputValue, setInputValue] = useState('');
     const [cadData, setCadData] = useState(null);
     const [cadThoughts, setCadThoughts] = useState(''); // Streaming AI thoughts
@@ -99,7 +101,7 @@ function App() {
     });
 
     const [elementSizes, setElementSizes] = useState({
-        visualizer: { w: 550, h: 350 },
+        visualizer: { w: 460, h: 460 },
         chat: { w: 550, h: 220 },
         tools: { w: 500, h: 80 }, // Approx
         cad: { w: 400, h: 400 },
@@ -464,6 +466,12 @@ function App() {
             });
         });
 
+        // Handle mood updates for reactor color
+        socket.on('mood_update', (data) => {
+            console.log('[MOOD]', data.mood);
+            setShardMood(data.mood);
+        });
+
         // Handle tool confirmation requests
         socket.on('tool_confirmation_request', (data) => {
             console.log("Received Confirmation Request:", data);
@@ -726,7 +734,19 @@ function App() {
                 constraints.video.deviceId = { exact: selectedWebcamId };
             }
 
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            let stream;
+            try {
+                // Try ideal 1080p first
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (err) {
+                console.warn("Ideal camera constraints failed, falling back to defaults.", err);
+                // Fallback: Just request video with the selected device or any video
+                const fallbackConstraints = {
+                    video: selectedWebcamId ? { deviceId: { exact: selectedWebcamId } } : true
+                };
+                stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+            }
+
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 videoRef.current.play();
@@ -1345,6 +1365,18 @@ function App() {
     return (
         <div className="h-screen w-screen bg-black text-cyan-100 font-mono overflow-hidden flex flex-col relative selection:bg-cyan-900 selection:text-white">
 
+             {/* CIRCUIT BACKGROUND */}
+        <CircuitBackground /> 
+
+             {/* Angoli decorativi */}
+        <div className="fixed top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-cyan-400/40 z-10 pointer-events-none" />
+        <div className="fixed top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-cyan-400/40 z-10 pointer-events-none" />
+        <div className="fixed bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-cyan-400/40 z-10 pointer-events-none" />
+        <div className="fixed bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-cyan-400/40 z-10 pointer-events-none" />
+
+             {/* Scanline */}
+        <div className="fixed left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent z-10 pointer-events-none animate-scanline" />
+
             {/* --- PREMIUM UI LAYER --- */}
 
             {/* --- PREMIUM UI LAYER --- */}
@@ -1397,7 +1429,7 @@ function App() {
             <div className="z-50 flex items-center justify-between p-2 border-b border-cyan-500/20 bg-black/40 backdrop-blur-md select-none sticky top-0" style={{ WebkitAppRegion: 'drag' }}>
                 <div className="flex items-center gap-4 pl-2">
                     <h1 className="text-xl font-bold tracking-[0.2em] text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
-                        A.D.A
+                        S.H.A.R.D. <span className="text-xs font-normal tracking-widest text-cyan-500/70">SYSTEM OF HYBRID AUTONOMOUS REASONING AND DESIGN</span>
                     </h1>
                     <div className="text-[10px] text-cyan-700 border border-cyan-900 px-1 rounded">
                         V2.0.0
@@ -1447,6 +1479,23 @@ function App() {
                 </div>
             </div>
 
+                {/* File Upload Widget */}
+                <div className="fixed top-12 left-4 z-30 w-48">
+                   <div className="border border-cyan-400/40 bg-black/60 backdrop-blur-md rounded-lg p-2 shadow-[0_0_15px_rgba(0,238,255,0.08)]">
+                       <div className="text-[10px] text-cyan-500/70 tracking-widest mb-2 font-mono">◈ FILE INPUT</div>
+                       <label className="flex flex-col items-center justify-center w-full h-16 border border-dashed border-cyan-500/40 rounded cursor-pointer hover:border-cyan-400/70 hover:bg-cyan-500/5 transition-all">
+                          <span className="text-[10px] text-cyan-500/50 font-mono">DRAG OR CLICK</span>
+                          <span className="text-[9px] text-cyan-700 font-mono mt-1">PDF · TXT · DOCX</span>
+                          <input type="file" className="hidden" accept=".pdf,.txt,.docx,.md"
+                              onChange={(e) => {
+                                  const file = e.target.files[0];
+                                  if (file) console.log('File selezionato:', file.name);
+                            }}
+                            />
+                    </label>
+                </div>
+            </div>
+
             {/* Main Content */}
             <div className="flex-1 relative z-10 flex flex-col items-center justify-center">
                 {/* Central Visualizer (AI Audio) */}
@@ -1473,6 +1522,7 @@ function App() {
                             intensity={audioAmp}
                             width={elementSizes.visualizer.w}
                             height={elementSizes.visualizer.h}
+                            mood={shardMood}
                         />
                     </div>
                     {isModularMode && <div className={`absolute top-2 right-2 text-xs font-bold tracking-widest z-20 ${activeDragElement === 'visualizer' ? 'text-green-500' : 'text-yellow-500/50'}`}>VISUALIZER</div>}
@@ -1480,7 +1530,7 @@ function App() {
 
                 {/* Video Feed Overlay */}
                 {/* Floating Project Label */}
-                <div className="absolute top-[70px] left-1/2 -translate-x-1/2 text-cyan-500 text-xs font-mono tracking-widest pointer-events-none z-50 bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-cyan-500/20">
+                <div className="absolute top-[70px] left-1/2 -translate-x-1/2 text-cyan-500 text-xs font-mono tracking-widest pointer-events-none z-50 bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-cyan-400/40 shadow-[0_0_15px_rgba(0,238,255,0.08)]">
                     PROJECT: {currentProject?.toUpperCase()}
                 </div>
 
@@ -1498,7 +1548,7 @@ function App() {
                         {/* Hidden Video Element (Source) */}
                         <video ref={videoRef} autoPlay muted className="absolute inset-0 w-full h-full object-cover opacity-0" />
 
-                        <div className="absolute top-2 left-2 text-[10px] text-cyan-400 bg-black/60 backdrop-blur px-2 py-0.5 rounded border border-cyan-500/20 z-10 font-bold tracking-wider">CAM_01</div>
+                        <div className="absolute top-2 left-2 text-[10px] text-cyan-400 bg-black/60 backdrop-blur px-2 py-0.5 rounded border border-cyan-400/40 shadow-[0_0_15px_rgba(0,238,255,0.08)] z-10 font-bold tracking-wider">CAM_01</div>
 
                         {/* Canvas for Displaying Video + Skeleton (Ensures overlap) */}
                         <canvas
@@ -1623,6 +1673,19 @@ function App() {
                     onMouseDown={(e) => handleMouseDown(e, 'chat')}
                 />
 
+                {/* Status Bar */}
+                <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6 text-[10px] font-mono text-cyan-500/60 pointer-events-none">
+                    <span className="flex items-center gap-1">
+                       <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
+                       SYS:ONLINE
+                    </span>
+                    <span>CPU: {Math.floor(20 + Math.random() * 5)}%</span>
+                    <span>RAM: 4.2GB</span>
+                    <span>NET: 12ms</span>
+                    <span>VER: 2.0.0</span>
+                    <span className="tracking-widest opacity-40">◈ SHARD ACTIVE ◈</span>
+                </div>
+
                 {/* Footer Controls / Tools Module */}
                 <div className="z-20 flex justify-center pb-10 pointer-events-none">
                     <ToolsModule
@@ -1685,6 +1748,7 @@ function App() {
                     onConfirm={handleConfirmTool}
                     onDeny={handleDenyTool}
                 />
+                <StudyWidget socket={socket} /> {/* <--- INCOLLA QUI */}
             </div>
         </div>
     );

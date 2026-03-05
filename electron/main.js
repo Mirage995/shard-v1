@@ -25,6 +25,21 @@ function createWindow() {
         show: false, // Don't show until ready
     });
 
+    // Handle permissions for camera and microphone
+    const { session } = mainWindow.webContents;
+    session.setPermissionRequestHandler((webContents, permission, callback) => {
+        const allowedPermissions = ['media', 'audioCapture', 'videoCapture'];
+        if (allowedPermissions.includes(permission)) {
+            return callback(true);
+        }
+        callback(false);
+    });
+
+    session.setPermissionCheckHandler((webContents, permission) => {
+        const allowedPermissions = ['media', 'audioCapture', 'videoCapture'];
+        return allowedPermissions.includes(permission);
+    });
+
     // In dev, load Vite server. In prod, load index.html
     const isDev = process.env.NODE_ENV !== 'production';
 

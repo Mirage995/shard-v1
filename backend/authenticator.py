@@ -7,6 +7,7 @@ import os
 import base64
 import numpy as np
 import urllib.request
+import sys
 
 class FaceAuthenticator:
     # MediaPipe Face Landmarker model URL
@@ -160,7 +161,10 @@ class FaceAuthenticator:
     def _run_cv_loop(self, loop):
         def try_open_camera(index):
             print(f"[AUTH] Trying to open camera with index {index}...")
-            cap = cv2.VideoCapture(index, cv2.CAP_AVFOUNDATION)
+            if sys.platform == "darwin":
+                cap = cv2.VideoCapture(index, cv2.CAP_AVFOUNDATION)
+            else:
+                cap = cv2.VideoCapture(index)
             if not cap.isOpened():
                 print(f"[AUTH] [ERR] Could not open video device {index}.")
                 return None
