@@ -749,6 +749,18 @@ Rules:
             print(f"[SYNTHESIZE] JSON parsed successfully ({len(result['concepts'])} concepts)")
         else:
             print(f"[SYNTHESIZE] Warning: no concepts extracted")
+            # Fallback: extract top-frequency words from raw text as minimal concepts
+            _STOPWORDS = {"function", "result", "value", "system", "data", "object", "class"}
+            words = re.findall(r'\b[A-Za-z][a-z]{4,}\b', raw)
+            freq: Dict[str, int] = {}
+            for w in words:
+                lw = w.lower()
+                if lw not in _STOPWORDS:
+                    freq[lw] = freq.get(lw, 0) + 1
+            top_kw = sorted(freq, key=lambda k: freq[k], reverse=True)[:5]
+            if top_kw:
+                result["concepts"] = [{"name": kw, "explanation": "", "importance": 5} for kw in top_kw]
+                print(f"[SYNTHESIZE] Fallback: {len(result['concepts'])} keywords promoted to concepts: {top_kw}")
 
         self.progress.complete_phase("SYNTHESIZE")
         return result
@@ -1144,7 +1156,7 @@ AUTO-EXAM (Questions and Answers):
     # ── Docker Sandbox Configuration ───────────────────────────────────────────
     DOCKER_IMAGE = "shard-sandbox:latest"
     MAX_OUTPUT_CHARS = 50_000
-    SANDBOX_TIMEOUT = 30
+    SANDBOX_TIMEOUT = 130
 
     def _validate_sandbox_path(self, sandbox_dir: str) -> pathlib.Path:
         """Validate and resolve sandbox directory path with security checks.
