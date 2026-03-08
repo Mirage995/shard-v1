@@ -1,4 +1,4 @@
-# A.D.A V2 - Advanced Design Assistant
+# SHARD V2 - Advanced Design Assistant
 
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-blue?logo=python)
 ![React](https://img.shields.io/badge/React-18.2-61DAFB?logo=react)
@@ -6,9 +6,9 @@
 ![Gemini](https://img.shields.io/badge/Google%20Gemini-Native%20Audio-4285F4?logo=google)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-> **A.D.A** = **A**dvanced **D**esign **A**ssistant
+> **SHARD** = **A**dvanced **D**esign **A**ssistant
 
-ADA V2 is a sophisticated AI assistant designed for multimodal interaction. It combines Google's Gemini 2.5 Native Audio with computer vision, gesture control, and 3D CAD generation in a Electron desktop application.
+SHARD V2 is a sophisticated AI assistant designed for multimodal interaction. It combines Google's Gemini 2.5 Native Audio with computer vision, gesture control, and 3D CAD generation in a Electron desktop application.
 
 ---
 
@@ -27,7 +27,7 @@ ADA V2 is a sophisticated AI assistant designed for multimodal interaction. It c
 
 ### 🖐️ Gesture Control Details
 
-ADA's "Minority Report" interface uses your webcam to detect hand gestures:
+SHARD's "Minority Report" interface uses your webcam to detect hand gestures:
 
 | Gesture | Action |
 |---------|--------|
@@ -52,7 +52,7 @@ graph TB
     
     subgraph Backend ["Backend (Python 3.11 + FastAPI)"]
         SERVER[server.py<br/>Socket.IO Server]
-        ADA[ada.py<br/>Gemini Live API]
+        SHARD[SHARD.py<br/>Gemini Live API]
         WEB[web_agent.py<br/>Playwright Browser]
         CAD[cad_agent.py<br/>CAD + build123d]
         PRINTER[printer_agent.py<br/>3D Printing + OrcaSlicer]
@@ -63,10 +63,10 @@ graph TB
     
     UI --> SOCKET_C
     SOCKET_C <--> SERVER
-    SERVER --> ADA
-    ADA --> WEB
-    ADA --> CAD
-    ADA --> KASA
+    SERVER --> SHARD
+    SHARD --> WEB
+    SHARD --> CAD
+    SHARD --> KASA
     SERVER --> AUTH
     SERVER --> PM
     SERVER --> PRINTER
@@ -178,7 +178,7 @@ npm install
 ```
 
 ### 4. 🔐 Face Authentication Setup
-To use the secure voice features, ADA needs to know what you look like.
+To use the secure voice features, SHARD needs to know what you look like.
 
 1. Take a clear photo of your face (or use an existing one).
 2. Rename the file to `reference.jpg`.
@@ -202,7 +202,7 @@ The system creates a `settings.json` file on first run. You can modify this to c
 ---
 
 ### 5. 🖨️ 3D Printer Setup
-ADA V2 can slice STL files and send them directly to your 3D printer.
+SHARD V2 can slice STL files and send them directly to your 3D printer.
 
 **Supported Hardware:**
 - **Klipper/Moonraker** (Creality K1, Voron, etc.)
@@ -210,21 +210,21 @@ ADA V2 can slice STL files and send them directly to your 3D printer.
 - **PrusaLink** (Experimental)
 
 **Step 1: Install Slicer**
-ADA uses **OrcaSlicer** (recommended) or PrusaSlicer to generate G-code.
+SHARD uses **OrcaSlicer** (recommended) or PrusaSlicer to generate G-code.
 1. Download and install [OrcaSlicer](https://github.com/SoftFever/OrcaSlicer).
 2. Run it once to ensure profiles are created.
-3. ADA automatically detects the installation path.
+3. SHARD automatically detects the installation path.
 
 **Step 2: Connect Printer**
 1. Ensure your printer and computer are on the **same Wi-Fi network**.
-2. Open the **Printer Window** in ADA (Cube icon).
-3. ADA automatically scans for printers using mDNS.
+2. Open the **Printer Window** in SHARD (Cube icon).
+3. SHARD automatically scans for printers using mDNS.
 4. **Manual Connection**: If your printer isn't found, use the "Add Printer" button and enter the IP address (e.g., `192.168.1.50`).
 
 ---
 
 ### 6. 🔑 Gemini API Key Setup
-ADA uses Google's Gemini API for voice and intelligence. You need a free API key.
+SHARD uses Google's Gemini API for voice and intelligence. You need a free API key.
 
 1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
 2. Sign in with your Google account.
@@ -240,7 +240,7 @@ ADA uses Google's Gemini API for voice and intelligence. You need a free API key
 
 ---
 
-## 🚀 Running ADA V2
+## 🚀 Running SHARD V2
 
 You have two options to run the app. Ensure your `ada_v2` environment is active!
 
@@ -273,7 +273,7 @@ npm run dev
 
 ## ✅ First Flight Checklist (Things to Test)
 
-1. **Voice Check**: Say "Hello Ada". She should respond.
+1. **Voice Check**: Say "Hello SHARD". She should respond.
 2. **Vision Check**: Look at the camera. If Face Auth is on, the lock screen should unlock.
 3. **CAD Check**: Open the CAD window and say "Create a cube". Watch the logs.
 4. **Web Check**: Open the Browser window and say "Go to Google".
@@ -300,9 +300,9 @@ npm run dev
 - **Note**: The agent will auto-scroll, click, and type. Do not interfere with the browser window while it runs.
 
 ### 🖨️ Printing & Slicing
-- **Auto-Discovery**: ADA automatically finds printers on your network.
+- **Auto-Discovery**: SHARD automatically finds printers on your network.
 - **Slicing**: Click "Slice & Print" on any generated 3D model.
-- **Profiles**: ADA intelligently selects the correct OrcaSlicer profile based on your printer's name (e.g., "Creality K1").
+- **Profiles**: SHARD intelligently selects the correct OrcaSlicer profile based on your printer's name (e.g., "Creality K1").
 
 ---
 
@@ -332,7 +332,7 @@ npm run dev
 **Symptoms**: `websockets.exceptions.ConnectionClosedError: 1011 (internal error)`.
 
 **Solution**:
-This is a server-side issue from the Gemini API. Simply reconnect by clicking the connect button or saying "Hello Ada" again. If it persists, check your internet connection or try again later.
+This is a server-side issue from the Gemini API. Simply reconnect by clicking the connect button or saying "Hello SHARD" again. If it persists, check your internet connection or try again later.
 
 ---
 
@@ -347,7 +347,7 @@ This is a server-side issue from the Gemini API. Simply reconnect by clicking th
 ```
 ada_v2/
 ├── backend/                    # Python server & AI logic
-│   ├── ada.py                  # Gemini Live API integration
+│   ├── SHARD.py                  # Gemini Live API integration
 │   ├── server.py               # FastAPI + Socket.IO server
 │   ├── cad_agent.py            # CAD generation orchestrator
 │   ├── printer_agent.py        # 3D printer discovery & slicing

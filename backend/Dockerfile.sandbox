@@ -1,7 +1,29 @@
 FROM python:3.10-slim
 
-# Installa numpy (e altre librerie base per il ML) a livello di sistema
-RUN pip install --no-cache-dir numpy
+# Aggiorniamo apt e installiamo dipendenze base di sistema necessarie per alcune lib (compilazione, ecc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libsqlite3-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir --upgrade pip
+
+# Installa torch CPU in un layer dedicato per ottimizzare spazio e cache
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Installa le librerie base e quelle per data science, web e tooling vario richieste da SHARD
+RUN pip install --no-cache-dir \
+    requests \
+    beautifulsoup4 \
+    numpy \
+    pandas \
+    matplotlib \
+    scikit-learn \
+    scipy \
+    flask \
+    fastapi \
+    sqlalchemy
 
 # Create non-root sandbox user with UID/GID 1000
 RUN groupadd -g 1000 sandbox && \

@@ -87,6 +87,11 @@ class StrategyMemory:
         score = float(eval_data.get("score", 0))
         verdict = eval_data.get("verdict", "FAIL")
 
+        # Sanity Filter: Solo strategie con score decente o sandbox funzionante
+        if score < 5.0 and verdict != "PASS":
+            print(f"[STRATEGY] Strategia scartata (score insufficiente: {score}, {verdict})")
+            return None
+
         # Only extract strategy if we have meaningful data
         if not sandbox and not structured:
             return None

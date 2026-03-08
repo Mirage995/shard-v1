@@ -12,7 +12,7 @@ HISTORY_DIR = os.path.join(os.path.dirname(__file__), '..', 'shard_memory')
 DEFAULT_FILE = os.path.join(HISTORY_DIR, 'experiment_history.json')
 
 # Score threshold: experiments below this are considered "failed"
-PASS_THRESHOLD = 8.0
+from constants import SUCCESS_SCORE_THRESHOLD
 
 
 class ExperimentReplay:
@@ -52,9 +52,9 @@ class ExperimentReplay:
         print(f"[REPLAY] logged experiment: {topic} (score={score})")
 
     def failed_experiments(self) -> List[Dict]:
-        """Return all experiments with score < PASS_THRESHOLD."""
+        """Return all experiments with score < SUCCESS_SCORE_THRESHOLD."""
         history = self._load()
-        return [e for e in history if e.get("score", 0) < PASS_THRESHOLD]
+        return [e for e in history if e.get("score", 0) < SUCCESS_SCORE_THRESHOLD]
 
     def choose_replay(self) -> Optional[Dict]:
         """Select the experiment with the lowest score for replay."""

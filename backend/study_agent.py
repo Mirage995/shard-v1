@@ -44,7 +44,7 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 CHROMA_DB_PATH   = os.path.join(os.getcwd(), "knowledge_db")
 SANDBOX_DIR      = os.path.join(os.getcwd(), "sandbox")
 WORKSPACE_DIR    = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shard_workspace")
-PASS_THRESHOLD   = 6.0
+from constants import SUCCESS_SCORE_THRESHOLD
 MAX_RETRY        = 3
 GROQ_DELAY       = 1.2  # Seconds between Groq calls to avoid rate limiting
 ANTHROPIC_DELAY  = 0.5  # Seconds between Anthropic calls
@@ -138,6 +138,9 @@ class StudyAgent:
         
         # ── Strategy Memory & Capability Graph ──
         self.capability_graph = CapabilityGraph()
+        
+        # Sandbox lazy check flag
+        self._sandbox_image_checked = False
         self.strategy_memory = StrategyMemory()
         self.skill_discovery = SkillDiscovery(self.capability_graph)
         self.replay_engine = ExperimentReplay()
@@ -715,8 +718,23 @@ Return ONLY a valid JSON object with this structure:
     "shard_opinion": "SHARD's reasoned stance on this topic...",
     "critical_questions": ["...", "...", "..."],
     "teoria": "Theoretical summary of core concepts...",
-    "spiegazione": "Simple explanation in Feynman-style..."
+    "spiegazione": "Simple explanation in Feynman-style...",
+    "codice_pratico": "A fully runnable Python 3 snippet testing the core concept."
 }}
+
+IMPORTANT EXECUTION CONSTRAINTS FOR `codice_pratico`:
+The generated code MUST terminate by itself.
+Do NOT start persistent servers (Flask, FastAPI, HTTPServer).
+Do NOT start infinite loops.
+Do NOT start blocking network listeners.
+
+Instead:
+- Demonstrate the concept using short simulations
+- Use mock requests or simple function calls
+- Use unit-test style examples when relevant
+- If demonstrating a REST API, write a test script that simulates requests and prints responses, DO NOT start the server with app.run() or HTTPServer.serve_forever()
+
+The script must finish execution in under 5 seconds.
 
 Rules:
 - JSON must be valid
@@ -973,88 +991,137 @@ Respond ONLY with valid JSON:
         print(f"[EVALUATE] Scoring understanding of: {topic}")
         self.progress.set_phase("EVALUATE", 0.0)
 
-        gaps_context = f"\nLacune note dal tentativo precedente: {gaps}" if gaps else ""
+        # 1. Programmatic Sandbox Score (0-2)
+        sandbox_score = 0.0
+        sandbox_status = "NONE"
+        sandbox_stdout = ""
+        sandbox_stderr = ""
+        sandbox_failed = True
 
-        # Build sandbox context for the evaluator
-        sandbox_section = "\nNESSUN CODICE ESEGUITO IN SANDBOX."
         if sandbox_result:
             sandbox_success = sandbox_result.get("success", False)
-            sandbox_stdout = sandbox_result.get("stdout", "(nessun output)")[:800]
+            sandbox_stdout = sandbox_result.get("stdout", "")[:800]
             sandbox_stderr = sandbox_result.get("stderr", "")[:500]
-            sandbox_code = sandbox_result.get("code", "(nessun codice)")[:1000]
-            sandbox_section = f"""
-
-RISULTATI ESECUZIONE SANDBOX:
-Codice eseguito:
-```
-{sandbox_code}
-```
-Successo: {sandbox_success}
-Output (stdout): {sandbox_stdout}
-Errori (stderr): {sandbox_stderr or "Nessuno"}
-"""
+            
+            if sandbox_success and not sandbox_stderr:
+                sandbox_score = 2.0
+                sandbox_status = "SUCCESS"
+                sandbox_failed = False
+            elif sandbox_success and sandbox_stderr:
+                sandbox_score = 1.0 # Esegue ma con warning (stdout ok ma stderr non vuoto p.es.)
+                sandbox_status = "WARNING"
+                sandbox_failed = False
+            else:
+                sandbox_score = 0.0 # Crash, timeout, ecc.
+                sandbox_status = "FAILURE"
+                sandbox_failed = True
 
         # Extract answers and validation_qa
         answers = validation_data.get("answers", validation_data)
         validation_qa = validation_data.get("validation_qa", [])
 
         prompt = f"""
-Sei un esaminatore spietato. Valuta la comprensione di "{topic}" secondo il Test-Driven Learning Protocol.
-{gaps_context}
+You are evaluating the understanding of an autonomous learning agent.
 
-{sandbox_section}
+Topic: {topic}
 
-AUTO-ESAME (Domande e Risposte):
-{json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
+Score the following criteria independently.
+Return ONLY JSON.
 
-REGOLE DI PENALITÀ (applica TUTTE quelle pertinenti):
-- Il codice in Sandbox ha generato un'eccezione o errore di runtime: -3.0
-- Il codice non produce output significativo o è banale (es. solo print di stringhe): -1.0
-- Le risposte dell'auto-esame sono superficiali o generiche: -1.5
-- Spiegazioni troppo teoriche e poco pratiche: -1.0
-- Mancanza di collegamenti a best practice: -0.5
-- Risposte vaghe o generiche senza dettagli specifici: -1.0
-- Errori fattuali o imprecisioni tecniche: -2.0
-- Mancanza di ragionamento critico: -0.5
-
-BONUS:
-- Se la Sandbox ha restituito un output corretto senza errori E il codice è non-banale: +1.0
-
-ISTRUZIONI:
-1. Parti da 10.0, applica penalità e bonus. Il punteggio finale deve riflettere la reale qualità.
-2. La soglia di sufficienza è {PASS_THRESHOLD}. Sii onesto.
-3. Identifica le lacune specifiche.
-4. Genera 3 ipotesi per ricerca approfondita.
-5. Fornisci la posizione attuale di SHARD sul topic.
-
-Respond ONLY with valid JSON:
 {{
-    "score": 7.5,
-    "verdict": "PASS or FAIL",
-    "penalties_applied": [
-        {{"rule": "description", "points": -1.5, "reason": "why applied"}}
-    ],
-    "bonuses_applied": [
-        {{"rule": "description", "points": 1.0, "reason": "why applied"}}
-    ],
-    "gaps": ["specific gap 1", "specific gap 2"],
-    "hypotheses": ["hypothesis 1", "hypothesis 2", "hypothesis 3"],
-    "shard_stance": "SHARD's current opinion after evaluation...",
-    "improvement_focus": "What to focus on in next iteration if needed"
+ "theory_score": 0.0,
+ "code_score": 0.0,
+ "synthesis_score": 0.0,
+ "explanation": "short explanation",
+ "gaps": ["specific gap 1", "specific gap 2"],
+ "hypotheses": ["hypothesis 1", "hypothesis 2"]
 }}
+
+Important rules:
+- Score 0 is a valid score. Use it when appropriate.
+- A score of 3/3 means exceptional, not merely acceptable.
+- If the topic is not a real technical concept, theory_score must be 0.
+- Be strict. Avoid default middle scores.
+- Penalize hallucinated concepts.
+
+# SCORING RUBRIC
+
+1 - THEORY UNDERSTANDING (0-3)
+Evaluate: conceptual correctness, technical validity of topic, synthesis quality.
+Rules: 0 = not real/invented, 1 = superficial, 2 = good, 3 = solid
+
+2 - CODE QUALITY (0-3)
+Evaluate: logic correctness, library usage, structure.
+Rules: 0 = broken, 1 = minimal/fragile, 2 = working, 3 = robust.
+
+3 - KNOWLEDGE SYNTHESIS (0-2)
+Evaluate: integration with previous knowledge, capability graph connections.
+Rules: 0 = none, 1 = weak, 2 = significant.
+
+Sandbox context:
+Sandbox result: {sandbox_status}
+Sandbox stdout excerpt: {sandbox_stdout}
+Sandbox stderr excerpt: {sandbox_stderr}
+
+If the sandbox failed, code_score cannot be higher than 1.
+
+AUTO-EXAM (Questions and Answers):
+{json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
 """
-        print("[EVALUATE] Using local Ollama (mistral) for evaluation...")
+
+        print("[EVALUATE] Using local Ollama (mistral/phi3) for evaluation...")
         raw = await self._think_local(prompt, json_mode=True)
+        
         try:
             cleaned = self._clean_json(raw)
-            result = json.loads(cleaned)
-            result["score"] = float(result.get("score", 0))
-            # Clamp score to [0, 10]
-            result["score"] = max(0.0, min(10.0, result["score"]))
+            parsed = json.loads(cleaned)
+            theory_score = float(parsed.get("theory_score", 0.0))
+            code_score = float(parsed.get("code_score", 0.0))
+            synthesis_score = float(parsed.get("synthesis_score", 0.0))
+            explanation = parsed.get("explanation", "")
+            gaps_out = parsed.get("gaps", [])
+            hypotheses = parsed.get("hypotheses", [])
+            
+            # Enforce constraints
+            if sandbox_failed:
+                code_score = min(code_score, 1.0)
+                
+            total_score = theory_score + code_score + synthesis_score + sandbox_score
+            
         except Exception as e:
-            print(f"[EVALUATE] Parse error: {e}")
+            print(f"[EVALUATE WARNING] Invalid JSON from evaluator \u2014 fallback score applied ({e})")
             print(f"[EVALUATE] Raw response (first 300 chars): {raw[:300]}")
-            result = {"score": 0.0, "verdict": "FAIL", "gaps": ["Parse error"], "hypotheses": [], "shard_stance": "", "improvement_focus": ""}
+            theory_score = 0.0
+            code_score = 0.0
+            synthesis_score = 0.0
+            total_score = 4.0
+            explanation = "JSONDecodeError Fallback"
+            gaps_out = ["Parse error"]
+            hypotheses = []
+
+        total_score = max(0.0, min(10.0, total_score))
+        
+        # Logging
+        print("[EVALUATE]")
+        print(f"theory={theory_score}")
+        print(f"code={code_score}")
+        print(f"sandbox={sandbox_score}")
+        print(f"synthesis={synthesis_score}")
+        print(f"total={total_score}")
+        
+        result = {
+            "score": total_score,
+            "verdict": "PASS" if total_score >= SUCCESS_SCORE_THRESHOLD else "FAIL",
+            "gaps": gaps_out,
+            "hypotheses": hypotheses,
+            "explanation": explanation,
+            "details": {
+                "theory": theory_score,
+                "code": code_score,
+                "sandbox": sandbox_score,
+                "synthesis": synthesis_score
+            }
+        }
         
         self.progress.complete_phase("EVALUATE")
         return result
@@ -1064,12 +1131,12 @@ Respond ONLY with valid JSON:
     async def phase_certify(self, topic: str, eval_data: Dict) -> bool:
         self.progress.set_phase("CERTIFY", 0.0)
         score = eval_data.get("score", 0)
-        if score >= PASS_THRESHOLD:
+        if score >= SUCCESS_SCORE_THRESHOLD:
             print(f"[CERTIFY] ✅ '{topic}' CERTIFIED — Score: {score}/10")
             self.progress.complete_phase("CERTIFY")
             return True
         else:
-            print(f"[CERTIFY] ❌ '{topic}' FAILED — Score: {score}/10 (need {PASS_THRESHOLD})")
+            print(f"[CERTIFY] ❌ '{topic}' FAILED — Score: {score}/10 (need {SUCCESS_SCORE_THRESHOLD})")
             return False
 
     # ── TIER 3: SANDBOX ───────────────────────────────────────────────────────
@@ -1137,6 +1204,38 @@ Respond ONLY with valid JSON:
             "python", filename,                               # Execute the script
         ]
 
+    async def _ensure_sandbox_image(self):
+        """Ensure the sandbox docker image exists, building it if necessary. Runs once per session."""
+        if getattr(self, "_sandbox_image_checked", False):
+            return
+
+        try:
+            # Check if image exists
+            await asyncio.to_thread(
+                subprocess.run,
+                ["docker", "image", "inspect", self.DOCKER_IMAGE],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True
+            )
+            self._sandbox_image_checked = True
+        except subprocess.CalledProcessError:
+            print(f"[SANDBOX] 🔨 Docker image '{self.DOCKER_IMAGE}' not found. Building it automatically...")
+            build_cmd = [
+                "docker", "build", "-t", self.DOCKER_IMAGE,
+                "-f", "backend/Dockerfile.sandbox", "backend/"
+            ]
+            try:
+                await asyncio.to_thread(
+                    subprocess.run, build_cmd, check=True
+                )
+                print(f"[SANDBOX] ✅ Docker image built successfully.")
+                self._sandbox_image_checked = True
+            except subprocess.CalledProcessError as e:
+                error_msg = f"Failed to automatically build docker image '{self.DOCKER_IMAGE}'."
+                print(f"[SANDBOX] ❌ {error_msg} ({e})")
+                raise RuntimeError(error_msg)
+
     async def run_sandbox(self, topic: str, code: str) -> Dict:
         """Execute LLM-generated code in a hardened Docker container.
 
@@ -1157,19 +1256,11 @@ Respond ONLY with valid JSON:
         filename = f"study_{uuid.uuid4().hex[:8]}.py"
 
         try:
-            # ── 1. Verify Docker image exists ────────────────────────────
-            image_check = await asyncio.to_thread(
-                subprocess.run,
-                ["docker", "image", "inspect", self.DOCKER_IMAGE],
-                capture_output=True, timeout=10
-            )
-            if image_check.returncode != 0:
-                error_msg = (
-                    f"Docker image '{self.DOCKER_IMAGE}' not found. "
-                    f"Build it with: docker build -t {self.DOCKER_IMAGE} "
-                    f"-f backend/Dockerfile.sandbox backend/"
-                )
-                print(f"[SANDBOX] ❌ {error_msg}")
+            # ── 1. Verify Docker image exists (once per session) ─────────
+            try:
+                await self._ensure_sandbox_image()
+            except RuntimeError as e:
+                error_msg = str(e)
                 self.progress.complete_phase("SANDBOX")
                 return {
                     "success": False, "stdout": "",
@@ -1627,14 +1718,14 @@ Rules:
 
                     # ── Experiment Replay & Cache: log this experiment ──
                     
-                    if eval_data and eval_data.get("score", 0) < 8.0:
+                    if eval_data and eval_data.get("score", 0) < SUCCESS_SCORE_THRESHOLD:
                         current_skills = len(self.capability_graph.capabilities) if self.capability_graph else 0
                         self.experiment_cache.register_failure(topic, current_skills)
 
                     self.replay_engine.log_experiment(
                         topic,
                         score=eval_data.get("score", 0),
-                        success=eval_data.get("score", 0) >= 8.0
+                        success=eval_data.get("score", 0) >= SUCCESS_SCORE_THRESHOLD
                     )
 
                 except Exception as e:

@@ -114,5 +114,353 @@
     "requires": [],
     "acquired": "2026-03-05T17:58:16.067631",
     "source_topic": "Implementazione Python da zero di un Perceptron"
+  },
+  "web scraping with beautifulsoup": {
+    "requires": [],
+    "acquired": "2026-03-06T17:34:34.832953",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "web scraping": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.834833",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "beautifulsoup": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.835831",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "html parsing": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.836992",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "dynamic content handling": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.837859",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "rate limiting and proxy rotation": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.838839",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "web_scraping": {
+    "requires": [
+      "web scraping with BeautifulSoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.843135",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
+  "chiedo facendo": {
+    "requires": [],
+    "acquired": "2026-03-06T21:10:57.887153",
+    "source_topic": "chiedo facendo"
+  },
+  "chiedo": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-06T21:10:57.888274",
+    "source_topic": "chiedo facendo"
+  },
+  "chiedere (infinitive)": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-06T21:10:57.889131",
+    "source_topic": "chiedo facendo"
+  },
+  "transitive usage": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-06T21:10:57.889973",
+    "source_topic": "chiedo facendo"
+  },
+  "interrogative usage": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-06T21:10:57.891169",
+    "source_topic": "chiedo facendo"
+  },
+  "reflexive form (mi chiedo)": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-06T21:10:57.892126",
+    "source_topic": "chiedo facendo"
+  },
+  "logging and monitoring patterns": {
+    "requires": [],
+    "acquired": "2026-03-06T21:27:05.559576",
+    "source_topic": "logging and monitoring patterns"
+  },
+  "observability": {
+    "requires": [
+      "logging and monitoring patterns"
+    ],
+    "acquired": "2026-03-06T21:27:05.561548",
+    "source_topic": "logging and monitoring patterns"
+  },
+  "interrogative usage applied to quantized inertia theory": {
+    "requires": [],
+    "acquired": "2026-03-06T21:43:47.690489",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "quantized inertia (qi)": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.691444",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "galaxy rotation curve problem": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.692573",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "dark matter hypothesis": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.693397",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "modified newtonian dynamics (mond)": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.694681",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "hubble-scale casimir effect": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.695544",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "neural networks and deep learning basics": {
+    "requires": [],
+    "acquired": "2026-03-06T22:12:25.221789",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "convolutional neural networks (cnns)": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.222749",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "fully connected layers": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.223709",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "local connectivity": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.224981",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "activation functions": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.225869",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "hidden layers": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.226706",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "deep_learning": {
+    "requires": [
+      "neural networks and deep learning basics"
+    ],
+    "acquired": "2026-03-06T22:12:25.228285",
+    "source_topic": "neural networks and deep learning basics"
+  },
+  "python exception handling best practices": {
+    "requires": [],
+    "acquired": "2026-03-06T22:25:46.131061",
+    "source_topic": "Python exception handling best practices"
+  },
+  "fail fast principle": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.132206",
+    "source_topic": "Python exception handling best practices"
+  },
+  "eafp (easier to ask forgiveness than permission)": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.133594",
+    "source_topic": "Python exception handling best practices"
+  },
+  "catch narrow exceptions": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.134720",
+    "source_topic": "Python exception handling best practices"
+  },
+  "exception handling boundaries": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.136068",
+    "source_topic": "Python exception handling best practices"
+  },
+  "domain-specific custom exceptions": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.137654",
+    "source_topic": "Python exception handling best practices"
+  },
+  "error_handling": {
+    "requires": [
+      "Python exception handling best practices"
+    ],
+    "acquired": "2026-03-06T22:25:46.139752",
+    "source_topic": "Python exception handling best practices"
+  },
+  "interrogative usage applied to eafp (easier to ask forgiveness than permission)": {
+    "requires": [],
+    "acquired": "2026-03-06T22:41:51.633209",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "lbyl (look before you leap)": {
+    "requires": [
+      "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+    ],
+    "acquired": "2026-03-06T22:41:51.634443",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "race conditions and non-atomicity": {
+    "requires": [
+      "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+    ],
+    "acquired": "2026-03-06T22:41:51.635508",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "exception-driven control flow": {
+    "requires": [
+      "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+    ],
+    "acquired": "2026-03-06T22:41:51.637129",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "tell": {
+    "requires": [
+      "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+    ],
+    "acquired": "2026-03-06T22:41:51.638566",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "concurrent_programming": {
+    "requires": [
+      "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+    ],
+    "acquired": "2026-03-06T22:41:51.640701",
+    "source_topic": "interrogative usage applied to eafp (easier to ask forgiveness than permission)"
+  },
+  "transitive usage applied to hubble-scale casimir effect": {
+    "requires": [],
+    "acquired": "2026-03-08T02:06:14.178760",
+    "source_topic": "transitive usage applied to hubble-scale casimir effect"
+  },
+  "impossible differentials in cryptography applied to safe_code_execution": {
+    "requires": [],
+    "acquired": "2026-03-08T11:56:57.001565",
+    "source_topic": "impossible differentials in cryptography applied to safe_code_execution"
+  },
+  "fail fast principle applied to dynamic content handling": {
+    "requires": [],
+    "acquired": "2026-03-08T12:11:24.117616",
+    "source_topic": "fail fast principle applied to dynamic content handling"
+  },
+  "object_oriented_design": {
+    "requires": [
+      "fail fast principle applied to dynamic content handling"
+    ],
+    "acquired": "2026-03-08T12:11:24.120027",
+    "source_topic": "fail fast principle applied to dynamic content handling"
+  },
+  "activation functions applied to exception-driven control flow": {
+    "requires": [],
+    "acquired": "2026-03-08T13:17:48.765450",
+    "source_topic": "activation functions applied to exception-driven control flow"
+  },
+  "learning through action": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-08T13:31:23.081318",
+    "source_topic": "chiedo facendo"
+  },
+  "implicit knowledge acquisition": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-08T13:31:23.082481",
+    "source_topic": "chiedo facendo"
+  },
+  "question-action integration": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-08T13:31:23.083494",
+    "source_topic": "chiedo facendo"
+  },
+  "experiential understanding": {
+    "requires": [
+      "chiedo facendo"
+    ],
+    "acquired": "2026-03-08T13:31:23.084447",
+    "source_topic": "chiedo facendo"
+  },
+  "quantized inertia theory applied to sorted data prerequisite": {
+    "requires": [],
+    "acquired": "2026-03-08T13:45:54.315389",
+    "source_topic": "quantized inertia theory applied to sorted data prerequisite"
+  },
+  "exception-driven control flow applied to logarithmic time complexity o(log n)": {
+    "requires": [],
+    "acquired": "2026-03-08T18:03:44.875866",
+    "source_topic": "exception-driven control flow applied to logarithmic time complexity o(log n)"
+  },
+  "catch narrow exceptions applied to python exception handling best practices": {
+    "requires": [],
+    "acquired": "2026-03-08T18:17:13.080421",
+    "source_topic": "catch narrow exceptions applied to python exception handling best practices"
+  },
+  "binary search applied to quantized inertia theory": {
+    "requires": [],
+    "acquired": "2026-03-08T19:52:51.504068",
+    "source_topic": "binary search applied to quantized inertia theory"
   }
 }

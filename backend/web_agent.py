@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from playwright.async_api import async_playwright
 from google import genai
 from google.genai import types
+from fail_tracker import FailTracker
 
 # 1. Load API Key
 load_dotenv()
@@ -26,6 +27,7 @@ class WebAgent:
         self.browser = None
         self.context = None
         self.page = None
+        self.fail_tracker = FailTracker(max_retries=3, cooldown_minutes=30)
 
     def denormalize_x(self, x: int, width: int) -> int:
         return int((x / 1000) * width)
@@ -190,7 +192,14 @@ class WebAgent:
         Returns the final response from the agent.
         """
         print(f"[START] WebAgent started. Goal: {prompt}")
+        
+        if self.fail_tracker.should_block(prompt):
+            if update_callback:
+                await update_callback(None, "Web Agent Blocked: Too many recent failures for this task.")
+            return "Task blocked by FailTracker due to repeated failures."
+            
         final_response = "Agent finished without a final summary."
+        success = False
 
         async with async_playwright() as p:
             # Launch browser (Headless=True usually, but for dev we might keep it hidden)
@@ -247,6 +256,7 @@ class WebAgent:
                 except Exception as e:
                     print(f"[CRITICAL] Critical API Error: {e}")
                     if update_callback: await update_callback(None, f"Error: {e}")
+                    self.fail_tracker.register_failure(prompt)
                     break
                 
                 # Check for empty response
@@ -287,6 +297,8 @@ class WebAgent:
                     if not has_tool_use:
                         print("[DONE] Task finished details.")
                         if update_callback: await update_callback(None, "Task Finished")
+                        self.fail_tracker.reset(prompt)
+                        success = True
                         break
                     else:
                         print("...Thinking...")
@@ -309,6 +321,9 @@ class WebAgent:
                 # Send Response Back
                 response_parts = [types.Part(function_response=fr) for fr in function_responses]
                 chat_history.append(types.Content(role="user", parts=response_parts))
+
+            if not success:
+                self.fail_tracker.register_failure(prompt)
 
             await self.browser.close()
             print("[CLOSE] Browser closed.")

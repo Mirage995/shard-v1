@@ -47,15 +47,15 @@ class TestExperimentReplay(unittest.TestCase):
         self.engine.log_experiment("Bad", score=5.0, success=False)
         self.engine.log_experiment("Meh", score=7.5, success=False)
         failed = self.engine.failed_experiments()
-        self.assertEqual(len(failed), 2)
+        self.assertEqual(len(failed), 1)
         topics = [e["topic"] for e in failed]
         self.assertIn("Bad", topics)
-        self.assertIn("Meh", topics)
+        self.assertNotIn("Meh", topics)
         self.assertNotIn("Good", topics)
 
     def test_failed_experiments_threshold(self):
-        """Score exactly 8.0 should NOT be considered failed."""
-        self.engine.log_experiment("Edge", score=8.0, success=True)
+        """Score exactly 7.5 should NOT be considered failed."""
+        self.engine.log_experiment("Edge", score=7.5, success=True)
         self.assertEqual(len(self.engine.failed_experiments()), 0)
 
     def test_choose_replay_lowest_first(self):

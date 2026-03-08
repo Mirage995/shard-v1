@@ -331,9 +331,9 @@ function App() {
         socket.on('status', (data) => {
             addMessage('System', data.msg);
             // Update status bar based on backend messages
-            if (data.msg === 'A.D.A Started') {
+            if (data.msg === 'SHARD Started') {
                 setStatus('Model Connected');
-            } else if (data.msg === 'A.D.A Stopped') {
+            } else if (data.msg === 'SHARD Stopped') {
                 setStatus('Connected');
             }
         });

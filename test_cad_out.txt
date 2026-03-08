@@ -1,0 +1,79 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\andre\Desktop\shard_v1
+configfile: pytest.ini
+plugins: anyio-4.9.0
+collected 7 items
+
+tests\test_cad_agent.py ..FFF..                                          [100%]
+
+================================== FAILURES ===================================
+_________________ TestCadGeneration.test_generate_simple_cube _________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+___________________ TestCadGeneration.test_generate_sphere ____________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+___________________ TestCadIteration.test_iterate_prototype ___________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+============================== warnings summary ===============================
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\_pytest\config\__init__.py:1428
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_default_fixture_loop_scope
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+..\..\AppData\Local\Programs\Python\Python313\Lib\site-packages\_pytest\config\__init__.py:1428
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_mode
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+tests\test_cad_agent.py:45
+  C:\Users\andre\Desktop\shard_v1\tests\test_cad_agent.py:45: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\test_cad_agent.py:70
+  C:\Users\andre\Desktop\shard_v1\tests\test_cad_agent.py:70: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\test_cad_agent.py:87
+  C:\Users\andre\Desktop\shard_v1\tests\test_cad_agent.py:87: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_cad_agent.py::TestBuild123dImport::test_build123d_import
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\build123d\objects_curve.py:1353: DeprecationWarning: The 'PointArcTangentLine' object is deprecated and will be removed in a future version.
+    class PointArcTangentLine(BaseEdgeObject):
+
+tests/test_cad_agent.py::TestBuild123dImport::test_build123d_import
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\build123d\objects_curve.py:1432: DeprecationWarning: The 'PointArcTangentArc' object is deprecated and will be removed in a future version.
+    class PointArcTangentArc(BaseEdgeObject):
+
+tests/test_cad_agent.py::TestBuild123dImport::test_build123d_import
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\build123d\objects_curve.py:1586: DeprecationWarning: The 'ArcArcTangentLine' object is deprecated and will be removed in a future version.
+    class ArcArcTangentLine(BaseEdgeObject):
+
+tests/test_cad_agent.py::TestBuild123dImport::test_build123d_import
+  C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\site-packages\build123d\objects_curve.py:1682: DeprecationWarning: The 'ArcArcTangentArc' object is deprecated and will be removed in a future version.
+    class ArcArcTangentArc(BaseEdgeObject):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_cad_agent.py::TestCadGeneration::test_generate_simple_cube
+FAILED tests/test_cad_agent.py::TestCadGeneration::test_generate_sphere - Fai...
+FAILED tests/test_cad_agent.py::TestCadIteration::test_iterate_prototype - Fa...
+================== 3 failed, 4 passed, 9 warnings in 12.89s ===================

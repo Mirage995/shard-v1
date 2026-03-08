@@ -13,7 +13,7 @@ generate_cad_prototype_tool = {
     }
 }
 
-# NOTE: write_file, read_directory, read_file tools have been migrated to ada.py
+# NOTE: write_file, read_directory, read_file tools have been migrated to SHARD.py
 # as list_directory, read_file, write_file with workspace sandboxing via filesystem_tools.py
 
 tools_list = [{"function_declarations": [

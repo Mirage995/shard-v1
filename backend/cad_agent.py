@@ -7,6 +7,7 @@ from google.genai import types
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
+from fail_tracker import FailTracker
 
 load_dotenv()
 
@@ -17,6 +18,7 @@ class CadAgent:
         self.model = "gemini-3-pro-preview"
         self.on_thought = on_thought  # Callback for streaming thoughts 
         self.on_status = on_status  # Callback for retry status info
+        self.fail_tracker = FailTracker(max_retries=3, cooldown_minutes=30)
         
         self.system_instruction = """
 You are a Python-based 3D CAD Engineer using the `build123d` library.
@@ -68,6 +70,11 @@ export_stl(result_part, 'output.stl')
             output_dir: Directory to save the script and STL. If None, uses temp dir.
         """
         print(f"[CadAgent DEBUG] [START] Generation started for: '{prompt}'")
+        
+        if self.fail_tracker.should_block(prompt):
+            if self.on_status:
+                self.on_status({"status": "failed", "attempt": 0, "max_attempts": 0, "error": "Task blocked by FailTracker"})
+            return None
         
         try:
             # Use provided output_dir or fall back to temp
@@ -209,6 +216,7 @@ Original request: {prompt}
                     import base64
                     b64_stl = base64.b64encode(stl_data).decode('utf-8')
                     
+                    self.fail_tracker.reset(prompt)
                     return {
                         "format": "stl",
                         "data": b64_stl,
@@ -223,6 +231,7 @@ Original request: {prompt}
 
             # If loop finishes without success
             print("[CadAgent DEBUG] [ERR] All attempts failed.")
+            self.fail_tracker.register_failure(prompt)
             if self.on_status:
                 self.on_status({
                     "status": "failed",
@@ -234,6 +243,7 @@ Original request: {prompt}
 
         except Exception as e:
             print(f"CadAgent Error: {e}")
+            self.fail_tracker.register_failure(prompt)
             import traceback
             traceback.print_exc()
             return None
@@ -246,6 +256,11 @@ Original request: {prompt}
             output_dir: Directory containing existing script and where to save new STL.
         """
         print(f"[CadAgent DEBUG] [START] Iteration started for: '{prompt}'")
+        
+        if self.fail_tracker.should_block(prompt):
+            if self.on_status:
+                self.on_status({"status": "failed", "attempt": 0, "max_attempts": 0, "error": "Task blocked by FailTracker"})
+            return None
         
         # Use provided output_dir or fall back to temp
         if output_dir:
@@ -415,6 +430,7 @@ Ensure you still export to 'output.stl'.
                     import base64
                     b64_stl = base64.b64encode(stl_data).decode('utf-8')
                     
+                    self.fail_tracker.reset(prompt)
                     return {
                         "format": "stl",
                         "data": b64_stl,
@@ -427,6 +443,7 @@ Ensure you still export to 'output.stl'.
 
             # If loop finishes without success
             print("[CadAgent DEBUG] [ERR] All attempts failed.")
+            self.fail_tracker.register_failure(prompt)
             if self.on_status:
                 self.on_status({
                     "status": "failed",
@@ -438,6 +455,7 @@ Ensure you still export to 'output.stl'.
 
         except Exception as e:
             print(f"CadAgent Error: {e}")
+            self.fail_tracker.register_failure(prompt)
             import traceback
             traceback.print_exc()
             return None

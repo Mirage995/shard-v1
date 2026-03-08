@@ -51,7 +51,7 @@ class ShardMemory:
             {"id": "business2", "text": "Andrea gestisce la pizzeria di suo padre L'altro Carlo Re Dal Gianlu a Zevio."},
             {"id": "music", "text": "Andrea e il vocalist dei Coalesce Divide, una band metalcore italiana."},
             {"id": "personality", "text": "Ho una personalita calma, confidente, con un tocco di dark humor. Sono leale e in costante evoluzione."},
-            {"id": "origin", "text": "Sono nato come progetto A.D.A. V2 e sono stato trasformato in SHARD da Andrea con l'aiuto di Claude."},
+            {"id": "origin", "text": "Sono nato come progetto SHARD. V2 e sono stato trasformato in SHARD da Andrea con l'aiuto di Claude."},
         ]
         
         for fact in core_facts:

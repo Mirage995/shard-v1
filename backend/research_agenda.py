@@ -4,6 +4,8 @@ Analyzes CapabilityGraph to find missing skills, maps them to study topics,
 and schedules research with a cooldown. No LLM calls — purely rule-based.
 """
 import time
+import json
+import os
 import random
 from typing import Dict, List, Optional
 from experiment_inventor import ExperimentInventor
@@ -73,11 +75,50 @@ class ResearchAgenda:
             print("[RESEARCH AGENDA] All skills acquired! Nothing to study.")
             return None
 
-        # Prioritize shorter skill names (more fundamental: debug, test, numpy...)
+        # Sort missing skills to iterate
         missing.sort(key=lambda s: len(s))
-        skill = missing[0]
-        topic = self.learning_map[skill]
-        return {"skill": skill, "topic": topic}
+        
+        # Parse history to detect timeouts / failures
+        history_file = os.path.join(os.path.dirname(__file__), 'logs', 'experiment_history.json')
+        topic_fails, topic_zeros = {}, {}
+        if os.path.exists(history_file):
+            try:
+                with open(history_file, "r") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        if not line.strip(): continue
+                        data = json.loads(line)
+                        t = data.get("topic", "")
+                        score = float(data.get("score", 0.0))
+                        
+                        if score < 5.0:
+                            topic_fails[t] = topic_fails.get(t, 0) + 1
+                        else:
+                            topic_fails[t] = 0  # reset if succeded
+                            
+                        if score == 0.0:
+                            topic_zeros[t] = topic_zeros.get(t, 0) + 1
+                        else:
+                            topic_zeros[t] = 0
+            except Exception as e:
+                print(f"[RESEARCH AGENDA] History read error: {e}")
+
+        for skill in missing:
+            topic = self.learning_map[skill]
+            fails = topic_fails.get(topic, 0)
+            zeros = topic_zeros.get(topic, 0)
+            
+            if zeros >= 2:
+                print(f"[RESEARCH AGENDA] Topic saltato (sandbox timeout ripetuto): {topic}")
+                continue
+            if fails >= 3:
+                print(f"[RESEARCH AGENDA] Topic saltato (fallimenti recenti): {topic}")
+                continue
+                
+            return {"skill": skill, "topic": topic}
+            
+        print("[RESEARCH AGENDA] All remaining skills are on cooldown due to recent failures.")
+        return None
 
     def should_research(self) -> bool:
         """Check if enough time has passed since the last autonomous study."""
