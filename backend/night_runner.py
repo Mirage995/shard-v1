@@ -313,23 +313,6 @@ class NightRunner:
                 self.logger.info("[DB] Topic quarantined (SQLite VIEW): %r", topic)
             return row is not None
         except Exception:
-            pass
-        # Fallback: legacy JSON
-        try:
-            hist_file = Path(__file__).resolve().parents[1] / "shard_memory" / "experiment_history.json"
-            if not hist_file.exists():
-                return False
-            history = json.loads(hist_file.read_text(encoding="utf-8"))
-            topic_lower = topic.lower().strip()
-            attempts = [
-                e for e in history
-                if e.get("topic", "").lower().strip() == topic_lower
-            ]
-            if len(attempts) < 3:
-                return False
-            max_score = max(e.get("score", 0) for e in attempts)
-            return max_score < 6.0
-        except Exception:
             return False
 
     async def _select_topic(self, capability_graph, config_context) -> tuple[str, str, str]:

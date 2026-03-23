@@ -9,16 +9,13 @@ Metrics computed from disk data (no LLM, no external calls):
   self_assess_gaps()        — categories with < GAP_SKILL_THRESHOLD certified skills
                               vs DEFAULT_LEARNING_MAP; returns severity + gap list
 """
-import json
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
 logger = logging.getLogger("shard.self_model")
 
-_ROOT              = Path(__file__).resolve().parent.parent.parent
-_EXPERIMENT_FILE   = _ROOT / "shard_memory" / "experiment_history.json"
-_META_FILE         = _ROOT / "shard_memory" / "meta_learning.json"
+_ROOT = Path(__file__).resolve().parent.parent.parent
 
 try:
     import sys as _sys
@@ -66,11 +63,16 @@ class SelfModel:
     def get_certification_rate(self) -> float:
         """Fraction of study cycles that resulted in a certified topic."""
         try:
-            history = self._load_experiment_history()
-            if not history:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from shard_db import get_db
+            conn = get_db()
+            row = conn.execute(
+                "SELECT COUNT(*) AS total, SUM(certified) AS cert FROM experiments"
+            ).fetchone()
+            if not row or not row["total"]:
                 return 0.0
-            certified = sum(1 for e in history if e.get("success", False))
-            return round(certified / len(history), 3)
+            return round((row["cert"] or 0) / row["total"], 3)
         except Exception as exc:
             logger.warning("[SELF MODEL] get_certification_rate failed: %s", exc)
             return 0.0
@@ -81,17 +83,16 @@ class SelfModel:
         > 1.0 means SHARD frequently retries — indicates learning difficulty.
         """
         try:
-            history = self._load_experiment_history()
-            if not history:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from shard_db import get_db
+            conn = get_db()
+            row = conn.execute(
+                "SELECT COUNT(*) AS total, COUNT(DISTINCT topic) AS unique_topics FROM experiments"
+            ).fetchone()
+            if not row or not row["unique_topics"]:
                 return 1.0
-            counts: Dict[str, int] = {}
-            for e in history:
-                t = e.get("topic", "")
-                if t:
-                    counts[t] = counts.get(t, 0) + 1
-            if not counts:
-                return 1.0
-            return round(sum(counts.values()) / len(counts), 2)
+            return round(row["total"] / row["unique_topics"], 2)
         except Exception as exc:
             logger.warning("[SELF MODEL] get_avg_repair_loops failed: %s", exc)
             return 1.0
@@ -220,15 +221,6 @@ class SelfModel:
         ).strip()
 
     # ── Helpers ───────────────────────────────────────────────────────────────
-
-    def _load_experiment_history(self) -> List[dict]:
-        if not _EXPERIMENT_FILE.exists():
-            return []
-        try:
-            data = json.loads(_EXPERIMENT_FILE.read_text(encoding="utf-8"))
-            return data if isinstance(data, list) else []
-        except Exception:
-            return []
 
     @staticmethod
     def _empty_gap_report() -> Dict:

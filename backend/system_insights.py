@@ -7,20 +7,16 @@ Niente drama, niente manipolazione emotiva.
 Solo fatti utili, consegnati al momento giusto.
 """
 
-import json
 import time
 import logging
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger("shard.system_insights")
 
 _MEMORY_DIR = Path(__file__).parent.parent / "shard_memory"
-_EXPERIMENT_HISTORY = _MEMORY_DIR / "experiment_history.json"
-_IMPROVEMENT_QUEUE  = _MEMORY_DIR / "improvement_queue.json"
-_CAPABILITY_GRAPH   = _MEMORY_DIR / "capability_graph.json"
 
 
 class SystemInsights:
@@ -85,17 +81,19 @@ class SystemInsights:
     def _check_improvement_queue_stale(self) -> list[str]:
         """Avvisa se ci sono topic in coda da troppo tempo senza essere studiati."""
         try:
-            data = json.loads(_IMPROVEMENT_QUEUE.read_text(encoding="utf-8"))
-            queue = data.get("queue", [])
-            if not queue:
+            from backend.shard_db import get_db
+            conn = get_db()
+            row = conn.execute(
+                "SELECT topic, created_at FROM improvement_tickets "
+                "WHERE status='pending' ORDER BY created_at ASC LIMIT 1"
+            ).fetchone()
+            if not row:
                 return []
-            oldest = queue[0]
-            added_at = oldest.get("added_at", "")
-            if not added_at:
+            topic, created_at = row["topic"] or "sconosciuto", row["created_at"] or ""
+            if not created_at:
                 return []
-            age_hours = (datetime.now() - datetime.fromisoformat(added_at)).total_seconds() / 3600
+            age_hours = (datetime.now() - datetime.fromisoformat(created_at)).total_seconds() / 3600
             if age_hours > 24:
-                topic = oldest.get("topic", "sconosciuto")
                 return [
                     f"Il topic '{topic}' è in coda da {age_hours:.0f}h senza essere studiato. "
                     f"Considera di avviare una sessione NightRunner."
@@ -107,14 +105,17 @@ class SystemInsights:
     def _check_benchmark_regression(self) -> list[str]:
         """Avvisa se il pass rate medio degli ultimi 3 benchmark è peggiorato."""
         try:
-            data = json.loads(_EXPERIMENT_HISTORY.read_text(encoding="utf-8"))
-            episodes = data if isinstance(data, list) else data.get("episodes", [])
-            if len(episodes) < 4:
+            from backend.shard_db import get_db
+            conn = get_db()
+            rows = conn.execute(
+                "SELECT certified FROM experiments ORDER BY id DESC LIMIT 6"
+            ).fetchall()
+            if len(rows) < 4:
                 return []
-            recent = episodes[-3:]
-            older  = episodes[-6:-3]
-            recent_rate = sum(1 for e in recent if e.get("success")) / len(recent)
-            older_rate  = sum(1 for e in older  if e.get("success")) / len(older)
+            recent = rows[:3]
+            older  = rows[3:6]
+            recent_rate = sum(1 for r in recent if r["certified"]) / len(recent)
+            older_rate  = sum(1 for r in older  if r["certified"]) / len(older)
             if older_rate > 0 and (older_rate - recent_rate) > 0.2:
                 return [
                     f"Regressione benchmark rilevata: pass rate sceso da "
@@ -128,10 +129,11 @@ class SystemInsights:
     def _check_capability_graph_growth(self) -> list[str]:
         """Segnala se il grafo delle capability non cresce da troppo tempo."""
         try:
-            data = json.loads(_CAPABILITY_GRAPH.read_text(encoding="utf-8"))
-            nodes = data.get("nodes", data) if isinstance(data, dict) else data
-            count = len(nodes) if isinstance(nodes, (list, dict)) else 0
-            # Confronta con snapshot precedente (salvato in memoria semplice)
+            import json
+            from backend.shard_db import get_db
+            conn = get_db()
+            row = conn.execute("SELECT COUNT(*) AS cnt FROM capabilities").fetchone()
+            count = row["cnt"] if row else 0
             snapshot_file = _MEMORY_DIR / "_cap_graph_snapshot.json"
             if snapshot_file.exists():
                 prev = json.loads(snapshot_file.read_text())
