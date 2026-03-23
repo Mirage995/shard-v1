@@ -32,8 +32,8 @@ from benchmark_generator import BenchmarkGenerator
 from benchmark_runner import BenchmarkRunner
 from skill_utils import normalize_capability_name
 from swe_agent import SWEAgent
-from backend.cognition.simulation_engine import SimulationEngine
-from backend.cognition.self_model import SelfModel
+from cognition.simulation_engine import SimulationEngine
+from cognition.self_model import SelfModel
 from dotenv import load_dotenv
 from study_utils import (
     find_file, safe_json_load, STOPWORDS, TECH_REFERENCE, GENERIC_CONCEPTS,
@@ -177,7 +177,7 @@ class StudyAgent:
         self.experiment_cache = SemanticExperimentCache()
         self.tracker = StrategyTracker()
         self.meta_learning = MetaLearning(self.strategy_memory)
-        from backend.cognition.world_model import world_model
+        from cognition.world_model import world_model
         self.world_model = world_model
         self.sim_engine = SimulationEngine(self.world_model)
         self.research_agenda = ResearchAgenda(
@@ -591,7 +591,7 @@ RAW CONTENT:
 
             # World Model ingestion (non-fatal, does not alter pipeline outputs)
             try:
-                from backend.cognition.world_model import world_model
+                from cognition.world_model import world_model
 
                 world_model.reset()
                 world_model.ingest_concepts(concepts)

@@ -289,11 +289,11 @@ async def create_goal(payload: dict):
     return g.dict()
 
 @sio.event
-async def list_goals(sid):
+async def list_goals_io(sid):
     await sio.emit("goals_list", {"goals": [g.dict() for g in goal_engine.list_goals()]}, room=sid)
 
 @sio.event
-async def create_goal(sid, data):
+async def create_goal_io(sid, data):
     g = goal_engine.create_goal(
         title=data.get("title"),
         description=data.get("description", ""),
