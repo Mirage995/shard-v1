@@ -636,7 +636,22 @@ class NightRunner:
                     certified=cycle_data["certified"],
                     score=cycle_data["score"] or 0.0,
                 )
-                
+
+                # Capability-driven refactor: enqueue responsible modules after failure
+                if not cycle_data["certified"]:
+                    try:
+                        from backend.proactive_refactor import ProactiveRefactor as _PR
+                        _pr = _PR(think_fn=study_agent._think_fast)
+                        _tags = [topic.lower().replace(" ", "_").replace("-", "_")]
+                        _n = _pr.enqueue_from_failure(topic, _tags)
+                        if _n:
+                            self.logger.info(
+                                "[PROACTIVE] Enqueued %d module(s) for capability-driven refactor "
+                                "after failed cycle: %s", _n, topic
+                            )
+                    except Exception:
+                        pass  # non-fatal
+
             except Exception as e:
                 self.logger.error(f"Cycle failed with exception: {str(e)}")
                 cycle_data["certified"] = False

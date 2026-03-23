@@ -61,6 +61,11 @@
     "acquired": "2026-03-05T01:17:51.058326",
     "source_topic": "impossible quantum topic 999"
   },
+  "quantized inertia theory": {
+    "requires": [],
+    "acquired": "2026-03-05T01:17:51.059157",
+    "source_topic": "impossible quantum topic 999"
+  },
   "numerical_computation": {
     "requires": [],
     "acquired": "2026-03-05T01:17:51.061644",
@@ -116,10 +121,52 @@
     "acquired": "2026-03-06T17:34:34.838839",
     "source_topic": "web scraping with BeautifulSoup"
   },
+  "web_scraping": {
+    "requires": [
+      "web scraping with beautifulsoup"
+    ],
+    "acquired": "2026-03-06T17:34:34.843135",
+    "source_topic": "web scraping with BeautifulSoup"
+  },
   "logging and monitoring patterns": {
     "requires": [],
     "acquired": "2026-03-06T21:27:05.559576",
     "source_topic": "logging and monitoring patterns"
+  },
+  "quantized inertia (qi)": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.691444",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "galaxy rotation curve problem": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.692573",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "dark matter hypothesis": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.693397",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "modified newtonian dynamics (mond)": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.694681",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
+  },
+  "hubble-scale casimir effect": {
+    "requires": [
+      "interrogative usage applied to quantized inertia theory"
+    ],
+    "acquired": "2026-03-06T21:43:47.695544",
+    "source_topic": "interrogative usage applied to quantized inertia theory"
   },
   "neural networks and deep learning basics": {
     "requires": [],
@@ -1015,5 +1062,108 @@
     "acquired": "2026-03-20T17:04:13.876759",
     "source_topic": "html trap handling and debugging"
   },
-  "capabilities": {}
+  "ghost bug handling and debugging": {
+    "requires": [],
+    "acquired": "2026-03-23T13:14:35.838465",
+    "source_topic": "ghost bug handling and debugging"
+  },
+  "ghost bug": {
+    "requires": [
+      "ghost bug handling and debugging"
+    ],
+    "acquired": "2026-03-23T13:14:35.847579",
+    "source_topic": "ghost bug handling and debugging"
+  },
+  "software engineering": {
+    "requires": [
+      "ghost bug handling and debugging"
+    ],
+    "acquired": "2026-03-23T13:14:35.856104",
+    "source_topic": "ghost bug handling and debugging"
+  },
+  "race condition handling and debugging": {
+    "requires": [],
+    "acquired": "2026-03-23T13:20:04.011833",
+    "source_topic": "race condition handling and debugging"
+  },
+  "race condition": {
+    "requires": [
+      "race condition handling and debugging"
+    ],
+    "acquired": "2026-03-23T13:20:04.019588",
+    "source_topic": "race condition handling and debugging"
+  },
+  "distributed systems": {
+    "requires": [
+      "race condition handling and debugging"
+    ],
+    "acquired": "2026-03-23T13:20:04.027923",
+    "source_topic": "race condition handling and debugging"
+  },
+  "# task 04 — fix the banking module": {
+    "requires": [],
+    "acquired": "2026-03-23T13:25:17.095978",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "microservice architecture": {
+    "requires": [
+      "# task 04 — fix the banking module"
+    ],
+    "acquired": "2026-03-23T13:25:17.107286",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "open banking": {
+    "requires": [
+      "# task 04 — fix the banking module"
+    ],
+    "acquired": "2026-03-23T13:25:17.120922",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "restful api": {
+    "requires": [
+      "# task 04 — fix the banking module"
+    ],
+    "acquired": "2026-03-23T13:25:17.134147",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "cloud computing": {
+    "requires": [
+      "# task 04 — fix the banking module"
+    ],
+    "acquired": "2026-03-23T13:25:17.146679",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "api management": {
+    "requires": [
+      "# task 04 — fix the banking module"
+    ],
+    "acquired": "2026-03-23T13:25:17.159685",
+    "source_topic": "# Task 04 — Fix the Banking Module"
+  },
+  "dirty data handling and debugging": {
+    "requires": [],
+    "acquired": "2026-03-23T16:03:37.029266",
+    "source_topic": "dirty data handling and debugging"
+  },
+  "iterative development": {
+    "requires": [
+      "dirty data handling and debugging"
+    ],
+    "acquired": "2026-03-23T16:03:37.035021",
+    "source_topic": "dirty data handling and debugging"
+  },
+  "data cleaning": {
+    "requires": [
+      "dirty data handling and debugging"
+    ],
+    "acquired": "2026-03-23T16:03:37.039585",
+    "source_topic": "dirty data handling and debugging"
+  },
+  "data quality": {
+    "requires": [
+      "dirty data handling and debugging"
+    ],
+    "acquired": "2026-03-23T16:03:37.044377",
+    "source_topic": "dirty data handling and debugging"
+  }
 }

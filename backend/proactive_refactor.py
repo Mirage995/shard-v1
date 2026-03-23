@@ -71,7 +71,7 @@ class ProactiveRefactor:
                 return json.loads(REFACTOR_STATE_PATH.read_text(encoding="utf-8"))
         except Exception as exc:
             logger.warning("[PROACTIVE] Could not load refactor_state.json: %s", exc)
-        return {"current_index": 0, "history": []}
+        return {"current_index": 0, "history": [], "capability_queue": []}
 
     def _save_state(self) -> None:
         try:
@@ -82,22 +82,77 @@ class ProactiveRefactor:
         except Exception as exc:
             logger.error("[PROACTIVE] Failed to save state: %s", exc)
 
+    # ── Capability-driven targeting ────────────────────────────────────────────
+
+    def enqueue_from_failure(self, topic: str, failed_capability_tags: List[str]) -> int:
+        """Enqueue modules responsible for failed capabilities as priority refactor targets.
+
+        Called by NightRunner after a failed study cycle. Uses architecture_map to
+        map capability_tags → module paths, then adds them to capability_queue.
+
+        Returns number of modules enqueued.
+        """
+        if not failed_capability_tags:
+            return 0
+        try:
+            from architecture_map import ArchitectureMap
+            arch = ArchitectureMap()
+        except Exception as exc:
+            logger.warning("[PROACTIVE] Could not load ArchitectureMap: %s", exc)
+            return 0
+
+        queue: List[Dict] = self._state.setdefault("capability_queue", [])
+        already_queued = {e["module"] for e in queue}
+        added = 0
+
+        for tag in failed_capability_tags:
+            modules = arch.get_modules_by_tag(tag)
+            for mod in modules:
+                mod_path = f"backend/{mod}.py"
+                if mod_path not in already_queued and (_ROOT / mod_path).exists():
+                    queue.append({"module": mod_path, "capability": tag, "reason": topic})
+                    already_queued.add(mod_path)
+                    added += 1
+
+        if added:
+            self._save_state()
+            logger.info(
+                "[PROACTIVE] Capability-driven: enqueued %d module(s) from failure on '%s' "
+                "(tags: %s)", added, topic, failed_capability_tags
+            )
+        return added
+
     # ── Core analysis ──────────────────────────────────────────────────────────
 
     async def analyze_next_file(self) -> Optional[Dict]:
         """Analyze the next file in the rotation.
 
+        Priority order:
+          1. capability_queue — modules flagged by recent study failures
+          2. REFACTOR_TARGETS round-robin — baseline rotation
+
         Returns the validated patch dict if an optimization is found, else None.
         Side-effect: writes pending_patch.json and prints [PATCH_READY] to stdout.
         """
-        n = len(REFACTOR_TARGETS)
-        idx = self._state.get("current_index", 0) % n
-        relative_path = REFACTOR_TARGETS[idx]
-        file_path = _ROOT / relative_path
+        # Drain capability queue first
+        cap_queue: List[Dict] = self._state.setdefault("capability_queue", [])
+        if cap_queue:
+            entry = cap_queue.pop(0)
+            self._save_state()
+            relative_path = entry["module"]
+            logger.info(
+                "[PROACTIVE] Capability-driven target: %s (capability=%s, reason='%s')",
+                relative_path, entry.get("capability"), entry.get("reason"),
+            )
+        else:
+            # Fall back to round-robin
+            n = len(REFACTOR_TARGETS)
+            idx = self._state.get("current_index", 0) % n
+            relative_path = REFACTOR_TARGETS[idx]
+            self._state["current_index"] = (idx + 1) % n
+            self._save_state()
 
-        # Advance index regardless of outcome so next session picks a fresh file
-        self._state["current_index"] = (idx + 1) % n
-        self._save_state()
+        file_path = _ROOT / relative_path
 
         if not file_path.exists():
             logger.warning("[PROACTIVE] Target not found: %s — skipping.", relative_path)
