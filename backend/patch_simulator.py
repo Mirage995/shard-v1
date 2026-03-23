@@ -53,23 +53,41 @@ class SimulationReport:
 # ── Static diff analysis ──────────────────────────────────────────────────────
 
 def _extract_public_api(code: str) -> dict:
-    """Extract public functions, classes, and their signatures from Python source."""
+    """Extract public functions, classes, and their signatures from Python source.
+
+    Handles both regular and async functions (ast.AsyncFunctionDef).
+    """
     api = {"functions": {}, "classes": {}}
     try:
         tree = ast.parse(code)
+        _func_nodes = (ast.FunctionDef, ast.AsyncFunctionDef)
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef) and not node.name.startswith("_"):
+            if isinstance(node, _func_nodes) and not node.name.startswith("_"):
                 args = [a.arg for a in node.args.args]
                 api["functions"][node.name] = args
             elif isinstance(node, ast.ClassDef) and not node.name.startswith("_"):
                 methods = [
                     n.name for n in ast.walk(node)
-                    if isinstance(n, ast.FunctionDef) and not n.name.startswith("_")
+                    if isinstance(n, _func_nodes) and not n.name.startswith("_")
                 ]
                 api["classes"][node.name] = methods
     except Exception:
         pass
     return api
+
+
+def _count_required_args(code: str, func_name: str) -> int:
+    """Count required (non-default) positional args for a function in source code."""
+    try:
+        tree = ast.parse(code)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == func_name:
+                n_args = len(node.args.args)
+                n_defaults = len(node.args.defaults)
+                return n_args - n_defaults
+    except Exception:
+        pass
+    return 0
 
 
 def _analyze_diff(old_code: str, new_code: str, filename: str) -> list[str]:
@@ -96,15 +114,23 @@ def _analyze_diff(old_code: str, new_code: str, filename: str) -> list[str]:
     for fn in removed_funcs:
         findings.append(f"BREAKING: function '{fn}()' removed")
 
-    # Signature changes (potentially breaking)
+    # Signature changes — distinguish required param additions (breaking) from safe changes
     for fn in set(old_api["functions"]) & set(new_api["functions"]):
         old_args = old_api["functions"][fn]
         new_args = new_api["functions"][fn]
         if old_args != new_args:
-            findings.append(
-                f"SIGNATURE CHANGE: '{fn}({', '.join(old_args)})' -> "
-                f"'{fn}({', '.join(new_args)})'"
-            )
+            old_req = _count_required_args(old_code, fn)
+            new_req = _count_required_args(new_code, fn)
+            if new_req > old_req:
+                findings.append(
+                    f"BREAKING: '{fn}()' gained {new_req - old_req} required param(s) "
+                    f"({', '.join(old_args)} -> {', '.join(new_args)})"
+                )
+            else:
+                findings.append(
+                    f"SIGNATURE CHANGE: '{fn}({', '.join(old_args)})' -> "
+                    f"'{fn}({', '.join(new_args)})'"
+                )
 
     # Removed classes (breaking)
     removed_classes = set(old_api["classes"]) - set(new_api["classes"])
@@ -218,9 +244,11 @@ def _compute_risk_level(
         if any(w in r.upper() for w in ["BREAK", "CRASH", "FAIL", "ERROR", "INCOMPATIBLE"])
     )
 
-    if has_breaking and n_affected >= 3:
+    has_required_param_added = any("gained" in c and "required param" in c for c in changes)
+
+    if (has_breaking or has_required_param_added) and n_affected >= 3:
         return "CRITICAL", "reject"
-    if has_breaking or (has_signature_change and n_affected >= 2):
+    if has_breaking or has_required_param_added or (has_signature_change and n_affected >= 2):
         return "HIGH", "apply_with_caution"
     if has_signature_change or high_risk_modules >= 2:
         return "MEDIUM", "apply_with_caution"
