@@ -1,29 +1,30 @@
-import chromadb
-from chromadb.config import Settings
+import asyncio
+import logging
 import os
 import json
 from datetime import datetime
 
+from db_manager import get_collection, DB_PATH_SHARD_MEMORY
+
+logger = logging.getLogger("shard.memory")
+
 class ShardMemory:
     def __init__(self):
-        # Percorso database memoria
-        db_path = os.path.join(os.path.dirname(__file__), '..', 'shard_memory')
-        os.makedirs(db_path, exist_ok=True)
-        
-        self.client = chromadb.PersistentClient(path=db_path)
-        
-        # Collezioni di memoria
-        self.conversations = self.client.get_or_create_collection(
+        # Collezioni di memoria — usa il singleton db_manager (no lock contention)
+        self.conversations = get_collection(
+            DB_PATH_SHARD_MEMORY,
             name="conversations",
             metadata={"description": "Chat history with Boss"}
         )
-        
-        self.core_memory = self.client.get_or_create_collection(
+
+        self.core_memory = get_collection(
+            DB_PATH_SHARD_MEMORY,
             name="core_memory",
             metadata={"description": "Permanent facts about Boss"}
         )
-        
-        self.inner_thoughts = self.client.get_or_create_collection(
+
+        self.inner_thoughts = get_collection(
+            DB_PATH_SHARD_MEMORY,
             name="inner_thoughts",
             metadata={"description": "Shard internal reflections"}
         )
@@ -51,7 +52,7 @@ class ShardMemory:
             {"id": "business2", "text": "Andrea gestisce la pizzeria di suo padre L'altro Carlo Re Dal Gianlu a Zevio."},
             {"id": "music", "text": "Andrea e il vocalist dei Coalesce Divide, una band metalcore italiana."},
             {"id": "personality", "text": "Ho una personalita calma, confidente, con un tocco di dark humor. Sono leale e in costante evoluzione."},
-            {"id": "origin", "text": "Sono nato come progetto A.D.A. V2 e sono stato trasformato in SHARD da Andrea con l'aiuto di Claude."},
+            {"id": "origin", "text": "Sono nato come progetto SHARD. V2 e sono stato trasformato in SHARD da Andrea con l'aiuto di Claude."},
         ]
         
         for fact in core_facts:
@@ -62,21 +63,23 @@ class ShardMemory:
         print("[SHARD MEMORY] Core memory initialized with fundamental facts.")
     
     def remember_conversation(self, sender, text):
-        """Salva un messaggio nella memoria conversazionale"""
+        """Salva un messaggio nella memoria conversazionale (sync — usa remember_conversation_async nelle coroutine)."""
         timestamp = datetime.now().isoformat()
         doc_id = f"conv_{timestamp}_{sender}"
-        
         self.conversations.add(
             documents=[f"[{sender}]: {text}"],
-            metadatas=[{"sender": sender, "timestamp": timestamp, "mood": self.emotional_state["mood"]}],
+            metadatas=[{"name": sender, "sender": sender, "timestamp": timestamp, "mood": self.emotional_state["mood"]}],
             ids=[doc_id]
         )
-    
+
+    async def remember_conversation_async(self, sender, text):
+        """Async wrapper — non blocca l'event loop durante la scrittura ChromaDB."""
+        await asyncio.to_thread(self.remember_conversation, sender, text)
+
     def recall(self, query, n_results=5):
-        """Cerca nella memoria conversazioni rilevanti"""
+        """Cerca nella memoria (sync — usa recall_async nelle coroutine)."""
         results = {"conversations": [], "core": []}
-        
-        # Cerca nelle conversazioni (retrieve 5, poi il gate filtra)
+
         if self.conversations.count() > 0:
             conv_results = self.conversations.query(
                 query_texts=[query],
@@ -84,8 +87,7 @@ class ShardMemory:
             )
             if conv_results and conv_results['documents']:
                 results["conversations"] = conv_results['documents'][0]
-        
-        # Cerca nella core memory (mai filtrata dal gate)
+
         if self.core_memory.count() > 0:
             core_results = self.core_memory.query(
                 query_texts=[query],
@@ -93,32 +95,48 @@ class ShardMemory:
             )
             if core_results and core_results['documents']:
                 results["core"] = core_results['documents'][0]
-        
+
         return results
-    
+
+    async def recall_async(self, query, n_results=5):
+        """Async wrapper — non blocca l'event loop durante le query ChromaDB."""
+        return await asyncio.to_thread(self.recall, query, n_results)
+
     def add_core_fact(self, fact_id, fact_text):
-        """Aggiunge un fatto permanente alla core memory"""
+        """Aggiunge un fatto permanente alla core memory (sync)."""
         self.core_memory.upsert(
             documents=[fact_text],
             ids=[fact_id]
         )
-        print(f"[SHARD MEMORY] Core fact added: {fact_id}")
-    
+        logger.info("[SHARD MEMORY] Core fact added: %s", fact_id)
+
+    async def add_core_fact_async(self, fact_id, fact_text):
+        """Async wrapper per add_core_fact."""
+        await asyncio.to_thread(self.add_core_fact, fact_id, fact_text)
+
     def add_thought(self, thought):
-        """Salva un pensiero interno di SHARD"""
+        """Salva un pensiero interno di SHARD (sync)."""
         timestamp = datetime.now().isoformat()
         self.inner_thoughts.add(
             documents=[thought],
-            metadatas=[{"timestamp": timestamp, "mood": self.emotional_state["mood"]}],
+            metadatas=[{"name": "thought", "timestamp": timestamp, "mood": self.emotional_state["mood"]}],
             ids=[f"thought_{timestamp}"]
         )
-    
+
+    async def add_thought_async(self, thought):
+        """Async wrapper per add_thought."""
+        await asyncio.to_thread(self.add_thought, thought)
+
     def get_recent_thoughts(self, n=5):
-        """Recupera i pensieri recenti"""
+        """Recupera i pensieri recenti (sync)."""
         if self.inner_thoughts.count() == 0:
             return []
         results = self.inner_thoughts.peek(limit=n)
         return results['documents'] if results else []
+
+    async def get_recent_thoughts_async(self, n=5):
+        """Async wrapper per get_recent_thoughts."""
+        return await asyncio.to_thread(self.get_recent_thoughts, n)
     
     def update_mood(self, mood, energy=None, curiosity=None, focus=None):
         """Aggiorna lo stato emotivo"""

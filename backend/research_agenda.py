@@ -1,13 +1,11 @@
-"""Autonomous Research Agenda — Decides what SHARD should study next.
-
-Analyzes CapabilityGraph to find missing skills, maps them to study topics,
-and schedules research with a cooldown. No LLM calls — purely rule-based.
-"""
-import time
 import random
 from typing import Dict, List, Optional
 from experiment_inventor import ExperimentInventor
+from frontier_detector import FrontierDetector
+from skill_utils import is_valid_topic
 
+# Exploration probability: occasionally attempt harder topics to avoid local minima
+EXPLORATION_PROBABILITY = 0.2  # 20% chance to explore difficulty + 2
 
 # Skill → suggested study topic
 DEFAULT_LEARNING_MAP: Dict[str, str] = {
@@ -47,73 +45,138 @@ DEFAULT_LEARNING_MAP: Dict[str, str] = {
 # Cooldown: 2 hours between autonomous studies
 RESEARCH_COOLDOWN = 7200
 
-
 class ResearchAgenda:
     """Analyzes capability gaps and schedules autonomous research."""
 
-    def __init__(self, capability_graph, replay_engine=None):
+    def __init__(self, capability_graph, replay_engine=None, goal_engine=None):
         self.capability_graph = capability_graph
         self.replay_engine = replay_engine
+        self.goal_engine = goal_engine
         self.experiment_inventor = ExperimentInventor(capability_graph)
+        self.frontier_detector = FrontierDetector(capability_graph, goal_engine=goal_engine)
         self.learning_map: Dict[str, str] = dict(DEFAULT_LEARNING_MAP)
         self.last_research: float = 0.0  # epoch timestamp
+        
+        # Coda prioritaria e Set per deduplicazione ultra-veloce
+        self.priority_topics: List[str] = []
+        self._priority_set = set()
         print(f"[RESEARCH AGENDA] Initialized with {len(self.learning_map)} skill→topic mappings")
 
-    def missing_skills(self) -> List[str]:
-        """Return skills in the learning map not yet in the capability graph."""
-        return [
-            skill for skill in self.learning_map
-            if not self.capability_graph.has_capability(skill)
-        ]
+    def add_priority_topic(self, topic: str):
+        # Filtro all'ingresso (Evita spazzatura)
+        if not is_valid_topic(topic):
+            print(f"[AGENDA] Ignoring invalid priority topic: {topic}")
+            return
+            
+        # Deduplicazione sicura
+        if topic not in self._priority_set:
+            self.priority_topics.append(topic)
+            self._priority_set.add(topic)
 
-    def choose_next_topic(self) -> Optional[Dict[str, str]]:
+    def choose_next_topic(self, goal_prereqs: Optional[List[str]] = None) -> Optional[Dict[str, str]]:
         """Pick a random missing skill and return its study topic."""
-        missing = self.missing_skills()
-        if not missing:
-            print("[RESEARCH AGENDA] All skills acquired! Nothing to study.")
-            return None
 
-        # Prioritize shorter skill names (more fundamental: debug, test, numpy...)
-        missing.sort(key=lambda s: len(s))
-        skill = missing[0]
-        topic = self.learning_map[skill]
-        return {"skill": skill, "topic": topic}
+        topic_data = None
 
-    def should_research(self) -> bool:
-        """Check if enough time has passed since the last autonomous study."""
-        return (time.time() - self.last_research) > RESEARCH_COOLDOWN
+        # Priority 0: Critic feedback (Highest priority)
+        if self.priority_topics:
+            topic = self.priority_topics.pop(0)
+            self._priority_set.discard(topic)  # Libera il set per il futuro
+            print(f"[RESEARCH] Using priority topic from critic feedback: {topic}")
+            topic_data = {"skill": topic, "topic": topic, "difficulty": 1}
 
-    def schedule_research(self) -> Optional[Dict[str, str]]:
-        """Schedule a new autonomous research task if cooldown has elapsed.
+        # Priority 1: Replay topics (Waterfall Fallback)
+        if not topic_data and self.replay_engine:
+            replay_topic = self.replay_engine.get_next_replay_topic()
+            if replay_topic and is_valid_topic(replay_topic):
+                print(f"[RESEARCH AGENDA] Selected replay topic: {replay_topic}")
+                topic_data = {"skill": replay_topic, "topic": replay_topic, "difficulty": 1}
 
-        Priority: replay failed experiments first, then study new skills.
-        Returns dict with {skill, topic} or None if not ready.
-        """
-        if not self.should_research():
-            return None
+        # Priority 2: Goal gaps
+        if not topic_data and goal_prereqs:
+            try:
+                missing = self.capability_graph.get_missing_skills()
+                goal_missing = [s for s in missing if s in goal_prereqs]
+                if goal_missing:
+                    skill = random.choice(goal_missing)
+                    topic = self.learning_map.get(skill) or skill
+                    print(f"[RESEARCH AGENDA] Selected goal prerequisite: {skill} → {topic}")
+                    topic_data = {"skill": skill, "topic": topic, "difficulty": 1}
+            except Exception as e:
+                print(f"[RESEARCH AGENDA] Could not extract goal gaps: {e}")
 
-        # Priority 1: replay failed experiments
-        if self.replay_engine:
-            topic = self.replay_engine.next_replay_topic()
-            if topic:
-                self.last_research = time.time()
-                print(f"[RESEARCH AGENDA] Replaying failed experiment: {topic}")
-                return {"skill": "replay", "topic": topic}
+        # Priority 3: FRONTIER DETECTOR & EXPERIMENT INVENTOR
+        if not topic_data:
+            try:
+                # Trova i confini della conoscenza di SHARD
+                if hasattr(self.frontier_detector, "get_frontier_skills"):
+                    frontier_skills = self.frontier_detector.get_frontier_skills()
+                else:
+                    frontier_skills = []
 
-        # Priority 2: study new skills
-        task = self.choose_next_topic()
-        if task:
-            self.last_research = time.time()
-            print(f"[RESEARCH AGENDA] New autonomous research scheduled")
-            print(f"  skill target: {task['skill']}")
-            print(f"  topic: {task['topic']}")
-            return task
+                if frontier_skills:
+                    target_skill = random.choice(frontier_skills)
+                    # Usa l'inventore per creare un topic complesso
+                    invented_topics = self.experiment_inventor.invent_experiments(target_skill)
+                    
+                    # Controllo di tipo robusto
+                    if isinstance(invented_topics, list) and invented_topics:
+                        chosen_topic = random.choice(invented_topics)
+                        
+                        # Lancio dei dadi stocastico per la difficoltà (20% chance per diff 3)
+                        difficulty = 3 if random.random() < EXPLORATION_PROBABILITY else 2
+                        
+                        print(f"[RESEARCH AGENDA] INVENTED new topic on frontier: {target_skill} → {chosen_topic} (Diff: {difficulty})")
+                        topic_data = {"skill": target_skill, "topic": chosen_topic, "difficulty": difficulty}
+                    else:
+                        print(f"[RESEARCH AGENDA] Inventor failed to return a valid list for: {target_skill}")
+            except Exception as e:
+                print(f"[RESEARCH AGENDA] Frontier/Inventor skipped: {e}")
 
-        # Priority 3: Invent new experiment (combine 2 known skills)
-        experiment = self.experiment_inventor.invent_experiment()
-        if experiment:
-            self.last_research = time.time()
-            print("[RESEARCH AGENDA] Invented experiment scheduled")
-            return {"skill": "invented", "topic": experiment["topic"]}
+        # Priority 4: Absolute Fallback (Random missing skill)
+        if not topic_data:
+            try:
+                missing = self.capability_graph.get_missing_skills()
+                if missing:
+                    skill = random.choice(missing)
+                    topic = self.learning_map.get(skill) or skill
+                    topic_data = {"skill": skill, "topic": topic, "difficulty": 1}
+            except Exception:
+                pass 
+
+        # --- VALIDAZIONE FINALE (L'Exit Gate) ---
+        if topic_data:
+            if not is_valid_topic(topic_data["topic"]):
+                print(f"[AGENDA] Discarding invalid topic at exit gate: {topic_data['topic']}")
+                return None
+            return topic_data
 
         return None
+
+    def get_frontier_topics(self, limit: int = 5) -> List[str]:
+        """Return top frontier topics for capability introspection."""
+        topics: List[str] = []
+
+        try:
+            if hasattr(self.frontier_detector, "get_frontier_skills"):
+                skills = self.frontier_detector.get_frontier_skills() or []
+            else:
+                skills = []
+
+            for skill in skills:
+                mapped = self.learning_map.get(skill) or skill
+                topics.append(mapped)
+                if len(topics) >= limit:
+                    break
+        except Exception:
+            pass
+
+        if not topics:
+            try:
+                missing = self.capability_graph.get_frontier_capabilities()
+                for skill in missing[:limit]:
+                    topics.append(self.learning_map.get(skill) or skill)
+            except Exception:
+                pass
+
+        return topics[:limit]

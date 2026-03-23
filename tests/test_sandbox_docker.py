@@ -23,6 +23,12 @@ from unittest.mock import patch, MagicMock, AsyncMock
 # Ensure backend/ is on the path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
+# Pre-load real modules if available to prevent poisoning sys.modules for subsequent tests
+try:
+    import study_agent
+except Exception:
+    pass
+
 # ── Mock third-party modules so tests run without full dependencies ───────────
 for _mod_name in [
     "playwright", "playwright.async_api",
@@ -50,7 +56,8 @@ for _mod_name in [
         _fake.__dict__.setdefault("DefaultEmbeddingFunction", MagicMock)
         _fake.__dict__.setdefault("embedding_functions", MagicMock())
         _fake.__dict__.setdefault("write_file", MagicMock(return_value="success"))
-        _fake.__dict__.setdefault("AsyncOpenAI", MagicMock)
+        _fake.__dict__.setdefault("read_file", MagicMock(return_value="success"))
+        _fake.__dict__.setdefault("list_directory", MagicMock(return_value="[]"))
         sys.modules[_mod_name] = _fake
 
 
@@ -336,8 +343,9 @@ def test_missing_docker_image_returns_clear_error(agent, tmp_path):
     sandbox.mkdir(exist_ok=True)
 
     def mock_subprocess_run(cmd, **kwargs):
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=1, stderr="No such image")
+        import subprocess
+        if cmd[:2] == ["docker", "image"] or cmd[:2] == ["docker", "build"]:
+            raise subprocess.CalledProcessError(1, cmd, stderr="Simulated build failure")
         return MagicMock(returncode=0)
 
     with patch("study_agent.SANDBOX_DIR", str(sandbox)), \

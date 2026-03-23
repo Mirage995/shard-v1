@@ -1,0 +1,401 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-03-16",
+    "description": "Machine-readable map of SHARD's backend modules. Used by SelfModel and future capability-driven refactoring to reason about system structure.",
+    "schema": "module_id -> { responsibility, layer, depends_on, reads, writes, capability_tags, notes }"
+  },
+
+  "modules": {
+
+    "study_agent": {
+      "responsibility": "Autonomous learning pipeline — aggregates web sources, synthesizes knowledge, validates via sandbox, certifies topics",
+      "layer": "learning",
+      "depends_on": ["llm_router", "sandbox_runner", "browser_scraper", "strategy_memory", "meta_learning", "capability_graph", "experiment_inventor", "experiment_replay", "critic_agent", "study_utils", "skill_utils", "strategy_extractor", "strategy_tracker", "swe_agent", "research_agenda", "goal_engine", "db_manager"],
+      "reads": ["capability_graph.json", "meta_learning.json"],
+      "writes": ["experiment_history.json", "shard_memory/failed_cache.json", "shard_workspace/knowledge_base/"],
+      "capability_tags": ["learning", "synthesis", "web_scraping", "sandbox_execution", "certification", "meta_learning_injection", "near_miss_retry"],
+      "notes": "Core learning loop. previous_score param injects near-miss context into LLM prompts (Fix B SSJ5)."
+    },
+
+    "night_runner": {
+      "responsibility": "Orchestrator for autonomous night study sessions — topic selection, cycle management, SSJ hooks",
+      "layer": "orchestration",
+      "depends_on": ["study_agent", "capability_graph", "consciousness", "research_agenda", "experiment_inventor", "experiment_replay", "strategy_memory", "memory", "goal_engine", "goal_storage", "self_analyzer", "improvement_engine", "proactive_refactor", "error_watchdog", "shard_semaphore"],
+      "reads": ["experiment_history.json", "capability_graph.json", "shard_memory/improvement_queue.json"],
+      "writes": ["logs/night_session_*.log", "night_reports/session_*.json", "night_reports/recap_*.md"],
+      "capability_tags": ["orchestration", "topic_selection", "topic_sanitization", "topic_quarantine", "session_management", "phoenix_retry"],
+      "notes": "Topic quarantine (_is_quarantined) blocks topics with 3+ hard fails. Fix A validates SSJ3 improvement topics."
+    },
+
+    "server": {
+      "responsibility": "FastAPI + Socket.IO HTTP server — exposes all REST endpoints and real-time events to the React frontend",
+      "layer": "interface",
+      "depends_on": ["shard", "study_agent", "strategy_memory", "meta_learning", "improvement_engine", "proactive_refactor", "goal_engine", "goal_storage", "shard_semaphore", "swe_agent"],
+      "reads": ["capability_graph.json", "settings.json"],
+      "writes": [],
+      "capability_tags": ["http_api", "websocket", "frontend_bridge", "patch_approval_gate"],
+      "notes": "Emits patch_approval_required socket event. Endpoints: /api/patch/*, /api/meta_learning/stats, /api/goals/*."
+    },
+
+    "shard": {
+      "responsibility": "Gemini Live voice session — mic/speaker I/O, auto-reconnect with exponential backoff",
+      "layer": "interface",
+      "depends_on": ["consciousness", "memory", "session_orchestrator"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["voice_io", "gemini_live", "auto_reconnect", "audio_streaming"],
+      "notes": "SSJ4 Phase 1: outer retry loop, backoff 1->2->4->8->max 30s, _stop_requested flag."
+    },
+
+    "capability_graph": {
+      "responsibility": "Persistent registry of SHARD's certified skills and their relationships",
+      "layer": "memory",
+      "depends_on": ["db_manager"],
+      "reads": ["shard_memory/capability_graph.json"],
+      "writes": ["shard_memory/capability_graph.json"],
+      "capability_tags": ["skill_tracking", "certification_registry", "graph_traversal"],
+      "notes": "Async-safe with asyncio.Lock. get_certified_skills(), get_all_skills(), certify()."
+    },
+
+    "strategy_memory": {
+      "responsibility": "Semantic memory for study strategies — stores and retrieves strategies by topic similarity",
+      "layer": "memory",
+      "depends_on": ["db_manager"],
+      "reads": [],
+      "writes": ["shard_memory/strategy_db/"],
+      "capability_tags": ["strategy_storage", "semantic_retrieval", "chromadb"],
+      "notes": "Async-safe with asyncio.Lock. Uses ChromaDB vector store."
+    },
+
+    "meta_learning": {
+      "responsibility": "Tracks which study strategies work best per topic category and suggests the optimal strategy for new topics",
+      "layer": "learning",
+      "depends_on": [],
+      "reads": ["shard_memory/meta_learning.json"],
+      "writes": ["shard_memory/meta_learning.json"],
+      "capability_tags": ["meta_learning", "strategy_suggestion", "category_matching", "learning_how_to_learn"],
+      "notes": "SSJ4 Phase 2. suggest_best_strategy(topic) injected into phase_synthesize and phase_materialize."
+    },
+
+    "memory": {
+      "responsibility": "Short-term and long-term episodic memory for SHARD's conversations and inner thoughts",
+      "layer": "memory",
+      "depends_on": ["db_manager"],
+      "reads": [],
+      "writes": ["shard_memory/"],
+      "capability_tags": ["conversation_memory", "episodic_storage", "chromadb"],
+      "notes": "Uses ChromaDB. Currently stores conversations — NOT linked to experiment_history (gap: no unified episodic layer)."
+    },
+
+    "llm_router": {
+      "responsibility": "Routes LLM calls across providers (Claude, Groq, Ollama) with circuit breaker and exponential backoff",
+      "layer": "infrastructure",
+      "depends_on": [],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["llm_routing", "circuit_breaker", "exponential_backoff", "multi_provider"],
+      "notes": "SSJ3: 3 states CLOSED/OPEN/HALF_OPEN, backoff 1->2->4s+jitter, timeout per-provider."
+    },
+
+    "sandbox_runner": {
+      "responsibility": "Executes LLM-generated Python code in isolation and returns stdout/stderr/exit code",
+      "layer": "learning",
+      "depends_on": ["study_utils"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["sandbox_execution", "python_execution", "code_validation", "timeout_management"],
+      "notes": "DockerSandboxRunner class. Extracted from study_agent in SSJ3 refactor."
+    },
+
+    "browser_scraper": {
+      "responsibility": "Web scraping for study source aggregation — Playwright/httpx, returns raw text per URL",
+      "layer": "learning",
+      "depends_on": ["study_utils"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["web_scraping", "content_aggregation", "playwright"],
+      "notes": "StudyBrowserScraper class. Extracted from study_agent in SSJ3 refactor."
+    },
+
+    "research_agenda": {
+      "responsibility": "Selects the next study topic based on capability gaps and learning map",
+      "layer": "learning",
+      "depends_on": ["experiment_inventor", "frontier_detector", "skill_utils"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["topic_selection", "learning_map", "capability_gap_detection"],
+      "notes": "DEFAULT_LEARNING_MAP defines the canonical skill curriculum."
+    },
+
+    "experiment_inventor": {
+      "responsibility": "Generates novel study topics by combining existing capabilities combinatorially",
+      "layer": "learning",
+      "depends_on": ["skill_utils"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["topic_generation", "capability_recombination"],
+      "notes": "Used by night_runner for capability-recombination topic source."
+    },
+
+    "experiment_replay": {
+      "responsibility": "Retrieves past failed experiments for Phoenix Protocol retry selection",
+      "layer": "learning",
+      "depends_on": ["skill_utils"],
+      "reads": ["shard_memory/experiment_replay.json"],
+      "writes": ["shard_memory/experiment_replay.json"],
+      "capability_tags": ["failure_retrieval", "phoenix_protocol", "near_miss_detection"],
+      "notes": "Phoenix Protocol picks candidates with score 6.0-7.4 for smart retry."
+    },
+
+    "self_analyzer": {
+      "responsibility": "Analyzes experiment history and capability graph to generate ImprovementTickets (SSJ3)",
+      "layer": "self_improvement",
+      "depends_on": ["research_agenda"],
+      "reads": ["experiment_history.json", "shard_memory/capability_graph.json", "shard_memory/failed_cache.json"],
+      "writes": [],
+      "capability_tags": ["failure_analysis", "near_miss_detection", "capability_gap_analysis", "ticket_generation"],
+      "notes": "4 ticket types: retry_chronic_failure (P1), certify_near_miss (P1), retry_grown (P2), fill_capability_gap (P2)."
+    },
+
+    "improvement_engine": {
+      "responsibility": "Consumes ImprovementTickets from SelfAnalyzer and persists them as prioritized study queue",
+      "layer": "self_improvement",
+      "depends_on": [],
+      "reads": ["shard_memory/improvement_queue.json"],
+      "writes": ["shard_memory/improvement_queue.json"],
+      "capability_tags": ["ticket_consumption", "queue_management", "proactive_improvement"],
+      "notes": "NightRunner drains this queue at Priority -1 (before normal topic selection)."
+    },
+
+    "proactive_refactor": {
+      "responsibility": "Analyzes core backend files and proposes code patches for human approval (SSJ4 Phase 3)",
+      "layer": "self_improvement",
+      "depends_on": [],
+      "reads": ["shard_memory/refactor_state.json", "shard_memory/pending_patch.json"],
+      "writes": ["shard_memory/refactor_state.json", "shard_memory/pending_patch.json"],
+      "capability_tags": ["code_analysis", "patch_generation", "human_gate", "self_modification"],
+      "notes": "Round-robin on 10 core files. Each old string validated to exist exactly once. .bak backup before apply. FUTURE: replace round-robin with capability-driven targeting."
+    },
+
+    "error_watchdog": {
+      "responsibility": "Scans NightRunner logs for Python exceptions and triggers SWEAgent to patch the affected file",
+      "layer": "self_improvement",
+      "depends_on": ["swe_agent"],
+      "reads": ["logs/"],
+      "writes": [],
+      "capability_tags": ["error_detection", "log_scanning", "reactive_repair"],
+      "notes": "SSJ2. Reactive (exception-driven) vs ProactiveRefactor which is proactive."
+    },
+
+    "swe_agent": {
+      "responsibility": "Software engineering agent — reads error context, generates and applies code patches, commits via git",
+      "layer": "self_improvement",
+      "depends_on": ["llm_router"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["code_patching", "git_commit", "exception_repair", "file_editing"],
+      "notes": "Called by ErrorWatchdog on exception detection. Also used by ProactiveRefactor flow."
+    },
+
+    "consciousness": {
+      "responsibility": "Generates SHARD's spontaneous thoughts and inner monologue for topic inspiration",
+      "layer": "cognition",
+      "depends_on": ["research_agenda"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["thought_generation", "inner_monologue", "topic_inspiration"],
+      "notes": "Used as one of 3 topic sources in night_runner._select_topic()."
+    },
+
+    "session_orchestrator": {
+      "responsibility": "Manages the Gemini Live WebSocket session — audio I/O loop, transcription callbacks, vision frames",
+      "layer": "interface",
+      "depends_on": ["study_agent"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["gemini_live", "audio_io", "vision_io", "transcription", "websocket_session"],
+      "notes": "Parses model_turn.parts directly. Charon voice 24kHz. Vision at 2fps 1280x720 JPEG."
+    },
+
+    "shard_semaphore": {
+      "responsibility": "Mutual exclusion between voice session and NightRunner — prevents concurrent Gemini API usage",
+      "layer": "infrastructure",
+      "depends_on": [],
+      "reads": ["shard_memory/session.lock"],
+      "writes": ["shard_memory/session.lock"],
+      "capability_tags": ["concurrency_control", "resource_locking", "session_management"],
+      "notes": "Architectural bottleneck: SHARD cannot learn while speaking. Known limitation."
+    },
+
+    "db_manager": {
+      "responsibility": "Singleton ChromaDB client factory — one PersistentClient per path, thread-safe, eliminates SQLite lock contention",
+      "layer": "infrastructure",
+      "depends_on": [],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["chromadb", "connection_pooling", "thread_safety", "singleton"],
+      "notes": "SSJ3 fix for Windows SQLite lock contention. All ChromaDB modules go through this."
+    },
+
+    "goal_engine": {
+      "responsibility": "Manages SHARD's active goals and selects study topics aligned with current objectives",
+      "layer": "cognition",
+      "depends_on": ["goal_storage"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["goal_management", "goal_driven_selection", "objective_tracking"],
+      "notes": "Wired into night_runner topic selection and server goal endpoints."
+    },
+
+    "self_model": {
+      "responsibility": "SHARD's self-awareness model — summarizes capabilities, computes live performance metrics, assesses capability gaps",
+      "layer": "cognition",
+      "depends_on": ["research_agenda", "capability_graph", "strategy_memory"],
+      "reads": ["shard_memory/experiment_history.json"],
+      "writes": [],
+      "capability_tags": ["self_awareness", "performance_metrics", "gap_assessment", "metacognition"],
+      "notes": "Metrics: get_certification_rate() 20.5%, get_avg_repair_loops() 3.87. get_prediction_accuracy() removed (mathematically invalid)."
+    },
+
+    "graph_rag": {
+      "responsibility": "Causal knowledge graph over SQLite — extracts and queries causal relations between concepts",
+      "layer": "memory",
+      "depends_on": ["shard_db", "llm_router"],
+      "reads": [],
+      "writes": ["shard_memory/shard.db (knowledge_graph table)"],
+      "capability_tags": ["causal_reasoning", "knowledge_graph", "rag_injection"],
+      "notes": "Write: extract_and_store_relations() during SYNTHESIZE. Read: query_causal_context() injected into swarm Architect, benchmark_loop correction, and SYNTHESIZE prompts."
+    },
+
+    "study_personas": {
+      "responsibility": "Dynamic persona selector for study sessions — picks THEORETICAL/HACKER/VISUAL based on topic category and meta-learning stats",
+      "layer": "learning",
+      "depends_on": ["meta_learning"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["adaptive_learning", "persona_selection", "study_strategy"],
+      "notes": "select_persona(topic) returns PersonaSpec with system_prompt, style, focus. Wired into night_runner topic selection."
+    },
+
+    "concurrency_simulator": {
+      "responsibility": "Pre-benchmark stress test — probes source code for race conditions, deadlocks, and atomicity bugs before pytest runs",
+      "layer": "infrastructure",
+      "depends_on": [],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["concurrency_testing", "race_detection", "stress_testing"],
+      "notes": "probe_concurrency(source, tests) returns ConcurrencyReport. Wired into benchmark_loop as pre-check before first attempt."
+    },
+
+    "report_agent": {
+      "responsibility": "Intelligent night recap generator — queries chronic failures, near-misses, trending categories, generates actionable insights",
+      "layer": "orchestration",
+      "depends_on": ["shard_db", "llm_router", "graph_rag"],
+      "reads": ["shard_memory/persona_history.json"],
+      "writes": [],
+      "capability_tags": ["reporting", "analytics", "night_recap"],
+      "notes": "generate_insights() called by night_runner._generate_markdown_recap() to add INSIGHTS section."
+    },
+
+    "llm_cache": {
+      "responsibility": "LLM response cache — in-memory LRU with SQLite persistence, avoids duplicate LLM calls",
+      "layer": "infrastructure",
+      "depends_on": ["shard_db", "llm_router"],
+      "reads": ["shard_memory/shard.db (llm_cache table)"],
+      "writes": ["shard_memory/shard.db (llm_cache table)"],
+      "capability_tags": ["caching", "cost_optimization", "deduplication"],
+      "notes": "cached_llm_complete() drop-in for llm_complete(). TTL 2h, max 500 entries, bypasses if temperature > 0.3. Used by swarm reviewers."
+    },
+
+    "patch_simulator": {
+      "responsibility": "What-if simulator for code patches — static diff analysis + LLM risk assessment per dependent module",
+      "layer": "self_improvement",
+      "depends_on": ["architecture_map", "llm_router"],
+      "reads": ["shard_memory/architecture_map.json"],
+      "writes": [],
+      "capability_tags": ["impact_analysis", "patch_safety", "dependency_tracking"],
+      "notes": "simulate_patch() async (static + LLM). simulate_patch_sync() instant (static only). Wired into server.py _emit_patch_approval() and /api/patch/simulate."
+    },
+
+    "benchmark_loop": {
+      "responsibility": "Closed feedback loop for SWE benchmark tasks — LLM solo → swarm → correction cycles until all pytest tests pass",
+      "layer": "benchmark",
+      "depends_on": ["llm_router", "swarm_engine", "concurrency_simulator", "graph_rag", "knowledge_bridge", "benchmark_memory", "improvement_engine"],
+      "reads": ["benchmark/task_*/README.md", "benchmark/task_*/*.py"],
+      "writes": ["benchmark/task_*/<output>.py", "shard_memory/benchmark_episodes.json"],
+      "capability_tags": ["benchmark", "swe_repair", "stuck_detection", "swarm_integration", "episodic_feedback"],
+      "notes": "stuck_detection: _detect_stuck_tests() injects STUCK TESTS section into both SHARD FEEDBACK and Swarm Architect prompts from attempt 2+."
+    },
+
+    "benchmark_generator": {
+      "responsibility": "LLM-powered test case generator for StudyAgent certification benchmarks",
+      "layer": "benchmark",
+      "depends_on": ["llm_router"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["benchmark", "test_generation", "certification"],
+      "notes": "_validate_test() rejects None/bool/int/float/dict as input_data. Async generate() returns scaffold + validated tests."
+    },
+
+    "swarm_engine": {
+      "responsibility": "Multi-agent Architect→Coder→Critic→Reviewers pipeline for complex code repair tasks",
+      "layer": "benchmark",
+      "depends_on": ["llm_router", "graph_rag", "llm_cache"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["swarm", "multi_agent", "code_repair", "parallel_review", "stuck_detection"],
+      "notes": "5 specialized reviewers (Concurrency, EdgeCases, Security, Performance, DataIntegrity). stuck_tests param injects targeted hints into Architect prompt."
+    },
+
+    "episodic_memory": {
+      "responsibility": "Read/write interface over experiments table — retrieve past study episodes for LLM context injection",
+      "layer": "memory",
+      "depends_on": ["shard_db"],
+      "reads": ["shard_memory/shard.db"],
+      "writes": ["shard_memory/shard.db"],
+      "capability_tags": ["memory", "episodic", "context_injection", "experience_retrieval"],
+      "notes": "retrieve_context() uses word-overlap similarity. get_context_prompt() formats for LLM injection. Guards None score/failure_reason from DB NULLs."
+    },
+
+    "knowledge_bridge": {
+      "responsibility": "Query interface over the shard_workspace knowledge base for benchmark context injection",
+      "layer": "knowledge",
+      "depends_on": [],
+      "reads": ["shard_workspace/knowledge_base/*.md"],
+      "writes": [],
+      "capability_tags": ["knowledge", "context_injection", "retrieval"],
+      "notes": "query_knowledge_base() returns relevant KB articles as formatted string for benchmark_loop prompt injection."
+    },
+
+    "shard_db": {
+      "responsibility": "SQLite connection manager — single shared connection for experiments, knowledge_graph, strategy tables",
+      "layer": "persistence",
+      "depends_on": [],
+      "reads": ["shard_memory/shard.db"],
+      "writes": ["shard_memory/shard.db"],
+      "capability_tags": ["persistence", "sqlite", "shared_state"],
+      "notes": "get_db() returns singleton connection. execute() and query() wrappers with row_factory=sqlite3.Row."
+    },
+
+    "study_phases": {
+      "responsibility": "Discrete phase objects for the study pipeline — PrepPhase, MapPhase, SynthesizePhase, MaterializePhase, EvaluatePhase, BenchmarkPhase",
+      "layer": "learning",
+      "depends_on": ["llm_router", "browser_scraper", "sandbox_runner", "benchmark_generator", "episodic_memory", "graph_rag", "study_context"],
+      "reads": [],
+      "writes": ["shard_workspace/knowledge_base/*.md"],
+      "capability_tags": ["learning", "synthesis", "sandbox_execution", "certification", "episodic_injection"],
+      "notes": "Marker check uses 'All assertions passed' (no UTF-8 checkmark) to avoid Windows/Docker encoding corruption."
+    },
+
+    "study_pipeline": {
+      "responsibility": "Orchestrates study phases in sequence — runs PrepPhase→MapPhase→SynthesizePhase→MaterializePhase→EvaluatePhase→BenchmarkPhase",
+      "layer": "learning",
+      "depends_on": ["study_phases", "study_context"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["learning", "orchestration"],
+      "notes": "Thin coordinator. Each phase is self-contained and fatal=True phases abort the pipeline on failure."
+    }
+  }
+}

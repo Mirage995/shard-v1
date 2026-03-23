@@ -4,29 +4,55 @@ Stores strategies that worked during sandbox experiments so SHARD can
 reuse successful methods in future studies. Uses ChromaDB for persistence
 and semantic retrieval.
 """
-import chromadb
+import asyncio
+import logging
 import os
 import json
 from datetime import datetime
 from typing import Dict, List, Optional
+from constants import SUCCESS_SCORE_THRESHOLD
 
-CHROMA_DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'shard_memory', 'strategy_db')
+from db_manager import get_collection, DB_PATH_STRATEGY_DB
+
+logger = logging.getLogger("shard.strategy_memory")
 
 
 class StrategyMemory:
     def __init__(self):
-        os.makedirs(CHROMA_DB_PATH, exist_ok=True)
-        self.client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-        self.collection = self.client.get_or_create_collection(
+        # Usa il singleton db_manager — elimina il secondo client ChromaDB indipendente
+        self.collection = get_collection(
+            DB_PATH_STRATEGY_DB,
             name="strategy_memory",
             metadata={"description": "Successful learning strategies from experiments"}
         )
+        # One writer at a time — prevents concurrent NightRunner/SessionOrchestrator races
+        self._lock = asyncio.Lock()
         print(f"[STRATEGY] Memory initialized ({self.collection.count()} strategies stored)")
 
     def store_strategy(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
         """Save a strategy with its topic, description, and outcome."""
         timestamp = datetime.now().isoformat()
         doc_id = f"strat_{timestamp}_{topic[:30].replace(' ', '_')}"
+
+        # Compute running stats from all existing records for this topic
+        runs = 1
+        avg_score = round(score, 3)
+        success_rate = 1.0 if score >= SUCCESS_SCORE_THRESHOLD else 0.0
+        try:
+            existing = self.collection.get(where={"topic": topic})
+            if existing and existing.get("metadatas"):
+                prev_scores = [float(m.get("score", 0)) for m in existing["metadatas"]]
+                if prev_scores:
+                    all_scores = prev_scores + [score]
+                    runs = len(all_scores)
+                    avg_score = round(sum(all_scores) / runs, 3)
+                    success_rate = round(
+                        sum(1 for s in all_scores if s >= SUCCESS_SCORE_THRESHOLD) / runs, 3
+                    )
+        except Exception:
+            pass  # keep initial values on any collection error
+
+        print(f"[STRATEGY] Updated stats → runs={runs} avg={avg_score} success={success_rate}")
 
         self.collection.add(
             documents=[strategy],
@@ -35,13 +61,42 @@ class StrategyMemory:
                 "outcome": outcome,
                 "score": str(score),
                 "timestamp": timestamp,
+                "runs": runs,
+                "avg_score": avg_score,
+                "success_rate": success_rate,
             }],
             ids=[doc_id]
         )
         print(f"[STRATEGY] Stored strategy for '{topic}' (outcome={outcome}, score={score})")
 
+    def store_strategy_object(self, strategy):
+        """Store a Strategy object."""
+        from strategy_model import Strategy  # import here to avoid circular
+        
+        timestamp = datetime.now().isoformat()
+        doc_id = f"strat_obj_{timestamp}_{strategy.id[:10]}"
+        
+        self.collection.add(
+            documents=[f"{strategy.name}: {strategy.description}\nPattern: {' -> '.join(strategy.pattern)}"],
+            metadatas=[{
+                "strategy_id": strategy.id,
+                "name": strategy.name,
+                "description": strategy.description,
+                "pattern": json.dumps(strategy.pattern),
+                "success_rate": str(strategy.success_rate),
+                "usage_count": strategy.usage_count,
+                "domains": json.dumps(strategy.domains) if strategy.domains else "[]",
+                "created_timestamp": strategy.created_timestamp,
+                "last_used_timestamp": strategy.last_used_timestamp,
+                "last_success_timestamp": strategy.last_success_timestamp,
+                "timestamp": timestamp,
+            }],
+            ids=[doc_id]
+        )
+        print(f"[STRATEGY] Stored Strategy object '{strategy.name}' (id={strategy.id})")
+
     def query(self, topic: str, k: int = 3) -> List[Dict]:
-        """Retrieve the most relevant strategies for a topic."""
+        """Retrieve the most relevant strategies for a topic (sync)."""
         if self.collection.count() == 0:
             return []
 
@@ -61,6 +116,69 @@ class StrategyMemory:
                     "score": float(meta.get("score", 0)),
                 })
         return strategies
+
+    async def query_async(self, topic: str, k: int = 3) -> List[Dict]:
+        """Async wrapper — non blocca l'event loop durante la query ChromaDB."""
+        return await asyncio.to_thread(self.query, topic, k)
+
+    async def store_strategy_async(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
+        """Async-safe write — serialises concurrent NightRunner/SessionOrchestrator calls."""
+        async with self._lock:
+            await asyncio.to_thread(self.store_strategy, topic, strategy, outcome, score)
+
+    async def store_strategy_object_async(self, strategy):
+        """Async-safe write for Strategy objects."""
+        async with self._lock:
+            await asyncio.to_thread(self.store_strategy_object, strategy)
+
+    async def get_all_strategies_async(self) -> List[Dict]:
+        """Async wrapper per get_all_strategies."""
+        return await asyncio.to_thread(self.get_all_strategies)
+
+    async def get_success_rate_async(self) -> float:
+        """Async wrapper per get_success_rate."""
+        return await asyncio.to_thread(self.get_success_rate)
+
+    def get_all_strategies(self):
+        """
+        Restituisce tutte le strategie memorizzate in ChromaDB.
+        Serve al modulo MetaLearning per calcolare statistiche globali.
+        """
+        try:
+            results = self.collection.get(include=["metadatas"])
+            
+            strategies = []
+            
+            for meta in results.get("metadatas", []):
+                strategies.append(meta)
+                
+            return strategies
+            
+        except Exception as e:
+            print(f"[STRATEGY] Failed to retrieve strategies: {e}")
+            return []
+
+    def get_success_rate(self) -> float:
+        """Return global strategy success rate across stored records."""
+        try:
+            strategies = self.get_all_strategies()
+            if not strategies:
+                return 0.0
+
+            success = 0
+            total = 0
+
+            for meta in strategies:
+                total += 1
+                if str(meta.get("outcome", "")).lower() == "success":
+                    success += 1
+
+            if total == 0:
+                return 0.0
+
+            return success / total
+        except Exception:
+            return 0.0
 
     @staticmethod
     def extract_strategy(experiment: Dict) -> Optional[Dict]:
@@ -86,6 +204,11 @@ class StrategyMemory:
 
         score = float(eval_data.get("score", 0))
         verdict = eval_data.get("verdict", "FAIL")
+
+        # Sanity Filter: Solo strategie con score decente o sandbox funzionante
+        if score < 5.0 and verdict != "PASS":
+            print(f"[STRATEGY] Strategia scartata (score insufficiente: {score}, {verdict})")
+            return None
 
         # Only extract strategy if we have meaningful data
         if not sandbox and not structured:
@@ -119,7 +242,7 @@ class StrategyMemory:
 
         gaps = eval_data.get("gaps", [])
         if gaps:
-            parts.append(f"Gaps identified: {', '.join(gaps[:3])}")
+            parts.append(f"Gaps identified: {', '.join(str(x) for x in gaps[:3])}")
 
         if not parts:
             return None

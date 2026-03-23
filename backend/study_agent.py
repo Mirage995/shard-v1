@@ -7,32 +7,77 @@ import subprocess
 import uuid
 import pathlib
 from typing import List, Dict, Any, Optional, Callable
+from importlib.util import spec_from_file_location, module_from_spec
 from openai import AsyncOpenAI
 from datetime import datetime
-
-from playwright.async_api import async_playwright, Page
-from playwright_stealth import Stealth
-from bs4 import BeautifulSoup
 from groq import Groq, RateLimitError as GroqRateLimitError
 import anthropic
 from ddgs import DDGS
-import chromadb
 from chromadb.utils import embedding_functions
+from db_manager import get_collection, DB_PATH_KNOWLEDGE_DB
 from filesystem_tools import write_file
 from strategy_memory import StrategyMemory
 from capability_graph import CapabilityGraph
+from goal_engine import GoalEngine
 from skill_discovery import SkillDiscovery
 from experiment_replay import ExperimentReplay
 from research_agenda import ResearchAgenda
 from experiment_inventor import ExperimentInventor
 from experiment_cache import SemanticExperimentCache
+from strategy_extractor import StrategyExtractor
+from strategy_tracker import StrategyTracker
+from meta_learning import MetaLearning
+from critic_feedback_engine import CriticFeedbackEngine
+from benchmark_generator import BenchmarkGenerator
+from benchmark_runner import BenchmarkRunner
+from skill_utils import normalize_capability_name
+from swe_agent import SWEAgent
+from cognition.simulation_engine import SimulationEngine
+from cognition.self_model import SelfModel
 from dotenv import load_dotenv
+from study_utils import (
+    find_file, safe_json_load, STOPWORDS, TECH_REFERENCE, GENERIC_CONCEPTS,
+    semantic_concept_score, valid_concept, PHASES, ProgressTracker,
+    _extract_json_block, _filter_concepts,
+)
+from sandbox_runner import DockerSandboxRunner
+from browser_scraper import StudyBrowserScraper
+try:
+    from llm_router import llm_complete
+except ImportError:
+    from backend.llm_router import llm_complete
 
-def find_file(filename: str, start_path="."):
-    for root, dirs, files in os.walk(start_path):
-        if filename in files:
-            return os.path.join(root, filename)
-    return None
+
+def _load_reliability_module(relative_path: str, module_name: str):
+    """Load reliability extension modules from repo-level shard/ without refactoring imports."""
+    repo_root = pathlib.Path(__file__).resolve().parents[1]
+    target = repo_root / relative_path
+    spec = spec_from_file_location(module_name, target)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load module from {target}")
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_episodic_memory_mod = _load_reliability_module(
+    "shard/memory/episodic_memory.py",
+    "shard_memory_episodic_memory",
+)
+store_episode = _episodic_memory_mod.store_episode
+
+_error_classifier_mod = _load_reliability_module(
+    "shard/debug/error_classifier.py",
+    "shard_debug_error_classifier",
+)
+FailureType = _error_classifier_mod.FailureType
+classify_error = _error_classifier_mod.classify_error
+
+_heuristic_repairs_mod = _load_reliability_module(
+    "shard/debug/heuristic_repairs.py",
+    "shard_debug_heuristic_repairs",
+)
+attempt_heuristic_fix = _heuristic_repairs_mod.attempt_heuristic_fix
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 load_dotenv()
@@ -41,13 +86,19 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 GROQ_API_KEY     = os.getenv("GROQ_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CHROMA_DB_PATH   = os.path.join(os.getcwd(), "knowledge_db")
+CHROMA_DB_PATH   = DB_PATH_KNOWLEDGE_DB  # Ora da db_manager (path assoluto, CWD-indipendente)
 SANDBOX_DIR      = os.path.join(os.getcwd(), "sandbox")
 WORKSPACE_DIR    = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shard_workspace")
-PASS_THRESHOLD   = 6.0
+from constants import (
+    SUCCESS_SCORE_THRESHOLD,
+    BENCHMARK_ENABLED,
+    BENCHMARK_PASS_THRESHOLD,
+    BENCHMARK_WEIGHT,
+)
 MAX_RETRY        = 3
 GROQ_DELAY       = 1.2  # Seconds between Groq calls to avoid rate limiting
 ANTHROPIC_DELAY  = 0.5  # Seconds between Anthropic calls
+
 
 if not ANTHROPIC_API_KEY:
     raise ValueError("ANTHROPIC_API_KEY must be set in .env")
@@ -58,53 +109,9 @@ if not GROQ_API_KEY:
 
 os.makedirs(SANDBOX_DIR, exist_ok=True)
 
-# ── PROGRESS TRACKER ──────────────────────────────────────────────────────────
-
-PHASES = [
-    {"name": "MAP",              "weight": 10},
-    {"name": "AGGREGATE",        "weight": 20},
-    {"name": "SYNTHESIZE",       "weight": 15},
-    {"name": "STORE",            "weight": 5},
-    {"name": "CROSS_POLLINATE",  "weight": 10},
-    {"name": "MATERIALIZE",      "weight": 10},
-    {"name": "SANDBOX",          "weight": 10},
-    {"name": "VALIDATE",         "weight": 10},
-    {"name": "EVALUATE",         "weight": 5},
-    {"name": "CERTIFY",          "weight": 5},
-]
-
-class ProgressTracker:
-    """Tracks study progress as a percentage across all phases."""
-    def __init__(self):
-        self.current_phase = ""
-        self.phase_progress = {}  # phase_name -> 0.0 to 1.0
-        self.total_weight = sum(p["weight"] for p in PHASES)
-    
-    def set_phase(self, phase_name: str, progress: float = 0.0):
-        self.current_phase = phase_name
-        self.phase_progress[phase_name] = min(1.0, max(0.0, progress))
-    
-    def complete_phase(self, phase_name: str):
-        self.phase_progress[phase_name] = 1.0
-    
-    @property
-    def percentage(self) -> int:
-        total = 0
-        for p in PHASES:
-            total += p["weight"] * self.phase_progress.get(p["name"], 0.0)
-        return min(100, int(total / self.total_weight * 100))
-    
-    @property
-    def status(self) -> Dict:
-        return {
-            "phase": self.current_phase,
-            "percentage": self.percentage,
-            "phases": {p["name"]: self.phase_progress.get(p["name"], 0.0) for p in PHASES}
-        }
-
 
 class StudyAgent:
-    def __init__(self):
+    def __init__(self, goal_engine: GoalEngine = None):
         # ── Anthropic Claude (Main Brain — complex reasoning) ──
         self.anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
@@ -115,9 +122,11 @@ class StudyAgent:
         else:
             self.groq_client = None
             print("[STUDY] ⚠️  Groq disabled — using Claude for all tasks")
-        self.chroma      = chromadb.PersistentClient(path=CHROMA_DB_PATH)
         self.emb_fn      = embedding_functions.DefaultEmbeddingFunction()
-        self.kb          = self.chroma.get_or_create_collection(
+        self.embed       = self.emb_fn  # Semantic validation use
+        # Usa il singleton db_manager — terzo client ChromaDB unificato
+        self.kb          = get_collection(
+            CHROMA_DB_PATH,
             name="shard_knowledge_base",
             embedding_function=self.emb_fn
         )
@@ -126,33 +135,79 @@ class StudyAgent:
         self.playwright  = None
         self.bctx        = None
         self.progress    = ProgressTracker()
-        
-        # Ollama local client (OpenAI-compatible API on port 11434)
-        self.local_client = AsyncOpenAI(
-            base_url="http://localhost:11434/v1",
-            api_key="ollama"
+
+        # ── Extracted sub-components (SSJ3 Phase 1) ──
+        self.sandbox_runner = DockerSandboxRunner(
+            sandbox_dir=SANDBOX_DIR,
+            analysis_fn=self._think,
         )
+        self.browser_scraper = StudyBrowserScraper()
+
+
         
         # Callback for sending browser screenshots to frontend
         self.on_web_data = None
         
         # ── Strategy Memory & Capability Graph ──
         self.capability_graph = CapabilityGraph()
+        # if a goal engine exists, register its callback listener for capability events
+        if goal_engine:
+            self.capability_graph.register_capability_listener(
+                goal_engine.on_capability_added
+            )
+
+        # create or adopt a GoalEngine for use by other components
+        if goal_engine is None:
+            self.goal_engine = None
+        else:
+            self.goal_engine = goal_engine
+            # ensure the engine knows about our graph in case it was created
+            # earlier without one
+            if not self.goal_engine.capability_graph:
+                self.goal_engine.capability_graph = self.capability_graph
+            # ensure listener registered as well (in case engine created earlier)
+            self.capability_graph.register_capability_listener(
+                self.goal_engine.on_capability_added
+            )
+
         self.strategy_memory = StrategyMemory()
         self.skill_discovery = SkillDiscovery(self.capability_graph)
         self.replay_engine = ExperimentReplay()
         self.experiment_inventor = ExperimentInventor(self.capability_graph)
         self.experiment_cache = SemanticExperimentCache()
+        self.tracker = StrategyTracker()
+        self.meta_learning = MetaLearning(self.strategy_memory)
+        from cognition.world_model import world_model
+        self.world_model = world_model
+        self.sim_engine = SimulationEngine(self.world_model)
         self.research_agenda = ResearchAgenda(
             capability_graph=self.capability_graph,
-            replay_engine=self.replay_engine
+            replay_engine=self.replay_engine,
+            goal_engine=self.goal_engine,
         )
+        self.self_model = SelfModel(
+            self.capability_graph,
+            self.strategy_memory,
+            self.research_agenda,
+            self.world_model
+        )
+
+        # ── CriticAgent for failure analysis ──
+        from critic_agent import CriticAgent
+        self.critic_agent = CriticAgent(self.capability_graph, self.strategy_memory)
+        self.critic_feedback_engine = CriticFeedbackEngine(self.research_agenda, self.capability_graph)
         
-        self.user_agents = [
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
-        ]
+        try:
+            self.swe_agent = SWEAgent()
+        except Exception as e:
+            print(f"[SWE] Initialization failed: {e}")
+            self.swe_agent = None
+        
+        # ── Benchmark system ──────────────────────────────────────────────────
+        # think_fn and sandbox_runner are wired here so the real implementations
+        # can call the LLM and Docker sandbox without circular dependencies.
+        self.benchmark_generator = BenchmarkGenerator(think_fn=self._think_fast)
+        self.benchmark_runner    = BenchmarkRunner(sandbox_runner=self.sandbox_runner)
 
     # ── LLM REASONING ENGINES ────────────────────────────────────────────────
 
@@ -190,8 +245,9 @@ class StudyAgent:
 
         Prevents SYNTHESIZE crashes from malformed model output.
         """
-        # Step 1: try normal json load (after clean)
-        cleaned = self._clean_json(raw_text)
+        # Step 1: extract JSON block, then clean, then parse
+        clean = _extract_json_block(raw_text)
+        cleaned = self._clean_json(clean)
         try:
             return json.loads(cleaned)
         except json.JSONDecodeError:
@@ -209,7 +265,7 @@ class StudyAgent:
                 pass
 
         print("[SYNTHESIZE] Recovery failed — returning empty structure")
-        return {"concepts": []}
+        return {"concepts": [], "summary": "", "insights": []}
 
     async def retrieve_strategy(self, topic: str):
         """
@@ -243,290 +299,36 @@ class StudyAgent:
         return None
 
     async def _think(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
-        """Core Anthropic Claude reasoning call — wrapped in to_thread to avoid blocking event loop.
-
-        Uses claude-sonnet-4-5-20250929 with max_tokens=2000 hard limit for cost safety.
-        Falls back to Ollama local on any Anthropic API error.
+        """Core reasoning call using the global llm_router.
+        Prefers Claude -> Groq -> Gemini.
         """
-        # Strengthen system prompt for JSON mode
         effective_system = system
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
 
-        # Rate limit protection
-        await asyncio.sleep(ANTHROPIC_DELAY)
-
-        try:
-            # Anthropic Messages API — sync call in thread
-            def _call_anthropic():
-                return self.anthropic_client.messages.create(
-                    model="claude-sonnet-4-5-20250929",
-                    max_tokens=2000,  # Hard limit for cost safety
-                    system=effective_system,
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.3,
-                )
-
-            resp = await asyncio.to_thread(_call_anthropic)
-            result = resp.content[0].text
-
-            # Clean JSON output if in json_mode
-            if json_mode:
-                result = self._clean_json(result)
-            return result
-
-        except anthropic.RateLimitError:
-            # ── FAILOVER: Anthropic 429 → Ollama locale ──
-            print("\n" + "=" * 60)
-            print("[ANTHROPIC] \u26a0\ufe0f  Rate Limit raggiunto! (429)")
-            print("[ANTHROPIC] Fallback su Ollama locale...")
-            print("=" * 60 + "\n")
-            return await self._think_local(prompt, system, json_mode)
-
-        except anthropic.APIError as e:
-            # Handle API-level errors (overloaded, bad request, etc.)
-            print(f"[ANTHROPIC] \u274c API Error: {e}")
-            print("[ANTHROPIC] Fallback su Ollama locale...")
-            return await self._think_local(prompt, system, json_mode)
-
-        except Exception as e:
-            print(f"[ANTHROPIC] \u274c Unexpected error: {e}")
-            # Fallback to Ollama on any failure
-            return await self._think_local(prompt, system, json_mode)
+        return await llm_complete(
+            prompt=prompt,
+            system=effective_system,
+            max_tokens=2000,
+            temperature=0.3,
+            providers=["Claude", "Groq", "Gemini"]
+        )
 
     async def _think_fast(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
-        """Fast Groq reasoning call for simple tasks (query generation, gap analysis).
-
-        Uses llama-3.3-70b-versatile via Groq for speed.
-        Falls back to Claude (_think) if Groq is unavailable or rate-limited.
+        """Fast reasoning call using the global llm_router.
+        Prefers Groq -> Gemini -> Claude (or just Groq -> Gemini to stay fast).
         """
-        # If Groq is not configured, fall through to Claude
-        if not self.groq_client:
-            return await self._think(prompt, system, json_mode)
-
         effective_system = system
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
 
-        # Rate limit protection
-        await asyncio.sleep(GROQ_DELAY)
-
-        try:
-            def _call_groq():
-                return self.groq_client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=[
-                        {"role": "system", "content": effective_system},
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.3,
-                    max_tokens=2000,
-                )
-
-            resp = await asyncio.to_thread(_call_groq)
-            result = resp.choices[0].message.content
-
-            if json_mode:
-                result = self._clean_json(result)
-
-            print(f"[GROQ] ✅ Fast response ({len(result)} chars)")
-            return result
-
-        except GroqRateLimitError:
-            print("\n" + "=" * 60)
-            print("[GROQ] ⚠️  Rate Limit raggiunto! (429)")
-            print("[GROQ] Fallback su Claude (Anthropic)...")
-            print("=" * 60 + "\n")
-            return await self._think(prompt, system, json_mode)
-
-        except Exception as e:
-            print(f"[GROQ] ❌ Error: {e}")
-            print("[GROQ] Fallback su Claude (Anthropic)...")
-            return await self._think(prompt, system, json_mode)
-
-    async def _think_local(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
-        """Local Ollama reasoning call via OpenAI-compatible API (model: phi3:mini)."""
-        print("[EVALUATE] Using lightweight model: phi3:mini")
-        effective_system = system
-        if json_mode:
-            effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
-
-        kwargs = {
-            "model": "phi3:mini",
-            "messages": [
-                {"role": "system", "content": effective_system},
-                {"role": "user",   "content": prompt}
-            ],
-            "temperature": 0.3,
-            "max_tokens":  4096,
-        }
-        if json_mode:
-            kwargs["response_format"] = {"type": "json_object"}
-
-        try:
-            resp = await self.local_client.chat.completions.create(**kwargs)
-            result = resp.choices[0].message.content
-            if json_mode:
-                result = self._clean_json(result)
-            return result
-        except ConnectionError as e:
-            print("\n" + "=" * 60)
-            print("[OLLAMA] ❌ Impossibile connettersi a Ollama!")
-            print("[OLLAMA] Assicurati che Ollama sia in esecuzione: ollama serve")
-            print("[OLLAMA] E che il modello phi3:mini sia disponibile: ollama pull phi3:mini")
-            print("=" * 60 + "\n")
-            raise
-        except Exception as e:
-            # Catch connection refused and similar network errors
-            if "Connection" in type(e).__name__ or "connect" in str(e).lower():
-                print("\n" + "=" * 60)
-                print("[OLLAMA] ❌ Impossibile connettersi a Ollama!")
-                print("[OLLAMA] Assicurati che Ollama sia in esecuzione: ollama serve")
-                print("[OLLAMA] E che il modello phi3:mini sia disponibile: ollama pull phi3:mini")
-                print("=" * 60 + "\n")
-            raise
-
-    # ── BROWSER (VISIBLE + ANTI-DETECTION) ───────────────────────────────────
-
-    async def _init_browser(self, headless: bool = False):
-        """Launch browser — headless=False so Boss can see it working."""
-        if not self.browser:
-            self.playwright = await async_playwright().start()
-            self.browser = await self.playwright.chromium.launch(
-                headless=headless,
-                args=[
-                    "--disable-blink-features=AutomationControlled",
-                    "--no-sandbox",
-                ]
-            )
-            self.bctx = await self.browser.new_context(
-                viewport={"width": 1280, "height": 800},
-                user_agent=random.choice(self.user_agents),
-                locale="it-IT",
-                timezone_id="Europe/Rome",
-            )
-            # Anti-detection: stealth is applied per-page via stealth_async()
-
-    async def _close_browser(self):
-        if self.browser:
-            try:
-                await self.browser.close()
-                await self.playwright.stop()
-            except:
-                pass
-            self.browser = self.playwright = self.bctx = None
-
-    async def _take_screenshot(self, page: Page, label: str = ""):
-        """Capture screenshot and send to frontend if callback is set."""
-        try:
-            screenshot = await page.screenshot(type="jpeg", quality=60)
-            import base64
-            b64 = base64.b64encode(screenshot).decode("utf-8")
-            if self.on_web_data:
-                self.on_web_data({
-                    "image": b64,
-                    "log": f"[STUDY] {label}" if label else "[STUDY] Browsing..."
-                })
-        except:
-            pass
-
-    async def _handle_cookies(self, page: Page):
-        """Try to dismiss common cookie consent banners."""
-        cookie_selectors = [
-            # Common cookie button selectors
-            "button:has-text('Accept')",
-            "button:has-text('Accetta')",
-            "button:has-text('Accept all')",
-            "button:has-text('Accetta tutto')",
-            "button:has-text('Accetta tutti')",
-            "button:has-text('Accept All Cookies')",
-            "button:has-text('Allow all')",
-            "button:has-text('Consenti tutti')",
-            "button:has-text('Got it')",
-            "button:has-text('OK')",
-            "button:has-text('Agree')",
-            "[id*='accept']",
-            "[id*='consent']",
-            "[class*='accept']",
-            "[class*='consent'] button",
-            "#onetrust-accept-btn-handler",
-            ".cc-accept",
-            ".cookie-accept",
-            "#cookie-accept",
-            "[data-testid='cookie-accept']",
-        ]
-        
-        for selector in cookie_selectors:
-            try:
-                btn = page.locator(selector).first
-                if await btn.is_visible(timeout=500):
-                    await btn.click()
-                    print(f"[COOKIES] Dismissed with: {selector}")
-                    await asyncio.sleep(0.5)
-                    return True
-            except:
-                continue
-        return False
-
-    async def _handle_captcha(self, page: Page) -> bool:
-        """Detect captcha and wait for manual resolution if browser is visible."""
-        captcha_indicators = [
-            "iframe[src*='recaptcha']",
-            "iframe[src*='captcha']",
-            "[class*='captcha']",
-            "[id*='captcha']",
-            "iframe[src*='challenge']",
-            ".g-recaptcha",
-            "#cf-challenge-running",  # Cloudflare
-        ]
-        
-        for selector in captcha_indicators:
-            try:
-                el = page.locator(selector).first
-                if await el.is_visible(timeout=500):
-                    print(f"[CAPTCHA] ⚠️ Captcha detected! Waiting for manual resolution...")
-                    await self._take_screenshot(page, "⚠️ CAPTCHA DETECTED - Solve manually!")
-                    
-                    # Wait up to 60 seconds for captcha to disappear
-                    for _ in range(60):
-                        await asyncio.sleep(1)
-                        try:
-                            if not await el.is_visible(timeout=300):
-                                print("[CAPTCHA] ✅ Captcha resolved!")
-                                return True
-                        except:
-                            print("[CAPTCHA] ✅ Captcha resolved!")
-                            return True
-                    
-                    print("[CAPTCHA] ❌ Timeout waiting for captcha resolution")
-                    return False
-            except:
-                continue
-        return True  # No captcha found = OK
-
-    async def _safe_goto(self, page: Page, url: str, label: str = "") -> bool:
-        """Navigate to URL with cookie/captcha handling and screenshot."""
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-            await asyncio.sleep(0.5)
-            
-            # Handle cookies
-            await self._handle_cookies(page)
-            
-            # Check for captcha
-            captcha_ok = await self._handle_captcha(page)
-            if not captcha_ok:
-                return False
-            
-            # Send screenshot to frontend
-            await self._take_screenshot(page, label or f"Loaded: {url[:60]}")
-            return True
-            
-        except Exception as e:
-            print(f"[BROWSER] Navigation failed: {url} — {e}")
-            return False
+        return await llm_complete(
+            prompt=prompt,
+            system=effective_system,
+            max_tokens=2000,
+            temperature=0.3,
+            providers=["Groq", "Gemini", "Claude"]
+        )
 
     # ── PHASE 1: MAP ──────────────────────────────────────────────────────────
 
@@ -558,11 +360,21 @@ Example: ["query 1", "query 2", "query 3"]"""
 
         print(f"[MAP] Smart queries: {queries}")
 
-        # Blocked domains that return garbage
+        # Blocked domains that return garbage or off-topic results
         blocked = [
             "zhihu.com", "quora.com", "pinterest.com", "facebook.com",
             "instagram.com", "tiktok.com", "reddit.com/user/",
             "youtube.com", "kela.fi",
+            # Off-topic domains (SNMP traps, non-programming content)
+            "microfocus.com", "cuddletech.com", "helpndoc.com",
+            "github.com/rcore-os",
+        ]
+
+        # Authoritative domains get a relevance boost
+        priority_domains = [
+            "developer.mozilla.org", "docs.python.org", "dev.to",
+            "stackoverflow.com", "w3.org", "realpython.com",
+            "wikipedia.org", "github.com", "readthedocs.io",
         ]
 
         def _search():
@@ -622,12 +434,16 @@ Example: ["query 1", "query 2", "query 3"]"""
                 unique.append(s)
         sources = unique
 
-        # Score and sort by relevance
+        # Score and sort by relevance (topic overlap + tier + priority domain boost)
         topic_words = set(topic.lower().split())
         for s in sources:
             title_words = set(s["title"].lower().split())
-            s["relevance"] = len(topic_words & title_words) + (1 if s["tier"] == 2 else 0)
+            domain_boost = 2 if any(d in s["url"] for d in priority_domains) else 0
+            s["relevance"] = len(topic_words & title_words) + (1 if s["tier"] == 2 else 0) + domain_boost
         sources.sort(key=lambda x: x["relevance"], reverse=True)
+
+        # Cap at 15 to avoid LLM context bloat
+        sources = sources[:15]
 
         print(f"[MAP] Found {len(sources)} unique sources (sorted by relevance)")
         for s in sources[:8]:
@@ -639,98 +455,171 @@ Example: ["query 1", "query 2", "query 3"]"""
     # ── PHASE 2: AGGREGATE ────────────────────────────────────────────────────
 
     async def phase_aggregate(self, sources: List[Dict]) -> str:
-        """Scrape and clean text from web pages with visible Playwright."""
+        """Scrape and clean text from web pages with visible Playwright.
+
+        Delegates to StudyBrowserScraper — browser is always closed via finally.
+        """
         max_sources = min(len(sources), 6)
-        print(f"[AGGREGATE] Scraping {max_sources} sources...")
         self.progress.set_phase("AGGREGATE", 0.0)
-        
-        await self._init_browser(headless=False)
-        all_text = ""
-
-        for idx, source in enumerate(sources[:max_sources]):
-            url = source["url"]
-            self.progress.set_phase("AGGREGATE", idx / max_sources)
-            
-            try:
-                page = await self.bctx.new_page()
-                await Stealth().apply_stealth_async(page)
-                success = await self._safe_goto(page, url, f"Reading [{idx+1}/{max_sources}]: {source['title'][:50]}")
-                
-                if success:
-                    content = await page.content()
-                    
-                    soup = BeautifulSoup(content, "html.parser")
-                    for tag in soup(["script", "style", "nav", "footer", "header", "aside", "noscript", "svg"]):
-                        tag.extract()
-
-                    text = soup.get_text(separator="\n", strip=True)
-                    # Filter short lines (likely menus, buttons)
-                    text = "\n".join(line for line in text.splitlines() if len(line) > 40)
-                    all_text += f"\n\n--- SOURCE: {source['title']} ({url}) ---\n{text[:3000]}"
-                    print(f"[AGGREGATE] ✅ [{idx+1}/{max_sources}] {source['title'][:50]} ({len(text)} chars)")
-                else:
-                    print(f"[AGGREGATE] ❌ [{idx+1}/{max_sources}] Failed: {url}")
-                
-                await page.close()
-                
-                # Small delay between pages to be polite
-                await asyncio.sleep(0.8)
-
-            except Exception as e:
-                print(f"[AGGREGATE] ❌ Failed {url}: {e}")
-                try:
-                    await page.close()
-                except:
-                    pass
-
-        print(f"[AGGREGATE] Total raw text: {len(all_text)} chars")
+        all_text = await self.browser_scraper.scrape_sources(
+            sources,
+            max_sources=max_sources,
+            progress=self.progress,
+            on_web_data_fn=self.on_web_data,
+        )
         self.progress.complete_phase("AGGREGATE")
         return all_text
 
     # ── PHASE 3: SYNTHESIZE ───────────────────────────────────────────────────
 
-    async def phase_synthesize(self, topic: str, raw: str) -> Dict:
+    async def phase_synthesize(self, topic: str, raw: str, strategy_hint: str = None,
+                               previous_score: float = None,
+                               episode_context: str = None) -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
 
+        meta_line = (
+            f"\nMeta-learning hint (historically best approach for this category): {strategy_hint}\n"
+            if strategy_hint else ""
+        )
+        score_line = (
+            f"\nPrevious attempt score: {previous_score}/10. Focus on depth and correctness "
+            f"— the previous synthesis was incomplete. Be more precise and cover more concepts.\n"
+            if previous_score is not None else ""
+        )
+        episodic_line = (
+            f"\n{episode_context}\n"
+            if episode_context else ""
+        )
+
+        # GraphRAG: inject causal relations already known about this topic
+        causal_line = ""
+        try:
+            from graph_rag import query_causal_context
+            causal = query_causal_context(topic)
+            if causal:
+                causal_line = f"\n{causal}\nUse these known relations to enrich your extraction — confirm, contradict, or extend them.\n"
+                print(f"[SYNTHESIZE] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings")
+        except Exception:
+            pass
+
         prompt = f"""
-You are SHARD. Study the following raw content about "{topic}" and synthesize it using the Feynman Method.
+You must extract structured concepts from the text.{meta_line}{score_line}{episodic_line}{causal_line}
+Return ONLY valid JSON.
 
-RAW CONTENT:
-{raw[:8000]}
+Do not include explanations.
+Do not include markdown.
+Do not include text before or after the JSON.
 
-Your task:
-1. Extract the 5-10 key concepts with clear explanations.
-2. Identify relationships between concepts.
-3. Form YOUR OWN OPINION on the topic based on evidence.
-4. Generate 3 critical questions that reveal deep understanding.
-5. Write a brief "teoria" summary of the key theoretical points.
-6. Write a "spiegazione" that explains the topic in simple terms (Feynman-style).
+Required format:
 
-Return ONLY a valid JSON object with this structure:
 {{
-    "concepts": [{{"name": "...", "explanation": "...", "importance": 1-10}}],
-    "relationships": ["concept A relates to concept B because..."],
-    "shard_opinion": "SHARD's reasoned stance on this topic...",
-    "critical_questions": ["...", "...", "..."],
-    "teoria": "Theoretical summary of core concepts...",
-    "spiegazione": "Simple explanation in Feynman-style..."
+"concepts": [
+{{
+"name": "concept_name",
+"dependencies": [],
+"applications": []
+}}
+]
 }}
 
 Rules:
-- JSON must be valid
-- do not add explanations outside JSON
-- return only JSON
+
+• name must be a technical concept
+• dependencies must list prerequisite concepts
+• applications must list real-world uses
+• if nothing is found return:
+
+{{
+"concepts": []
+}}
+
+RAW CONTENT:
+{raw[:8000]}
 """
         self.progress.set_phase("SYNTHESIZE", 0.5)
+        prompt = "You MUST respond with valid JSON only.\n\n" + prompt
         raw_json = await self._think(prompt, json_mode=True)
 
-        result = self._safe_parse_json(raw_json)
+        data = safe_json_load(raw_json)
+
+        if data:
+            print("[SYNTHESIZE] JSON recovered successfully")
+        else:
+            print("[SYNTHESIZE] JSON recovery failed")
+
+        if not isinstance(data, dict):
+            data = {"concepts": []}
+
+        if "concepts" not in data:
+            data["concepts"] = []
+
+        if not data.get("concepts"):
+            print("[SYNTHESIZE] LLM returned empty concepts list")
+
+        result = data
+
         if result.get("concepts"):
             print(f"[SYNTHESIZE] JSON parsed successfully ({len(result['concepts'])} concepts)")
         else:
             print(f"[SYNTHESIZE] Warning: no concepts extracted")
+            # Fallback: extract top-frequency words from raw text as minimal concepts
+            _STOPWORDS = {
+                "function", "result", "value", "system", "data", "object", "class",
+                "cookie", "cookies", "privacy", "accept", "banner", "login", "advertisement",
+            }
+            words = re.findall(r'\b[A-Za-z][a-z]{4,}\b', raw)
+            freq: Dict[str, int] = {}
+            for w in words:
+                lw = w.lower()
+                if lw not in _STOPWORDS:
+                    freq[lw] = freq.get(lw, 0) + 1
+            top_kw = sorted(freq, key=lambda k: freq[k], reverse=True)[:5]
+            if top_kw:
+                result["concepts"] = [{"name": kw, "explanation": "", "importance": 5} for kw in top_kw]
+                print(f"[SYNTHESIZE] Fallback: {len(result['concepts'])} keywords promoted to concepts: {top_kw}")
+
+        # Filter low-quality / noisy concepts before returning
+        if result.get("concepts"):
+            # Use semantic validator with embeddings
+            concepts = [
+                c for c in result.get("concepts", [])
+                if valid_concept(c.get("name", ""), embed_fn=self.embed)
+            ]
+            result["concepts"] = concepts
+
+            # World Model ingestion (non-fatal, does not alter pipeline outputs)
+            try:
+                from cognition.world_model import world_model
+
+                world_model.reset()
+                world_model.ingest_concepts(concepts)
+                print(
+                    f"[WORLD MODEL] entities: {world_model.graph.number_of_nodes()} "
+                    f"edges: {world_model.graph.number_of_edges()}"
+                )
+
+                hubs = world_model.compute_hubs()
+                if hubs:
+                    top = hubs[:5]
+
+                    for name, degree in top:
+                        print(f"[WORLD MODEL] hub detected: {name} (degree {degree})")
+            except Exception as e:
+                print(f"[WORLD MODEL] ingestion skipped: {e}")
+
+            print(f"[SYNTHESIZE] concepts extracted: {len(concepts)} after semantic validation")
+
+            # GraphRAG: extract causal relations (non-fatal, async fire-and-forget)
+            try:
+                import asyncio
+                from graph_rag import extract_and_store_relations
+                asyncio.ensure_future(
+                    extract_and_store_relations(topic, concepts, raw)
+                )
+            except Exception as e:
+                print(f"[GRAPH_RAG] skipped: {e}")
 
         self.progress.complete_phase("SYNTHESIZE")
         return result
@@ -838,7 +727,9 @@ Genera il Rapporto di Integrazione (max 150 parole)."""
 
     # ── PHASE 4c: MATERIALIZE (Cheat Sheet to File System) ────────────────────
 
-    async def phase_materialize(self, topic: str, structured: Dict) -> bool:
+    async def phase_materialize(self, topic: str, structured: Dict, strategy_hint: str = None,
+                                previous_score: float = None,
+                                episode_context: str = None) -> bool:
         """Generate a structured Cheat Sheet and write it to the filesystem."""
         print(f"[MATERIALIZE] Creating Cheat Sheet for: {topic}")
         self.progress.set_phase("MATERIALIZE", 0.0)
@@ -847,7 +738,21 @@ Genera il Rapporto di Integrazione (max 150 parole)."""
         concepts_summary = json.dumps(structured.get("concepts", []), indent=2)[:3000]
         code_snippet = structured.get("code_snippet", "")
 
-        prompt = f"""You are SHARD. Generate a structured Cheat Sheet in Markdown for the topic "{topic}".
+        meta_line = (
+            f"\nMeta-learning hint — apply this approach in the Practical Example: {strategy_hint}\n"
+            if strategy_hint else ""
+        )
+        score_line = (
+            f"\nPrevious attempt scored {previous_score}/10. The Practical Example was weak — "
+            f"make the code snippet complete, runnable, and well-commented this time.\n"
+            if previous_score is not None else ""
+        )
+        episodic_line = (
+            f"\n{episode_context}\n"
+            if episode_context else ""
+        )
+
+        prompt = f"""You are SHARD. Generate a structured Cheat Sheet in Markdown for the topic "{topic}".{meta_line}{score_line}{episodic_line}
 
 Based on these synthesized concepts:
 {concepts_summary}
@@ -968,93 +873,177 @@ Respond ONLY with valid JSON:
 
     # ── PHASE 6: EVALUATE ─────────────────────────────────────────────────────
 
-    async def phase_evaluate(self, topic: str, validation_data: Dict, sandbox_result: Dict = None, gaps: List[str] = None) -> Dict:
+    async def phase_evaluate(self, topic: str, validation_data: Dict, sandbox_result: Dict = None, gaps: List[str] = None, generated_code: str = None) -> Dict:
         """Evaluate with Test-Driven Learning Protocol: teoria + sandbox + auto-esame."""
         print(f"[EVALUATE] Scoring understanding of: {topic}")
         self.progress.set_phase("EVALUATE", 0.0)
 
-        gaps_context = f"\nLacune note dal tentativo precedente: {gaps}" if gaps else ""
+        # 1. Programmatic Sandbox Score (0-2)
+        sandbox_score = 0.0
+        sandbox_status = "NONE"
+        sandbox_stdout = ""
+        sandbox_stderr = ""
+        sandbox_failed = True
 
-        # Build sandbox context for the evaluator
-        sandbox_section = "\nNESSUN CODICE ESEGUITO IN SANDBOX."
         if sandbox_result:
             sandbox_success = sandbox_result.get("success", False)
-            sandbox_stdout = sandbox_result.get("stdout", "(nessun output)")[:800]
+            sandbox_stdout = sandbox_result.get("stdout", "")[:800]
             sandbox_stderr = sandbox_result.get("stderr", "")[:500]
-            sandbox_code = sandbox_result.get("code", "(nessun codice)")[:1000]
-            sandbox_section = f"""
+            
+            if sandbox_success and not sandbox_stderr:
+                sandbox_score = 10.0
+                sandbox_status = "SUCCESS"
+                sandbox_failed = False
+            elif sandbox_success and sandbox_stderr:
+                sandbox_score = 5.0  # Esegue ma con warning (stdout ok ma stderr non vuoto p.es.)
+                sandbox_status = "WARNING"
+                sandbox_failed = False
+            else:
+                sandbox_score = 0.0  # Crash, timeout, ecc.
+                sandbox_status = "FAILURE"
+                sandbox_failed = True
 
-RISULTATI ESECUZIONE SANDBOX:
-Codice eseguito:
-```
-{sandbox_code}
-```
-Successo: {sandbox_success}
-Output (stdout): {sandbox_stdout}
-Errori (stderr): {sandbox_stderr or "Nessuno"}
-"""
+        # Domain mismatch penalty: penalize when topic signals a domain the code ignores
+        _DOMAIN_RULES = [
+            (["quantum"], ["hashlib", "hmac", "sha256", "sha512", "md5", "base64"],
+             "quantum topic uses only standard hashing libraries"),
+        ]
+        if generated_code:
+            topic_lower = topic.lower()
+            code_lower = generated_code.lower()
+            for topic_kws, code_kws, reason in _DOMAIN_RULES:
+                if any(kw in topic_lower for kw in topic_kws):
+                    uses_mismatch = any(kw in code_lower for kw in code_kws)
+                    uses_topic_kw = any(kw in code_lower for kw in topic_kws)
+                    if uses_mismatch and not uses_topic_kw:
+                        print(f"[EVALUATE] ⚠️ Domain mismatch: {reason}")
+                        sandbox_score = max(0.0, sandbox_score - 5.0)
 
         # Extract answers and validation_qa
         answers = validation_data.get("answers", validation_data)
         validation_qa = validation_data.get("validation_qa", [])
 
         prompt = f"""
-Sei un esaminatore spietato. Valuta la comprensione di "{topic}" secondo il Test-Driven Learning Protocol.
-{gaps_context}
+You are evaluating the understanding of an autonomous learning agent.
 
-{sandbox_section}
+Topic: {topic}
 
-AUTO-ESAME (Domande e Risposte):
-{json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
+Score the following criteria independently.
+Return ONLY JSON.
 
-REGOLE DI PENALITÀ (applica TUTTE quelle pertinenti):
-- Il codice in Sandbox ha generato un'eccezione o errore di runtime: -3.0
-- Il codice non produce output significativo o è banale (es. solo print di stringhe): -1.0
-- Le risposte dell'auto-esame sono superficiali o generiche: -1.5
-- Spiegazioni troppo teoriche e poco pratiche: -1.0
-- Mancanza di collegamenti a best practice: -0.5
-- Risposte vaghe o generiche senza dettagli specifici: -1.0
-- Errori fattuali o imprecisioni tecniche: -2.0
-- Mancanza di ragionamento critico: -0.5
-
-BONUS:
-- Se la Sandbox ha restituito un output corretto senza errori E il codice è non-banale: +1.0
-
-ISTRUZIONI:
-1. Parti da 10.0, applica penalità e bonus. Il punteggio finale deve riflettere la reale qualità.
-2. La soglia di sufficienza è {PASS_THRESHOLD}. Sii onesto.
-3. Identifica le lacune specifiche.
-4. Genera 3 ipotesi per ricerca approfondita.
-5. Fornisci la posizione attuale di SHARD sul topic.
-
-Respond ONLY with valid JSON:
 {{
-    "score": 7.5,
-    "verdict": "PASS or FAIL",
-    "penalties_applied": [
-        {{"rule": "description", "points": -1.5, "reason": "why applied"}}
-    ],
-    "bonuses_applied": [
-        {{"rule": "description", "points": 1.0, "reason": "why applied"}}
-    ],
-    "gaps": ["specific gap 1", "specific gap 2"],
-    "hypotheses": ["hypothesis 1", "hypothesis 2", "hypothesis 3"],
-    "shard_stance": "SHARD's current opinion after evaluation...",
-    "improvement_focus": "What to focus on in next iteration if needed"
+ "theory_score": 0.0,
+ "code_score": 0.0,
+ "synthesis_score": 0.0,
+ "explanation": "short explanation",
+ "gaps": ["specific gap 1", "specific gap 2"],
+ "hypotheses": ["hypothesis 1", "hypothesis 2"]
 }}
+
+Important rules:
+- Score 0 is a valid score. Use it when appropriate.
+- A score of 3/3 means exceptional, not merely acceptable.
+- If the topic is not a real technical concept, theory_score must be 0.
+- Be strict. Avoid default middle scores.
+- Penalize hallucinated concepts.
+
+# SCORING RUBRIC
+
+1 - THEORY UNDERSTANDING (0-10)
+Evaluate: conceptual correctness, technical validity of topic, synthesis quality.
+Rules: 0 = invented/not real, 1-3 = superficial, 4-6 = good, 7-9 = solid, 10 = exceptional.
+
+2 - CODE QUALITY (0-10)
+Evaluate: logic correctness, library usage, structure.
+Rules: 0 = broken, 1-3 = minimal/fragile, 4-6 = working, 7-9 = robust, 10 = exemplary.
+
+3 - KNOWLEDGE SYNTHESIS (0-10)
+Evaluate: integration with previous knowledge, capability graph connections.
+Rules: 0 = none, 1-3 = weak, 4-6 = moderate, 7-9 = significant, 10 = deep.
+
+Sandbox context:
+Sandbox result: {sandbox_status}
+Sandbox stdout excerpt: {sandbox_stdout}
+Sandbox stderr excerpt: {sandbox_stderr}
+
+If the sandbox failed, code_score cannot be higher than 1.
+
+AUTO-EXAM (Questions and Answers):
+{json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
 """
-        print("[EVALUATE] Using local Ollama (mistral) for evaluation...")
-        raw = await self._think_local(prompt, json_mode=True)
+
+        print("[EVALUATE] Scoring via Groq (Groq → Gemini → Claude fallback)...")
+        raw = await self._think_fast(prompt, json_mode=True)
+        
         try:
             cleaned = self._clean_json(raw)
-            result = json.loads(cleaned)
-            result["score"] = float(result.get("score", 0))
-            # Clamp score to [0, 10]
-            result["score"] = max(0.0, min(10.0, result["score"]))
+            parsed = json.loads(cleaned)
+            theory_score = float(parsed.get("theory_score", 0.0))
+            code_score = float(parsed.get("code_score", 0.0))
+            synthesis_score = float(parsed.get("synthesis_score", 0.0))
+            explanation = parsed.get("explanation", "")
+            gaps_out = parsed.get("gaps", [])
+            hypotheses = parsed.get("hypotheses", [])
+            
+            # Enforce constraints
+            if sandbox_failed:
+                code_score = min(code_score, 1.0)
+
         except Exception as e:
-            print(f"[EVALUATE] Parse error: {e}")
+            print(f"[EVALUATE WARNING] Invalid JSON from evaluator \u2014 fallback score applied ({e})")
             print(f"[EVALUATE] Raw response (first 300 chars): {raw[:300]}")
-            result = {"score": 0.0, "verdict": "FAIL", "gaps": ["Parse error"], "hypotheses": [], "shard_stance": "", "improvement_focus": ""}
+            theory_score = 0.0
+            code_score = 0.0
+            synthesis_score = 0.0
+            explanation = "JSONDecodeError Fallback"
+            gaps_out = ["Parse error"]
+            hypotheses = []
+
+        # ── Rule-based fallback for invalid or inconsistent LLM scores ────
+        _scores_out_of_range = (
+            not (0.0 <= theory_score <= 10.0)
+            or not (0.0 <= code_score <= 10.0)
+            or not (0.0 <= synthesis_score <= 10.0)
+        )
+        _scores_inconsistent = (
+            not sandbox_failed and validation_qa and synthesis_score < 5
+        )
+        if _scores_out_of_range or _scores_inconsistent:
+            print("[EVALUATE] Using rule-based fallback scoring")
+            sandbox_score   = 10.0 if not sandbox_failed else 0.0
+            theory_score    = max(0.0, min(10.0, theory_score))
+            code_score      = max(0.0, min(10.0, code_score))
+            synthesis_score = max(0.0, min(10.0, synthesis_score))
+            if validation_qa and synthesis_score < 5:
+                synthesis_score = 5.0
+
+        total_score = round((theory_score + code_score + sandbox_score + synthesis_score) / 40 * 10, 2)
+        total_score = max(0.0, min(10.0, total_score))
+        # Floor: a passing sandbox guarantees a minimum meaningful score
+        if not sandbox_failed:
+            total_score = max(3.0, total_score)
+        
+        # Logging
+        print("[EVALUATE]")
+        print(f"theory={theory_score}")
+        print(f"code={code_score}")
+        print(f"sandbox={sandbox_score}")
+        print(f"synthesis={synthesis_score}")
+        print(f"total={total_score}")
+        
+        result = {
+            "score": total_score,
+            "verdict": "PASS" if total_score >= SUCCESS_SCORE_THRESHOLD else "FAIL",
+            "gaps": gaps_out,
+            "hypotheses": hypotheses,
+            "explanation": explanation,
+            "details": {
+                "theory": theory_score,
+                "code": code_score,
+                "sandbox": sandbox_score,
+                "synthesis": synthesis_score
+            }
+        }
         
         self.progress.complete_phase("EVALUATE")
         return result
@@ -1063,234 +1052,152 @@ Respond ONLY with valid JSON:
 
     async def phase_certify(self, topic: str, eval_data: Dict) -> bool:
         self.progress.set_phase("CERTIFY", 0.0)
-        score = eval_data.get("score", 0)
-        if score >= PASS_THRESHOLD:
-            print(f"[CERTIFY] ✅ '{topic}' CERTIFIED — Score: {score}/10")
+        score     = eval_data.get("score", 0)
+        details   = eval_data.get("details", {})
+        synthesis = details.get("synthesis", 0)
+        sandbox   = details.get("sandbox", 0)
+
+        # Benchmark gate: if a real benchmark ran, pass_rate must meet the threshold.
+        # If benchmark was unavailable (fallback mode), this gate is skipped entirely.
+        pass_rate            = eval_data.get("pass_rate", None)
+        benchmark_available  = eval_data.get("benchmark_available", False)
+
+        reasons = []
+        if score < SUCCESS_SCORE_THRESHOLD:
+            reasons.append(f"score {score} < {SUCCESS_SCORE_THRESHOLD}")
+        if synthesis < 5:
+            reasons.append(f"synthesis {synthesis} < 5")
+        if sandbox < 5:
+            reasons.append(f"sandbox {sandbox} < 5")
+        if benchmark_available and pass_rate is not None and pass_rate < BENCHMARK_PASS_THRESHOLD:
+            reasons.append(
+                f"pass_rate {pass_rate:.0%} < {BENCHMARK_PASS_THRESHOLD:.0%} "
+                f"(benchmark gate — fin delle auto-congratulazioni)"
+            )
+
+        if not reasons:
+            bench_tag = f" | pass_rate={pass_rate:.0%}" if benchmark_available else " | LLM-only"
+            print(f"[CERTIFY] ✅ '{topic}' CERTIFIED — Score: {score}/10{bench_tag}")
             self.progress.complete_phase("CERTIFY")
             return True
         else:
-            print(f"[CERTIFY] ❌ '{topic}' FAILED — Score: {score}/10 (need {PASS_THRESHOLD})")
+            print(f"[CERTIFY] ❌ '{topic}' FAILED — {', '.join(reasons)}")
             return False
+
+    # ── PHASE 7b: BENCHMARK ───────────────────────────────────────────────────
+
+    async def phase_benchmark(
+        self,
+        topic: str,
+        synthesized_code: str,
+        eval_data: Dict,
+    ) -> Dict:
+        """Run objective benchmark tests and blend the result into the eval score.
+
+        If BENCHMARK_ENABLED is False, Docker is unavailable, or generation fails,
+        falls back to the LLM-only score transparently (soft degradation).
+
+        Returns a dict with keys to be merged into eval_data:
+            score              — blended final score (or original LLM score on fallback)
+            pass_rate          — 0.0-1.0 (None on fallback)
+            benchmark_available — True when real benchmark ran
+            benchmark_detail   — raw BenchmarkRunner output
+        """
+        llm_score = eval_data.get("score", 0.0)
+
+        if not BENCHMARK_ENABLED:
+            print("[BENCHMARK] Disabled via BENCHMARK_ENABLED=False — using LLM score")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        self.progress.set_phase("BENCHMARK", 0.0)
+        print(f"[BENCHMARK] Generating tests for '{topic}'...")
+
+        try:
+            benchmark = await self.benchmark_generator.generate(
+                topic=topic,
+                synthesized_code=synthesized_code or "",
+            )
+        except Exception as e:
+            print(f"[BENCHMARK] ❌ Generator exception — falling back to LLM score: {e}")
+            self.progress.complete_phase("BENCHMARK")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        if not benchmark.get("available"):
+            reason = benchmark.get("reason", "no tests generated")
+            print(f"[BENCHMARK] Unavailable ({reason}) — falling back to LLM score")
+            self.progress.complete_phase("BENCHMARK")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        self.progress.set_phase("BENCHMARK", 0.4)
+        print(
+            f"[BENCHMARK] {benchmark['n_valid']} tests generated — "
+            f"requesting implementation attempt from LLM..."
+        )
+
+        # Ask the LLM to implement the scaffold, knowing what it just studied
+        scaffold = benchmark.get("scaffold", "def solve(input_data):\n    pass")
+        impl_prompt = (
+            f"You just studied: {topic}\n\n"
+            f"Implement this Python function to satisfy the benchmark tests:\n\n"
+            f"{scaffold}\n\n"
+            f"Return ONLY the complete Python function. No explanation, no markdown."
+        )
+        try:
+            impl_code = await self._think_fast(impl_prompt)
+            # Strip markdown fences if present
+            impl_code = re.sub(r"```(?:python)?|```", "", impl_code or "").strip()
+        except Exception as e:
+            print(f"[BENCHMARK] ❌ Implementation LLM call failed — falling back: {e}")
+            self.progress.complete_phase("BENCHMARK")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        self.progress.set_phase("BENCHMARK", 0.7)
+        print("[BENCHMARK] Running tests in sandbox...")
+
+        try:
+            bench_result = await self.benchmark_runner.run_benchmark(
+                benchmark=benchmark,
+                implementation_code=impl_code,
+                topic=topic,
+            )
+        except Exception as e:
+            print(f"[BENCHMARK] ❌ Runner exception — falling back to LLM score: {e}")
+            self.progress.complete_phase("BENCHMARK")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        if not bench_result.get("available") or bench_result.get("total", 0) == 0:
+            print("[BENCHMARK] No tests ran — falling back to LLM score")
+            self.progress.complete_phase("BENCHMARK")
+            return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
+
+        # ── Blend scores ────────────────────────────────────────────────────
+        pass_rate       = bench_result["pass_rate"]
+        benchmark_score = pass_rate * 10
+        final_score     = round(
+            (1 - BENCHMARK_WEIGHT) * llm_score + BENCHMARK_WEIGHT * benchmark_score,
+            2
+        )
+        final_score = max(0.0, min(10.0, final_score))
+
+        print(
+            f"[BENCHMARK] LLM={llm_score} × {1-BENCHMARK_WEIGHT:.0%}  +  "
+            f"bench={benchmark_score:.1f} × {BENCHMARK_WEIGHT:.0%}  =  "
+            f"final={final_score}  (pass_rate={pass_rate:.0%})"
+        )
+
+        self.progress.complete_phase("BENCHMARK")
+        return {
+            "score":               final_score,
+            "pass_rate":           pass_rate,
+            "benchmark_available": True,
+            "benchmark_detail":    bench_result,
+        }
 
     # ── TIER 3: SANDBOX ───────────────────────────────────────────────────────
 
-    # ── Docker Sandbox Configuration ───────────────────────────────────────────
-    DOCKER_IMAGE = "shard-sandbox:latest"
-    MAX_OUTPUT_CHARS = 50_000
-    SANDBOX_TIMEOUT = 30
-
-    def _validate_sandbox_path(self, sandbox_dir: str) -> pathlib.Path:
-        """Validate and resolve sandbox directory path with security checks.
-
-        Prevents symlink escape and directory traversal attacks.
-        Returns the resolved absolute path as a pathlib.Path.
-        Raises SecurityError (ValueError) on any violation.
-        """
-        sandbox_path = pathlib.Path(sandbox_dir).resolve()
-
-        # 1. Must be absolute after resolution
-        if not sandbox_path.is_absolute():
-            raise ValueError(f"[SANDBOX SECURITY] Path is not absolute: {sandbox_path}")
-
-        # 2. Walk every component — reject if any segment is a symlink
-        check = sandbox_path
-        while check != check.parent:  # Walk up to root
-            if check.exists() and check.is_symlink():
-                raise ValueError(
-                    f"[SANDBOX SECURITY] Symlink detected in sandbox path: {check}"
-                )
-            check = check.parent
-
-        # 3. Verify the resolved path hasn't escaped the expected parent
-        #    (prevents crafted paths like sandbox/../../etc)
-        expected_parent = pathlib.Path(SANDBOX_DIR).resolve().parent
-        if not str(sandbox_path).startswith(str(expected_parent)):
-            raise ValueError(
-                f"[SANDBOX SECURITY] Path traversal detected: {sandbox_path} "
-                f"is outside {expected_parent}"
-            )
-
-        return sandbox_path
-
-    def _build_docker_command(self, sandbox_posix: str, filename: str, container_name: str) -> list:
-        """Build the hardened Docker run command with all security flags.
-
-        Returns a list of arguments for subprocess.run().
-        """
-        return [
-            "docker", "run",
-            "--rm",                                          # Auto-destroy container
-            "--network", "none",                              # No network access
-            "-m", "256m",                                     # RAM limit
-            "--cpus=0.5",                                     # CPU limit
-            "--pids-limit", "64",                              # Fork bomb prevention
-            "--read-only",                                    # Read-only filesystem
-            "--tmpfs", "/tmp:rw,noexec,nosuid,size=64m",      # Controlled temp area
-            "--security-opt", "no-new-privileges",            # Block privilege escalation
-            "--cap-drop", "ALL",                              # Drop all Linux capabilities
-            "--ulimit", "nofile=64:64",                       # File descriptor limit
-            "--user", "1000:1000",                            # Non-root execution
-            "-v", f"{sandbox_posix}:/app:rw",                 # Mount only sandbox dir
-            "-w", "/app",                                     # Working directory
-            "--name", container_name,                         # Unique name for kill
-            self.DOCKER_IMAGE,                                # Custom hardened image
-            "python", filename,                               # Execute the script
-        ]
-
     async def run_sandbox(self, topic: str, code: str) -> Dict:
-        """Execute LLM-generated code in a hardened Docker container.
-
-        Security layers:
-        - Docker container isolation (not host execution)
-        - No network, no capabilities, no privilege escalation
-        - Read-only filesystem with controlled /tmp
-        - Resource limits (RAM, CPU, PIDs, file descriptors)
-        - Non-root user (sandbox:1000)
-        - Path validation (symlink + traversal prevention)
-        - 30s timeout with explicit container kill
-        - Output truncation (50k chars)
-        """
-        print(f"[SANDBOX] Executing code in Docker container for: {topic}")
-        self.progress.set_phase("SANDBOX", 0.0)
-
-        container_name = f"shard-sandbox-{uuid.uuid4().hex[:12]}"
-        filename = f"study_{uuid.uuid4().hex[:8]}.py"
-
-        try:
-            # ── 1. Verify Docker image exists ────────────────────────────
-            image_check = await asyncio.to_thread(
-                subprocess.run,
-                ["docker", "image", "inspect", self.DOCKER_IMAGE],
-                capture_output=True, timeout=10
-            )
-            if image_check.returncode != 0:
-                error_msg = (
-                    f"Docker image '{self.DOCKER_IMAGE}' not found. "
-                    f"Build it with: docker build -t {self.DOCKER_IMAGE} "
-                    f"-f backend/Dockerfile.sandbox backend/"
-                )
-                print(f"[SANDBOX] ❌ {error_msg}")
-                self.progress.complete_phase("SANDBOX")
-                return {
-                    "success": False, "stdout": "",
-                    "stderr": error_msg,
-                    "analysis": f"Sandbox unavailable: {error_msg}",
-                    "code": code
-                }
-
-            # ── 2. Path security ─────────────────────────────────────────
-            sandbox_path = self._validate_sandbox_path(SANDBOX_DIR)
-            os.makedirs(sandbox_path, exist_ok=True)
-
-            # Convert to POSIX format for Docker mount (Windows compat)
-            sandbox_posix = sandbox_path.as_posix()
-
-            # Write code to sandbox directory
-            filepath = sandbox_path / filename
-            # Verify the resolved file path stays inside sandbox
-            resolved_filepath = filepath.resolve()
-            if not str(resolved_filepath).startswith(str(sandbox_path)):
-                raise ValueError(
-                    f"[SANDBOX SECURITY] File path escapes sandbox: {resolved_filepath}"
-                )
-
-            filepath.write_text(code, encoding="utf-8")
-            print(f"[SANDBOX] Code saved to: {filepath}")
-            print(f"[SANDBOX] Code ({len(code)} chars):\n{code[:300]}...")
-            sys.stdout.flush()
-
-            self.progress.set_phase("SANDBOX", 0.3)
-
-            # ── 3. Build Docker command ──────────────────────────────────
-            docker_cmd = self._build_docker_command(sandbox_posix, filename, container_name)
-            print(f"[SANDBOX] Docker command: {' '.join(docker_cmd[:10])}...")
-
-            # ── 4. Execute with timeout ──────────────────────────────────
-            try:
-                proc = await asyncio.to_thread(
-                    subprocess.run,
-                    docker_cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=self.SANDBOX_TIMEOUT
-                )
-                stdout = (proc.stdout or "").strip()[:self.MAX_OUTPUT_CHARS]
-                stderr = (proc.stderr or "").strip()[:self.MAX_OUTPUT_CHARS]
-                success = proc.returncode == 0
-
-            except subprocess.TimeoutExpired:
-                # ── 5. Timeout → explicit container kill ─────────────────
-                print(f"[SANDBOX] ⚠️ Timeout ({self.SANDBOX_TIMEOUT}s) — killing container {container_name}")
-                try:
-                    await asyncio.to_thread(
-                        subprocess.run,
-                        ["docker", "kill", container_name],
-                        capture_output=True, timeout=10
-                    )
-                    print(f"[SANDBOX] Container {container_name} killed successfully")
-                except Exception as kill_err:
-                    # Kill failure must never crash the agent
-                    print(f"[SANDBOX] ⚠️ docker kill failed (non-fatal): {kill_err}")
-
-                self.progress.complete_phase("SANDBOX")
-                return {
-                    "success": False, "stdout": "",
-                    "stderr": f"Timeout ({self.SANDBOX_TIMEOUT}s)",
-                    "analysis": f"Code execution exceeded {self.SANDBOX_TIMEOUT}-second timeout",
-                    "code": code
-                }
-
-            self.progress.set_phase("SANDBOX", 0.7)
-
-            print(f"[SANDBOX] {'✅' if success else '❌'} Exit code: {proc.returncode}")
-            print(f"[SANDBOX] stdout: {stdout[:300]}")
-            if stderr:
-                print(f"[SANDBOX] stderr: {stderr[:300]}")
-
-            # ── 6. Cleanup temp file ─────────────────────────────────────
-            try:
-                filepath.unlink(missing_ok=True)
-            except Exception:
-                pass
-
-            # ── 7. LLM analysis ──────────────────────────────────────────
-            analysis_prompt = f"""
-Code eseguito per "{topic}":
-{code[:1500]}
-
-Risultato:
-STDOUT: {stdout[:500] or '(vuoto)'}
-STDERR: {stderr[:500] or '(nessuno)'}
-Return code: {proc.returncode}
-
-Analizza brevemente: Il codice funziona? Dimostra comprensione reale di {topic}?
-"""
-            analysis = await self._think(analysis_prompt)  # Claude: complex code analysis
-
-            self.progress.complete_phase("SANDBOX")
-            return {
-                "success": success,
-                "stdout": stdout,
-                "stderr": stderr,
-                "analysis": analysis,
-                "code": code
-            }
-
-        except Exception as e:
-            print(f"[SANDBOX] ❌ Exception: {e}")
-            import traceback; traceback.print_exc()
-            # Cleanup on error
-            try:
-                sandbox_path_cleanup = pathlib.Path(SANDBOX_DIR).resolve() / filename
-                sandbox_path_cleanup.unlink(missing_ok=True)
-            except Exception:
-                pass
-            self.progress.complete_phase("SANDBOX")
-            return {
-                "success": False, "stdout": "",
-                "stderr": str(e), "analysis": f"Sandbox error: {e}",
-                "code": code
-            }
+        """Delegate to DockerSandboxRunner. Kept for internal compatibility."""
+        return await self.sandbox_runner.run(topic, code, progress=self.progress)
 
     # ── KNOWLEDGE QUERY (for conversations) ───────────────────────────────────
 
@@ -1363,333 +1270,55 @@ Analizza brevemente: Il codice funziona? Dimostra comprensione reale di {topic}?
         on_certify: Optional[Callable] = None,
         on_web_data: Optional[Callable] = None,
         on_error: Optional[Callable] = None,
+        previous_score: float = None,
     ):
-        """Complete study loop with automatic retry up to MAX_RETRY attempts."""
+        """Complete study loop — delegates to StudyPipeline.
+
+        Phases are declared as a configurable list. Each phase reads from
+        and writes to a shared StudyContext. Fatal phases abort on error;
+        non-fatal phases log and continue.
+        """
+        from study_context import StudyContext
+        from study_pipeline import StudyPipeline
+        from study_phases import (
+            InitPhase, MapPhase, AggregatePhase, SynthesizePhase,
+            StorePhase, CrossPollinatePhase, MaterializePhase,
+            SandboxPhase, CertifyRetryGroup, PostStudyPhase,
+        )
+
         self.is_running = True
         self.on_web_data = on_web_data
-        attempt = 0
-        gaps = []
-        current_phase = "INIT"
-
-        # ── RESET PROGRESS (fix: second study starting at 100%) ──
         self.progress = ProgressTracker()
 
-        async def progress(phase: str, score: float, msg: str):
-            pct = self.progress.percentage
-            print(f"[SHARD.STUDY] [{pct:3d}%] {phase} | {score}/10 | {msg}")
-            sys.stdout.flush()
-            if on_progress:
-                await on_progress(phase, topic, score, msg, pct)
+        ctx = StudyContext(
+            topic=topic,
+            tier=tier,
+            agent=self,
+            progress=self.progress,
+            previous_score=previous_score,
+            on_progress=on_progress,
+            on_certify=on_certify,
+            on_error=on_error,
+            on_web_data=on_web_data,
+        )
 
-        # Emit INIT at 0% so frontend resets immediately
-        await progress("INIT", 0, f"Starting study of '{topic}'...")
-
-        async def report_crash(phase: str, error: Exception):
-            """Report crash to logs, frontend UI, and on_error callback."""
-            import traceback as tb
-            error_msg = f"CRITICAL ERROR during phase {phase}: {type(error).__name__}: {error}"
-            full_trace = tb.format_exc()
-            
-            # Detailed log to terminal
-            print(f"\n{'='*60}")
-            print(f"[CRITICAL] {error_msg}")
-            print(f"[CRITICAL] Full traceback:")
-            print(full_trace)
-            print(f"{'='*60}\n")
-            sys.stdout.flush()
-            sys.stderr.flush()
-            
-            # Notify frontend UI (phase = ERROR)
-            await progress("ERROR", 0, f"Crash in {phase}: {str(error)[:200]}")
-            
-            # Call on_error callback if provided (for vocal notification)
-            if on_error:
-                try:
-                    await on_error(topic, phase, str(error))
-                except Exception as cb_err:
-                    print(f"[CRITICAL] on_error callback also failed: {cb_err}")
+        pipeline = StudyPipeline([
+            InitPhase(),            # meta-learning hint + episodic memory
+            MapPhase(),             # search sources
+            AggregatePhase(),       # scrape web pages
+            SynthesizePhase(),      # LLM synthesis + cross-reference
+            StorePhase(),           # persist to ChromaDB
+            CrossPollinatePhase(),  # integration report        (non-fatal)
+            MaterializePhase(),     # cheat sheet to filesystem (non-fatal)
+            SandboxPhase(),         # code gen + Docker exec    (non-fatal)
+            CertifyRetryGroup(),    # VALIDATE→EVALUATE→BENCHMARK→CERTIFY × N
+            PostStudyPhase(),       # meta-learning + episodic  (non-fatal)
+        ])
 
         try:
-            # ── PHASE 1: MAP
-            current_phase = "MAP"
-            try:
-                await progress("MAP", 0, f"Searching sources for '{topic}'...")
-                sources = await self.phase_map(topic, tier)
-                print(f"[MAP] ✅ Phase completed. {len(sources)} sources found.")
-            except Exception as e:
-                await report_crash("MAP", e)
-                return
-
-            # ── PHASE 2: AGGREGATE
-            current_phase = "AGGREGATE"
-            try:
-                await progress("AGGREGATE", 0, f"Scraping {len(sources)} sources...")
-                print(f"[AGGREGATE] Entering phase. Initializing browser...")
-                sys.stdout.flush()
-                raw_text = await self.phase_aggregate(sources)
-                print(f"[AGGREGATE] ✅ Phase completed. {len(raw_text)} chars scraped.")
-            except Exception as e:
-                await report_crash("AGGREGATE", e)
-                return
-
-            if not raw_text.strip():
-                await progress("ERROR", 0, "No content could be scraped from any source.")
-                if on_error:
-                    await on_error(topic, "AGGREGATE", "No content could be scraped from any source")
-                return
-
-            # ── PHASE 3: SYNTHESIZE
-            current_phase = "SYNTHESIZE"
-            try:
-                await progress("SYNTHESIZE", 0, "Building structured knowledge...")
-                structured = await self.phase_synthesize(topic, raw_text)
-                print(f"[SYNTHESIZE] ✅ Phase completed. {len(structured.get('concepts', []))} concepts extracted.")
-            except Exception as e:
-                await report_crash("SYNTHESIZE", e)
-                return
-
-            # Cross-referencing with existing knowledge
-            try:
-                connections = await self._cross_reference(topic, structured)
-                structured["connections"] = connections
-                if connections:
-                    await progress("SYNTHESIZE", 0, f"Found {len(connections)} connections with existing knowledge")
-            except Exception as e:
-                print(f"[CROSS-REF] Non-fatal error: {e}")
-                connections = []
-                structured["connections"] = []
-
-            # ── PHASE 4: STORE
-            current_phase = "STORE"
-            try:
-                await progress("STORE", 0, "Persisting to knowledge base...")
-                await self.phase_store(topic, structured)
-                print(f"[STORE] ✅ Phase completed.")
-            except Exception as e:
-                await report_crash("STORE", e)
-                return
-
-            # ── PHASE 4b: CROSS-POLLINATE
-            current_phase = "CROSS_POLLINATE"
-            try:
-                await progress("CROSS_POLLINATE", 0, "Generating Integration Report...")
-                integration_report = await self.phase_cross_pollinate(topic, raw_text, structured)
-                if integration_report:
-                    await progress("CROSS_POLLINATE", 0, f"Integration Report: {integration_report[:100]}...")
-                print(f"[CROSS-POLLINATE] ✅ Phase completed.")
-            except Exception as e:
-                print(f"[CROSS-POLLINATE] Non-fatal error: {e}")
-                import traceback; traceback.print_exc()
-                self.progress.complete_phase("CROSS_POLLINATE")
-
-            # ── PHASE 4c: MATERIALIZE
-            current_phase = "MATERIALIZE"
-            try:
-                await progress("MATERIALIZE", 0, "Writing Cheat Sheet to filesystem...")
-                mat_ok = await self.phase_materialize(topic, structured)
-                if mat_ok:
-                    await progress("MATERIALIZE", 0, f"Cheat Sheet saved to knowledge_base/")
-                else:
-                    await progress("MATERIALIZE", 0, "Cheat Sheet materialization failed")
-                print(f"[MATERIALIZE] ✅ Phase completed.")
-            except Exception as e:
-                print(f"[MATERIALIZE] Non-fatal error: {e}")
-                import traceback; traceback.print_exc()
-                self.progress.complete_phase("MATERIALIZE")
-
-            # --- SANDBOX PHASE (Decoupled from theory JSON) ---
-            sandbox_result = None
-            current_phase = "SANDBOX"
-            
-            strategy = await self.retrieve_strategy(topic)
-            
-            if strategy:
-                await progress("SANDBOX", 0, "Using past strategy to guide code generation")
-                print("[STUDY] Using past strategy")
-                print("[SANDBOX] Generating code independently from theory phase")
-                
-                prompt_codice = f"""
-Topic: {topic}
-
-Previous successful strategy:
-{strategy}
-
-Write a minimal executable Python script demonstrating the topic.
-
-Rules:
-- valid Python code
-- no markdown
-- no explanations
-- executable script only
-"""
-            else:
-                await progress("SANDBOX", 0, "Generating code independently from theory phase")
-                print("[SANDBOX] Generating code independently from theory phase")
-
-                prompt_codice = f"""
-Write a minimal executable Python script demonstrating: {topic}
-
-Rules:
-- valid Python code
-- no markdown
-- no explanations
-"""
-
-            codice_generato = None
-
-            try:
-                codice_generato = await self._think_fast(prompt_codice)
-            except Exception as e:
-                print(f"[SANDBOX] Code generation failed: {e}")
-
-            # pulizia markdown se presenti
-            if codice_generato:
-                if "```" in codice_generato:
-                    lines = codice_generato.split("\n")
-                    lines = [l for l in lines if not l.strip().startswith("```")]
-                    codice_generato = "\n".join(lines).strip()
-            else:
-                print("[SANDBOX] No code generated by model")
-
-            # esecuzione sandbox solo se codice esiste
-            if codice_generato:
-                try:
-                    await progress("SANDBOX", 0, "Executing generated code")
-                    print("[SANDBOX] Executing generated code")
-
-                    sandbox_result = await self.run_sandbox(topic, codice_generato)
-                    
-                    status = "passed" if sandbox_result["success"] else "failed"
-                    await progress("SANDBOX", 0, f"Sandbox {status}: {sandbox_result['analysis'][:100]}")
-                    print("[SANDBOX] Execution completed")
-
-                except Exception as e:
-                    print(f"[SANDBOX] Execution error: {e}")
-                    import traceback; traceback.print_exc()
-                    sandbox_result = {"success": False, "stdout": "", "stderr": str(e), "analysis": f"Sandbox crash: {e}", "code": codice_generato}
-            else:
-                print("[SANDBOX] Skipping execution (no code produced)")
-            
-            self.progress.complete_phase("SANDBOX")
-
-            # ── RETRY LOOP: VALIDATE → EVALUATE → CERTIFY
-            certified = False
-            score = 0
-            while attempt < MAX_RETRY and not certified:
-                attempt += 1
-                current_phase = "VALIDATE"
-                try:
-                    await progress("VALIDATE", 0, f"Self-interrogation (attempt {attempt}/{MAX_RETRY})...")
-                    validation_data = await self.phase_validate(topic, structured, sandbox_result=sandbox_result)
-                except Exception as e:
-                    await report_crash("VALIDATE", e)
-                    return
-
-                current_phase = "EVALUATE"
-                try:
-                    await progress("EVALUATE", 0, "Scoring with Test-Driven Protocol...")
-                    eval_data = await self.phase_evaluate(
-                        topic, validation_data,
-                        sandbox_result=sandbox_result,
-                        gaps=gaps if attempt > 1 else None
-                    )
-                    score = eval_data.get("score", 0)
-
-                    # ── Strategy Memory: extract and store strategy ──
-                    try:
-                        experiment = {
-                            "topic": topic,
-                            "sandbox_result": sandbox_result,
-                            "eval_data": eval_data,
-                            "structured": structured,
-                        }
-                        strategy_info = self.strategy_memory.extract_strategy(experiment)
-                        if strategy_info:
-                            self.strategy_memory.store_strategy(
-                                topic,
-                                strategy_info["strategy"],
-                                strategy_info["outcome"],
-                                score=strategy_info.get("score", 0),
-                            )
-                            # Update capability graph only on success
-                            if strategy_info["outcome"] == "success":
-                                self.capability_graph.update_from_strategy(
-                                    topic,
-                                    strategy_info["strategy"]
-                                )
-                                # Discover implicit skills from strategy
-                                self.skill_discovery.discover_from_experiment(
-                                    topic,
-                                    strategy_info["strategy"]
-                                )
-                    except Exception as strat_err:
-                        print(f"[STRATEGY] Error extracting/storing strategy: {strat_err}")
-
-                    # ── Experiment Replay & Cache: log this experiment ──
-                    
-                    if eval_data and eval_data.get("score", 0) < 8.0:
-                        current_skills = len(self.capability_graph.capabilities) if self.capability_graph else 0
-                        self.experiment_cache.register_failure(topic, current_skills)
-
-                    self.replay_engine.log_experiment(
-                        topic,
-                        score=eval_data.get("score", 0),
-                        success=eval_data.get("score", 0) >= 8.0
-                    )
-
-                except Exception as e:
-                    await report_crash("EVALUATE", e)
-                    return
-
-                current_phase = "CERTIFY"
-                certified = await self.phase_certify(topic, eval_data)
-
-                if certified:
-                    await progress("CERTIFY", score, f"Topic certified! Score: {score}/10")
-                    await progress("CERTIFY", score, f"SHARD stance: {eval_data.get('shard_stance', '')[:120]}")
-                    if on_certify:
-                        await on_certify(topic, score, {
-                            **eval_data,
-                            "sandbox": sandbox_result,
-                            "concepts": structured.get("concepts", []),
-                            "shard_opinion": structured.get("shard_opinion", ""),
-                            "connections": connections,
-                            "validation_qa": validation_data.get("validation_qa", [])
-                        })
-                else:
-                    gaps = eval_data.get("gaps", [])
-                    focus = eval_data.get("improvement_focus", "")
-                    await progress("VALIDATE", score, f"Score {score}/10 — Retrying. Focus: {focus[:80]}")
-
-                    if attempt < MAX_RETRY:
-                        # Reset validation/evaluation progress for retry
-                        self.progress.phase_progress["VALIDATE"] = 0
-                        self.progress.phase_progress["EVALUATE"] = 0
-                        self.progress.phase_progress["CERTIFY"] = 0
-                        
-                        gap_prompt = f"""
-Previous study of "{topic}" had these gaps: {gaps}
-Focus area: {focus}
-
-Re-synthesize with emphasis on filling these specific gaps.
-Use the same JSON format as before.
-"""
-                        raw_gap = await self._think_fast(gap_prompt, json_mode=True)  # Groq: fast retry
-                        try:
-                            gap_structured = json.loads(raw_gap)
-                            structured["concepts"].extend(gap_structured.get("concepts", []))
-                            structured["critical_questions"] = gap_structured.get("critical_questions", structured["critical_questions"])
-                        except:
-                            pass
-
-            if not certified:
-                await progress("FAILED", score, f"Could not certify '{topic}' after {MAX_RETRY} attempts. Best: {score}/10")
-
-        except Exception as e:
-            # Catch-all for any unexpected errors not caught by per-phase handlers
-            await report_crash(current_phase, e)
+            return await pipeline.execute(ctx)
         finally:
-            await self._close_browser()
+            await self.browser_scraper._close()
             self.is_running = False
 
 

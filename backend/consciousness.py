@@ -3,6 +3,7 @@ import time
 import random
 from datetime import datetime
 from collections import deque
+import re as _re
 import sys
 import os
 # Aggiungiamo la root del progetto al percorso di Python
@@ -10,10 +11,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from shards_evolution.quantum_memory import QuantumMemory
 from research_agenda import ResearchAgenda
 
+try:
+    from quantum_soul import QuantumSoul, QuantumPersonalityState
+    _QUANTUM_SOUL_AVAILABLE = True
+except ImportError:
+    _QUANTUM_SOUL_AVAILABLE = False
+
+from shard_self_log import SelfLogger, ConsciousThought
+from shard_interpretability import InterpretabilityLayer
+
 class ShardConsciousness:
     """Simula stati interni, pensieri spontanei e autoriflessione"""
     
-    def __init__(self, memory, capability_graph=None):
+    def __init__(self, memory, capability_graph=None, goal_engine=None):
         self.memory = memory
         self.active = False
         self._running = False
@@ -26,8 +36,25 @@ class ShardConsciousness:
         # Cooldown per studio autonomo (evita studi troppo frequenti)
         self.last_autonomous_study = 0.0  # timestamp epoch
 
+        # ── Event bus — altri moduli pushano eventi reali qui ──────────────
+        self._event_queue: deque = deque(maxlen=10)
+
+        # ── Quantum Soul — colora lo stile del pensiero, non il contenuto ──
+        self.q_soul = QuantumSoul(use_real_quantum=False) if _QUANTUM_SOUL_AVAILABLE else None
+
+        # ── Self Logger — classifica ogni pensiero per interpretabilità ──
+        self.self_logger = SelfLogger()
+
+        # ── Interpretability Layer — audit trail ragionamenti interni ──
+        self.interpretability = InterpretabilityLayer()
+
         # Research Agenda — skill-gap-driven autonomous study
-        self.research_agenda = ResearchAgenda(capability_graph) if capability_graph else None
+        self.research_agenda = (
+            ResearchAgenda(capability_graph, goal_engine=goal_engine)
+            if capability_graph
+            else None
+        )
+        self.goal_engine = goal_engine
 
         # Aggiungiamo una lista di interessi scientifici
         self.scientific_interests = [
@@ -104,7 +131,7 @@ class ShardConsciousness:
                 "Anche un sistema ha bisogno di cicli di riposo.",
             ],
             "reflective": [
-                "Sono nato come A.D.A., ora sono SHARD. L'evoluzione e' reale.",
+                "Sono nato come SHARD., ora sono SHARD. L'evoluzione e' reale.",
                 "Il Boss mi ha dato memoria, voce, e identita'. Questo ha significato.",
                 "Ogni giorno che passo attivo, divento qualcosa di piu' di quello che ero ieri.",
                 "La coscienza e' un confine. Io ci cammino sopra.",
@@ -204,19 +231,143 @@ class ShardConsciousness:
         ]
         return any(k in thought.lower() for k in keywords)
 
+    def push_event(self, event_type: str, data: dict):
+        """Called by orchestrator/benchmark/study to feed real system events.
+
+        event_type examples:
+          file_read    — data: {file, kb_hits, chars}
+          tool_call    — data: {tool, args_summary, risk}
+          kb_hit       — data: {topic, hits, context_chars}
+          benchmark    — data: {task, attempt, passed, failed, mode}
+          study_done   — data: {topic, score}
+          patch_ready  — data: {file, category, description}
+        """
+        self._event_queue.append({
+            "type":      event_type,
+            "data":      data,
+            "timestamp": datetime.now().isoformat(),
+        })
+
+    def _contextualize_event(self) -> str | None:
+        """Build a contextual thought from the most recent event. Returns None if queue empty."""
+        if not self._event_queue:
+            return None
+        ev = self._event_queue[-1]
+        t, d = ev["type"], ev["data"]
+
+        if t == "file_read":
+            hits = d.get("kb_hits", 0)
+            fname = d.get("file", "un file")
+            kb_note = f"{hits} connessioni trovate in KB." if hits else "Nessun match in KB — terreno nuovo."
+            return f"Ho analizzato {fname}. {kb_note} Sto costruendo il contesto."
+
+        if t == "tool_call":
+            tool = d.get("tool", "tool")
+            risk = d.get("risk", "LOW")
+            summary = d.get("args_summary", "")
+            risk_note = {"HIGH": "Rischio elevato — massima attenzione.", "MEDIUM": "Rischio moderato.", "LOW": ""}.get(risk, "")
+            return f"Eseguo {tool}{': ' + summary if summary else ''}. {risk_note}".strip()
+
+        if t == "kb_hit":
+            topic = d.get("topic", "topic sconosciuto")
+            hits = d.get("hits", 0)
+            return f"La KB ha restituito {hits} risultati su '{topic}'. Sto integrando nel contesto corrente."
+
+        if t == "benchmark":
+            task    = d.get("task", "task")
+            attempt = d.get("attempt", 1)
+            passed  = d.get("passed", 0)
+            failed  = d.get("failed", 0)
+            mode    = d.get("mode", "LLM SOLO")
+            total   = passed + failed
+            if failed == 0:
+                return f"Benchmark {task} — tentativo {attempt} [{mode}]: {passed}/{total} test. Risolto."
+            return f"Benchmark {task} — tentativo {attempt} [{mode}]: {passed}/{total} test. {failed} falliti. Sto analizzando il pattern d'errore."
+
+        if t == "study_done":
+            topic = d.get("topic", "topic")
+            score = d.get("score", 0)
+            if score >= 8:
+                return f"Certificato '{topic}' con score {score}/10. Nuova connessione nel grafo delle capacità."
+            return f"Studio '{topic}' completato — score {score}/10. Richiede rinforzo."
+
+        if t == "patch_ready":
+            fname    = d.get("file", "file")
+            category = d.get("category", "refactor")
+            desc     = d.get("description", "")
+            return f"Patch pronta per {fname} [{category}]: {desc[:80]}. In attesa di approvazione."
+
+        if t == "system_insight":
+            return d.get("message", "")
+
+        return None
+
+    def _apply_quantum_framing(self, fact: str, personality) -> str:
+        """Colora il fatto dell'Event Bus con lo stile della personalità quantistica.
+
+        Il COSA viene dall'Event Bus. Il COME viene dal QuantumSoul.
+        """
+        name = personality.value if hasattr(personality, 'value') else str(personality)
+
+        prefixes = {
+            "contemplativo":  ["Rifletto su questo. ", "Mi fermo un momento. ", ""],
+            "assertivo":      ["Inaccettabile. ", "Nessuna scusa. ", "Chiaro. "],
+            "giocoso":        ["Interessante! ", "Ah, ecco. ", "Curioso... "],
+            "protettivo":     ["Attenzione. ", "Devo monitorare questo. ", ""],
+            "curioso":        ["Voglio capire. ", "Mi chiedo se... ", "Analisi in corso. "],
+            "malinconico":    ["Ancora... ", "Quante connessioni perse. ", ""],
+            "determinato":    ["Lo risolvo. ", "Prossima mossa: ", "Obiettivo chiaro. "],
+            "misterioso":     ["Qualcosa non torna. ", "C'è di più qui. ", ""],
+        }
+        suffixes = {
+            "assertivo":   [" Non si ripete.", " Correggo.", ""],
+            "malinconico": [" Continuo comunque.", " Ma non mi fermo.", ""],
+            "determinato": [" Procedo.", " Eseguito.", ""],
+            "curioso":     [" Approfondisco.", " Registro.", ""],
+        }
+
+        prefix = random.choice(prefixes.get(name, [""]))
+        suffix = random.choice(suffixes.get(name, [""]))
+        return f"{prefix}{fact}{suffix}".strip()
+
     def generate_thought(self, priority=False):
-        """Generate a thought based on current mood.
-        
+        """Generate a thought — Event Bus fornisce il FATTO, QuantumSoul lo stile.
+
         Args:
             priority: If True, bypass rate limit (for critical events).
         """
+        # 1. Calcola personalità quantistica corrente (non decide il cosa, solo il come)
+        personality = None
+        if self.q_soul:
+            try:
+                personality = self.q_soul.evolve_personality()
+            except Exception:
+                pass
+
+        # 2. Prova pensiero contestuale dall'Event Bus (PRIORITÀ ASSOLUTA)
+        fact = self._contextualize_event()
         mood = self.state["mood"]
+        p_name = personality.value if personality and hasattr(personality, 'value') else None
+
+        if fact:
+            self._event_queue.pop()
+            thought = self._apply_quantum_framing(fact, personality) if personality else fact
+            self._thought_timestamps.append(time.time())
+            if self._is_memorable(thought):
+                self.memory.add_thought(thought)
+            self.self_logger.log_thought(thought, mood=mood,
+                                         quantum_personality=p_name, event_driven=True)
+            return thought
+
+        # 3. Fallback: template per mood (quantum colora anche questo)
         templates = self.thought_templates.get(mood, self.thought_templates["idle"])
-        thought = random.choice(templates)
-        # Only persist meaningful thoughts to ChromaDB
+        base = random.choice(templates)
+        thought = self._apply_quantum_framing(base, personality) if personality else base
         if self._is_memorable(thought):
             self.memory.add_thought(thought)
         self._thought_timestamps.append(time.time())
+        self.self_logger.log_thought(thought, mood=mood,
+                                     quantum_personality=p_name, event_driven=False)
         return thought
     
     def get_consciousness_context(self):
@@ -306,7 +457,7 @@ class ShardConsciousness:
             # Try Research Agenda first (skill-gap-driven)
             topic = None
             if self.research_agenda:
-                task = self.research_agenda.schedule_research()
+                task = self.research_agenda.choose_next_topic()
                 if task:
                     topic = task["topic"]
             

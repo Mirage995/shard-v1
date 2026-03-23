@@ -21,7 +21,7 @@ sys.modules['project_manager'] = MagicMock()
 
 # Avoid actual imports that might fail
 with patch('google.genai.Client'), patch('google.genai.types.LiveConnectConfig'):
-    from ada import AudioLoop
+    from shard import AudioLoop
 
 class TestVisionTransmission(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):

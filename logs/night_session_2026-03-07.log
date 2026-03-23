@@ -1,0 +1,109 @@
+[NIGHT RUNNER] [11:23] Random seed: 3730377
+[NIGHT RUNNER] [11:23] Session started
+[NIGHT RUNNER] [11:23] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): chiedo facendo applied to numerical_computation
+[NIGHT RUNNER] [11:23] === Cycle 1/3 ===
+[NIGHT RUNNER] [11:23] Topic selected: chiedo facendo applied to numerical_computation
+[NIGHT RUNNER] [11:23] Source: experiment_inventor
+[NIGHT RUNNER] [11:23] Reason: Generato combinatorialmente (ExperimentInventor).
+[NIGHT RUNNER] [11:23] [STRATEGY] Reusing strategy: chiedo facendo for topic: chiedo facendo applied to numerical_computation
+[NIGHT RUNNER] [11:30] Night runner aborted by user.
+[NIGHT RUNNER] [14:18] Random seed: 2791522
+[NIGHT RUNNER] [14:18] Session started
+[NIGHT RUNNER] [14:18] === Cycle 1/15 ===
+[NIGHT RUNNER] [14:18] Topic selected: REST API design patterns
+[NIGHT RUNNER] [14:18] Source: research_agenda
+[NIGHT RUNNER] [14:18] Reason: Selezionato dall'agenda di ricerca.
+[NIGHT RUNNER] [14:18] [STRATEGY] Reusing strategy: REST API design patterns for topic: REST API design patterns
+[NIGHT RUNNER] [14:34] Sandbox/Study result: failed
+[NIGHT RUNNER] [14:34] Score: 0.0/10
+[NIGHT RUNNER] [14:34] Certified: False
+[NIGHT RUNNER] [14:34] Skills unlocked: 0
+[NIGHT RUNNER] [14:34] Strategies reused: 1
+[NIGHT RUNNER] [14:34] Cycle duration: 16.73 minutes
+[NIGHT RUNNER] [14:34] Pausing for 10 minutes...
+[NIGHT RUNNER] [14:44] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): quantized inertia theory applied to hubble-scale casimir effect
+[NIGHT RUNNER] [14:44] === Cycle 2/15 ===
+[NIGHT RUNNER] [14:44] Topic selected: quantized inertia theory applied to hubble-scale casimir effect
+[NIGHT RUNNER] [14:44] Source: experiment_inventor
+[NIGHT RUNNER] [14:44] Reason: Generato combinatorialmente (ExperimentInventor).
+[NIGHT RUNNER] [14:44] [STRATEGY] Reusing strategy: interrogative usage applied to quantized inertia theory for topic: quantized inertia theory applied to hubble-scale casimir effect
+[NIGHT RUNNER] [14:53] Sandbox/Study result: failed
+[NIGHT RUNNER] [14:53] Score: 0.0/10
+[NIGHT RUNNER] [14:53] Certified: False
+[NIGHT RUNNER] [14:53] Skills unlocked: 0
+[NIGHT RUNNER] [14:53] Strategies reused: 1
+[NIGHT RUNNER] [14:53] Cycle duration: 8.91 minutes
+[NIGHT RUNNER] [14:53] Pausing for 10 minutes...
+[NIGHT RUNNER] [15:03] === Cycle 3/15 ===
+[NIGHT RUNNER] [15:03] Topic selected: REST API design patterns
+[NIGHT RUNNER] [15:03] Source: research_agenda
+[NIGHT RUNNER] [15:03] Reason: Selezionato dall'agenda di ricerca.
+[NIGHT RUNNER] [15:03] [STRATEGY] Reusing strategy: REST API design patterns for topic: REST API design patterns
+[NIGHT RUNNER] [15:11] Sandbox/Study result: failed
+[NIGHT RUNNER] [15:11] Score: 0.0/10
+[NIGHT RUNNER] [15:11] Certified: False
+[NIGHT RUNNER] [15:11] Skills unlocked: 0
+[NIGHT RUNNER] [15:11] Strategies reused: 1
+[NIGHT RUNNER] [15:11] Cycle duration: 7.31 minutes
+[NIGHT RUNNER] [15:11] Pausing for 10 minutes...
+[NIGHT RUNNER] [15:21] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): chiedo facendo
+[NIGHT RUNNER] [15:21] === Cycle 4/15 ===
+[NIGHT RUNNER] [15:21] Topic selected: chiedo facendo
+[NIGHT RUNNER] [15:21] Source: consciousness
+[NIGHT RUNNER] [15:21] Reason: Derivato da un pensiero spontaneo.
+[NIGHT RUNNER] [15:21] [STRATEGY] Reusing strategy: chiedo facendo for topic: chiedo facendo
+[NIGHT RUNNER] [15:27] Sandbox/Study result: failed
+[NIGHT RUNNER] [15:27] Score: 0.0/10
+[NIGHT RUNNER] [15:27] Certified: False
+[NIGHT RUNNER] [15:27] Skills unlocked: 0
+[NIGHT RUNNER] [15:27] Strategies reused: 1
+[NIGHT RUNNER] [15:27] Cycle duration: 6.51 minutes
+[NIGHT RUNNER] [15:27] Pausing for 10 minutes...
+[NIGHT RUNNER] [15:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Potrei analizzare
+[NIGHT RUNNER] [15:37] === Cycle 5/15 ===
+[NIGHT RUNNER] [15:37] Topic selected: Potrei analizzare
+[NIGHT RUNNER] [15:37] Source: consciousness
+[NIGHT RUNNER] [15:37] Reason: Derivato da un pensiero spontaneo.
+[NIGHT RUNNER] [15:37] [STRATEGY] Reusing strategy: web scraping with BeautifulSoup for topic: Potrei analizzare
+[NIGHT RUNNER] [15:43] Sandbox/Study result: failed
+[NIGHT RUNNER] [15:43] Score: 0.0/10
+[NIGHT RUNNER] [15:43] Certified: False
+[NIGHT RUNNER] [15:43] Skills unlocked: 0
+[NIGHT RUNNER] [15:43] Strategies reused: 1
+[NIGHT RUNNER] [15:43] Cycle duration: 6.03 minutes
+[NIGHT RUNNER] [15:43] Pausing for 10 minutes...
+[NIGHT RUNNER] [15:53] === Cycle 6/15 ===
+[NIGHT RUNNER] [15:53] Topic selected: REST API design patterns
+[NIGHT RUNNER] [15:53] Source: research_agenda
+[NIGHT RUNNER] [15:53] Reason: Selezionato dall'agenda di ricerca.
+[NIGHT RUNNER] [15:53] [STRATEGY] Reusing strategy: REST API design patterns for topic: REST API design patterns
+[NIGHT RUNNER] [16:02] Sandbox/Study result: failed
+[NIGHT RUNNER] [16:02] Score: 0.0/10
+[NIGHT RUNNER] [16:02] Certified: False
+[NIGHT RUNNER] [16:02] Skills unlocked: 0
+[NIGHT RUNNER] [16:02] Strategies reused: 1
+[NIGHT RUNNER] [16:02] Cycle duration: 8.35 minutes
+[NIGHT RUNNER] [16:02] Pausing for 10 minutes...
+[NIGHT RUNNER] [16:12] === Cycle 7/15 ===
+[NIGHT RUNNER] [16:12] Topic selected: REST API design patterns
+[NIGHT RUNNER] [16:12] Source: research_agenda
+[NIGHT RUNNER] [16:12] Reason: Selezionato dall'agenda di ricerca.
+[NIGHT RUNNER] [16:12] [STRATEGY] Reusing strategy: REST API design patterns for topic: REST API design patterns
+[NIGHT RUNNER] [16:19] Sandbox/Study result: failed
+[NIGHT RUNNER] [16:19] Score: 0.0/10
+[NIGHT RUNNER] [16:19] Certified: False
+[NIGHT RUNNER] [16:19] Skills unlocked: 0
+[NIGHT RUNNER] [16:19] Strategies reused: 1
+[NIGHT RUNNER] [16:19] Cycle duration: 7.98 minutes
+[NIGHT RUNNER] [16:19] Session stopped: timeout (120 min)
+[NIGHT RUNNER] [16:19] === Session Summary ===
+[NIGHT RUNNER] [16:19] Total cycles: 7
+[NIGHT RUNNER] [16:19] Total certified: 0
+[NIGHT RUNNER] [16:19] Total failed: 7
+[NIGHT RUNNER] [16:19] Total skills gained: 0
+[NIGHT RUNNER] [16:19] Total runtime: 121.85 minutes
+[NIGHT RUNNER] [16:19] JSON dump saved to night_reports\session_2026-03-07.json
+[NIGHT RUNNER] [16:19] Waiting 15s for Ollama cooldown before recap generation...
+[NIGHT RUNNER] [16:20] Generazione riflessioni via Ollama locale in corso...
+[NIGHT RUNNER] [16:20] Markdown recap saved to night_reports\recap_2026-03-07.md
+[NIGHT RUNNER] [16:20] Session complete. Shutting down cleanly.

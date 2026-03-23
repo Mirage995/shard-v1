@@ -1,7 +1,27 @@
 import { useEffect, useRef } from 'react';
 
-const CircuitBackground = () => {
-    const canvasRef = useRef(null);
+// speedMult: 1.0 = idle, 3.5 = SHARD speaking
+const IDLE_SPEED   = 1.0;
+const ACTIVE_SPEED = 3.5;
+const IDLE_ALPHA   = 0.45;
+const ACTIVE_ALPHA = 0.75;
+const DECAY_MS     = 2800; // ms after last speech event to return to idle
+
+const CircuitBackground = ({ socket }) => {
+    const canvasRef   = useRef(null);
+    const reactiveRef = useRef({ speedMult: IDLE_SPEED, alpha: IDLE_ALPHA, lastSpeech: 0 });
+
+    // Wire socket: boost on SHARD transcription, decay after DECAY_MS
+    useEffect(() => {
+        if (!socket) return;
+        const handle = (data) => {
+            if (data?.sender === 'shard' || data?.text) {
+                reactiveRef.current.lastSpeech = performance.now();
+            }
+        };
+        socket.on('transcription', handle);
+        return () => socket.off('transcription', handle);
+    }, [socket]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -34,24 +54,24 @@ const CircuitBackground = () => {
                 let x = sx, y = sy;
                 const steps = 2 + Math.floor(Math.random() * 3);
 
-            for (let s = 0; s < steps; s++) {
-                const prog = (s + 1) / steps;
-                const nx = x + (tx - x) * prog;
-                const ny = y + (ty - y) * prog;
-                if (s % 2 === 0) {
-                segs.push({ x1: x,  y1: y,  x2: nx, y2: y  });
-                segs.push({ x1: nx, y1: y,  x2: nx, y2: ny });
-                } else {
-                segs.push({ x1: x,  y1: y,  x2: x,  y2: ny });
-                segs.push({ x1: x,  y1: ny, x2: nx, y2: ny });
+                for (let s = 0; s < steps; s++) {
+                    const prog = (s + 1) / steps;
+                    const nx = x + (tx - x) * prog;
+                    const ny = y + (ty - y) * prog;
+                    if (s % 2 === 0) {
+                        segs.push({ x1: x,  y1: y,  x2: nx, y2: y  });
+                        segs.push({ x1: nx, y1: y,  x2: nx, y2: ny });
+                    } else {
+                        segs.push({ x1: x,  y1: y,  x2: x,  y2: ny });
+                        segs.push({ x1: x,  y1: ny, x2: nx, y2: ny });
+                    }
+                    x = nx; y = ny;
                 }
-                x = nx; y = ny;
+                traces.push({ segs, alpha: IDLE_ALPHA + Math.random() * 0.25, endX: tx, endY: ty });
             }
-            traces.push({ segs, alpha: 0.45 + Math.random() * 0.45, endX: tx, endY: ty });
-    }
-}
+        }
 
-        function spawnPulse() {
+        function spawnPulse(speedMult) {
             if (!traces.length) return;
             const trace = traces[Math.floor(Math.random() * traces.length)];
             const pts = [];
@@ -60,34 +80,69 @@ const CircuitBackground = () => {
                 pts.push({ x: s.x2, y: s.y2 });
             }
             if (pts.length < 2) return;
-            pulses.push({ pts, t: 0, speed: 0.005 + Math.random() * 0.009 });
+            pulses.push({
+                pts,
+                t: 0,
+                speed: (0.005 + Math.random() * 0.009) * speedMult,
+            });
         }
 
-        const pulseInterval = setInterval(spawnPulse, 220);
+        // Dynamic interval: respawns pulses faster when SHARD is speaking
+        let pulseInterval = null;
+        let currentIntervalMs = 220;
+
+        function setSpawnRate(ms) {
+            if (ms === currentIntervalMs) return;
+            currentIntervalMs = ms;
+            clearInterval(pulseInterval);
+            pulseInterval = setInterval(() => spawnPulse(reactiveRef.current.speedMult), ms);
+        }
+
+        pulseInterval = setInterval(() => spawnPulse(reactiveRef.current.speedMult), currentIntervalMs);
         window.addEventListener('resize', resize);
         resize();
 
         function draw() {
+            // Smooth speedMult and alpha transitions
+            const r = reactiveRef.current;
+            const elapsed = performance.now() - r.lastSpeech;
+            const active = elapsed < DECAY_MS;
+            const target  = active ? ACTIVE_SPEED : IDLE_SPEED;
+            const tAlpha  = active ? ACTIVE_ALPHA : IDLE_ALPHA;
+
+            r.speedMult += (target - r.speedMult) * 0.04;
+            r.alpha     += (tAlpha - r.alpha)     * 0.04;
+
+            // Adjust spawn rate dynamically
+            const spawnMs = active ? 80 : 220;
+            setSpawnRate(spawnMs);
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Draw static traces — brighten when active
             for (const tr of traces) {
-                ctx.lineWidth = 0.7;
+                const a = tr.alpha * r.alpha / IDLE_ALPHA;
+                ctx.lineWidth = active ? 0.9 : 0.7;
                 for (const s of tr.segs) {
                     ctx.beginPath();
                     ctx.moveTo(s.x1, s.y1);
                     ctx.lineTo(s.x2, s.y2);
-                    ctx.strokeStyle = `rgba(0,180,255,${tr.alpha})`;
+                    ctx.strokeStyle = `rgba(0,180,255,${a})`;
                     ctx.stroke();
                 }
                 ctx.beginPath();
-                ctx.arc(tr.endX, tr.endY, 1.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0,220,255,${tr.alpha * 2})`;
+                ctx.arc(tr.endX, tr.endY, active ? 2 : 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0,220,255,${a * 2})`;
                 ctx.fill();
             }
 
+            // Draw pulses — wider glow when active
+            const glowRadius = active ? 3.0 : 2.2;
+            const glowBlur   = active ? 14  : 8;
+
             for (let i = pulses.length - 1; i >= 0; i--) {
                 const p = pulses[i];
-                p.t += p.speed;
+                p.t += p.speed * r.speedMult;
                 if (p.t >= 1) { pulses.splice(i, 1); continue; }
                 const tot = p.pts.length - 1;
                 for (let t = 0; t < 5; t++) {
@@ -99,13 +154,14 @@ const CircuitBackground = () => {
                     const px = p.pts[idx].x + (p.pts[idx+1].x - p.pts[idx].x) * f;
                     const py = p.pts[idx].y + (p.pts[idx+1].y - p.pts[idx].y) * f;
                     ctx.beginPath();
-                    ctx.arc(px, py, 2.2 * (1 - t/6), 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(0,238,255,${0.75*(1-t/5)*(1-p.t*0.4)})`;
-                    if (t === 0) { ctx.shadowBlur = 8; ctx.shadowColor = '#00eeff'; }
+                    ctx.arc(px, py, glowRadius * (1 - t / 6), 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0,238,255,${0.75 * (1 - t / 5) * (1 - p.t * 0.4)})`;
+                    if (t === 0) { ctx.shadowBlur = glowBlur; ctx.shadowColor = '#00eeff'; }
                     ctx.fill();
                     ctx.shadowBlur = 0;
                 }
             }
+
             animId = requestAnimationFrame(draw);
         }
         draw();

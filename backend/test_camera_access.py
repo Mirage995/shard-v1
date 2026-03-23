@@ -15,7 +15,7 @@ def test_camera_init_logic_windows():
     """Verify the expected initialization logic for Windows."""
     with patch('sys.platform', 'win32'):
         with patch('cv2.VideoCapture') as mock_vc:
-            # Simulate what we do in ada.py
+            # Simulate what we do in SHARD.py
             if sys.platform == "darwin":
                 cap = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
             else:
@@ -27,7 +27,7 @@ def test_camera_init_logic_mac():
     """Verify the expected initialization logic for macOS."""
     with patch('sys.platform', 'darwin'):
         with patch('cv2.VideoCapture') as mock_vc:
-            # Simulate what we do in ada.py
+            # Simulate what we do in SHARD.py
             if sys.platform == "darwin":
                 cap = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
             else:

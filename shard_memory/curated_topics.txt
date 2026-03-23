@@ -1,0 +1,64 @@
+# Curated study topics for SHARD NightRunner
+# One topic per line. Lines starting with # are comments.
+# Topics should be concrete, technical, and studiable with Python code.
+
+# Python core
+python decorators and metaclasses
+python asyncio event loop internals
+python context managers and resource management
+python generators and coroutines
+python dataclasses and slots
+python typing system and generics
+python memory management and garbage collection
+python descriptor protocol
+
+# Algorithms & Data Structures
+binary search tree operations
+graph traversal algorithms bfs dfs
+dynamic programming memoization
+heap data structure and priority queue
+trie data structure
+union find disjoint set
+sliding window technique
+two pointer technique
+
+# Systems & Networking
+http client implementation python
+websocket protocol implementation
+tcp socket programming python
+async io with python selectors
+dns resolution python
+
+# Machine Learning (concrete, codeable)
+gradient descent implementation from scratch
+neural network backpropagation python
+k-nearest neighbors classifier
+decision tree implementation
+linear regression numpy
+logistic regression from scratch
+convolutional neural network basics
+transformer attention mechanism
+
+# Software Engineering
+design patterns factory singleton observer
+dependency injection python
+clean architecture python
+test driven development pytest
+property based testing hypothesis
+profiling and optimization python
+caching strategies lru cache
+circuit breaker pattern python
+
+# Cryptography & Security
+rsa encryption python from scratch
+sha256 implementation
+aes encryption python
+jwt token validation
+password hashing bcrypt argon2
+
+# DevOps & Infrastructure
+docker container python sdk
+git internals object model
+sqlite query optimization
+redis data structures python
+message queue rabbitmq python

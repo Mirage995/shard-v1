@@ -15,6 +15,12 @@ _temp_file = os.path.join(_temp_dir, 'test_cap_graph.json')
 import capability_graph
 capability_graph.CAPABILITY_FILE = _temp_file
 
+# Make _get_db fail so tests use JSON fallback (isolated from production DB)
+def _fake_get_db():
+    raise RuntimeError("Test isolation: no DB")
+
+capability_graph._get_db = _fake_get_db
+
 
 class TestCapabilityGraph(unittest.TestCase):
     def setUp(self):
@@ -38,16 +44,16 @@ class TestCapabilityGraph(unittest.TestCase):
 
     def test_no_duplicate(self):
         g = self._make_graph()
-        g.add_capability("Git")
-        g.add_capability("Git")  # Should not duplicate
+        g.add_capability("git internals")
+        g.add_capability("git internals")  # Should not duplicate
         self.assertEqual(len(g.get_all()), 1)
 
     def test_missing_requirements(self):
         g = self._make_graph()
-        g.add_capability("Flask", requires=["Python", "HTTP"])
-        g.add_capability("Python")
-        missing = g.missing_requirements("Flask")
-        self.assertEqual(missing, ["HTTP"])
+        g.add_capability("flask framework", requires=["python basics", "http protocol"])
+        g.add_capability("python basics")
+        missing = g.missing_requirements("flask framework")
+        self.assertEqual(missing, ["http protocol"])
 
     def test_missing_requirements_unknown_capability(self):
         g = self._make_graph()
@@ -56,19 +62,19 @@ class TestCapabilityGraph(unittest.TestCase):
 
     def test_persistence(self):
         g1 = self._make_graph()
-        g1.add_capability("Docker")
+        g1.add_capability("docker containers")
         # Create a new instance — should load from disk
         g2 = self._make_graph()
-        self.assertTrue(g2.has_capability("Docker"))
+        self.assertTrue(g2.has_capability("docker containers"))
 
     def test_update_from_strategy(self):
         g = self._make_graph()
-        strategy = "[Python] Concepts: asyncio, coroutines, event loops | Sandbox: SUCCESS"
+        strategy = "[Python] Concepts: asyncio patterns, coroutine design, event loop internals | Sandbox: SUCCESS"
         g.update_from_strategy("Python Async", strategy)
         self.assertTrue(g.has_capability("Python Async"))
-        self.assertTrue(g.has_capability("asyncio"))
-        self.assertTrue(g.has_capability("coroutines"))
-        self.assertTrue(g.has_capability("event loops"))
+        self.assertTrue(g.has_capability("asyncio patterns"))
+        self.assertTrue(g.has_capability("coroutine design"))
+        self.assertTrue(g.has_capability("event loop internals"))
 
     def test_update_from_strategy_no_concepts(self):
         g = self._make_graph()
