@@ -8,11 +8,9 @@ import uuid
 import pathlib
 from typing import List, Dict, Any, Optional, Callable
 from importlib.util import spec_from_file_location, module_from_spec
-from openai import AsyncOpenAI
 from datetime import datetime
 from groq import Groq, RateLimitError as GroqRateLimitError
 import anthropic
-from ddgs import DDGS
 from chromadb.utils import embedding_functions
 from db_manager import get_collection, DB_PATH_KNOWLEDGE_DB
 from filesystem_tools import write_file
@@ -378,6 +376,7 @@ Example: ["query 1", "query 2", "query 3"]"""
         ]
 
         def _search():
+            from ddgs import DDGS  # lazy: only needed during MAP web search
             results = []
             with DDGS(timeout=15) as ddgs:
                 for query in queries[:4]:

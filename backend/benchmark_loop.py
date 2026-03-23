@@ -412,7 +412,7 @@ async def run_benchmark_loop(
     task_dir: str | Path,
     max_attempts: int = MAX_ATTEMPTS_DEFAULT,
     progress_cb=None,
-    use_episodic_memory: bool = False,
+    use_episodic_memory: bool = True,
     use_swarm: bool = False,
     use_concurrency_sim: bool = True,  # auto-detects if task needs it
 ) -> BenchmarkResult:

@@ -20,7 +20,7 @@ export default function BenchmarkWidget({ socket }) {
     const [open, setOpen]               = useState(false);
     const [selected, setSelected]       = useState(new Set(['ghost_bug', 'dirty_data', 'bank_race']));
     const [maxAttempts, setMaxAttempts]           = useState(8);
-    const [episodicMemory, setEpisodicMemory]     = useState(false);
+    const [episodicMemory, setEpisodicMemory]     = useState(true);
     const [useSwarm, setUseSwarm]               = useState(false);
     const [running, setRunning]         = useState(false);
     const [log, setLog]                 = useState([]);       // [{id, text, color, bold}]

@@ -12,6 +12,7 @@ import asyncio
 import logging
 import argparse
 from datetime import datetime
+from enum import Enum, auto
 from pathlib import Path
 
 try:
@@ -233,6 +234,17 @@ def is_trivial_topic(topic: str, logger: logging.Logger) -> bool:
         
     return False
 
+class SessionState(Enum):
+    INIT     = auto()  # session setup: memory, agents, SSJ3 analysis
+    SELECT   = auto()  # picking next topic
+    STUDY    = auto()  # study_agent.study_topic() running
+    REFACTOR = auto()  # enqueue_from_failure() after a failed cycle
+    RECORD   = auto()  # writing experiment to SQLite + updating cycle_data
+    COMPLETE = auto()  # cycle certified — moving to next cycle
+    FAILED   = auto()  # cycle not certified — moving to next cycle
+    DONE     = auto()  # session finished (limit reached or all cycles done)
+
+
 class NightRunner:
     def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int):
         self.max_cycles = cycles
@@ -250,9 +262,10 @@ class NightRunner:
         # Priority -1: topics queued by ImprovementEngine (SSJ3 proactive self-improvement)
         self._background_mode: bool = False  # True when running alongside an audio session
         self._improvement_topics: list = []
-        
+        self._state: SessionState = SessionState.INIT
+
         self.topic_filter_discards = 0
-        
+
         self._setup_directories()
         self._setup_logging()
         
@@ -281,6 +294,15 @@ class NightRunner:
         
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+
+    def _transition(self, new_state: SessionState, detail: str = "") -> None:
+        """Log a state transition and update _state."""
+        old = self._state.name
+        self._state = new_state
+        msg = f"[STATE] {old} → {new_state.name}"
+        if detail:
+            msg += f"  ({detail})"
+        self.logger.info(msg)
 
     def _check_limits(self, current_cycle: int) -> str:
         if current_cycle > self.max_cycles:
@@ -533,6 +555,7 @@ class NightRunner:
         if self._background_mode:
             def _vb(text, priority="low", event_type="info"):  # noqa: F811
                 pass
+        self._transition(SessionState.INIT, "loading memory + capability graph")
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
         # create goal engine tied to the same capability graph
@@ -565,8 +588,9 @@ class NightRunner:
                 self.logger.info(f"Session stopped: {limit_reason}")
                 break
                 
+            self._transition(SessionState.SELECT, f"cycle {cycle}/{self.max_cycles}")
             topic, source, reason = await self._select_topic(capability_graph, "")
-            
+
             self.logger.info(f"=== Cycle {cycle}/{self.max_cycles} ===")
             self.logger.info(f"Topic selected: {topic}")
             self.logger.info(f"Source: {source}")
@@ -615,6 +639,7 @@ class NightRunner:
             )
 
             try:
+                self._transition(SessionState.STUDY, topic)
                 self.api_calls_used += 3
                 best_score = await study_agent.study_topic(
                     topic=topic,
@@ -638,6 +663,7 @@ class NightRunner:
 
                 # Capability-driven refactor: enqueue responsible modules after failure
                 if not cycle_data["certified"]:
+                    self._transition(SessionState.REFACTOR, f"enqueue modules for failed topic: {topic}")
                     try:
                         from backend.proactive_refactor import ProactiveRefactor as _PR
                         _pr = _PR(think_fn=study_agent._think_fast)
@@ -657,8 +683,13 @@ class NightRunner:
                 cycle_data["score"] = 0.0
                 cycle_data["failures"] = [f"CRASH: {str(e)}"]
                 
+            self._transition(
+                SessionState.COMPLETE if cycle_data["certified"] else SessionState.FAILED,
+                f"score={cycle_data['score']}/10",
+            )
+            self._transition(SessionState.RECORD, f"writing experiment to SQLite")
             cycle_data["duration_minutes"] = round((time.time() - cycle_start) / 60, 2)
-            
+
             capability_graph._load()
             cycle_data["skills_after"] = len(capability_graph.capabilities)
             new_skills = cycle_data["skills_after"] - cycle_data["skills_before"]
@@ -740,6 +771,8 @@ class NightRunner:
                         pass
                 self.logger.info(f"Pausing for {self.pause_minutes} minutes...")
                 await asyncio.sleep(self.pause_minutes * 60)
+
+        self._transition(SessionState.DONE, "all cycles completed")
 
         # ── Benchmark Loop: run all benchmark tasks ──────────────────────────
         await self._run_benchmarks()
