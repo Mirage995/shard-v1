@@ -29,7 +29,6 @@ if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
 from backend.study_agent import StudyAgent
-from backend.consciousness import ShardConsciousness
 from backend.research_agenda import ResearchAgenda
 from backend.experiment_inventor import ExperimentInventor
 from backend.capability_graph import CapabilityGraph
@@ -313,7 +312,7 @@ class NightRunner:
         except Exception:
             return False
 
-    async def _select_topic(self, consciousness, capability_graph, config_context) -> tuple[str, str, str]:
+    async def _select_topic(self, capability_graph, config_context) -> tuple[str, str, str]:
         """Returns (topic, source, reason)"""
 
         # Priority -1: ImprovementEngine queue (SSJ3 proactive self-improvement)
@@ -378,7 +377,7 @@ class NightRunner:
             except Exception as _cur_err:
                 self.logger.warning("[CURATED] Could not read curated_topics.txt: %s", _cur_err)
 
-        sources = ["research_agenda", "consciousness"]  # ExperimentInventor disabled
+        sources = ["research_agenda"]  # consciousness removed — generates garbage from Italian thoughts; ExperimentInventor disabled
 
         # TASK 2: Try curiosity-driven frontier exploration (20% chance)
         if random.random() < 0.20:
@@ -412,21 +411,8 @@ class NightRunner:
             if source == "research_agenda":
                 agenda = ResearchAgenda(capability_graph, goal_engine=self.goal_engine)
                 task = agenda.choose_next_topic()
-                if task and "topic" in task: 
-                    topic, reason = task["topic"], "Selezionato dall'agenda di ricerca."
-            elif source == "experiment_inventor":
-                inventor = ExperimentInventor(capability_graph)
-                skills = list(capability_graph.capabilities.keys()) if hasattr(capability_graph, "capabilities") else []
-                target_skill = random.choice(skills) if skills else "python"
-                tasks = inventor.invent_experiments(target_skill)
-                task = {"topic": tasks[0]} if tasks else None
                 if task and "topic" in task:
-                    topic, reason = task["topic"], "Generato combinatorialmente (ExperimentInventor)."
-            else:
-                thought = consciousness.generate_thought()
-                words = [w for w in thought.split() if len(w) > 5]
-                topic = " ".join(words[:2]) if words else "Python Meta-programming"
-                reason = "Derivato da un pensiero spontaneo."
+                    topic, reason = task["topic"], "Selezionato dall'agenda di ricerca."
             
             if not topic:
                 continue
@@ -534,7 +520,6 @@ class NightRunner:
         # create goal engine tied to the same capability graph
         storage = GoalStorage()
         self.goal_engine = GoalEngine(storage, capability_graph)
-        consciousness = ShardConsciousness(memory, capability_graph, goal_engine=self.goal_engine)
         study_agent = StudyAgent(goal_engine=self.goal_engine)
 
         # ── SSJ3: Proactive self-improvement (ImprovementEngine) ──────────────
@@ -562,7 +547,7 @@ class NightRunner:
                 self.logger.info(f"Session stopped: {limit_reason}")
                 break
                 
-            topic, source, reason = await self._select_topic(consciousness, capability_graph, "")
+            topic, source, reason = await self._select_topic(capability_graph, "")
             
             self.logger.info(f"=== Cycle {cycle}/{self.max_cycles} ===")
             self.logger.info(f"Topic selected: {topic}")
