@@ -25,6 +25,11 @@ RUN pip install --no-cache-dir \
     fastapi \
     sqlalchemy
 
+# Dynamic packages — auto-expanded by SHARD when ModuleNotFoundError is detected.
+# Only this layer is invalidated on each auto-install rebuild (all others stay cached).
+COPY sandbox_requirements.txt /tmp/sandbox_requirements.txt
+RUN pip install --no-cache-dir -r /tmp/sandbox_requirements.txt || true
+
 # Create non-root sandbox user with UID/GID 1000
 RUN groupadd -g 1000 sandbox && \
     useradd -u 1000 -g 1000 -m -s /bin/sh sandbox

@@ -17,6 +17,12 @@ import KasaWindow from './components/KasaWindow';
 import PrinterWindow from './components/PrinterWindow';
 import SettingsWindow from './components/SettingsWindow';
 import CircuitBackground from './components/CircuitBackground';
+import NightRecapWidget from './components/NightRecapWidget';
+import ClinicaWidget from './components/ClinicaWidget';
+import SkillRadarWidget from './components/SkillRadarWidget';
+import VoiceBroadcast from './components/VoiceBroadcast';
+import NightRunnerWidget from './components/NightRunnerWidget';
+import BenchmarkWidget from './components/BenchmarkWidget';
 
 
 const socket = io('http://localhost:8000');
@@ -57,6 +63,7 @@ function App() {
     const [browserData, setBrowserData] = useState({ image: null, logs: [] });
     // showMemoryPrompt removed - memory is now actively saved to project
     const [confirmationRequest, setConfirmationRequest] = useState(null); // { id, tool, args }
+    const [pendingPatch, setPendingPatch] = useState(null); // SSJ4 proactive refactor proposal
     const [kasaDevices, setKasaDevices] = useState([]);
     const [showKasaWindow, setShowKasaWindow] = useState(false);
     const [showPrinterWindow, setShowPrinterWindow] = useState(false);
@@ -532,6 +539,11 @@ function App() {
         });
 
         // Print status for top toolbar - track active prints
+        socket.on('patch_approval_required', (patch) => {
+            console.log('[PROACTIVE] Patch proposal received:', patch);
+            setPendingPatch(patch);
+        });
+
         socket.on('print_status_update', (data) => {
             console.log('[PRINT STATUS]', data);
             // Only show in toolbar if actively printing
@@ -640,6 +652,7 @@ function App() {
             socket.off('printer_list');
             socket.off('slicing_progress');
             socket.off('print_status_update');
+            socket.off('patch_approval_required');
             socket.off('error');
 
             stopMicVisualizer();
@@ -653,6 +666,14 @@ function App() {
             setStatus('Connected');
             socket.emit('get_settings');
         }
+    }, []);
+
+    // On load: check if a patch proposal is already waiting (NightRunner ran before UI opened)
+    useEffect(() => {
+        fetch('http://localhost:8000/api/patch/pending')
+            .then(r => r.json())
+            .then(data => { if (data.available && data.patch) setPendingPatch(data.patch); })
+            .catch(() => {});
     }, []);
 
     // Persist device selections to localStorage when they change
@@ -688,7 +709,12 @@ function App() {
         stopMicVisualizer();
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                audio: { deviceId: { exact: deviceId } }
+                audio: {
+                    deviceId:        { exact: deviceId },
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl:  true,
+                }
             });
 
             audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -752,12 +778,12 @@ function App() {
                 videoRef.current.play();
             }
 
-            // Initialize the transmission canvas
+            // Initialize the transmission canvas (higher res for better finger/detail recognition)
             if (!transmissionCanvasRef.current) {
                 transmissionCanvasRef.current = document.createElement('canvas');
-                transmissionCanvasRef.current.width = 640;
-                transmissionCanvasRef.current.height = 360;
-                console.log("Initialized transmission canvas (640x360)");
+                transmissionCanvasRef.current.width = 1280;
+                transmissionCanvasRef.current.height = 720;
+                console.log("Initialized transmission canvas (1280x720)");
             }
 
             setIsVideoOn(true);
@@ -765,6 +791,22 @@ function App() {
 
             console.log("Starting video loop with webcam:", selectedWebcamId || "default");
             requestAnimationFrame(predictWebcam);
+
+            // Send frames to Gemini at a stable 2fps (every 500ms).
+            // Using setInterval instead of rAF throttle prevents async toBlob
+            // backpressure and motion-blur from mid-movement frame grabs.
+            if (videoIntervalRef.current) clearInterval(videoIntervalRef.current);
+            videoIntervalRef.current = setInterval(() => {
+                if (!isVideoOnRef.current || !isConnected) return;
+                const transCanvas = transmissionCanvasRef.current;
+                const vid = videoRef.current;
+                if (!transCanvas || !vid || vid.readyState < 2 || vid.videoWidth === 0) return;
+                const transCtx = transCanvas.getContext('2d');
+                transCtx.drawImage(vid, 0, 0, transCanvas.width, transCanvas.height);
+                transCanvas.toBlob((blob) => {
+                    if (blob) socket.emit('video_frame', { image: blob });
+                }, 'image/jpeg', 0.85); // 0.85 quality preserves finger/edge detail
+            }, 500);
 
         } catch (err) {
             console.error("Error accessing camera:", err);
@@ -795,28 +837,8 @@ function App() {
 
         ctx.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
 
-        // 2. Send Frame to Backend (Throttled & Resized)
-        // Only send if connected
-        if (isConnected) {
-            // Simple throttle: every 5th frame roughly
-            if (frameCountRef.current % 5 === 0) {
-
-                // Use dedicated transmission canvas for resizing
-                const transCanvas = transmissionCanvasRef.current;
-                if (transCanvas) {
-                    const transCtx = transCanvas.getContext('2d');
-                    // Draw resized image
-                    transCtx.drawImage(videoRef.current, 0, 0, transCanvas.width, transCanvas.height);
-
-                    // Convert resized image to blob
-                    transCanvas.toBlob((blob) => {
-                        if (blob) {
-                            socket.emit('video_frame', { image: blob });
-                        }
-                    }, 'image/jpeg', 0.6); // Slightly higher compression for speed
-                }
-            }
-        }
+        // 2. Send Frame to Backend — handled by a separate setInterval (see startWebcam)
+        //    Do NOT send here: rAF fires ~60fps and creates async toBlob backpressure.
 
 
         // 3. Hand Tracking
@@ -1074,6 +1096,11 @@ function App() {
             videoRef.current.srcObject.getTracks().forEach(track => track.stop());
             videoRef.current.srcObject = null;
         }
+        // Stop the Gemini frame-send interval
+        if (videoIntervalRef.current) {
+            clearInterval(videoIntervalRef.current);
+            videoIntervalRef.current = null;
+        }
         setIsVideoOn(false);
         isVideoOnRef.current = false; // Update ref
         setFps(0);
@@ -1185,6 +1212,27 @@ function App() {
             socket.emit('confirm_tool', { id: confirmationRequest.id, confirmed: false });
             setConfirmationRequest(null);
         }
+    };
+
+    // SSJ4 Phase 3: Proactive patch gate handlers
+    const handleApprovePatch = async () => {
+        try {
+            const res = await fetch('http://localhost:8000/api/patch/approve', { method: 'POST' });
+            const data = await res.json();
+            console.log('[PROACTIVE] Approve result:', data);
+        } catch (e) {
+            console.error('[PROACTIVE] Approve failed:', e);
+        }
+        setPendingPatch(null);
+    };
+
+    const handleRejectPatch = async () => {
+        try {
+            await fetch('http://localhost:8000/api/patch/reject', { method: 'POST' });
+        } catch (e) {
+            console.error('[PROACTIVE] Reject failed:', e);
+        }
+        setPendingPatch(null);
     };
 
     // Updated Bounds Checking Logic
@@ -1365,8 +1413,82 @@ function App() {
     return (
         <div className="h-screen w-screen bg-black text-cyan-100 font-mono overflow-hidden flex flex-col relative selection:bg-cyan-900 selection:text-white">
 
-             {/* CIRCUIT BACKGROUND */}
-        <CircuitBackground /> 
+             {/* CIRCUIT BACKGROUND — audio-reactive */}
+        <CircuitBackground socket={socket} />
+        <VoiceBroadcast socket={socket} />
+        <NightRunnerWidget socket={socket} />
+        <BenchmarkWidget socket={socket} />
+
+             {/* DASHBOARD WIDGETS */}
+        <NightRecapWidget socket={socket} />
+        <ClinicaWidget socket={socket} />
+        <SkillRadarWidget socket={socket} />
+
+        {/* SSJ4 Phase 3 — Proactive Patch Approval Card */}
+        {pendingPatch && (
+            <div className="fixed bottom-6 right-6 z-[200] w-[480px] bg-black/95 border border-yellow-400/60 rounded-lg shadow-[0_0_30px_rgba(234,179,8,0.2)] font-mono text-sm">
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-2 border-b border-yellow-400/30 bg-yellow-400/5">
+                    <span className="text-yellow-400 font-bold tracking-widest text-xs uppercase">
+                        ⚡ SHARD Self-Optimization Proposal
+                    </span>
+                    <span className={`text-xs px-2 py-0.5 rounded border ${
+                        pendingPatch.category === 'performance'
+                            ? 'border-red-400/50 text-red-400'
+                            : pendingPatch.category === 'token_savings'
+                            ? 'border-purple-400/50 text-purple-400'
+                            : 'border-cyan-400/50 text-cyan-400'
+                    }`}>
+                        {pendingPatch.category?.replace('_', ' ') || 'refactor'}
+                    </span>
+                </div>
+
+                {/* Body */}
+                <div className="px-4 py-3 space-y-2">
+                    <div className="text-cyan-100/80 text-xs">
+                        <span className="text-yellow-400/60">FILE </span>
+                        <span className="text-yellow-300">{pendingPatch.file}</span>
+                    </div>
+                    <p className="text-cyan-100 text-xs leading-relaxed">{pendingPatch.description}</p>
+                    {pendingPatch.rationale && (
+                        <p className="text-cyan-400/60 text-xs italic">{pendingPatch.rationale}</p>
+                    )}
+
+                    {/* Diff preview — first change only */}
+                    {pendingPatch.changes?.length > 0 && (
+                        <div className="mt-2 rounded border border-white/10 overflow-hidden">
+                            <div className="bg-red-900/30 px-3 py-1.5 text-red-300 text-xs whitespace-pre-wrap break-all leading-relaxed max-h-20 overflow-y-auto">
+                                {pendingPatch.changes[0].old}
+                            </div>
+                            <div className="bg-green-900/30 px-3 py-1.5 text-green-300 text-xs whitespace-pre-wrap break-all leading-relaxed max-h-20 overflow-y-auto">
+                                {pendingPatch.changes[0].new}
+                            </div>
+                        </div>
+                    )}
+                    {pendingPatch.changes?.length > 1 && (
+                        <p className="text-cyan-400/40 text-xs">
+                            +{pendingPatch.changes.length - 1} more change(s)
+                        </p>
+                    )}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-2 px-4 py-3 border-t border-yellow-400/20">
+                    <button
+                        onClick={handleApprovePatch}
+                        className="flex-1 py-1.5 bg-green-600/20 hover:bg-green-600/40 border border-green-500/50 text-green-400 text-xs font-bold rounded tracking-widest transition-colors"
+                    >
+                        ✓ APPROVE
+                    </button>
+                    <button
+                        onClick={handleRejectPatch}
+                        className="flex-1 py-1.5 bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-400 text-xs font-bold rounded tracking-widest transition-colors"
+                    >
+                        ✗ REJECT
+                    </button>
+                </div>
+            </div>
+        )}
 
              {/* Angoli decorativi */}
         <div className="fixed top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-cyan-400/40 z-10 pointer-events-none" />

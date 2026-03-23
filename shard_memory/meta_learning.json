@@ -1,0 +1,352 @@
+{
+  "sessions": [
+    {
+      "timestamp": "2026-03-16T02:05:45.857181",
+      "topic": "convolutional neural networks (cnns) applied to sorting algorithm tier 1",
+      "category": "algorithms",
+      "score": 3.75,
+      "certified": false,
+      "sandbox_success": false,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T02:19:29.078968",
+      "topic": "exception-driven control flow applied to perceptron",
+      "category": "machine_learning",
+      "score": 8.5,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 1,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T02:33:25.061835",
+      "topic": "fail fast principle applied to python applied to post-quantum security margin",
+      "category": "parsing",
+      "score": 7.75,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 1,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T02:50:33.355345",
+      "topic": "impossible differentials in cryptography applied to exception handling boundaries",
+      "category": "algorithms",
+      "score": 7.75,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T03:05:04.109311",
+      "topic": "observability applied to dark matter hypothesis",
+      "category": "general",
+      "score": 8.25,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 2,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T03:18:04.240042",
+      "topic": "Integration of fail fast principle applied to python applied to post-quantum security margin and catch narrow exceptions applied to python exception handling best practices",
+      "category": "parsing",
+      "score": 7.75,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 1,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T03:31:23.197483",
+      "topic": "Integration of activation functions and order of execution",
+      "category": "general",
+      "score": 8.25,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 1,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T03:44:33.805797",
+      "topic": "Integration of impossible differential characteristics and rest api",
+      "category": "web",
+      "score": 8.5,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 1,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T03:59:31.161078",
+      "topic": "Integration of exception handling and exception-driven control flow applied to perceptron",
+      "category": "machine_learning",
+      "score": 8.25,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 2,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T15:29:15.818324",
+      "topic": "Integration of logging and monitoring patterns and multilayer perceptron",
+      "category": "machine_learning",
+      "score": 2.1,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T15:44:35.349920",
+      "topic": "Integration of fail fast principle applied to python applied to post-quantum security margin and fail fast principle",
+      "category": "parsing",
+      "score": 3.4,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T17:48:02.230213",
+      "topic": "Integration of fail fast principle applied to python applied to post-quantum security margin and implementazione python da zero di un perceptron",
+      "category": "machine_learning",
+      "score": 1.4,
+      "certified": false,
+      "sandbox_success": false,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T18:34:12.261804",
+      "topic": "Integration of fail fast principle applied to python applied to post-quantum security margin and web scraping with beautifulsoup",
+      "category": "parsing",
+      "score": 4.3,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T18:55:50.785605",
+      "topic": "Integration of integration of fail fast principle applied to python applied to post-quantum security margin and fail fast principle and activation functions applied to exception-driven control flow",
+      "category": "parsing",
+      "score": 3.3,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T19:15:37.996126",
+      "topic": "Integration of test_driven_development and microservices",
+      "category": "general",
+      "score": 2.0,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T19:36:38.717531",
+      "topic": "Integration of integration of integration of fail fast principle applied to python applied to post-quantum security margin and fail fast principle and activation functions applied to exception-driven control flow and quantum speedup in key recovery",
+      "category": "parsing",
+      "score": 2.7,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T19:56:44.064739",
+      "topic": "Integration of post-quantum tls and lbyl (look before you leap)",
+      "category": "general",
+      "score": 3.1,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T20:17:52.787008",
+      "topic": "Integration of impossible differential characteristics and iterative_algorithm_design",
+      "category": "algorithms",
+      "score": 3.3,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T20:37:27.461213",
+      "topic": "Integration of domain-specific custom exceptions and rest api design patterns",
+      "category": "web",
+      "score": 3.2,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-16T21:03:38.758177",
+      "topic": "Integration of quantum speedup in key recovery and lbyl (look before you leap)",
+      "category": "general",
+      "score": 2.3,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T21:27:06.749364",
+      "topic": "Integration of fail fast principle applied to python applied to post-quantum security margin and dark matter hypothesis",
+      "category": "parsing",
+      "score": 1.7,
+      "certified": false,
+      "sandbox_success": false,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-16T21:48:50.692085",
+      "topic": "Integration of data corruption prevention and modified gravity",
+      "category": "general",
+      "score": 8.5,
+      "certified": true,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "PASS"
+    },
+    {
+      "timestamp": "2026-03-17T00:25:07.247264",
+      "topic": "Integration of relu activation function and web_scraping",
+      "category": "general",
+      "score": 2.7,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-17T00:48:33.931948",
+      "topic": "Integration of qiskit sdk and modified gravity",
+      "category": "general",
+      "score": 3.0,
+      "certified": false,
+      "sandbox_success": true,
+      "attempts": 3,
+      "verdict": "FAIL"
+    },
+    {
+      "timestamp": "2026-03-17T01:13:03.750672",
+      "topic": "Integration of activation function and microservices architecture",
+      "category": "general",
+      "score": 0.0,
+      "certified": false,
+      "sandbox_success": false,
+      "attempts": 3,
+      "verdict": "FAIL"
+    }
+  ],
+  "score_history": [
+    7.75,
+    8.25,
+    8.5,
+    8.25,
+    2.1,
+    3.4,
+    1.4,
+    4.3,
+    3.3,
+    2.0,
+    2.7,
+    3.1,
+    3.3,
+    3.2,
+    2.3,
+    1.7,
+    8.5,
+    2.7,
+    3.0,
+    0.0
+  ],
+  "topic_categories": {
+    "algorithms": {
+      "total": 3,
+      "certified": 1,
+      "scores": [
+        3.75,
+        7.75,
+        3.3
+      ],
+      "avg_score": 4.93,
+      "cert_rate": 0.333
+    },
+    "machine_learning": {
+      "total": 4,
+      "certified": 2,
+      "scores": [
+        8.5,
+        8.25,
+        2.1,
+        1.4
+      ],
+      "avg_score": 5.06,
+      "cert_rate": 0.5
+    },
+    "parsing": {
+      "total": 7,
+      "certified": 2,
+      "scores": [
+        7.75,
+        7.75,
+        3.4,
+        4.3,
+        3.3,
+        2.7,
+        1.7
+      ],
+      "avg_score": 4.41,
+      "cert_rate": 0.286
+    },
+    "general": {
+      "total": 9,
+      "certified": 3,
+      "scores": [
+        8.25,
+        8.25,
+        2.0,
+        3.1,
+        2.3,
+        8.5,
+        2.7,
+        3.0,
+        0.0
+      ],
+      "avg_score": 4.23,
+      "cert_rate": 0.333
+    },
+    "web": {
+      "total": 2,
+      "certified": 1,
+      "scores": [
+        8.5,
+        3.2
+      ],
+      "avg_score": 5.85,
+      "cert_rate": 0.5
+    }
+  },
+  "global_stats": {
+    "total_sessions": 25,
+    "certified": 9,
+    "avg_score": 4.63,
+    "cert_rate": 0.36,
+    "score_trend": -0.246,
+    "best_category": "machine_learning",
+    "worst_category": "general"
+  }
+}

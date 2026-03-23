@@ -1,75 +1,90 @@
-"""Experiment Replay Engine — Re-attempts failed studies when new skills are available.
-
-Records all experiment outcomes to a JSON file. When SHARD acquires new
-capabilities, it can replay previously failed experiments to improve scores.
-"""
 import json
+import logging
 import os
-from datetime import datetime
-from typing import Dict, List, Optional
+import random
+import tempfile
+from typing import Optional
 
-HISTORY_DIR = os.path.join(os.path.dirname(__file__), '..', 'shard_memory')
-DEFAULT_FILE = os.path.join(HISTORY_DIR, 'experiment_history.json')
+from skill_utils import is_valid_topic
 
-# Score threshold: experiments below this are considered "failed"
-from constants import SUCCESS_SCORE_THRESHOLD
+logger = logging.getLogger("shard.experiment_replay")
+
+REPLAY_FILE = os.path.join(
+    os.path.dirname(__file__), '..', 'shard_memory', 'experiment_replay.json'
+)
 
 
 class ExperimentReplay:
-    """Tracks experiment history and replays failed ones."""
+    """Manages replay of past experiments that scored in the 6.0–7.4 range.
 
-    def __init__(self, file_path: str = DEFAULT_FILE):
-        self.file_path = file_path
-        os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
-        if not os.path.exists(self.file_path):
-            self._save([])
-        print(f"[REPLAY] Engine initialized (history: {self.file_path})")
+    State is persisted to disk so the PHOENIX Protocol backlog survives restarts.
+    Write strategy: atomic rename, same as CapabilityGraph.
+    """
 
-    def _load(self) -> List[Dict]:
-        """Load experiment history from disk."""
+    def __init__(self):
+        self.history: list[str] = []
+        self._load()
+
+    # ------------------------------------------------------------------
+    # Persistence
+    # ------------------------------------------------------------------
+
+    def _load(self):
         try:
-            with open(self.file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            return []
+            if os.path.exists(REPLAY_FILE):
+                with open(REPLAY_FILE, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                if isinstance(data, list):
+                    self.history = [t for t in data if isinstance(t, str)]
+                    logger.info(
+                        "[REPLAY] Loaded %d topics from disk.", len(self.history)
+                    )
+        except Exception as e:
+            logger.warning("[REPLAY] Could not load replay history: %s — starting fresh.", e)
+            self.history = []
 
-    def _save(self, history: List[Dict]):
-        """Persist experiment history to disk."""
-        with open(self.file_path, 'w', encoding='utf-8') as f:
-            json.dump(history, f, indent=2, ensure_ascii=False)
+    def _save(self):
+        try:
+            target = os.path.realpath(REPLAY_FILE)
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            with tempfile.NamedTemporaryFile(
+                mode='w', encoding='utf-8',
+                dir=os.path.dirname(target), suffix='.tmp', delete=False
+            ) as tf:
+                json.dump(self.history, tf, indent=2, ensure_ascii=False)
+                tmp_path = tf.name
+            os.replace(tmp_path, target)
+        except Exception as e:
+            logger.error("[REPLAY] Could not save replay history: %s", e)
 
-    def log_experiment(self, topic: str, score: float, success: bool):
-        """Record an experiment outcome."""
-        history = self._load()
-        entry = {
-            "topic": topic,
-            "score": score,
-            "success": success,
-            "timestamp": datetime.now().isoformat(),
-        }
-        history.append(entry)
-        self._save(history)
-        print(f"[REPLAY] logged experiment: {topic} (score={score})")
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
-    def failed_experiments(self) -> List[Dict]:
-        """Return all experiments with score < SUCCESS_SCORE_THRESHOLD."""
-        history = self._load()
-        return [e for e in history if e.get("score", 0) < SUCCESS_SCORE_THRESHOLD]
-
-    def choose_replay(self) -> Optional[Dict]:
-        """Select the experiment with the lowest score for replay."""
-        failed = self.failed_experiments()
-        if not failed:
+    def get_next_replay_topic(self) -> Optional[str]:
+        """Return a random topic from the replay backlog, or None if empty."""
+        if not self.history:
             return None
-        failed.sort(key=lambda e: e.get("score", 0))
-        return failed[0]
+        return random.choice(self.history)
 
-    def next_replay_topic(self) -> Optional[str]:
-        """Return the topic of the next experiment to retry, or None."""
-        replay = self.choose_replay()
-        if replay:
-            topic = replay["topic"]
-            score = replay.get("score", 0)
-            print(f"[REPLAY] retrying experiment '{topic}' (previous score: {score})")
-            return topic
-        return None
+    def add_experiment(self, topic: str):
+        """Enqueue a topic for future replay if it passes the quality gate."""
+        if not is_valid_topic(topic):
+            logger.debug("[REPLAY] Skipping invalid replay topic: %s", topic)
+            return
+        if topic in self.history:
+            return  # already queued — avoid duplicates
+        self.history.append(topic)
+        self._save()
+        logger.debug("[REPLAY] Added replay topic: %s (backlog: %d)", topic, len(self.history))
+
+    def remove_topic(self, topic: str):
+        """Remove a topic after it has been successfully replayed."""
+        try:
+            self.history.remove(topic)
+            self._save()
+        except ValueError:
+            pass
+
+    def __len__(self) -> int:
+        return len(self.history)

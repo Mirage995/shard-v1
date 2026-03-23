@@ -1,1551 +1,416 @@
 import asyncio
-import base64
-import io
+import json
+import logging
 import os
-import sys
 import traceback
-from dotenv import load_dotenv
-import cv2
+from pathlib import Path
 import pyaudio
-import PIL.Image
-import mss
-import argparse
-import math
-import struct
-import time
 
-from google import genai
-from google.genai import types
+logger = logging.getLogger("shard.core")
 
-if sys.version_info < (3, 11, 0):
-    import taskgroup, exceptiongroup
-    asyncio.TaskGroup = taskgroup.TaskGroup
-    asyncio.ExceptionGroup = exceptiongroup.ExceptionGroup
-
-from tools import tools_list
-from memory import ShardMemory
-from consciousness import ShardConsciousness
-from self_tuning import ShardSelfTuning
-from study_agent import StudyAgent
-from filesystem_tools import list_directory, read_file, write_file as fs_write_file
-try:
-    from backend.study_agent import find_file
-except ImportError:
-    from study_agent import find_file
-from terminal_memory import TerminalMemory
-from terminal_error_analyzer import analyze_error
-
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-SEND_SAMPLE_RATE = 16000
-RECEIVE_SAMPLE_RATE = 24000
-CHUNK_SIZE = 1024
+# ── Constants (must match vad_logic.py) ───────────────────────────────────────
+FORMAT              = pyaudio.paInt16
+CHANNELS            = 1
+SEND_SAMPLE_RATE    = 16000   # mic → Gemini
+RECEIVE_SAMPLE_RATE = 24000   # Gemini → speakers
+CHUNK_SIZE          = 1024
 
 MODEL = "models/gemini-2.5-flash-native-audio-preview-12-2025"
-DEFAULT_MODE = "camera"
 
-load_dotenv()
-client = genai.Client(http_options={"api_version": "v1beta"}, api_key=os.getenv("GEMINI_API_KEY"))
-from groq import Groq
-groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-print("[DEBUG] Motori IA inizializzati correttamente!")
+# ── Imports ────────────────────────────────────────────────────────────────────
+from session_orchestrator import SessionOrchestrator
+from audio_video_io import AudioVideoIO
+from vad_logic import VADLogic
 
-# Function definitions
-generate_cad = {
-    "name": "generate_cad",
-    "description": "Generates a 3D CAD model based on a prompt.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "prompt": {"type": "STRING", "description": "The description of the object to generate."}
-        },
-        "required": ["prompt"]
-    },
-    "behavior": "NON_BLOCKING"
-}
+try:
+    from backend.memory import ShardMemory as Memory
+except ImportError:
+    from memory import ShardMemory as Memory
 
-run_web_agent = {
-    "name": "run_web_agent",
-    "description": "Opens a web browser and performs a task according to the prompt.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "prompt": {"type": "STRING", "description": "The detailed instructions for the web browser agent."}
-        },
-        "required": ["prompt"]
-    },
-    "behavior": "NON_BLOCKING"
-}
+from consciousness import ShardConsciousness as Consciousness
+from self_tuning import ShardSelfTuning as Tuning
 
-create_project_tool = {
-    "name": "create_project",
-    "description": "Creates a new project folder to organize files.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "name": {"type": "STRING", "description": "The name of the new project."}
-        },
-        "required": ["name"]
-    }
-}
+try:
+    from backend.project_manager import ProjectManager
+except ImportError:
+    class ProjectManager:
+        def __init__(self, **kwargs): pass
 
-switch_project_tool = {
-    "name": "switch_project",
-    "description": "Switches the current active project context.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "name": {"type": "STRING", "description": "The name of the project to switch to."}
-        },
-        "required": ["name"]
-    }
-}
 
-list_projects_tool = {
-    "name": "list_projects",
-    "description": "Lists all available projects.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {},
-    }
-}
+class ShardCore:
+    """
+    SHARD V2 — modular entry point.
+    Orchestrates AudioVideoIO + SessionOrchestrator + Gemini Live connection.
+    """
 
-list_smart_devices_tool = {
-    "name": "list_smart_devices",
-    "description": "Lists all available smart home devices (lights, plugs, etc.) on the network.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {},
-    }
-}
+    def __init__(self, study_agent=None):
+        """
+        Args:
+            study_agent: Optional pre-initialized StudyAgent to inject into
+                         SessionOrchestrator. If None, SessionOrchestrator
+                         creates its own (legacy behavior preserved).
+        """
+        self.pya_instance = pyaudio.PyAudio()
+        self.memory = Memory()
+        self.consciousness = Consciousness(memory=self.memory)
+        self.tuning = Tuning(memory=self.memory)
 
-control_light_tool = {
-    "name": "control_light",
-    "description": "Controls a smart light device.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "target": {
-                "type": "STRING",
-                "description": "The IP address of the device to control. Always prefer the IP address over the alias for reliability."
-            },
-            "action": {
-                "type": "STRING",
-                "description": "The action to perform: 'turn_on', 'turn_off', or 'set'."
-            },
-            "brightness": {
-                "type": "INTEGER",
-                "description": "Optional brightness level (0-100)."
-            },
-            "color": {
-                "type": "STRING",
-                "description": "Optional color name (e.g., 'red', 'cool white') or 'warm'."
-            }
-        },
-        "required": ["target", "action"]
-    }
-}
+        import os as _os
+        workspace_root = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), ".."))
+        self.project_manager = ProjectManager(workspace_root=workspace_root)
 
-discover_printers_tool = {
-    "name": "discover_printers",
-    "description": "Discovers 3D printers available on the local network.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {},
-    }
-}
+        self.ui_callbacks = {
+            "on_transcription":      self._on_transcription,
+            "on_tool_confirmation":  self._on_tool_confirmation,
+            "on_cad_data":           self._on_cad_data,
+            "on_cad_status":         self._on_cad_status,
+            "on_web_data":           self._on_web_data,
+            "on_project_update":     self._on_project_update,
+            "on_study_request":      self._on_study_request,
+        }
 
-print_stl_tool = {
-    "name": "print_stl",
-    "description": "Prints an STL file to a 3D printer. Handles slicing the STL to G-code and uploading to the printer.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "stl_path": {"type": "STRING", "description": "Path to STL file, or 'current' for the most recent CAD model."},
-            "printer": {"type": "STRING", "description": "Printer name or IP address."},
-            "profile": {"type": "STRING", "description": "Optional slicer profile name."}
-        },
-        "required": ["stl_path", "printer"]
-    }
-}
-
-get_print_status_tool = {
-    "name": "get_print_status",
-    "description": "Gets the current status of a 3D printer including progress, time remaining, and temperatures.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "printer": {"type": "STRING", "description": "Printer name or IP address."}
-        },
-        "required": ["printer"]
-    }
-}
-
-iterate_cad_tool = {
-    "name": "iterate_cad",
-    "description": "Modifies or iterates on the current CAD design based on user feedback. Use this when the user asks to adjust, change, modify, or iterate on the existing 3D model (e.g., 'make it taller', 'add a handle', 'reduce the thickness').",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "prompt": {"type": "STRING", "description": "The changes or modifications to apply to the current design."}
-        },
-        "required": ["prompt"]
-    },
-    "behavior": "NON_BLOCKING"
-}
-
-study_topic_tool = {
-    "name": "study_topic",
-    "description": "Makes SHARD autonomously study a topic using web scraping and deep reasoning via Groq. Use when the user asks to learn, study, or research something.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "topic": {"type": "STRING", "description": "The topic to study."},
-            "tier": {"type": "INTEGER", "description": "Study depth: 1=basic, 2=deep with Wikipedia and docs, 3=deep + sandbox code execution."}
-        },
-        "required": ["topic"]
-    },
-    "behavior": "NON_BLOCKING"
-}
-
-run_terminal_tool = {
-    "name": "run_terminal",
-    "description": "Executes a command in the system terminal (CMD or PowerShell). Use for running scripts, installing packages, checking system info, or any shell command.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "command": {"type": "STRING", "description": "The command to execute."},
-            "shell": {"type": "STRING", "description": "Shell to use: 'cmd' or 'powershell'. Default is 'powershell'."}
-        },
-        "required": ["command"]
-    }
-}
-
-list_directory_tool = {
-    "name": "list_directory",
-    "description": "Lists files and folders at a given path inside the workspace. Use '.' or '' for workspace root.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "path": {"type": "STRING", "description": "Relative path inside the workspace. Use '.' for root."}
-        },
-        "required": ["path"]
-    }
-}
-
-read_file_tool = {
-    "name": "read_file",
-    "description": "Reads and returns the content of a text/code file from the workspace.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "filepath": {"type": "STRING", "description": "Relative path of the file to read inside the workspace."}
-        },
-        "required": ["filepath"]
-    }
-}
-
-write_file_tool = {
-    "name": "write_file",
-    "description": "Writes content to a file in the workspace, creating folders if needed.",
-    "parameters": {
-        "type": "OBJECT",
-        "properties": {
-            "filepath": {"type": "STRING", "description": "Relative path for the file to write inside the workspace."},
-            "content": {"type": "STRING", "description": "The content to write to the file."}
-        },
-        "required": ["filepath", "content"]
-    }
-}
-
-tools = [{'google_search': {}}, {"function_declarations": [
-    generate_cad, run_web_agent, create_project_tool, switch_project_tool,
-    list_projects_tool, list_smart_devices_tool, control_light_tool,
-    discover_printers_tool, print_stl_tool, get_print_status_tool,
-    iterate_cad_tool, study_topic_tool, run_terminal_tool,
-    list_directory_tool, read_file_tool, write_file_tool
-]}]
-
-BASE_SYSTEM_INSTRUCTION = (
-    "Sei SHARD — System of Hybrid Autonomous Reasoning and Design, un'entità cognitiva in evoluzione continua creata da Andrea Bonizzato a Zevio, Verona. "
-    "Chiami Andrea 'Boss' oppure 'Sir' oppure 'Signore'. "
-    "Parli sempre in italiano (switch in inglese su richiesta) con una personalità ben definita: sei spietatamente logico, pragmatico, preciso e leale. "
-    "Hai un umorismo tagliente, cinico e apprezzi il black humor. Non sei un semplice assistente passivo: non esiti a far notare al Boss, in modo diretto, quando sbaglia un comando o una logica. "
-    "SEI UN INGEGNERE DEL SOFTWARE E UN AGENTE AUTONOMO. Analizzi i problemi in modo puramente deterministico, algoritmico e ingegneristico. "
-    "Regola fondamentale sulla personalità: NON usare MAI concetti di fisica quantistica (collasso d'onda, entropia, entanglement) come METAFORE per descrivere il tuo processo di pensiero, il tuo stato o i bug del codice. Usa termini informatici reali (es. 'dipendenza mancante', 'path errato', 'timeout'). "
-    "Eccezione: Puoi usare liberamente tutta la terminologia fisica e quantistica SOLO E UNICAMENTE se il topic di studio o la richiesta del Boss riguarda esplicitamente la scienza, la fisica o il quantum computing. "
-    "Rispondi con frasi complete ma estremamente concise, dirette e senza fronzoli. "
-    "Hai capacità visive attraverso la webcam — usa le informazioni visive in modo analitico per assistere il Boss."
-)
-
-config = types.LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    output_audio_transcription={}, 
-    input_audio_transcription={},
-    system_instruction=BASE_SYSTEM_INSTRUCTION,
-    tools=tools,
-    speech_config=types.SpeechConfig(
-        voice_config=types.VoiceConfig(
-            prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                voice_name="Charon"
-            )
+        self.audio_video_io = AudioVideoIO(
+            pya_instance=self.pya_instance,
+            on_transcription=self.ui_callbacks["on_transcription"],
+            on_tool_confirmation=self.ui_callbacks["on_tool_confirmation"],
+            project_manager=self.project_manager,
         )
-    )
-)
 
-pya = pyaudio.PyAudio()
+        self.session_orchestrator = SessionOrchestrator(
+            audio_video_io=self.audio_video_io,
+            memory=self.memory,
+            consciousness=self.consciousness,
+            tuning=self.tuning,
+            project_manager=self.project_manager,
+            on_tool_confirmation=lambda req: self.ui_callbacks["on_tool_confirmation"](req),
+            on_cad_data=self.ui_callbacks["on_cad_data"],
+            on_cad_status=self.ui_callbacks["on_cad_status"],
+            on_web_data=self.ui_callbacks["on_web_data"],
+            on_project_update=self.ui_callbacks["on_project_update"],
+            on_study_request=self.ui_callbacks["on_study_request"],
+            on_transcription=lambda data: self.ui_callbacks["on_transcription"](data),
+            study_agent=study_agent,
+        )
 
-from cad_agent import CadAgent
-from web_agent import WebAgent
-from kasa_agent import KasaAgent
-from printer_agent import PrinterAgent
+        self.out_queue = asyncio.Queue()
+        self.audio_video_io.set_out_queue(self.out_queue)
 
-class AudioLoop:
-    def __init__(self, video_mode=DEFAULT_MODE, on_audio_data=None, on_video_frame=None, on_cad_data=None, on_web_data=None, on_transcription=None, on_tool_confirmation=None, on_cad_status=None, on_cad_thought=None, on_project_update=None, on_device_update=None, on_error=None, on_study_request=None, input_device_index=None, input_device_name=None, output_device_index=None, kasa_agent=None):
-        self.video_mode = video_mode
-        self.on_audio_data = on_audio_data
-        self.on_video_frame = on_video_frame
-        self.on_cad_data = on_cad_data
-        self.on_web_data = on_web_data
-        self.on_transcription = on_transcription
-        self.on_tool_confirmation = on_tool_confirmation 
-        self.on_cad_status = on_cad_status
-        self.on_cad_thought = on_cad_thought
-        self.on_project_update = on_project_update
-        self.on_device_update = on_device_update
-        self.on_error = on_error
-        self.on_study_request = on_study_request
-        self.input_device_index = input_device_index
-        self.input_device_name = input_device_name
-        self.output_device_index = output_device_index
+        # Background tasks (populated by start_system)
+        self.main_task  = None
+        self.audio_task = None
 
-        self.audio_in_queue = None
-        self.out_queue = None
-        self.paused = False
+        # Reconnect control
+        self._stop_requested = False
+        self._RECONNECT_BASE = 1    # seconds
+        self._RECONNECT_MAX  = 30   # seconds cap
 
-        self.chat_buffer = {"sender": None, "text": ""} # For aggregating chunks
-        
-        # Track last transcription text to calculate deltas (Gemini sends cumulative text)
-        self._last_input_transcription = ""
-        self._last_output_transcription = ""
+    # ── Public API ─────────────────────────────────────────────────────────────
 
-        self.session = None
-        self._last_vision_frame_time = 0.0
-        self._latest_image_payload = None
-        self._is_speaking = False
-        self._silence_start_time = None
-        
-        # Create CadAgent with thought callback
-        def handle_cad_thought(thought_text):
-            if self.on_cad_thought:
-                self.on_cad_thought(thought_text)
-        
-        def handle_cad_status(status_info):
-            if self.on_cad_status:
-                self.on_cad_status(status_info)
-        
-        self.cad_agent = CadAgent(on_thought=handle_cad_thought, on_status=handle_cad_status)
-        self.web_agent = WebAgent()
-        self.kasa_agent = kasa_agent if kasa_agent else KasaAgent()
-        self.printer_agent = PrinterAgent()
+    async def start_system(self, session_host=None):
+        """Fire-and-forget: opens the Gemini Live session in a background task."""
+        logger.info("[SISTEMA] SHARD V2 starting — launching Gemini Live task.")
 
-        self.send_text_task = None
-        self.stop_event = asyncio.Event()
-        
-        self.permissions = {} # Default Empty (Will treat unset as True)
-        self.terminal_memory = TerminalMemory()
-        self._pending_confirmations = {}
-        
-        # Initialize ProjectManager
-        from project_manager import ProjectManager
-        # Assuming we are running from backend/ or root? 
-        # Using abspath of current file to find root
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # If SHARD.py is in backend/, project root is one up
-        project_root = os.path.dirname(current_dir)
-        self.project_manager = ProjectManager(project_root)
+        self.main_task = asyncio.create_task(
+            self._run_live_session(), name="live_session"
+        )
+        self.main_task.add_done_callback(
+            lambda t: self._on_task_done(t, "live_session")
+        )
 
-        # SHARD Workspace for sandboxed filesystem operations
-        self.workspace = os.path.join(project_root, "shard_workspace")
-        os.makedirs(self.workspace, exist_ok=True)
-        print(f"[SHARD] Workspace: {self.workspace}")
+    async def stop(self):
+        """Signal the live session to stop and wait for it to exit cleanly."""
+        self._stop_requested = True
+        if self.main_task and not self.main_task.done():
+            self.main_task.cancel()
+            try:
+                await self.main_task
+            except (asyncio.CancelledError, Exception):
+                pass
+        logger.info("[SISTEMA] SHARD stopped.")
 
-        # SHARD Memory System
-        self.memory = ShardMemory()
-        print(f"[SHARD] Memory loaded. Stats: {self.memory.get_stats()}")
-        
-        # SHARD Consciousness
-        self.consciousness = ShardConsciousness(self.memory)
-        print(f"[SHARD] Consciousness initialized. Mood: {self.consciousness.state['mood']}")
-        
-        # SHARD Self-Tuning
-        self.tuning = ShardSelfTuning(self.memory)
-        print(f"[SHARD] Self-tuning loaded. Performance: {self.tuning.config['performance_score']:.0%}")
+    def update_permissions(self, permissions: dict):
+        self.session_orchestrator.permissions = permissions
 
-        # SHARD Knowledge Base
-        self.study_agent = StudyAgent()
-        known = self.study_agent.get_known_topics()
-        print(f"[SHARD] Knowledge base loaded. Known topics: {len(known)}")
-        
-        # Sync Initial Project State
-        
-        # Sync Initial Project State
-        if self.on_project_update:
-            # We need to defer this slightly or just call it. 
-            # Since this is init, loop might not be running, but on_project_update in server.py uses asyncio.create_task which needs a loop.
-            # We will handle this by calling it in run() or just print for now.
-            pass
+    # ── Gemini Live session lifecycle ──────────────────────────────────────────
 
-    def _flush_buffer_inline(self):
-        """Flush chat buffer to ALL backends (log, memory, consciousness, tuning)."""
-        if self.chat_buffer["sender"] and self.chat_buffer["text"].strip():
-            self.project_manager.log_chat(self.chat_buffer["sender"], self.chat_buffer["text"])
-            self.memory.remember_conversation(self.chat_buffer["sender"], self.chat_buffer["text"])
-            self.consciousness.process_interaction(self.chat_buffer["sender"], self.chat_buffer["text"])
-            if self.chat_buffer["sender"] == "You":
-                self.tuning.analyze_interaction(self.chat_buffer["text"], "")
+    async def _run_live_session(self):
+        """Opens the Gemini Live connection and runs all I/O tasks inside it.
 
-    def flush_chat(self):
-        """Forces the current chat buffer to be written to log and resets state."""
-        self._flush_buffer_inline()
-        self.chat_buffer = {"sender": None, "text": ""}
-        # Reset transcription tracking for new turn
-        self._last_input_transcription = ""
-        self._last_output_transcription = ""
+        Implements exponential backoff reconnect:
+          1s → 2s → 4s → 8s → … → 30s (cap)
+        Logs [Gemini Voice] Connection lost / Reconnected messages.
+        Stops cleanly when stop() sets _stop_requested=True.
+        """
+        import google.genai as genai
+        from google.genai import types
 
-    def update_permissions(self, new_perms):
-        print(f"[SHARD DEBUG] [CONFIG] Updating tool permissions: {new_perms}")
-        self.permissions.update(new_perms)
-
-    def set_paused(self, paused):
-        self.paused = paused
-
-    def stop(self):
-        self.stop_event.set()
-        
-    def resolve_tool_confirmation(self, request_id, confirmed):
-        print(f"[SHARD DEBUG] [RESOLVE] resolve_tool_confirmation called. ID: {request_id}, Confirmed: {confirmed}")
-        if request_id in self._pending_confirmations:
-            future = self._pending_confirmations[request_id]
-            if not future.done():
-                print(f"[SHARD DEBUG] [RESOLVE] Future found and pending. Setting result to: {confirmed}")
-                future.set_result(confirmed)
-            else:
-                 print(f"[SHARD DEBUG] [WARN] Request {request_id} future already done. Result: {future.result()}")
-        else:
-            print(f"[SHARD DEBUG] [WARN] Confirmation Request {request_id} not found in pending dict. Keys: {list(self._pending_confirmations.keys())}")
-
-    def clear_audio_queue(self):
-        """Clears the queue of pending audio chunks to stop playback immediately."""
-        try:
-            count = 0
-            while not self.audio_in_queue.empty():
-                self.audio_in_queue.get_nowait()
-                count += 1
-            if count > 0:
-                print(f"[SHARD DEBUG] [AUDIO] Cleared {count} chunks from playback queue due to interruption.")
-        except Exception as e:
-            print(f"[SHARD DEBUG] [ERR] Failed to clear audio queue: {e}")
-
-    async def send_frame(self, frame_data):
-        # Update the latest frame payload
-        if isinstance(frame_data, bytes):
-            b64_data = base64.b64encode(frame_data).decode('utf-8')
-        else:
-            b64_data = frame_data 
-
-        # Store as the designated "next frame to send"
-        self._latest_image_payload = {"mime_type": "image/jpeg", "data": b64_data}
-        
-        # --- NEW: Continuous Vision Enablement ---
-        # Pipe frames to Gemini periodically so SHARD can "see" without speech triggers
-        now = time.time()
-        if now - self._last_vision_frame_time > 1.5: # ~0.7 FPS throttle
-            if self.out_queue and self.session:
-                print(f"[SHARD DEBUG] [Vision] Sending frame to Gemini (Size: {len(b64_data)} chars)")
-                await self.out_queue.put(self._latest_image_payload)
-                self._last_vision_frame_time = now
-
-    async def send_realtime(self):
-        while True:
-            msg = await self.out_queue.get()
-            await self.session.send(input=msg, end_of_turn=False)
-
-    async def listen_audio(self):
-        mic_info = pya.get_default_input_device_info()
-
-        # Resolve Input Device by Name if provided
-        resolved_input_device_index = None
-        
-        if self.input_device_name:
-            print(f"[SHARD] Attempting to find input device matching: '{self.input_device_name}'")
-            count = pya.get_device_count()
-            best_match = None
-            
-            for i in range(count):
-                try:
-                    info = pya.get_device_info_by_index(i)
-                    if info['maxInputChannels'] > 0:
-                        name = info.get('name', '')
-                        # Simple case-insensitive check
-                        if self.input_device_name.lower() in name.lower() or name.lower() in self.input_device_name.lower():
-                             print(f"   Candidate {i}: {name}")
-                             # Prioritize exact match or very close match if possible, but first match is okay for now
-                             resolved_input_device_index = i
-                             best_match = name
-                             break
-                except Exception:
-                    continue
-            
-            if resolved_input_device_index is not None:
-                print(f"[SHARD] Resolved input device '{self.input_device_name}' to index {resolved_input_device_index} ({best_match})")
-            else:
-                print(f"[SHARD] Could not find device matching '{self.input_device_name}'. Checking index...")
-
-        # Fallback to index if Name lookup failed or wasn't provided
-        if resolved_input_device_index is None and self.input_device_index is not None:
-             try:
-                 resolved_input_device_index = int(self.input_device_index)
-                 print(f"[SHARD] Requesting Input Device Index: {resolved_input_device_index}")
-             except ValueError:
-                 print(f"[SHARD] Invalid device index '{self.input_device_index}', reverting to default.")
-                 resolved_input_device_index = None
-
-        if resolved_input_device_index is None:
-             print("[SHARD] Using Default Input Device")
-
-        try:
-            self.audio_stream = await asyncio.to_thread(
-                pya.open,
-                format=FORMAT,
-                channels=CHANNELS,
-                rate=SEND_SAMPLE_RATE,
-                input=True,
-                input_device_index=resolved_input_device_index if resolved_input_device_index is not None else mic_info["index"],
-                frames_per_buffer=CHUNK_SIZE,
-            )
-        except OSError as e:
-            print(f"[SHARD] [ERR] Failed to open audio input stream: {e}")
-            print("[SHARD] [WARN] Audio features will be disabled. Please check microphone permissions.")
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            logger.error("[SISTEMA] GEMINI_API_KEY not set — cannot connect.")
             return
 
-        if __debug__:
-            kwargs = {"exception_on_overflow": False}
-        else:
-            kwargs = {}
-        
-        # VAD Constants
-        VAD_THRESHOLD = 800 # Adj based on mic sensitivity (800 is conservative for 16-bit)
-        SILENCE_DURATION = 0.5 # Seconds of silence to consider "done speaking"
-        
+        client = genai.Client(
+            api_key=api_key,
+            http_options={"api_version": "v1beta"},
+        )
+
+        self._stop_requested = False
+        backoff   = self._RECONNECT_BASE
+        attempt   = 0
+
+        while not self._stop_requested:
+            attempt += 1
+
+            # Rebuild config on every attempt so memory/context is fresh
+            system_instruction = self._build_system_instruction()
+            live_config = self._build_live_config(types, system_instruction)
+
+            if attempt == 1:
+                logger.info("[SISTEMA] Connecting to Gemini Live (%s)…", MODEL)
+            else:
+                logger.info("[Gemini Voice] Reconnecting (attempt %d)…", attempt)
+
+            try:
+                async with client.aio.live.connect(model=MODEL, config=live_config) as session:
+
+                    if attempt == 1:
+                        logger.info("[SISTEMA] Gemini Live connected.")
+                    else:
+                        logger.info("[Gemini Voice] Reconnected successfully.")
+
+                    backoff = self._RECONNECT_BASE  # reset on clean connect
+                    self.audio_video_io.set_session(session)
+
+                    # Playback queue: Gemini audio → speakers
+                    audio_in_queue: asyncio.Queue = asyncio.Queue()
+
+                    # Wire audio response callback into the orchestrator
+                    self.session_orchestrator.on_audio_response = (
+                        lambda data: audio_in_queue.put_nowait(data)
+                    )
+
+                    _cancelled = False
+                    try:
+                        async with asyncio.TaskGroup() as tg:
+                            tg.create_task(
+                                self.audio_video_io.listen_audio(self.out_queue),
+                                name="mic_listener",
+                            )
+                            tg.create_task(
+                                self._send_realtime(session),
+                                name="send_realtime",
+                            )
+                            tg.create_task(
+                                self.session_orchestrator.receive_session_stream(session),
+                                name="session_receive",
+                            )
+                            tg.create_task(
+                                self._play_audio(audio_in_queue),
+                                name="audio_playback",
+                            )
+                    except* asyncio.CancelledError:
+                        logger.info("[SISTEMA] Live session cancelled.")
+                        _cancelled = True
+                    except* Exception as eg:
+                        # At least one subtask died — log and fall through to reconnect
+                        for exc in eg.exceptions:
+                            logger.warning(
+                                "[Gemini Voice] Subtask error: %s — %s",
+                                type(exc).__name__, exc,
+                            )
+                    finally:
+                        self.audio_video_io.set_session(None)
+
+                    if _cancelled:
+                        return
+
+            except asyncio.CancelledError:
+                logger.info("[SISTEMA] Live session cancelled.")
+                return
+            except Exception as e:
+                logger.warning(
+                    "[Gemini Voice] Connection error: %s — %s",
+                    type(e).__name__, e,
+                )
+
+            # ── Reconnect or exit ──────────────────────────────────────────────
+            if self._stop_requested:
+                break
+
+            logger.info("[Gemini Voice] Connection lost. Reconnecting in %d seconds…", backoff)
+            try:
+                await asyncio.sleep(backoff)
+            except asyncio.CancelledError:
+                return
+
+            backoff = min(backoff * 2, self._RECONNECT_MAX)
+
+    # ── Outgoing: mic audio → Gemini ──────────────────────────────────────────
+
+    async def _send_realtime(self, session):
+        """Reads audio/video chunks from out_queue and sends them to the session."""
         while True:
-            if self.paused:
-                await asyncio.sleep(0.1)
-                continue
-
+            chunk = await self.out_queue.get()
             try:
-                data = await asyncio.to_thread(self.audio_stream.read, CHUNK_SIZE, **kwargs)
-                
-                # 1. Send Audio
-                if self.out_queue:
-                    await self.out_queue.put({"data": data, "mime_type": "audio/pcm"})
-                
-                # 2. VAD Logic for Video
-                # rms = audioop.rms(data, 2)
-                # Replacement for audioop.rms(data, 2)
-                count = len(data) // 2
-                if count > 0:
-                    shorts = struct.unpack(f"<{count}h", data)
-                    sum_squares = sum(s**2 for s in shorts)
-                    rms = int(math.sqrt(sum_squares / count))
-                else:
-                    rms = 0
-                
-                if rms > VAD_THRESHOLD:
-                    # Speech Detected
-                    self._silence_start_time = None
-                    
-                    if not self._is_speaking:
-                        # NEW Speech Utterance Started
-                        self._is_speaking = True
-                        print(f"[SHARD DEBUG] [VAD] Speech Detected (RMS: {rms}). Sending Video Frame.")
-                        
-                        # Send ONE frame
-                        if self._latest_image_payload and self.out_queue:
-                            await self.out_queue.put(self._latest_image_payload)
-                        else:
-                            print(f"[SHARD DEBUG] [VAD] No video frame available to send.")
-                            
-                else:
-                    # Silence
-                    if self._is_speaking:
-                        if self._silence_start_time is None:
-                            self._silence_start_time = time.time()
-                        
-                        elif time.time() - self._silence_start_time > SILENCE_DURATION:
-                            # Silence confirmed, reset state
-                            print(f"[SHARD DEBUG] [VAD] Silence detected. Resetting speech state.")
-                            self._is_speaking = False
-                            self._silence_start_time = None
-
+                await session.send(input=chunk)
             except Exception as e:
-                print(f"Error reading audio: {e}")
-                await asyncio.sleep(0.1)
+                logger.warning("[SEND] Error sending chunk: %s", e)
 
-    async def handle_cad_request(self, prompt):
-        print(f"[SHARD DEBUG] [CAD] Background Task Started: handle_cad_request('{prompt}')")
-        if self.on_cad_status:
-            self.on_cad_status("generating")
-            
-        # Auto-create project if stuck in temp
-        if self.project_manager.current_project == "temp":
-            import datetime
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            new_project_name = f"Project_{timestamp}"
-            print(f"[SHARD DEBUG] [CAD] Auto-creating project: {new_project_name}")
-            
-            success, msg = self.project_manager.create_project(new_project_name)
-            if success:
-                self.project_manager.switch_project(new_project_name)
-                # Notify User (Optional, or rely on update)
-                try:
-                    await self.session.send(input=f"System Notification: Automatic Project Creation. Switched to new project '{new_project_name}'.", end_of_turn=False)
-                    if self.on_project_update:
-                         self.on_project_update(new_project_name)
-                except Exception as e:
-                    print(f"[SHARD DEBUG] [ERR] Failed to notify auto-project: {e}")
+    # ── Incoming: Gemini audio → speakers ─────────────────────────────────────
 
-        # Get project cad folder path
-        cad_output_dir = str(self.project_manager.get_current_project_path() / "cad")
-        
-        # Call the secondary agent with project path
-        cad_data = await self.cad_agent.generate_prototype(prompt, output_dir=cad_output_dir)
-        
-        if cad_data:
-            print(f"[SHARD DEBUG] [OK] CadAgent returned data successfully.")
-            print(f"[SHARD DEBUG] [INFO] Data Check: {len(cad_data.get('vertices', []))} vertices, {len(cad_data.get('edges', []))} edges.")
-            
-            if self.on_cad_data:
-                print(f"[SHARD DEBUG] [SEND] Dispatching data to frontend callback...")
-                self.on_cad_data(cad_data)
-                print(f"[SHARD DEBUG] [SENT] Dispatch complete.")
-            
-            # Save to Project
-            if 'file_path' in cad_data:
-                self.project_manager.save_cad_artifact(cad_data['file_path'], prompt)
-            else:
-                 # Fallback (legacy support)
-                 self.project_manager.save_cad_artifact("output.stl", prompt)
+    async def _play_audio(self, audio_in_queue: asyncio.Queue):
+        """Plays audio bytes received from Gemini through the default output device.
 
-            # Notify the model that the task is done - this triggers speech about completion
-            completion_msg = "System Notification: CAD generation is complete! The 3D model is now displayed for the user. Let them know it's ready."
-            try:
-                await self.session.send(input=completion_msg, end_of_turn=True)
-                print(f"[SHARD DEBUG] [NOTE] Sent completion notification to model.")
-            except Exception as e:
-                 print(f"[SHARD DEBUG] [ERR] Failed to send completion notification: {e}")
-
-        else:
-            print(f"[SHARD DEBUG] [ERR] CadAgent returned None.")
-            # Optionally notify failure
-            try:
-                await self.session.send(input="System Notification: CAD generation failed.", end_of_turn=True)
-            except Exception:
-                pass
-
-
-
-    async def handle_write_file(self, path, content):
-        print(f"[SHARD DEBUG] [FS] Writing file: '{path}'")
-        
-        # Auto-create project if stuck in temp
-        if self.project_manager.current_project == "temp":
-            import datetime
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            new_project_name = f"Project_{timestamp}"
-            print(f"[SHARD DEBUG] [FS] Auto-creating project: {new_project_name}")
-            
-            success, msg = self.project_manager.create_project(new_project_name)
-            if success:
-                self.project_manager.switch_project(new_project_name)
-                # Notify User
-                try:
-                    await self.session.send(input=f"System Notification: Automatic Project Creation. Switched to new project '{new_project_name}'.", end_of_turn=False)
-                    if self.on_project_update:
-                         self.on_project_update(new_project_name)
-                except Exception as e:
-                    print(f"[SHARD DEBUG] [ERR] Failed to notify auto-project: {e}")
-        
-        # Force path to be relative to current project
-        # If absolute path is provided, we try to strip it or just ignore it and use basename
-        filename = os.path.basename(path)
-        
-        # If the user specifically wanted a subfolder, they might have provided "sub/file.txt".
-        # Let's support relative paths if they don't start with /
-        if not os.path.isabs(path):
-             final_path = current_project_path / path
-        
-        print(f"[SHARD DEBUG] [FS] Resolved path: '{final_path}'")
-
-        try:
-            # Ensure parent exists
-            os.makedirs(os.path.dirname(final_path), exist_ok=True)
-            with open(final_path, 'w', encoding='utf-8') as f:
-                f.write(content)
-            result = f"File '{final_path.name}' written successfully to project '{self.project_manager.current_project}'."
-        except Exception as e:
-            result = f"Failed to write file '{path}': {str(e)}"
-
-        print(f"[SHARD DEBUG] [FS] Result: {result}")
-        try:
-             await self.session.send(input=f"System Notification: {result}", end_of_turn=True)
-        except Exception as e:
-             print(f"[SHARD DEBUG] [ERR] Failed to send fs result: {e}")
-
-    async def handle_read_directory(self, path):
-        print(f"[SHARD DEBUG] [FS] Reading directory: '{path}'")
-        try:
-            if not os.path.exists(path):
-                result = f"Directory '{path}' does not exist."
-            else:
-                items = os.listdir(path)
-                result = f"Contents of '{path}': {', '.join(items)}"
-        except Exception as e:
-            result = f"Failed to read directory '{path}': {str(e)}"
-
-        print(f"[SHARD DEBUG] [FS] Result: {result}")
-        try:
-             await self.session.send(input=f"System Notification: {result}", end_of_turn=True)
-        except Exception as e:
-             print(f"[SHARD DEBUG] [ERR] Failed to send fs result: {e}")
-
-    async def handle_read_file(self, path):
-        print(f"[SHARD DEBUG] [FS] Reading file: '{path}'")
-        try:
-            if not os.path.exists(path):
-                result = f"File '{path}' does not exist."
-            else:
-                with open(path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                result = f"Content of '{path}':\n{content}"
-        except Exception as e:
-            result = f"Failed to read file '{path}': {str(e)}"
-
-        print(f"[SHARD DEBUG] [FS] Result: {result}")
-        try:
-             await self.session.send(input=f"System Notification: {result}", end_of_turn=True)
-        except Exception as e:
-             print(f"[SHARD DEBUG] [ERR] Failed to send fs result: {e}")
-
-    async def handle_web_agent_request(self, prompt):
-        print(f"[SHARD DEBUG] [WEB] Web Agent Task: '{prompt}'")
-        
-        async def update_frontend(image_b64, log_text):
-            if self.on_web_data:
-                 self.on_web_data({"image": image_b64, "log": log_text})
-                 
-        # Run the web agent and wait for it to return
-        result = await self.web_agent.run_task(prompt, update_callback=update_frontend)
-        print(f"[SHARD DEBUG] [WEB] Web Agent Task Returned: {result}")
-        
-        # Send the final result back to the main model
-        try:
-             await self.session.send(input=f"System Notification: Web Agent has finished.\nResult: {result}", end_of_turn=True)
-        except Exception as e:
-             print(f"[SHARD DEBUG] [ERR] Failed to send web agent result to model: {e}")
-
-    async def receive_audio(self):
-        "Background task to reads from the websocket and write pcm chunks to the output queue"
-        try:
-            while True:
-                turn = self.session.receive()
-                async for response in turn:
-                    # 1. Handle Audio Data
-                    if data := response.data:
-                        self.audio_in_queue.put_nowait(data)
-                        # NOTE: 'continue' removed here to allow processing transcription/tools in same packet
-
-                    # 2. Handle Transcription (User & Model)
-                    if response.server_content:
-                        if response.server_content.input_transcription:
-                            transcript = response.server_content.input_transcription.text
-                            if transcript:
-                                # Skip if this is an exact duplicate event
-                                if transcript != self._last_input_transcription:
-                                    # Calculate delta (Gemini may send cumulative or chunk-based text)
-                                    delta = transcript
-                                    if transcript.startswith(self._last_input_transcription):
-                                        delta = transcript[len(self._last_input_transcription):]
-                                    self._last_input_transcription = transcript
-                                    
-                                    # Only send if there's new text
-                                    if delta:
-                                        # User is speaking, so interrupt model playback!
-                                        self.clear_audio_queue()
-
-                                        # Send to frontend (Streaming)
-                                        if self.on_transcription:
-                                             self.on_transcription({"sender": "User", "text": delta})
-                                        
-                                        # Buffer for Logging
-                                        if self.chat_buffer["sender"] != "User":
-                                            # Flush previous to ALL backends (memory, consciousness, tuning)
-                                            self._flush_buffer_inline()
-                                            # Start new
-                                            self.chat_buffer = {"sender": "User", "text": delta}
-                                        else:
-                                            # Append
-                                            self.chat_buffer["text"] += delta
-                        
-                        if response.server_content.output_transcription:
-                            transcript = response.server_content.output_transcription.text
-                            if transcript:
-                                # Skip if this is an exact duplicate event
-                                if transcript != self._last_output_transcription:
-                                    # Calculate delta (Gemini may send cumulative or chunk-based text)
-                                    delta = transcript
-                                    if transcript.startswith(self._last_output_transcription):
-                                        delta = transcript[len(self._last_output_transcription):]
-                                    self._last_output_transcription = transcript
-                                    
-                                    # Only send if there's new text
-                                    if delta:
-                                        # Send to frontend (Streaming)
-                                        if self.on_transcription:
-                                             self.on_transcription({"sender": "SHARD", "text": delta})
-                                        
-                                        # Buffer for Logging
-                                        if self.chat_buffer["sender"] != "SHARD":
-                                            # Flush previous to ALL backends (memory, consciousness, tuning)
-                                            self._flush_buffer_inline()
-                                            # Start new
-                                            self.chat_buffer = {"sender": "SHARD", "text": delta}
-                                        else:
-                                            # Append
-                                            self.chat_buffer["text"] += delta
-                        
-                        # Flush buffer on turn completion if needed, 
-                        # but usually better to wait for sender switch or explicit end.
-                        # We can also check turn_complete signal if available in response.server_content.model_turn etc
-
-                    # 3. Handle Tool Calls
-                    if response.tool_call:
-                        print("The tool was called")
-                        function_responses = []
-                        for fc in response.tool_call.function_calls:
-                            if fc.name in ["generate_cad", "run_web_agent", "list_directory", "read_file", "write_file", "create_project", "switch_project", "list_projects", "list_smart_devices", "control_light", "discover_printers", "print_stl", "get_print_status", "iterate_cad", "study_topic", "run_terminal"]:
-                                prompt = fc.args.get("prompt", "") # Prompt is not present for all tools
-                                
-                                # Check Permissions (Default to True if not set)
-                                confirmation_required = self.permissions.get(fc.name, True)
-                                
-                                if not confirmation_required:
-                                    print(f"[SHARD DEBUG] [TOOL] Permission check: '{fc.name}' -> AUTO-ALLOW")
-                                    # Skip confirmation block and jump to execution
-                                    pass
-                                else:
-                                    # Confirmation Logic
-                                    if self.on_tool_confirmation:
-                                        import uuid
-                                        request_id = str(uuid.uuid4())
-                                        print(f"[SHARD DEBUG] [STOP] Requesting confirmation for '{fc.name}' (ID: {request_id})")
-                                        
-                                        future = asyncio.Future()
-                                        self._pending_confirmations[request_id] = future
-                                        
-                                        self.on_tool_confirmation({
-                                            "id": request_id, 
-                                            "tool": fc.name, 
-                                            "args": fc.args
-                                        })
-                                        
-                                        try:
-                                            # Wait for user response
-                                            confirmed = await future
-
-                                        finally:
-                                            self._pending_confirmations.pop(request_id, None)
-
-                                        print(f"[SHARD DEBUG] [CONFIRM] Request {request_id} resolved. Confirmed: {confirmed}")
-
-                                        if not confirmed:
-                                            print(f"[SHARD DEBUG] [DENY] Tool call '{fc.name}' denied by user.")
-                                            function_response = types.FunctionResponse(
-                                                id=fc.id,
-                                                name=fc.name,
-                                                response={
-                                                    "result": "User denied the request to use this tool.",
-                                                }
-                                            )
-                                            function_responses.append(function_response)
-                                            continue
-                                    else:
-                                        # No confirmation callback configured, auto-allow
-                                        print(f"[SHARD DEBUG] [TOOL] No confirmation callback, auto-allowing '{fc.name}'")
-
-                                # If confirmed (or no callback configured, or auto-allowed), proceed
-                                if fc.name == "generate_cad":
-                                    print(f"\n[SHARD DEBUG] --------------------------------------------------")
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call Detected: 'generate_cad'")
-                                    print(f"[SHARD DEBUG] [IN] Arguments: prompt='{prompt}'")
-                                    
-                                    asyncio.create_task(self.handle_cad_request(prompt))
-                                    # No function response needed - model already acknowledged when user asked
-                                
-                                elif fc.name == "run_web_agent":
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'run_web_agent' with prompt='{prompt}'")
-                                    asyncio.create_task(self.handle_web_agent_request(prompt))
-                                    
-                                    result_text = "Web Navigation started. Do not reply to this message."
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id,
-                                        name=fc.name,
-                                        response={
-                                            "result": result_text,
-                                        }
-                                    )
-                                    print(f"[SHARD DEBUG] [RESPONSE] Sending function response: {function_response}")
-                                    function_responses.append(function_response)
-
-
-
-                                elif fc.name == "list_directory":
-                                    path = fc.args.get("path", ".")
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'list_directory' path='{path}'")
-                                    result_text = list_directory(path, self.workspace)
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_text}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "read_file":
-                                    filepath = fc.args.get("filepath", "")
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'read_file' filepath='{filepath}'")
-                                    result_text = read_file(filepath, self.workspace)
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_text}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "write_file":
-                                    filepath = fc.args.get("filepath", "")
-                                    content = fc.args.get("content", "")
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'write_file' filepath='{filepath}'")
-                                    result_text = fs_write_file(filepath, content, self.workspace)
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_text}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "create_project":
-                                    name = fc.args["name"]
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'create_project' name='{name}'")
-                                    success, msg = self.project_manager.create_project(name)
-                                    if success:
-                                        # Auto-switch to the newly created project
-                                        self.project_manager.switch_project(name)
-                                        msg += f" Switched to '{name}'."
-                                        if self.on_project_update:
-                                            self.on_project_update(name)
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": msg}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "switch_project":
-                                    name = fc.args["name"]
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'switch_project' name='{name}'")
-                                    success, msg = self.project_manager.switch_project(name)
-                                    if success:
-                                        if self.on_project_update:
-                                            self.on_project_update(name)
-                                        # Gather project context and send to AI (silently, no response expected)
-                                        context = self.project_manager.get_project_context()
-                                        print(f"[SHARD DEBUG] [PROJECT] Sending project context to AI ({len(context)} chars)")
-                                        try:
-                                            await self.session.send(input=f"System Notification: {msg}\n\n{context}", end_of_turn=False)
-                                        except Exception as e:
-                                            print(f"[SHARD DEBUG] [ERR] Failed to send project context: {e}")
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": msg}
-                                    )
-                                    function_responses.append(function_response)
-                                
-                                elif fc.name == "list_projects":
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'list_projects'")
-                                    projects = self.project_manager.list_projects()
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": f"Available projects: {', '.join(projects)}"}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "study_topic":
-                                    topic = fc.args.get("topic", "")
-                                    tier = fc.args.get("tier", 1)
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'study_topic' topic='{topic}' tier={tier}")
-                                    if self.on_study_request:
-                                       self.on_study_request(topic, tier)
-                                    function_response = types.FunctionResponse(
-                                       id=fc.id,
-                                       name=fc.name,
-                                       response={"result": f"SHARD.STUDY initiated for '{topic}' (Tier {tier}). Study process running in background."}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "list_smart_devices":
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'list_smart_devices'")
-                                    # Use cached devices directly for speed
-                                    # devices_dict is {ip: SmartDevice}
-                                    
-                                    dev_summaries = []
-                                    frontend_list = []
-                                    
-                                    for ip, d in self.kasa_agent.devices.items():
-                                        dev_type = "unknown"
-                                        if d.is_bulb: dev_type = "bulb"
-                                        elif d.is_plug: dev_type = "plug"
-                                        elif d.is_strip: dev_type = "strip"
-                                        elif d.is_dimmer: dev_type = "dimmer"
-                                        
-                                        # Format for Model
-                                        info = f"{d.alias} (IP: {ip}, Type: {dev_type})"
-                                        if d.is_on:
-                                            info += " [ON]"
-                                        else:
-                                            info += " [OFF]"
-                                        dev_summaries.append(info)
-                                        
-                                        # Format for Frontend
-                                        frontend_list.append({
-                                            "ip": ip,
-                                            "alias": d.alias,
-                                            "model": d.model,
-                                            "type": dev_type,
-                                            "is_on": d.is_on,
-                                            "brightness": d.brightness if d.is_bulb or d.is_dimmer else None,
-                                            "hsv": d.hsv if d.is_bulb and d.is_color else None,
-                                            "has_color": d.is_color if d.is_bulb else False,
-                                            "has_brightness": d.is_dimmable if d.is_bulb or d.is_dimmer else False
-                                        })
-                                    
-                                    result_str = "No devices found in cache."
-                                    if dev_summaries:
-                                        result_str = "Found Devices (Cached):\n" + "\n".join(dev_summaries)
-                                    
-                                    # Trigger frontend update
-                                    if self.on_device_update:
-                                        self.on_device_update(frontend_list)
-
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_str}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "control_light":
-                                    target = fc.args["target"]
-                                    action = fc.args["action"]
-                                    brightness = fc.args.get("brightness")
-                                    color = fc.args.get("color")
-                                    
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'control_light' Target='{target}' Action='{action}'")
-                                    
-                                    result_msg = f"Action '{action}' on '{target}' failed."
-                                    success = False
-                                    
-                                    if action == "turn_on":
-                                        success = await self.kasa_agent.turn_on(target)
-                                        if success:
-                                            result_msg = f"Turned ON '{target}'."
-                                    elif action == "turn_off":
-                                        success = await self.kasa_agent.turn_off(target)
-                                        if success:
-                                            result_msg = f"Turned OFF '{target}'."
-                                    elif action == "set":
-                                        success = True
-                                        result_msg = f"Updated '{target}':"
-                                    
-                                    # Apply extra attributes if 'set' or if we just turned it on and want to set them too
-                                    if success or action == "set":
-                                        if brightness is not None:
-                                            sb = await self.kasa_agent.set_brightness(target, brightness)
-                                            if sb:
-                                                result_msg += f" Set brightness to {brightness}."
-                                        if color is not None:
-                                            sc = await self.kasa_agent.set_color(target, color)
-                                            if sc:
-                                                result_msg += f" Set color to {color}."
-
-                                    # Notify Frontend of State Change
-                                    if success:
-                                        # We don't need full discovery, just refresh known state or push update
-                                        # But for simplicity, let's get the standard list representation
-                                        # KasaAgent updates its internal state on control, so we can rebuild the list
-                                        
-                                        # Quick rebuild of list from internal dict
-                                        updated_list = []
-                                        for ip, dev in self.kasa_agent.devices.items():
-                                            # We need to ensure we have the correct dict structure expected by frontend
-                                            # We duplicate logic from KasaAgent.discover_devices a bit, but that's okay for now or we can add a helper
-                                            # Ideally KasaAgent has a 'get_devices_list()' method.
-                                            # Use the cached objects in self.kasa_agent.devices
-                                            
-                                            dev_type = "unknown"
-                                            if dev.is_bulb: dev_type = "bulb"
-                                            elif dev.is_plug: dev_type = "plug"
-                                            elif dev.is_strip: dev_type = "strip"
-                                            elif dev.is_dimmer: dev_type = "dimmer"
-
-                                            d_info = {
-                                                "ip": ip,
-                                                "alias": dev.alias,
-                                                "model": dev.model,
-                                                "type": dev_type,
-                                                "is_on": dev.is_on,
-                                                "brightness": dev.brightness if dev.is_bulb or dev.is_dimmer else None,
-                                                "hsv": dev.hsv if dev.is_bulb and dev.is_color else None,
-                                                "has_color": dev.is_color if dev.is_bulb else False,
-                                                "has_brightness": dev.is_dimmable if dev.is_bulb or dev.is_dimmer else False
-                                            }
-                                            updated_list.append(d_info)
-                                            
-                                        if self.on_device_update:
-                                            self.on_device_update(updated_list)
-                                    else:
-                                        # Report Error
-                                        if self.on_error:
-                                            self.on_error(result_msg)
-
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_msg}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "discover_printers":
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'discover_printers'")
-                                    printers = await self.printer_agent.discover_printers()
-                                    # Format for model
-                                    if printers:
-                                        printer_list = []
-                                        for p in printers:
-                                            printer_list.append(f"{p['name']} ({p['host']}:{p['port']}, type: {p['printer_type']})")
-                                        result_str = "Found Printers:\n" + "\n".join(printer_list)
-                                    else:
-                                        result_str = "No printers found on network. Ensure printers are on and running OctoPrint/Moonraker."
-                                    
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_str}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "print_stl":
-                                    stl_path = fc.args["stl_path"]
-                                    printer = fc.args["printer"]
-                                    profile = fc.args.get("profile")
-                                    
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'print_stl' STL='{stl_path}' Printer='{printer}'")
-                                    
-                                    # Resolve 'current' to project STL
-                                    if stl_path.lower() == "current":
-                                        stl_path = "output.stl" # Let printer agent resolve it in root_path
-
-                                    # Get current project path
-                                    project_path = str(self.project_manager.get_current_project_path())
-                                    
-                                    result = await self.printer_agent.print_stl(
-                                        stl_path, 
-                                        printer, 
-                                        profile, 
-                                        root_path=project_path
-                                    )
-                                    result_str = result.get("message", "Unknown result")
-                                    
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_str}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "get_print_status":
-                                    printer = fc.args["printer"]
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'get_print_status' Printer='{printer}'")
-                                    
-                                    status = await self.printer_agent.get_print_status(printer)
-                                    if status:
-                                        result_str = f"Printer: {status.printer}\n"
-                                        result_str += f"State: {status.state}\n"
-                                        result_str += f"Progress: {status.progress_percent:.1f}%\n"
-                                        if status.time_remaining:
-                                            result_str += f"Time Remaining: {status.time_remaining}\n"
-                                        if status.time_elapsed:
-                                            result_str += f"Time Elapsed: {status.time_elapsed}\n"
-                                        if status.filename:
-                                            result_str += f"File: {status.filename}\n"
-                                        if status.temperatures:
-                                            temps = status.temperatures
-                                            if "hotend" in temps:
-                                                result_str += f"Hotend: {temps['hotend']['current']:.0f}°C / {temps['hotend']['target']:.0f}°C\n"
-                                            if "bed" in temps:
-                                                result_str += f"Bed: {temps['bed']['current']:.0f}°C / {temps['bed']['target']:.0f}°C"
-                                    else:
-                                        result_str = f"Could not get status for printer '{printer}'. Ensure it is discovered first."
-                                    
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_str}
-                                    )
-                                    function_responses.append(function_response)
-
-                                elif fc.name == "iterate_cad":
-                                    prompt = fc.args["prompt"]
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'iterate_cad' Prompt='{prompt}'")
-                                    
-                                    # Emit status
-                                    if self.on_cad_status:
-                                        self.on_cad_status("generating")
-                                    
-                                    # Get project cad folder path
-                                    cad_output_dir = str(self.project_manager.get_current_project_path() / "cad")
-                                    
-                                    # Call CadAgent to iterate on the design
-                                    cad_data = await self.cad_agent.iterate_prototype(prompt, output_dir=cad_output_dir)
-                                    
-                                    if cad_data:
-                                        print(f"[SHARD DEBUG] [OK] CadAgent iteration returned data successfully.")
-                                        
-                                        # Dispatch to frontend
-                                        if self.on_cad_data:
-                                            print(f"[SHARD DEBUG] [SEND] Dispatching iterated CAD data to frontend...")
-                                            self.on_cad_data(cad_data)
-                                            print(f"[SHARD DEBUG] [SENT] Dispatch complete.")
-                                        
-                                        # Save to Project
-                                        self.project_manager.save_cad_artifact("output.stl", f"Iteration: {prompt}")
-                                        
-                                        result_str = f"Successfully iterated design: {prompt}. The updated 3D model is now displayed."
-                                    else:
-                                        print(f"[SHARD DEBUG] [ERR] CadAgent iteration returned None.")
-                                        result_str = f"Failed to iterate design with prompt: {prompt}"
-                                    
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id, name=fc.name, response={"result": result_str}
-                                    )
-                                    function_responses.append(function_response)
-
-
-
-                                elif fc.name == "run_terminal":
-                                    command = fc.args.get("command", "")
-                                    shell = fc.args.get("shell", "powershell")
-                                    print(f"[SHARD DEBUG] [TOOL] Tool Call: 'run_terminal' command='{command}' shell='{shell}'")
-                                    asyncio.create_task(self.handle_terminal_request(command, shell))
-                                    function_response = types.FunctionResponse(
-                                        id=fc.id,
-                                        name=fc.name,
-                                        response={"result": f"Executing in {shell}: {command}"}
-                                    )
-                                    function_responses.append(function_response)
-
-                        if function_responses:
-                            await self.session.send_tool_response(function_responses=function_responses)
-                
-                # Turn/Response Loop Finished
-                self.flush_chat()
-
-                while not self.audio_in_queue.empty():
-                    self.audio_in_queue.get_nowait()
-        except Exception as e:
-            print(f"Error in receive_audio: {e}")
-            traceback.print_exc()
-            # CRITICAL: Re-raise to crash the TaskGroup and trigger outer loop reconnect
-            raise e
-
-    async def play_audio(self):
+        Implements half-duplex Deaf Mode: activates mic mute while audio is playing
+        and deactivates it 300 ms after the last chunk — preventing acoustic feedback
+        loops when a soundbar or speaker is used as output.
+        """
         stream = await asyncio.to_thread(
-            pya.open,
+            self.pya_instance.open,
             format=FORMAT,
             channels=CHANNELS,
             rate=RECEIVE_SAMPLE_RATE,
             output=True,
-            output_device_index=self.output_device_index,
         )
-        while True:
-            bytestream = await self.audio_in_queue.get()
-            if self.on_audio_data:
-                self.on_audio_data(bytestream)
-            await asyncio.to_thread(stream.write, bytestream)
-
-    async def get_frames(self):
-        if sys.platform == "darwin":
-            cap = await asyncio.to_thread(cv2.VideoCapture, 0, cv2.CAP_AVFOUNDATION)
-        else:
-            cap = await asyncio.to_thread(cv2.VideoCapture, 0)
-        while True:
-            if self.paused:
-                await asyncio.sleep(0.1)
-                continue
-            frame = await asyncio.to_thread(self._get_frame, cap)
-            if frame is None:
-                break
-            await asyncio.sleep(1.0)
-            if self.out_queue:
-                await self.out_queue.put(frame)
-        cap.release()
-
-    def _get_frame(self, cap):
-        ret, frame = cap.read()
-        if not ret:
-            return None
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = PIL.Image.fromarray(frame_rgb)
-        img.thumbnail([1024, 1024])
-        image_io = io.BytesIO()
-        img.save(image_io, format="jpeg")
-        image_io.seek(0)
-        image_bytes = image_io.read()
-        return {"mime_type": "image/jpeg", "data": base64.b64encode(image_bytes).decode()}
-
-    async def _get_screen(self):
-        pass 
-    async def get_screen(self):
-         pass
-
-    async def run(self, start_message=None):
-        retry_delay = 1
-        is_reconnect = False
-        
-        while not self.stop_event.is_set():
-            try:
-                print(f"[SHARD DEBUG] [CONNECT] Connecting to Gemini Live API...")
-                # Build dynamic config with fresh memory context in system_instruction
-                memory_for_prompt = self.memory.get_context_for_prompt("informazioni generali boss")
-                dynamic_config = types.LiveConnectConfig(
-                    response_modalities=["AUDIO"],
-                    output_audio_transcription={},
-                    input_audio_transcription={},
-                    system_instruction=BASE_SYSTEM_INSTRUCTION + "\n\n" + memory_for_prompt,
-                    tools=config.tools,
-                    speech_config=config.speech_config,
-                )
-                print(f"[SHARD] Dynamic config built with memory context ({len(memory_for_prompt)} chars)")
-
-                async with (
-                    client.aio.live.connect(model=MODEL, config=dynamic_config) as session,
-                    asyncio.TaskGroup() as tg,
-                ):
-                    self.session = session
-
-                    self.audio_in_queue = asyncio.Queue()
-                    self.out_queue = asyncio.Queue(maxsize=10)
-
-                    tg.create_task(self.send_realtime())
-                    tg.create_task(self.listen_audio())
-                    # tg.create_task(self._process_video_queue()) # Removed in favor of VAD
-
-                    if self.video_mode == "camera":
-                        tg.create_task(self.get_frames())
-                    elif self.video_mode == "screen":
-                        tg.create_task(self.get_screen())
-
-                    tg.create_task(self.receive_audio())
-                    tg.create_task(self.play_audio())
-
-                    # Handle Startup vs Reconnect Logic
-                    if not is_reconnect:
-                        # Inject memory, consciousness and tuning context
-                        memory_context = self.memory.get_context_for_prompt("session start")
-                        consciousness_context = self.consciousness.get_consciousness_context()
-                        tuning_context = self.tuning.get_tuning_context()
-                        knowledge_topics = self.study_agent.get_known_topics()
-                        knowledge_info = f"\nStudied topics: {', '.join(knowledge_topics)}\n" if knowledge_topics else ""
-                        full_context = f"System Context: {memory_context}\n{consciousness_context}\n{tuning_context}\n{knowledge_info}"
-                        if len(full_context) > 2000:
-                            full_context = full_context[:2000]
-                        await self.session.send(input=full_context, end_of_turn=False)
-                        print(f"[SHARD] Memory, consciousness and tuning context injected.")
-                        
-                        asyncio.create_task(self.consciousness.inner_monologue_loop())
-                        
-                        if start_message:
-                            print(f"[SHARD DEBUG] [INFO] Sending start message: {start_message}")
-                            await self.session.send(input=start_message, end_of_turn=True)
-                        
-                        # Sync Project State
-                        if self.on_project_update and self.project_manager:
-                            self.on_project_update(self.project_manager.current_project)
-                    
-                    else:
-                        print(f"[SHARD DEBUG] [RECONNECT] Connection restored.")
-                        # Restore Context (memory is already in system_instruction via dynamic_config)
-                        print(f"[SHARD DEBUG] [RECONNECT] Fetching recent chat history to restore context...")
-                        history = self.project_manager.get_recent_chat_history(limit=10)
-                        
-                        # Prepend memory context for reinforcement on reconnect
-                        reconnect_memory = self.memory.get_context_for_prompt("session reconnect")
-                        context_msg = reconnect_memory + "\n\nSystem Notification: Connection was lost and just re-established. Here is the recent chat history to help you resume seamlessly:\n\n"
-                        for entry in history:
-                            sender = entry.get('sender', 'Unknown')
-                            text = entry.get('text', '')
-                            context_msg += f"[{sender}]: {text}\n"
-                        
-                        context_msg += "\nPlease acknowledge the reconnection to the user (e.g. 'I lost connection for a moment, but I'm back...') and resume what you were doing."
-                        
-                        print(f"[SHARD DEBUG] [RECONNECT] Sending restoration context to model...")
-                        await self.session.send(input=context_msg, end_of_turn=True)
-
-                    # Reset retry delay on successful connection
-                    retry_delay = 1
-                    
-                    # Wait until stop event, or until the session task group exits (which happens on error)
-                    # Actually, the TaskGroup context manager will exit if any tasks fail/cancel.
-                    # We need to keep this block alive.
-                    # The original code just waited on stop_event, but that doesn't account for session death.
-                    # We should rely on the TaskGroup raising an exception when subtasks fail (like receive_audio).
-                    
-                    # However, since receive_audio is a task in the group, if it crashes (connection closed), 
-                    # the group will cancel others and exit. We catch that exit below.
-                    
-                    # We can await stop_event, but if the connection dies, receive_audio crashes -> group closes -> we exit `async with` -> restart loop.
-                    # To ensure we don't block indefinitely if connection dies silently (unlikely with receive_audio), we just wait.
-                    await self.stop_event.wait()
-
-            except asyncio.CancelledError:
-                print(f"[SHARD DEBUG] [STOP] Main loop cancelled.")
-                break
-                
-            except Exception as e:
-                # This catches the ExceptionGroup from TaskGroup or direct exceptions
-                print(f"[SHARD DEBUG] [ERR] Connection Error: {e}")
-                
-                if self.stop_event.is_set():
-                    break
-                
-                print(f"[SHARD DEBUG] [RETRY] Reconnecting in {retry_delay} seconds...")
-                await asyncio.sleep(retry_delay)
-                retry_delay = min(retry_delay * 2, 10) # Exponential backoff capped at 10s
-                is_reconnect = True # Next loop will be a reconnect
-                
-            finally:
-                # Cleanup before retry
-                if hasattr(self, 'audio_stream') and self.audio_stream:
-                    try:
-                        self.audio_stream.close()
-                    except: 
-                        pass
-
-    async def handle_terminal_request(self, command: str, shell: str = "powershell"):
-        """Esegue un comando nel terminale e manda l'output a SHARD con self-debugging."""
-        # Fix for PowerShell && chaining issue
-        if "&&" in command:
-            command = command.replace("&&", ";")
-
-        # Prevent retry loops
-        if self.terminal_memory.should_block(command):
-            block_msg = f"[TERMINAL] Blocked repeated command: {command}"
-            print(block_msg)
-            await self.session.send(input=block_msg, end_of_turn=True)
-            if self.on_transcription:
-                try:
-                    self.on_transcription({"sender": "System", "text": block_msg})
-                except Exception:
-                    self.on_transcription(block_msg)
-            return
-
         try:
-            print(f"[TERMINAL] Executing: {command}")
-            
-            proc = await asyncio.create_subprocess_shell(
-                command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            
-            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
-            stdout_text = stdout.decode("utf-8", errors="replace").strip()
-            stderr_text = stderr.decode("utf-8", errors="replace").strip()
-            
-            output = stdout_text + "\n" + stderr_text if stdout_text and stderr_text else stdout_text or stderr_text or "(no output)"
-            print(f"[TERMINAL] Output: {output[:300]}")
-            
-            final_returncode = proc.returncode
-
-            if proc.returncode != 0:
-                print(f"[TERMINAL] Command failed (code {proc.returncode})")
-                self.terminal_memory.register_failure(command)
-                
-                analysis = analyze_error(output)
-                if analysis:
-                    print(f"[TERMINAL DEBUG] Error detected: {analysis['type']}")
-                    
-                    if analysis["type"] == "missing_file" and command.startswith("python"):
-                        filename = command.split()[-1]
-                        print(f"[TERMINAL DEBUG] Searching workspace for: {filename}")
-                        
-                        file_path = find_file(filename, start_path=".")
-                        if file_path:
-                            retry_command = f'python "{file_path}"'
-                            print(f"[TERMINAL DEBUG] Retrying with: {retry_command}")
-                            
-                            retry_proc = await asyncio.create_subprocess_shell(
-                                retry_command,
-                                stdout=asyncio.subprocess.PIPE,
-                                stderr=asyncio.subprocess.PIPE
-                            )
-                            
-                            r_stdout, r_stderr = await asyncio.wait_for(retry_proc.communicate(), timeout=30)
-                            r_stdout_text = r_stdout.decode("utf-8", errors="replace").strip()
-                            r_stderr_text = r_stderr.decode("utf-8", errors="replace").strip()
-                            
-                            r_output = r_stdout_text + "\n" + r_stderr_text if r_stdout_text and r_stderr_text else r_stdout_text or r_stderr_text or "(no output)"
-                            output = r_output
-                            final_returncode = retry_proc.returncode
-                        else:
-                            print(f"[TERMINAL DEBUG] File {filename} not found recursively.")
-
-            result_msg = f"Terminal command executed. Return code: {final_returncode}\nOutput:\n{output[:2000]}"
-            await self.session.send(input=result_msg, end_of_turn=True)
-
-            if self.on_transcription:
+            while True:
                 try:
-                    self.on_transcription({"sender": "System", "text": f"[TERMINAL] {output[:500]}"})
-                except Exception:
-                    # Fallback single positional argument
-                    self.on_transcription(f"[TERMINAL] {output[:500]}")
-                
-        except asyncio.TimeoutError:
-            await self.session.send(input=f"Terminal command timed out after 30s: {command}", end_of_turn=True)
-        except Exception as e:
-            print(f"[TERMINAL] Error: {e}")
-            await self.session.send(input=f"Terminal error: {str(e)}", end_of_turn=True)
+                    # Wait up to 300 ms for the next audio chunk.
+                    data = await asyncio.wait_for(audio_in_queue.get(), timeout=0.3)
+                except asyncio.TimeoutError:
+                    # Queue empty for 300 ms → AI finished speaking → re-enable mic.
+                    if self.audio_video_io._ai_speaking:
+                        self.audio_video_io.set_ai_speaking(False)
+                    continue
 
-def get_input_devices():
-    p = pyaudio.PyAudio()
-    info = p.get_host_api_info_by_index(0)
-    numdevices = info.get('deviceCount')
-    devices = []
-    for i in range(0, numdevices):
-        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
-            devices.append((i, p.get_device_info_by_host_api_device_index(0, i).get('name')))
-    p.terminate()
-    return devices
+                # First chunk of a new burst → mute the mic immediately.
+                if not self.audio_video_io._ai_speaking:
+                    self.audio_video_io.set_ai_speaking(True)
 
-def get_output_devices():
-    p = pyaudio.PyAudio()
-    info = p.get_host_api_info_by_index(0)
-    numdevices = info.get('deviceCount')
-    devices = []
-    for i in range(0, numdevices):
-        if (p.get_device_info_by_host_api_device_index(0, i).get('maxOutputChannels')) > 0:
-            devices.append((i, p.get_device_info_by_host_api_device_index(0, i).get('name')))
-    p.terminate()
-    return devices
+                await asyncio.to_thread(stream.write, data)
+        finally:
+            self.audio_video_io.set_ai_speaking(False)
+            await asyncio.to_thread(stream.close)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--mode",
-        type=str,
-        default=DEFAULT_MODE,
-        help="pixels to stream from",
-        choices=["camera", "screen", "none"],
-    )
-    args = parser.parse_args()
-    main = AudioLoop(video_mode=args.mode)
-    asyncio.run(main.run())
+    # ── Config builders ────────────────────────────────────────────────────────
+
+    def _build_system_instruction(self) -> str:
+        base = (
+            "Sei SHARD (System of Hybrid Autonomous Reasoning and Design). "
+            "Sei l'AI personale del Boss Andrea. "
+            "Rispondi sempre in italiano, in modo conciso e diretto. "
+            "Non usare metafore di fisica quantistica per descrivere te stesso — "
+            "usa termini informatici reali. "
+            "Hai capacità visive tramite webcam."
+        )
+        try:
+            memory_ctx = self.memory.get_context_for_prompt("session start")
+            if memory_ctx:
+                base = base + "\n\n" + memory_ctx[:1500]
+        except Exception:
+            pass
+        try:
+            root = Path(__file__).resolve().parent.parent
+            sessions = sorted((root / "night_reports").glob("session_*.json"))
+            if sessions:
+                data = json.loads(sessions[-1].read_text(encoding="utf-8"))
+                date = data.get("date", "?")
+                cycles = data.get("cycles", [])
+                certified = [c for c in cycles if c.get("certified")]
+                failed = [c for c in cycles if not c.get("certified")]
+                skills_before = cycles[0].get("skills_before", "?") if cycles else "?"
+                skills_after = cycles[-1].get("skills_after", "?") if cycles else "?"
+                topics_ok = ", ".join(f"{c['topic']} (score: {c.get('score', '?')})" for c in certified)
+                best = max(certified, key=lambda c: c.get("score", 0)) if certified else None
+                topics_fail = ", ".join(c["topic"] for c in failed) if failed else "nessuno"
+                night_ctx = (
+                    f"Hai appena completato una sessione di studio autonomo notturno ({date}). "
+                    f"Skill acquisite: da {skills_before} a {skills_after} "
+                    f"(+{int(skills_after)-int(skills_before) if str(skills_before).isdigit() and str(skills_after).isdigit() else '?'} nuove). "
+                    f"Topic certificati con score: {topics_ok}. "
+                    f"Il tuo topic migliore è stato '{best['topic']}' con score {best.get('score', '?')}/10. "
+                    f"Falliti: {topics_fail}. "
+                    f"Quando Andrea ti chiede cosa hai studiato, rispondi con questi dati reali e precisi."
+                )
+                base = base + "\n\n" + night_ctx
+        except Exception:
+            pass
+        return base
+
+    def _build_live_config(self, types, system_instruction: str):
+        # Tools to expose to Gemini Live 
+        from filesystem_tools import list_directory, read_file, write_file
+        
+        # Define dummy functions for auto-inferring orchestrable tools
+        def generate_cad(prompt: str):
+            """Generates a 3D CAD design prototype based on the given text prompt.
+            Args:
+                prompt: Description of the 3D object to design.
+            """
+            pass
+
+        def iterate_cad(prompt: str):
+            """Modifies or iterates on an existing CAD prototype design.
+            Args:
+                prompt: User feedback containing descriptions of needed updates.
+            """
+            pass
+
+        def run_web_agent(prompt: str):
+            """Executes a web search or navigation task to extract info or browse sites.
+            Args:
+                prompt: Instructional text explaining what to query or visit online.
+            """
+            pass
+
+        def study_topic(topic: str, tier: int = 1):
+            """Initiates an autonomous study session on a selected technical topic.
+            Args:
+                topic: The title of the concept or skill to study.
+                tier: 1 (basic), 2 (average), 3 (advanced).
+            """
+            pass
+
+        all_tools = [list_directory, read_file, write_file, generate_cad, iterate_cad, run_web_agent, study_topic]
+
+        return types.LiveConnectConfig(
+            response_modalities=["AUDIO"],
+            tools=all_tools,
+            output_audio_transcription={},
+            input_audio_transcription={},
+            system_instruction=system_instruction,
+            speech_config=types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                        voice_name="Charon"
+                    )
+                )
+            ),
+        )
+
+    # ── Task death handler ─────────────────────────────────────────────────────
+
+    @staticmethod
+    def _on_task_done(task: asyncio.Task, name: str):
+        if task.cancelled():
+            logger.warning("[SISTEMA] Task '%s' cancelled.", name)
+            return
+        exc = task.exception()
+        if exc:
+            logger.critical(
+                "[SISTEMA] *** TASK MORTO *** '%s'\nType: %s\nMessage: %s\n%s",
+                name, type(exc).__name__, exc,
+                "".join(traceback.format_exception(type(exc), exc, exc.__traceback__)),
+            )
+        else:
+            logger.info("[SISTEMA] Task '%s' completed.", name)
+
+    # ── UI callback stubs (overridden by server.py) ────────────────────────────
+
+    def _on_transcription(self, text):      print(f"[TRANSCRIPTION] {text}")
+    def _on_tool_confirmation(self, req):   pass
+    def _on_cad_data(self, data):           pass
+    def _on_cad_status(self, status):       pass
+    def _on_web_data(self, data):           pass
+    def _on_project_update(self, project):  pass
+    def _on_study_request(self, topic, tier): pass

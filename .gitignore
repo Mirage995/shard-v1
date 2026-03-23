@@ -7,15 +7,6 @@ venv/
 .venv/
 env/
 
-# ADA Specific Local Data
-backend/reference.jpg
-backend/settings.json
-backend/last_cad_generation.json
-long_term_memory/
-projects/
-output.stl
-cad_outputs/
-
 # Node.js
 node_modules/
 dist/
@@ -35,3 +26,53 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+.aider*
+
+# ── SHARD: Generated sandbox scripts (auto-created by NightRunner) ────────────
+sandbox/
+backend/sandbox/
+
+# ── SHARD: Binary DB files (never commit live databases) ──────────────────────
+shard_memory/*.db
+shard_memory/*.db-shm
+shard_memory/*.db-wal
+shard_memory/*.bin
+shard_memory/*.pickle
+shard_memory/chroma.sqlite3
+
+# ChromaDB vector stores (binary, not human-readable)
+knowledge_db/
+shard_memory/strategy_db/
+shard_memory/0ed9c0af-*/
+shard_memory/b9fafd48-*/
+shard_memory/c7bca8ef-*/
+backend/knowledge_db/
+
+# ── SHARD: Backup files (temp, auto-generated) ────────────────────────────────
+backend/*.bak_*
+shard_memory/*.backup*
+shard_memory/capability_graph.json.backup*
+shard_memory/capability_graph.json.backup_norm*
+
+# ── SHARD: Keep these JSON state files ────────────────────────────────────────
+# (capability_graph.json, meta_learning.json, etc. are intentionally tracked)
+
+# ── SHARD: Logs and reports (runtime output, not source) ──────────────────────
+logs/
+night_reports/
+backend/logs/
+backend/night_reports/
+
+# ── SHARD: Dead code / archived ───────────────────────────────────────────────
+old_attempts/
+backups/
+
+# ── SHARD: Local settings ─────────────────────────────────────────────────────
+backend/reference.jpg
+backend/settings.json
+backend/last_cad_generation.json
+settings.json
+long_term_memory/
+projects/
+output.stl
+cad_outputs/

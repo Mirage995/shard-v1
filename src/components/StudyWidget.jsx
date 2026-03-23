@@ -60,7 +60,7 @@ const StudyWidget = ({ socket }) => {
     const isComplete = status.complete;
 
     return (
-        <div className="fixed bottom-5 right-5 w-80 z-[10000] pointer-events-auto">
+        <div className="fixed bottom-36 right-5 w-80 z-[10000] pointer-events-auto">
             {/* Glass container */}
             <div className="relative overflow-hidden rounded-xl border border-cyan-500/30 bg-black/80 backdrop-blur-xl shadow-[0_0_30px_rgba(0,242,255,0.15)] p-4">
                 {/* Animated glow border */}

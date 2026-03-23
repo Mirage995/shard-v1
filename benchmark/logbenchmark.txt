@@ -1,0 +1,71 @@
+ python benchmark_loop.py ../benchmark/task_01_html_trap
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_01_html_trap
+  Max attempts: 5
+====================================================================
+
+──────────────────────────────────────────────────
+  Attempt 1/5
+──────────────────────────────────────────────────
+  [prompt] Initial (31,627 chars)
+  [llm] Calling... 00:13:58 [httpx] INFO: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+00:13:58 [shard.llm_router] INFO: [LLM_ROUTER] Claude OK (9837 chars)
+OK (9,837 chars)
+  [syntax] Valid
+  [write] refactored_agent.py (209 lines)
+  [pytest] Running test_task1.py... ALL PASSED (17 tests)
+
+====================================================================
+  VICTORY on attempt 1/5
+  Tests passed: 17
+  Total time: 40.3s
+====================================================================
+
+PS C:\Users\andre\desktop\shard_v1\backend>  python benchmark_loop.py ../benchmark/task_02_ghost_bug
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+====================================================================
+
+──────────────────────────────────────────────────
+  Attempt 1/5
+──────────────────────────────────────────────────
+  [prompt] Initial (23,287 chars)
+  [llm] Calling... 00:26:53 [httpx] INFO: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+00:26:53 [shard.llm_router] INFO: [LLM_ROUTER] Claude OK (4923 chars)
+OK (4,923 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (146 lines)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+──────────────────────────────────────────────────
+  Attempt 2/5
+──────────────────────────────────────────────────
+  [prompt] Correction (15,637 chars)
+  [llm] Calling... 00:27:09 [httpx] INFO: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+00:27:09 [shard.llm_router] INFO: [LLM_ROUTER] Claude OK (5461 chars)
+OK (5,461 chars)
+  [syntax] INVALID: SyntaxError at line 1: invalid syntax
+
+──────────────────────────────────────────────────
+  Attempt 3/5
+──────────────────────────────────────────────────
+  [prompt] Correction (14,433 chars)
+  [llm] Calling... 00:27:24 [httpx] INFO: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+00:27:24 [shard.llm_router] INFO: [LLM_ROUTER] Claude OK (5043 chars)
+OK (5,043 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (150 lines)
+  [pytest] Running test_task2.py... ALL PASSED (16 tests)
+
+====================================================================
+  VICTORY on attempt 3/5
+  Tests passed: 16
+  Total time: 49.0s
+====================================================================

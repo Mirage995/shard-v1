@@ -466,5 +466,542 @@
     "score": 9.0,
     "success": true,
     "timestamp": "2026-03-08T19:52:51.507089"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 2.0,
+    "success": false,
+    "timestamp": "2026-03-08T23:16:58.626122"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 2.0,
+    "success": false,
+    "timestamp": "2026-03-08T23:19:31.048638"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 1.0,
+    "success": false,
+    "timestamp": "2026-03-08T23:20:22.809111"
+  },
+  {
+    "topic": "fully connected layers applied to interrogative usage applied to eafp (easier to ask forgiveness than permission)",
+    "score": 4.0,
+    "success": false,
+    "timestamp": "2026-03-08T23:34:00.344048"
+  },
+  {
+    "topic": "fully connected layers applied to interrogative usage applied to eafp (easier to ask forgiveness than permission)",
+    "score": 9.0,
+    "success": true,
+    "timestamp": "2026-03-08T23:35:37.187794"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 2.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:28:24.574395"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 0.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:30:15.847624"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 6.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:31:53.517718"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 1.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:45:16.556560"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:47:44.942477"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 6.0,
+    "success": false,
+    "timestamp": "2026-03-09T10:49:41.468801"
+  },
+  {
+    "topic": "chiedo facendo applied to numerical_computation",
+    "score": 3.0,
+    "success": false,
+    "timestamp": "2026-03-09T11:06:12.011208"
+  },
+  {
+    "topic": "chiedo facendo applied to numerical_computation",
+    "score": 6.0,
+    "success": false,
+    "timestamp": "2026-03-09T11:07:58.253155"
+  },
+  {
+    "topic": "chiedo facendo applied to numerical_computation",
+    "score": 7.0,
+    "success": false,
+    "timestamp": "2026-03-09T11:10:00.032177"
+  },
+  {
+    "topic": "python applied to post-quantum security margin",
+    "score": 10.0,
+    "success": true,
+    "timestamp": "2026-03-09T15:35:20.518662"
+  },
+  {
+    "topic": "quantized inertia theory applied to hubble-scale casimir effect",
+    "score": 8.0,
+    "success": true,
+    "timestamp": "2026-03-09T15:50:35.424123"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 9.0,
+    "success": true,
+    "timestamp": "2026-03-09T16:05:22.141713"
+  },
+  {
+    "topic": "transitive usage applied to binary search algorithm",
+    "score": 9.0,
+    "success": true,
+    "timestamp": "2026-03-09T16:19:36.355946"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 6.25,
+    "success": false,
+    "timestamp": "2026-03-09T16:33:29.482597"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-09T16:35:09.698489"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 6.25,
+    "success": false,
+    "timestamp": "2026-03-09T16:37:11.598940"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 3.25,
+    "success": false,
+    "timestamp": "2026-03-09T16:56:32.520437"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 10.0,
+    "success": true,
+    "timestamp": "2026-03-09T16:57:56.935933"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 7.5,
+    "success": true,
+    "timestamp": "2026-03-09T17:17:35.358744"
+  },
+  {
+    "topic": "Python decorators and metaclasses",
+    "score": 8.5,
+    "success": true,
+    "timestamp": "2026-03-09T18:21:56.715176"
+  },
+  {
+    "topic": "quantized inertia theory applied to hubble-scale casimir effect",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-09T18:48:01.716721"
+  },
+  {
+    "topic": "quantized inertia theory applied to hubble-scale casimir effect",
+    "score": 6.25,
+    "success": false,
+    "timestamp": "2026-03-09T18:51:15.157374"
+  },
+  {
+    "topic": "quantized inertia theory applied to hubble-scale casimir effect",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-09T18:54:04.597668"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to exception handling boundaries",
+    "score": 5.0,
+    "success": false,
+    "timestamp": "2026-03-09T19:18:21.492874"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to exception handling boundaries",
+    "score": 4.5,
+    "success": false,
+    "timestamp": "2026-03-09T19:22:05.665056"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to exception handling boundaries",
+    "score": 4.0,
+    "success": false,
+    "timestamp": "2026-03-09T19:24:31.575558"
+  },
+  {
+    "topic": "test_driven_development applied to deep_learning",
+    "score": 1.5,
+    "success": false,
+    "timestamp": "2026-03-09T19:48:49.408777"
+  },
+  {
+    "topic": "test_driven_development applied to deep_learning",
+    "score": 0.25,
+    "success": false,
+    "timestamp": "2026-03-09T19:54:05.611762"
+  },
+  {
+    "topic": "test_driven_development applied to deep_learning",
+    "score": 1.5,
+    "success": false,
+    "timestamp": "2026-03-09T19:58:30.829922"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to python decorators and metaclasses",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-09T20:20:41.673073"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to python decorators and metaclasses",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-09T20:23:56.381696"
+  },
+  {
+    "topic": "impossible differentials in cryptography applied to python decorators and metaclasses",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-09T20:27:34.509717"
+  },
+  {
+    "topic": "sorting algorithm tier 1 applied to quantized inertia theory",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T01:46:03.104757"
+  },
+  {
+    "topic": "sorting algorithm tier 1 applied to quantized inertia theory",
+    "score": 5.5,
+    "success": false,
+    "timestamp": "2026-03-10T01:48:52.124041"
+  },
+  {
+    "topic": "sorting algorithm tier 1 applied to quantized inertia theory",
+    "score": 5.5,
+    "success": false,
+    "timestamp": "2026-03-10T01:52:28.870275"
+  },
+  {
+    "topic": "Python decorators and metaclasses",
+    "score": 10.0,
+    "success": true,
+    "timestamp": "2026-03-10T02:14:13.412452"
+  },
+  {
+    "topic": "Python decorators and metaclasses",
+    "score": 7.75,
+    "success": true,
+    "timestamp": "2026-03-10T02:35:32.241627"
+  },
+  {
+    "topic": "observability applied to dark matter hypothesis",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-10T02:59:21.423630"
+  },
+  {
+    "topic": "observability applied to dark matter hypothesis",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T03:02:52.752822"
+  },
+  {
+    "topic": "observability applied to dark matter hypothesis",
+    "score": 6.25,
+    "success": false,
+    "timestamp": "2026-03-10T03:06:08.159756"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 7.75,
+    "success": true,
+    "timestamp": "2026-03-10T03:28:45.247282"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 6.75,
+    "success": false,
+    "timestamp": "2026-03-10T17:10:09.509365"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T17:19:25.869989"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T17:26:24.571182"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.62,
+    "success": false,
+    "timestamp": "2026-03-10T17:30:03.572597"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-10T17:33:35.695872"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T17:36:36.965585"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-10T18:01:40.084072"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.62,
+    "success": false,
+    "timestamp": "2026-03-10T18:02:38.651028"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 6.5,
+    "success": false,
+    "timestamp": "2026-03-10T18:07:43.068262"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 4.75,
+    "success": false,
+    "timestamp": "2026-03-10T18:08:53.184367"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 5.5,
+    "success": false,
+    "timestamp": "2026-03-10T18:13:50.755579"
+  },
+  {
+    "topic": "REST API design patterns",
+    "score": 7.75,
+    "success": true,
+    "timestamp": "2026-03-10T18:14:56.807577"
+  },
+  {
+    "topic": "api_integration applied to web_scraping",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-11T16:24:32.873639"
+  },
+  {
+    "topic": "api_integration applied to web_scraping",
+    "score": 2.5,
+    "success": false,
+    "timestamp": "2026-03-11T16:28:15.647344"
+  },
+  {
+    "topic": "api_integration applied to web_scraping",
+    "score": 3.25,
+    "success": false,
+    "timestamp": "2026-03-11T16:31:43.402059"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-11T16:57:53.454244"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:01:19.540059"
+  },
+  {
+    "topic": "fail fast principle applied to python applied to post-quantum security margin",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:04:45.903030"
+  },
+  {
+    "topic": "exception-driven control flow applied to perceptron",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:27:41.265308"
+  },
+  {
+    "topic": "exception-driven control flow applied to perceptron",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:30:35.355670"
+  },
+  {
+    "topic": "exception-driven control flow applied to perceptron",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:33:53.303394"
+  },
+  {
+    "topic": "web scraping with beautifulsoup applied to convolutional neural networks (cnns)",
+    "score": 5.5,
+    "success": false,
+    "timestamp": "2026-03-11T17:55:42.478341"
+  },
+  {
+    "topic": "web scraping with beautifulsoup applied to convolutional neural networks (cnns)",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-11T17:59:42.425764"
+  },
+  {
+    "topic": "web scraping with beautifulsoup applied to convolutional neural networks (cnns)",
+    "score": 5.75,
+    "success": false,
+    "timestamp": "2026-03-11T18:03:17.574757"
+  },
+  {
+    "topic": "Potrei analizzare",
+    "score": 6.25,
+    "success": false,
+    "timestamp": "2026-03-11T19:06:53.568273"
+  },
+  {
+    "topic": "Potrei analizzare",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T19:09:53.056348"
+  },
+  {
+    "topic": "Potrei analizzare",
+    "score": 3.75,
+    "success": false,
+    "timestamp": "2026-03-11T19:12:33.806254"
+  },
+  {
+    "timestamp": "2026-03-17T00:14:15.541392",
+    "topic": "Integration of integration of impossible differential characteristics and rest api and concurrent_programming",
+    "strategy_used": null,
+    "error_type": null,
+    "error_signature": null,
+    "sandbox_success": false,
+    "files_modified": [],
+    "evaluation_score": null,
+    "certified": false
+  },
+  {
+    "timestamp": "2026-03-17T00:25:07.250529",
+    "topic": "Integration of relu activation function and web_scraping",
+    "strategy_used": null,
+    "error_type": null,
+    "error_signature": null,
+    "sandbox_success": true,
+    "files_modified": [],
+    "evaluation_score": 2.7,
+    "certified": false
+  },
+  {
+    "topic": "Integration of relu activation function and web_scraping",
+    "score": 2.7,
+    "success": false,
+    "timestamp": "2026-03-17T00:25:07.257482",
+    "failure_reason": "low_score",
+    "source": "experiment_inventor",
+    "previous_score": null,
+    "strategies_reused": [
+      "web scraping with beautifulsoup applied to convolutional neural networks (cnns)"
+    ],
+    "skills_unlocked": [
+      "3 skill(s)"
+    ],
+    "duration_minutes": 9.34
+  },
+  {
+    "timestamp": "2026-03-17T00:48:33.933749",
+    "topic": "Integration of qiskit sdk and modified gravity",
+    "strategy_used": null,
+    "error_type": null,
+    "error_signature": null,
+    "sandbox_success": true,
+    "files_modified": [],
+    "evaluation_score": 3.0,
+    "certified": false
+  },
+  {
+    "topic": "Integration of qiskit sdk and modified gravity",
+    "score": 3.0,
+    "success": false,
+    "timestamp": "2026-03-17T00:48:33.939836",
+    "failure_reason": "low_score",
+    "source": "capability_recombination",
+    "previous_score": null,
+    "strategies_reused": [
+      "Integration of integration of integration of fail fast principle applied to python applied to post-quantum security margin and fail fast principle and activation functions applied to exception-driven control flow and quantum speedup in key recovery"
+    ],
+    "skills_unlocked": [],
+    "duration_minutes": 15.44
+  },
+  {
+    "timestamp": "2026-03-17T01:13:03.754447",
+    "topic": "Integration of activation function and microservices architecture",
+    "strategy_used": null,
+    "error_type": null,
+    "error_signature": null,
+    "sandbox_success": false,
+    "files_modified": [],
+    "evaluation_score": 0.0,
+    "certified": false
+  },
+  {
+    "topic": "Integration of activation function and microservices architecture",
+    "score": 0.0,
+    "success": false,
+    "timestamp": "2026-03-17T01:13:03.764180",
+    "failure_reason": "phase_error",
+    "source": "experiment_inventor",
+    "previous_score": null,
+    "strategies_reused": [
+      "Integration of activation functions and order of execution"
+    ],
+    "skills_unlocked": [],
+    "duration_minutes": 16.5
+  },
+  {
+    "timestamp": "2026-03-17T01:21:44.228375",
+    "topic": "Integration of race conditions and non-atomicity and transitive usage applied to hubble-scale casimir effect",
+    "strategy_used": null,
+    "error_type": null,
+    "error_signature": null,
+    "sandbox_success": false,
+    "files_modified": [],
+    "evaluation_score": null,
+    "certified": false
   }
 ]

@@ -1,0 +1,6 @@
+# Dynamic sandbox dependencies — managed automatically by DockerSandboxRunner.
+# Add packages here and rebuild the image, or let SHARD do it autonomously
+# when a ModuleNotFoundError is detected during sandbox execution.
+qiskit
+hypothesis
+psutil

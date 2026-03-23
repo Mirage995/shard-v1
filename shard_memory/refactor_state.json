@@ -1,0 +1,57 @@
+{
+  "current_index": 2,
+  "history": [
+    {
+      "id": "d75bd75d-4551-4a2f-bba2-a383f38909ba",
+      "timestamp": "2026-03-16T22:49:46.366763",
+      "type": "refactor",
+      "file": "backend/experiment_inventor.py",
+      "description": "Translate inline comment from Italian to English for consistency with the rest of the codebase.",
+      "category": "clean_code",
+      "rationale": "Mixed-language comments reduce readability for non-Italian contributors and violate code style.",
+      "changes": [
+        {
+          "old": "        # Fallback se non ci sono altre skill: inventiamo un pattern avanzato",
+          "new": "        # Fallback: no other capabilities available — generate an advanced pattern"
+        }
+      ],
+      "status": "applied",
+      "applied_at": "2026-03-16T22:54:52.324479",
+      "backup": "C:\\Users\\andre\\Desktop\\shard_v1\\backend\\experiment_inventor.bak_20260316_225452"
+    },
+    {
+      "id": "test-patch-001",
+      "timestamp": "2026-03-19T14:00:00",
+      "type": "refactor",
+      "file": "backend/constants.py",
+      "description": "TEST PATCH — rimuove commento ridondante",
+      "category": "clean_code",
+      "rationale": "Commento che ripete il nome della variabile senza aggiungere informazione.",
+      "changes": [],
+      "status": "applied",
+      "applied_at": "2026-03-19T14:38:21.684455",
+      "backup": "C:\\Users\\andre\\Desktop\\shard_v1\\backend\\constants.bak_20260319_143821"
+    },
+    {
+      "id": "bfbb56a0-f1e2-4e9d-b003-1d966aa428a8",
+      "timestamp": "2026-03-20T17:15:15.534366",
+      "type": "refactor",
+      "file": "backend/night_runner.py",
+      "description": "Avoid repeated calls to `capability_graph.list_capabilities()` by storing the result in a variable.",
+      "category": "performance",
+      "rationale": "The `capability_graph.list_capabilities()` method is called multiple times within the `_select_topic` function. Calling it once and storing the result in a variable avoids redundant computations, especially if this method involves complex operations. This reduces the overall execution time of the function.",
+      "changes": [
+        {
+          "old": "        # TASK 2: Try curiosity-driven frontier exploration (20% chance)\n        if random.random() < 0.20:\n            capabilities = capability_graph.list_capabilities() if hasattr(capability_graph, \"list_capabilities\") else list(capability_graph.capabilities.keys()) if hasattr(capability_graph, \"capabilities\") else []\n            frontier_size = len(capability_frontier(capabilities))",
+          "new": "        # TASK 2: Try curiosity-driven frontier exploration (20% chance)\n        if random.random() < 0.20:\n            capabilities = capability_graph.list_capabilities() if hasattr(capability_graph, \"list_capabilities\") else list(capability_graph.capabilities.keys()) if hasattr(capability_graph, \"capabilities\") else []\n            all_capabilities = capabilities\n            frontier_size = len(capability_frontier(all_capabilities))"
+        },
+        {
+          "old": "        \n        # TASK 5: Capability recombination DISABLED — generates nonsense composite topics\n        if False and random.random() < 0.25:\n            candidate = generate_recombined_topic(capability_graph.list_capabilities() if hasattr(capability_graph, \"list_capabilities\") else list(capability_graph.capabilities.keys()) if hasattr(capability_graph, \"capabilities\") else [])",
+          "new": "        \n        # TASK 5: Capability recombination DISABLED — generates nonsense composite topics\n        if False and random.random() < 0.25:\n            candidate = generate_recombined_topic(all_capabilities)"
+        }
+      ],
+      "status": "rejected",
+      "rejected_at": "2026-03-20T17:24:42.572682"
+    }
+  ]
+}

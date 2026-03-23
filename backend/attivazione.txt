@@ -1,4 +1,4 @@
  cd desktop
- cd ada_v2
+ cd shard_v1
  .\venv\Scripts\Activate
  npm run dev

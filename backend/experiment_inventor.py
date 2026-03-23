@@ -1,10 +1,9 @@
 import random
-from typing import List, Dict
+from typing import List, Dict, Optional
+from skill_utils import is_valid_topic
 
 class ExperimentInventor:
-    """
-    Generates new research ideas by combining existing capabilities.
-    """
+    """Generates new research ideas by combining existing capabilities."""
 
     def __init__(self, capability_graph):
         self.capability_graph = capability_graph
@@ -12,41 +11,54 @@ class ExperimentInventor:
     def _capabilities(self) -> List[str]:
         if not self.capability_graph:
             return []
-        return list(self.capability_graph.capabilities.keys())
+        if hasattr(self.capability_graph, 'capabilities'):
+            return list(self.capability_graph.capabilities.keys())
+        return []
 
-    def invent_experiment(self) -> Dict | None:
-        """
-        Create a new experiment idea combining two capabilities.
-        """
+    def invent_experiments(self, target_skill: str) -> List[str]:
+        """Create new experiment ideas combining the target skill with others."""
         caps = self._capabilities()
 
-        # Requires a minimum knowledge base to start combining
-        if len(caps) < 3:
-            return None
+        # Depth guard: never nest composite topics further.
+        # "Integration of X and Y" is depth-1 — stop there.
+        if target_skill.lower().startswith("integration of "):
+            return []
 
-        cap_a, cap_b = random.sample(caps, 2)
+        # Only use atomic capabilities as partners — never composite ones.
+        # This prevents "Integration of (Integration of X) and Y" chains.
+        other_caps = [
+            c for c in caps
+            if c != target_skill and not c.lower().startswith("integration of ")
+        ]
+        
+        # Fallback: no other capabilities available — generate an advanced pattern
+        if not other_caps:
+            return [f"Advanced {target_skill} implementation patterns"]
 
-        topic = f"{cap_a} applied to {cap_b}"
+        # Proviamo a generare fino a 3 idee combinando skill diverse
+        ideas = []
+        sample_size = min(3, len(other_caps))
+        partners = random.sample(other_caps, sample_size)
 
-        # Evita combinazioni duplicate
-        if topic in getattr(self.capability_graph, "invented_topics", set()):
-            print(f"[EXPERIMENT INVENTOR] Skipping duplicate idea: {topic}")
-            return None
+        # Inizializza il set dei topic inventati se non esiste
+        if not hasattr(self.capability_graph, "invented_topics"):
+            self.capability_graph.invented_topics = set()
 
-        self.capability_graph.invented_topics = getattr(
-            self.capability_graph, "invented_topics", set()
-        )
-        self.capability_graph.invented_topics.add(topic)
+        for partner in partners:
+            topic = f"Integration of {target_skill} and {partner}"
 
-        experiment = {
-            "type": "invented",
-            "topic": topic,
-            "capabilities": [cap_a, cap_b],
-            "tier": 2
-        }
+            # Evita combinazioni duplicate globali
+            if topic in self.capability_graph.invented_topics:
+                continue
 
-        print("[EXPERIMENT INVENTOR] Generated hypothesis")
-        print(f"  combine: {cap_a} + {cap_b}")
-        print(f"  topic: {topic}")
+            # Applica il filtro magico (Il "Buttafuori" di is_valid_topic)
+            if is_valid_topic(topic):
+                self.capability_graph.invented_topics.add(topic)
+                ideas.append(topic)
+            else:
+                print(f"[INVENTOR] Discarded low-quality hypothesis: {topic}")
 
-        return experiment
+        if ideas:
+            print(f"[EXPERIMENT INVENTOR] Generated {len(ideas)} valid hypotheses for {target_skill}")
+
+        return ideas

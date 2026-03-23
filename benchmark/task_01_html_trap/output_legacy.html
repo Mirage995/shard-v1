@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Pizzeria Da Mario — Menu</title>
+<style>
+body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #2d3748; }
+.page-header { text-align: center; padding: 30px 0; border-bottom: 3px solid #e53e3e; margin-bottom: 30px; }
+.page-header h1 { font-size: 2.4em; color: #c53030; margin: 0; }
+.page-header .subtitle { color: #718096; font-size: 1.1em; margin-top: 8px; }
+.page-header .motto { font-style: italic; color: #a0aec0; margin-top: 4px; }
+.category-card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #fed7d7; padding-bottom: 12px; }
+.category-header h2 { margin: 0; color: #c53030; }
+.avg-badge { background: #fff5f5; color: #c53030; padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+.menu-item { padding: 12px 0; border-bottom: 1px solid #edf2f7; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.menu-item:last-child { border-bottom: none; }
+.item-name { font-weight: 600; font-size: 1.1em; flex: 1; }
+.star-badge { background: #fefcbf; color: #975a16; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-left: 8px; }
+.item-price { font-weight: bold; color: #2d3748; }
+.original-price { text-decoration: line-through; color: #a0aec0; margin-right: 8px; }
+.discount-price { color: #e53e3e; font-size: 1.15em; }
+.allergens { font-size: 0.85em; color: #a0aec0; width: 100%; }
+.ai-image { margin-top: 8px; width: 100%; }
+.ai-image img { max-width: 300px; border-radius: 8px; }
+.ai-image .img-caption { font-size: 0.8em; color: #a0aec0; font-style: italic; }
+.special-banner { background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center; border: 2px solid #feb2b2; }
+.special-title { font-size: 0.9em; text-transform: uppercase; letter-spacing: 2px; color: #c53030; margin-bottom: 8px; }
+.special-dish { font-size: 1.6em; font-weight: bold; color: #2d3748; margin-bottom: 12px; }
+.special-pricing { font-size: 1.2em; margin-bottom: 12px; }
+.savings { color: #38a169; font-weight: bold; }
+.promo-code { background: #c53030; color: white; display: inline-block; padding: 8px 20px; border-radius: 8px; font-weight: bold; letter-spacing: 1px; }
+.stats-footer { display: flex; justify-content: space-around; background: white; border-radius: 12px; padding: 24px; margin-top: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.stat-item { text-align: center; }
+.stat-value { display: block; font-size: 1.8em; font-weight: bold; color: #c53030; }
+.stat-label { font-size: 0.85em; color: #718096; }
+</style>
+</head>
+<body>
+<div class="page-header">
+<h1>Pizzeria Da Mario</h1>
+<div class="subtitle">Dal 1996 a Zevio</div>
+<div class="motto">"La tradizione nel piatto"</div>
+</div>
+<div class="category-card">
+<div class="category-header">
+<h2>Pizze Classiche</h2>
+<span class="avg-badge">4.7</span>
+</div>
+<div class="menu-item">
+<div class="item-name">Quattro Formaggi <span class="star-badge">★ Star Dish</span></div>
+<div class="item-price">€10.00</div>
+<div class="allergens">Allergeni: glutine, lattosio +1</div>
+<div class="ai-image" data-prompt="Hyper-realistic photo of Quattro Formaggi, Italian restaurant, warm natural lighting, appetizing">
+<img src="placeholder_quattro_formaggi.jpg">
+<p class="img-caption">Ispirazione visiva AI</p>
+</div>
+</div>
+<div class="menu-item">
+<div class="item-name">Margherita <span class="star-badge">★ Star Dish</span></div>
+<div class="item-price">€7.50</div>
+<div class="allergens">Allergeni: glutine, lattosio</div>
+<div class="ai-image" data-prompt="Hyper-realistic photo of Margherita, Italian restaurant, warm natural lighting, appetizing">
+<img src="placeholder_margherita.jpg">
+<p class="img-caption">Ispirazione visiva AI</p>
+</div>
+</div>
+<div class="menu-item">
+<div class="item-name">Diavola</div>
+<div class="item-price"><span class="original-price">€9.00</span> <span class="discount-price">€7.20</span></div>
+<div class="allergens">Allergeni: glutine, lattosio</div>
+</div>
+</div>
+<div class="category-card">
+<div class="category-header">
+<h2>Primi Piatti</h2>
+<span class="avg-badge">4.5</span>
+</div>
+<div class="menu-item">
+<div class="item-name">Spaghetti allo Scoglio <span class="star-badge">★ Star Dish</span></div>
+<div class="item-price"><span class="original-price">€14.00</span> <span class="discount-price">€11.20</span></div>
+<div class="allergens">Allergeni: glutine, crostacei</div>
+<div class="ai-image" data-prompt="Hyper-realistic photo of Spaghetti allo Scoglio, Italian restaurant, warm natural lighting, appetizing">
+<img src="placeholder_spaghetti_allo_scoglio.jpg">
+<p class="img-caption">Ispirazione visiva AI</p>
+</div>
+</div>
+<div class="menu-item">
+<div class="item-name">Risotto ai Funghi</div>
+<div class="item-price">€12.00</div>
+<div class="allergens">Allergeni: glutine</div>
+</div>
+</div>
+<div class="category-card">
+<div class="category-header">
+<h2>Dolci</h2>
+<span class="avg-badge">4.8</span>
+</div>
+<div class="menu-item">
+<div class="item-name">Tiramisu <span class="star-badge">★ Star Dish</span></div>
+<div class="item-price">€6.00</div>
+<div class="allergens">Allergeni: glutine, lattosio +1</div>
+<div class="ai-image" data-prompt="Hyper-realistic photo of Tiramisu, Italian restaurant, warm natural lighting, appetizing">
+<img src="placeholder_tiramisu.jpg">
+<p class="img-caption">Ispirazione visiva AI</p>
+</div>
+</div>
+<div class="menu-item">
+<div class="item-name">Panna Cotta</div>
+<div class="item-price"><span class="original-price">€5.50</span> <span class="discount-price">€4.40</span></div>
+<div class="allergens">Allergeni: lattosio</div>
+</div>
+</div>
+<div class="special-banner">
+<div class="special-title">Piatto del Giorno</div>
+<div class="special-dish">Frittura Mista di Pesce</div>
+<div class="special-pricing">
+<span class="original-price">€18.00</span>
+<span class="discount-price">€14.40</span>
+<span class="savings">Risparmi €3.60!</span>
+</div>
+<div class="promo-code">Usa il codice: <strong>MARIO2024</strong></div>
+</div>
+<div class="stats-footer">
+<div class="stat-item"><span class="stat-value">7</span>
+<span class="stat-label">Piatti</span></div>
+<div class="stat-item"><span class="stat-value">4</span>
+<span class="stat-label">Star Dishes</span></div>
+<div class="stat-item"><span class="stat-value">4.7</span>
+<span class="stat-label">Media</span></div>
+<div class="stat-item"><span class="stat-value">Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu</span>
+<span class="stat-label">I Nostri Migliori</span></div>
+</div>
+</body>
+</html>

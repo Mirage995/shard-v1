@@ -1,3 +1,6 @@
+# Script di manutenzione standalone — NON importato dal runtime SHARD.
+# Usa PersistentClient diretto intenzionalmente: viene eseguito manualmente
+# a server spento, quindi non causa lock contention con db_manager.
 import os
 import chromadb
 

@@ -60,8 +60,19 @@ def agent(mock_env, tmp_path):
         mock_groq_client.chat.completions.create.return_value = mock_groq_response
         MockGroq.return_value = mock_groq_client
 
-        from study_agent import StudyAgent
-        sa = StudyAgent()
+        # patch GoalStorage so that StudyAgent writes to tmp_path instead of
+        # the real shard_memory directory
+        from study_agent import GoalStorage
+        class TempStorage(GoalStorage):
+            def __init__(self, path=None):
+                super().__init__(path=str(tmp_path / "goals.json"))
+
+        # add our TempStorage to the existing patch context
+        with patch("study_agent.GoalStorage", TempStorage):
+            from study_agent import StudyAgent
+            sa = StudyAgent()
+
+        # `sa` is created with patched storage
 
         # Store refs for assertions
         sa._mock_collection = mock_collection

@@ -1,4 +1,25 @@
 import sys
+import os
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("shard.server")
+
+# Il trucco definitivo per l'inferno dei path di Node/Electron
+# Calcoliamo i path assoluti in modo dinamico
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))  # cartella shard_v1/backend/
+ROOT_DIR = os.path.dirname(BACKEND_DIR)                   # cartella shard_v1/
+
+# Iniettiamo entrambi i path nel radar di Python
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
+
 import asyncio
 
 # Fix for asyncio subprocess support on Windows
@@ -9,28 +30,45 @@ if sys.platform == 'win32':
 import socketio
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import asyncio
 import threading
-import sys
-import os
 import json
 from datetime import datetime
 from pathlib import Path
 
 
 
-# Ensure we can import SHARD
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 import shard
 from authenticator import FaceAuthenticator
 from kasa_agent import KasaAgent
 from study_agent import StudyAgent
-study_agent = StudyAgent()
+from goal_storage import GoalStorage
+from goal_engine import GoalEngine
+from swe_agent import SWEAgent
+from shard_semaphore import (
+    SHARD_SESSION_LOCK,
+    acquire_file_lock, release_file_lock, is_file_locked, get_lock_reason,
+)
+
+# Deferred initialization — populated in startup_event() to avoid double
+# instantiation (global scope runs at import time, before FastAPI startup).
+storage: "GoalStorage" = None
+goal_engine: "GoalEngine" = None
+study_agent: "StudyAgent" = None
 
 # Create a Socket.IO server
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app_socketio = socketio.ASGIApp(sio, app)
 
 import signal
@@ -55,8 +93,73 @@ signal.signal(signal.SIGTERM, signal_handler)
 # Global state
 audio_loop = None
 loop_task = None
+audio_fe_task = None   # background worker that drains the frontend audio queue
 authenticator = None
-kasa_agent = KasaAgent()
+_shard_core = None     # active ShardCore instance (replaces audio_loop for new system)
+
+# ── Session Authentication ─────────────────────────────────────────────────────
+# Tracks Socket.IO session IDs that have passed authentication.
+# Populated in connect() when face-auth passes or is disabled (auto-auth).
+# Cleaned in disconnect().
+_authenticated_sids: set[str] = set()
+_session_lock_held: bool = False   # True while start_audio holds SHARD_SESSION_LOCK
+
+def _is_authenticated(sid: str) -> bool:
+    return sid in _authenticated_sids
+
+async def _require_auth(sid: str, event: str) -> bool:
+    """Guard for sensitive Socket.IO events.
+
+    Returns True if the caller is authenticated.
+    Emits an error event to the caller and returns False otherwise.
+    """
+    if not _is_authenticated(sid):
+        logger.warning(
+            "[AUTH] Unauthorized access: event='%s' sid=%s — rejecting.", event, sid
+        )
+        await sio.emit(
+            "error",
+            {"msg": f"Unauthorized: authentication required for '{event}'"},
+            to=sid,
+        )
+        return False
+    return True
+
+# ── Settings Schema Validation ────────────────────────────────────────────────
+# Whitelist of top-level keys and their expected types.
+_ALLOWED_SETTINGS_KEYS: frozenset[str] = frozenset({
+    "tool_permissions", "face_auth_enabled", "camera_flipped", "printers",
+})
+_KNOWN_TOOL_PERMISSIONS: frozenset[str] = frozenset({
+    "generate_cad", "iterate_cad", "run_web_agent", "study_topic",
+    "list_directory", "read_file", "write_file",
+    "create_project", "switch_project",
+    "control_kasa", "print_file",
+})
+
+def _validate_settings_payload(data: dict) -> tuple[bool, str]:
+    """Validate an update_settings / update_tool_permissions payload.
+
+    Returns (True, "") if valid, (False, reason) if rejected.
+    """
+    if not isinstance(data, dict):
+        return False, "Payload must be a JSON object."
+    for key in data:
+        if key not in _ALLOWED_SETTINGS_KEYS:
+            return False, f"Unknown settings key: '{key}' — rejected."
+    if "tool_permissions" in data:
+        perms = data["tool_permissions"]
+        if not isinstance(perms, dict):
+            return False, "'tool_permissions' must be a JSON object."
+        for k, v in perms.items():
+            if k not in _KNOWN_TOOL_PERMISSIONS:
+                return False, f"Unknown tool permission: '{k}'."
+            if not isinstance(v, bool):
+                return False, f"Permission value for '{k}' must be boolean, got {type(v).__name__}."
+    for bool_key in ("face_auth_enabled", "camera_flipped"):
+        if bool_key in data and not isinstance(data[bool_key], bool):
+            return False, f"'{bool_key}' must be boolean."
+    return True, ""
 SETTINGS_FILE = "settings.json"
 
 DEFAULT_SETTINGS = {
@@ -65,8 +168,8 @@ DEFAULT_SETTINGS = {
         "generate_cad": True,
         "run_web_agent": True,
         "write_file": True,
-        "read_directory": True,
-        "read_file": True,
+        "list_directory": False,
+        "read_file": False,
         "create_project": True,
         "switch_project": True,
         "list_projects": True
@@ -112,6 +215,7 @@ kasa_agent = KasaAgent(known_devices=SETTINGS.get("kasa_devices"))
 
 @app.on_event("startup")
 async def startup_event():
+    global storage, goal_engine, study_agent
     import sys
     print(f"[SERVER DEBUG] Startup Event Triggered")
     print(f"[SERVER DEBUG] Python Version: {sys.version}")
@@ -123,12 +227,88 @@ async def startup_event():
     except Exception as e:
         print(f"[SERVER DEBUG] Error checking loop: {e}")
 
+    # ── Lazy init: one instantiation, exactly here, after FastAPI is live ──
+    print("[SERVER] Startup: Initializing GoalStorage, GoalEngine, StudyAgent...")
+    storage = GoalStorage()
+    goal_engine = GoalEngine(storage)
+    study_agent = StudyAgent(goal_engine=goal_engine)
+    print("[SERVER] Startup: Agents ready.")
+
     print("[SERVER] Startup: Initializing Kasa Agent...")
     await kasa_agent.initialize()
 
 @app.get("/status")
 async def status():
     return {"status": "running", "service": "SHARD Backend"}
+
+class SWERequest(BaseModel):
+    repo_name: str
+    base_commit: str
+    issue_text: str
+
+@app.post("/api/run-swe-task")
+async def run_swe_task(payload: SWERequest):
+    agent = SWEAgent()
+    result = await agent.run_task(
+        repo_name=payload.repo_name,
+        base_commit=payload.base_commit,
+        issue_text=payload.issue_text
+    )
+    return {
+        "status": "success",
+        "result": result
+    }
+
+@app.get("/api/knowledge/query")
+async def query_knowledge(topic: str, n: int = 3):
+    """Query NightRunner's ChromaDB knowledge base (Debug/Inspection)."""
+    from knowledge_bridge import query_knowledge_base
+    result = query_knowledge_base(topic, n_results=n)
+    return {"topic": topic, "result": result}
+
+# --- Goal Engine Endpoints ------------------------------------------------
+@app.get("/goals")
+async def list_goals():
+    """Return all known goals."""
+    return [g.dict() for g in goal_engine.list_goals()]
+
+@app.post("/goals")
+async def create_goal(payload: dict):
+    """Create a new goal. Expects title, optional description, priority,
+    goal_type and prerequisites list."""
+    title = payload.get("title")
+    if not title:
+        return {"error": "title required"}
+    g = goal_engine.create_goal(
+        title=title,
+        description=payload.get("description", ""),
+        priority=float(payload.get("priority", 0.0)),
+        goal_type=payload.get("goal_type", "general"),
+        prerequisites=payload.get("prerequisites", []),
+    )
+    return g.dict()
+
+@sio.event
+async def list_goals(sid):
+    await sio.emit("goals_list", {"goals": [g.dict() for g in goal_engine.list_goals()]}, room=sid)
+
+@sio.event
+async def create_goal(sid, data):
+    g = goal_engine.create_goal(
+        title=data.get("title"),
+        description=data.get("description", ""),
+        priority=data.get("priority", 0.0),
+        goal_type=data.get("goal_type", "general"),
+        prerequisites=data.get("prerequisites", []),
+    )
+    await sio.emit("goal_created", {"goal": g.dict()}, room=sid)
+
+@sio.event
+async def activate_goal(sid, data):
+    goal_id = data.get("id")
+    g = goal_engine.set_active_goal(goal_id)
+    if g:
+        await sio.emit("goal_activated", {"goal": g.dict()}, room=sid)
 
 heartbeat_started = False
 
@@ -139,62 +319,89 @@ async def connect(sid, environ):
     await sio.emit('status', {'msg': 'Connected to SHARD Backend'}, room=sid)
 
     # --- Authentication Logic ---
-    # Callback for Auth Status
-    async def on_auth_status(is_auth):
-        print(f"[SERVER] Auth status change: {is_auth}")
-        await sio.emit('auth_status', {'authenticated': is_auth})
+    # Callbacks need access to sid via closure
+    async def on_auth_status(is_auth: bool):
+        logger.info("[AUTH] Status change for sid=%s: authenticated=%s", sid, is_auth)
+        if is_auth:
+            _authenticated_sids.add(sid)
+        else:
+            _authenticated_sids.discard(sid)
+        await sio.emit('auth_status', {'authenticated': is_auth}, to=sid)
 
-    # Callback for Auth Camera Frames
     async def on_auth_frame(frame_b64):
-        await sio.emit('auth_frame', {'image': frame_b64})
+        await sio.emit('auth_frame', {'image': frame_b64}, to=sid)
 
-    # Initialize Authenticator if not already done
+    # Reinitialize authenticator with updated callbacks
     if authenticator is None:
         authenticator = FaceAuthenticator(
             reference_image_path="reference.jpg",
             on_status_change=on_auth_status,
             on_frame=on_auth_frame
         )
-    
-    # Check if already authenticated or needs to start
+
+    # Authenticate or bypass
     if authenticator.authenticated:
-        await sio.emit('auth_status', {'authenticated': True})
+        _authenticated_sids.add(sid)
+        await sio.emit('auth_status', {'authenticated': True}, to=sid)
     else:
-        # Check Settings for Auth
         if SETTINGS.get("face_auth_enabled", False):
-            await sio.emit('auth_status', {'authenticated': False})
-            # Start the auth loop in background
+            await sio.emit('auth_status', {'authenticated': False}, to=sid)
             asyncio.create_task(authenticator.start_authentication_loop())
         else:
-            # Bypass Auth
-            print("Face Auth Disabled. Auto-authenticating.")
-            await sio.emit('auth_status', {'authenticated': True})
+            logger.info("[AUTH] Face auth disabled — auto-authenticating sid=%s.", sid)
+            _authenticated_sids.add(sid)
+            await sio.emit('auth_status', {'authenticated': True}, to=sid)
 
-    # --- Evolution Heartbeat ---
+    # --- Evolution Heartbeat + Voice Queue Poller ---
     if not heartbeat_started:
         print("[SERVER] Avvio del motore evolutivo di SHARD...")
         asyncio.create_task(shard_evolution_heartbeat())
+        asyncio.create_task(_voice_queue_poller())
         heartbeat_started = True
 
     # --- Consciousness Auto-Start ---
     async def accendi_coscienza_quando_pronto():
-        global audio_loop
-        while audio_loop is None or not hasattr(audio_loop, 'consciousness'):
+        STARTUP_TIMEOUT = 30  # secondi
+        elapsed = 0
+        while True:
+            if elapsed >= STARTUP_TIMEOUT:
+                logger.error(
+                    "[SERVER] TIMEOUT STARTUP: SHARD non ha inizializzato 'consciousness' "
+                    "entro %d secondi. Il sistema è bloccato — verifica i log di ShardCore.",
+                    STARTUP_TIMEOUT,
+                )
+                return
+            # Support both legacy audio_loop and new shard_core
+            core = _shard_core if _shard_core is not None else audio_loop
+            if core is not None and hasattr(core, 'consciousness'):
+                break
             await asyncio.sleep(1)
-        print("[SERVER] Sistema neurale pronto! Accensione monologo interiore di SHARD...")
-        asyncio.create_task(audio_loop.consciousness.inner_monologue_loop())
-        print("[SHARD] Consciousness loop avviato in background")
+            elapsed += 1
+        logger.info("[SERVER] Sistema neurale pronto! Accensione monologo interiore di SHARD...")
+        asyncio.create_task(core.consciousness.inner_monologue_loop())
+        logger.info("[SHARD] Consciousness loop avviato in background")
 
     asyncio.create_task(accendi_coscienza_quando_pronto())
 
 
 @sio.event
 async def disconnect(sid):
-    print(f"Client disconnected: {sid}")
+    global _session_lock_held
+    _authenticated_sids.discard(sid)
+    logger.info("[SERVER] Client disconnected: sid=%s (authenticated_sids remaining: %d)", sid, len(_authenticated_sids))
+    # If the client disconnected without calling stop_audio, release the stale lock.
+    if _session_lock_held:
+        try:
+            SHARD_SESSION_LOCK.release()
+            release_file_lock()
+            _session_lock_held = False
+            logger.info("[SESSION LOCK] Released by disconnect (stale audio lock cleaned up).")
+        except Exception as _lock_err:
+            logger.warning("[SESSION LOCK] Failed to release on disconnect: %s", _lock_err)
 
 @sio.event
-async def start_audio(sid, data=None):
-    global audio_loop, loop_task
+async def start_audio(session_host, data=None):
+    global audio_loop, loop_task, audio_fe_task, _shard_core
     
     # Optional: Block if not authenticated
     # Only block if auth is ENABLED and not authenticated
@@ -227,11 +434,60 @@ async def start_audio(sid, data=None):
              return
 
 
-    # Callback to send audio data to frontend
+    # ── SESSION LOCK ────────────────────────────────────────────────────────────
+    # Prevent audio session from starting while NightRunner is active.
+    global _session_lock_held
+    try:
+        await asyncio.wait_for(SHARD_SESSION_LOCK.acquire(), timeout=0.1)
+        _session_lock_held = True
+        acquire_file_lock("audio_session")
+        logger.info("[SESSION LOCK] Acquired by audio session.")
+    except asyncio.TimeoutError:
+        reason = get_lock_reason()
+        logger.warning("[SESSION LOCK] Blocked — held by: %s", reason or "unknown")
+        await sio.emit('error', {'msg': f'[LOCK] Cannot start: autonomous session is active ({reason or "unknown"}).'})
+        return
+
+    # --- Bounded queue for audio → frontend ---
+    # CHUNK_SIZE=1024 @ 16kHz ≈ 15 chunks/sec. maxsize=30 ≈ 2 seconds of buffer.
+    # Chunks beyond the limit are dropped silently: frontend visualization is
+    # best-effort and must never block or slow down audio capture.
+    _audio_fe_queue: asyncio.Queue = asyncio.Queue(maxsize=30)
+
+    async def _audio_frontend_worker():
+        """Single coroutine that serialises all audio→frontend emissions.
+        Replaces the per-chunk create_task pattern that caused unbounded task growth."""
+        try:
+            while True:
+                chunk = await _audio_fe_queue.get()
+                try:
+                    await sio.emit('audio_data', {'data': chunk})
+                finally:
+                    _audio_fe_queue.task_done()
+        except asyncio.CancelledError:
+            logger.info("[AudioFrontend] Worker shutting down — draining queue.")
+            while not _audio_fe_queue.empty():
+                try:
+                    _audio_fe_queue.get_nowait()
+                    _audio_fe_queue.task_done()
+                except asyncio.QueueEmpty:
+                    break
+
+    audio_fe_task = asyncio.create_task(
+        _audio_frontend_worker(), name="audio_frontend_worker"
+    )
+    audio_fe_task.add_done_callback(
+        lambda t: logger.error(
+            "[AudioFrontend] Worker died unexpectedly: %s", t.exception()
+        ) if not t.cancelled() and t.exception() else None
+    )
+
     def on_audio_data(data_bytes):
-        # We need to schedule this on the event loop
-        # This is high frequency, so we might want to downsample or batch if it's too much
-        asyncio.create_task(sio.emit('audio_data', {'data': list(data_bytes)}))
+        """Sync callback invoked per audio chunk. Enqueues for the worker — never blocks."""
+        try:
+            _audio_fe_queue.put_nowait(list(data_bytes))
+        except asyncio.QueueFull:
+            pass  # drop — frontend is behind, audio capture must not wait
 
     # Callback to send CAL data to frontend
     def on_cad_data(data):
@@ -314,71 +570,63 @@ async def start_audio(sid, data=None):
             on_certify=_on_certify
         ))
 
-    # Initialize SHARD
+    # Initialize SHARD (refactored to ShardCore)
+    # Pass the existing study_agent so SessionOrchestrator doesn't create a second one.
     try:
-        print(f"Initializing AudioLoop with device_index={device_index}")
-        audio_loop = shard.AudioLoop(
-            video_mode="none", 
-            on_audio_data=on_audio_data,
-            on_cad_data=on_cad_data,
-            on_web_data=on_web_data,
-            on_transcription=on_transcription,
-            on_tool_confirmation=on_tool_confirmation,
-            on_cad_status=on_cad_status,
-            on_cad_thought=on_cad_thought,
-            on_project_update=on_project_update,
-            on_device_update=on_device_update,
-            on_error=on_error,
-            on_study_request=on_study_request,
+        shard_core = shard.ShardCore(study_agent=study_agent)
 
-            input_device_index=device_index,
-            input_device_name=device_name,
-            kasa_agent=kasa_agent
-        )
-        print("AudioLoop initialized successfully.")
+        # Map UI callbacks to socket emissions
+        shard_core.ui_callbacks["on_transcription"] = lambda text: asyncio.create_task(sio.emit('transcription', text))
+        shard_core.ui_callbacks["on_cad_data"] = lambda data: asyncio.create_task(sio.emit('cad_data', data))
+        shard_core.ui_callbacks["on_cad_status"] = lambda status: asyncio.create_task(sio.emit('cad_status', status))
+        shard_core.ui_callbacks["on_cad_thought"] = lambda thought_text: asyncio.create_task(sio.emit('cad_thought', {'text': thought_text}))
+        shard_core.ui_callbacks["on_project_update"] = lambda project_name: asyncio.create_task(sio.emit('project_update', {'project': project_name}))
+        shard_core.ui_callbacks["on_device_update"] = lambda devices: asyncio.create_task(sio.emit('kasa_devices', devices))
+        shard_core.ui_callbacks["on_error"] = lambda msg: asyncio.create_task(sio.emit('error', {'msg': msg}))
+        shard_core.ui_callbacks["on_study_request"] = on_study_request
+        shard_core.ui_callbacks["on_tool_confirmation"] = on_tool_confirmation
 
-        # Apply current permissions
-        audio_loop.update_permissions(SETTINGS["tool_permissions"])
-        
-        # Check initial mute state
-        if data and data.get('muted', False):
-            print("Starting with Audio Paused")
-            audio_loop.set_paused(True)
+        # Apply current permissions if supported
+        if hasattr(shard_core, "update_permissions"):
+            shard_core.update_permissions(SETTINGS["tool_permissions"])
 
-        print("Creating asyncio task for AudioLoop.run()")
-        loop_task = asyncio.create_task(audio_loop.run())
-        
-        # Add a done callback to catch silent failures in the loop
-        def handle_loop_exit(task):
-            try:
-                task.result()
-            except asyncio.CancelledError:
-                print("Audio Loop Cancelled")
-            except Exception as e:
-                print(f"Audio Loop Crashed: {e}")
-                # You could emit 'error' here if you have context
-        
-        loop_task.add_done_callback(handle_loop_exit)
-        
+        # Expose shard_core globally so video_frame handler can reach it
+        _shard_core = shard_core
+        audio_loop = shard_core.audio_video_io
+
+        # Wire consciousness to benchmark_loop e llm_router
+        try:
+            import benchmark_loop as _bl
+            import llm_router as _lr
+            if hasattr(audio_loop, 'consciousness'):
+                _bl.set_consciousness(audio_loop.consciousness)
+                _lr.set_consciousness(audio_loop.consciousness)
+        except Exception:
+            pass
+
+        # Start system
+        print("Starting ShardCore system…")
+        await shard_core.start_system(session_host)
+
         print("Emitting 'SHARD Started'")
         await sio.emit('status', {'msg': 'SHARD Started'})
 
-        # Load saved printers
+        # Load saved printers if ShardCore exposes printer_agent
         saved_printers = SETTINGS.get("printers", [])
-        if saved_printers and audio_loop.printer_agent:
+        if saved_printers and getattr(shard_core, "printer_agent", None):
             print(f"[SERVER] Loading {len(saved_printers)} saved printers...")
             for p in saved_printers:
-                audio_loop.printer_agent.add_printer_manually(
+                shard_core.printer_agent.add_printer_manually(
                     name=p.get("name", p["host"]),
                     host=p["host"],
                     port=p.get("port", 80),
                     printer_type=p.get("type", "moonraker"),
                     camera_url=p.get("camera_url")
                 )
-        
-        # Start Printer Monitor
+
+        # Start Printer Monitor (adapted to shard_core if needed)
         asyncio.create_task(monitor_printers_loop())
-        
+
     except Exception as e:
         print(f"CRITICAL ERROR STARTING SHARD: {e}")
         import traceback
@@ -390,7 +638,7 @@ async def start_audio(sid, data=None):
 async def monitor_printers_loop():
     """Background task to query printer status periodically."""
     print("[SERVER] Starting Printer Monitor Loop")
-    while audio_loop and audio_loop.printer_agent:
+    while audio_loop and hasattr(audio_loop, 'printer_agent') and audio_loop.printer_agent:
         try:
             agent = audio_loop.printer_agent
             if not agent.printers:
@@ -421,12 +669,30 @@ async def monitor_printers_loop():
 
 @sio.event
 async def stop_audio(sid):
-    global audio_loop
+    global audio_loop, audio_fe_task, _session_lock_held, _shard_core
     if audio_loop:
-        audio_loop.stop() 
-        print("Stopping Audio Loop")
+        audio_loop.stop()
+        logger.info("[SERVER] Audio loop stopped.")
         audio_loop = None
-        await sio.emit('status', {'msg': 'SHARD Stopped'})
+    if _shard_core:
+        await _shard_core.stop()
+        _shard_core = None
+        logger.info("[SERVER] ShardCore stopped.")
+    # ── Release session lock ─────────────────────────────────────────────────
+    if _session_lock_held:
+        SHARD_SESSION_LOCK.release()
+        release_file_lock()
+        _session_lock_held = False
+        logger.info("[SESSION LOCK] Released by stop_audio.")
+    if audio_fe_task and not audio_fe_task.done():
+        audio_fe_task.cancel()
+        try:
+            await audio_fe_task
+        except asyncio.CancelledError:
+            pass
+        audio_fe_task = None
+        logger.info("[AudioFrontend] Worker cancelled and cleaned up.")
+    await sio.emit('status', {'msg': 'SHARD Stopped'})
 
 @sio.event
 async def pause_audio(sid):
@@ -446,20 +712,22 @@ async def resume_audio(sid):
 
 @sio.event
 async def confirm_tool(sid, data):
+    if not await _require_auth(sid, "confirm_tool"): return
     # data: { "id": "...", "confirmed": True/False }
     request_id = data.get('id')
     confirmed = data.get('confirmed', False)
     
     print(f"[SERVER DEBUG] Received confirmation response for {request_id}: {confirmed}")
     
-    if audio_loop:
-        audio_loop.resolve_tool_confirmation(request_id, confirmed)
+    if _shard_core and hasattr(_shard_core, 'session_orchestrator'):
+        _shard_core.session_orchestrator.resolve_tool_confirmation(request_id, confirmed)
     else:
-        print("Audio loop not active, cannot resolve confirmation.")
+        print("Orchestrator not active, cannot resolve confirmation.")
 
 @sio.event
 async def shutdown(sid, data=None):
     """Gracefully shutdown the server when the application closes."""
+    if not await _require_auth(sid, "shutdown"): return
     global audio_loop, loop_task, authenticator
     
     print("[SERVER] ========================================")
@@ -494,6 +762,18 @@ async def shutdown(sid, data=None):
 async def user_input(sid, data):
     text = data.get('text')
     print(f"[SERVER DEBUG] User input received: '{text}'")
+
+    capability_queries = [
+        "what can you do",
+        "capabilities",
+        "cosa sai fare",
+        "dimmi le tue capacità",
+    ]
+    normalized = (text or "").lower()
+    if any(q in normalized for q in capability_queries):
+        response = study_agent.self_model.describe()
+        await sio.emit('transcription', {'text': response, 'sender': 'SHARD'})
+        return
     
     # --- BACKDOOR PER LO STUDIO MANUALE ---
     if text and text.lower().startswith("/study "):
@@ -511,12 +791,10 @@ async def user_input(sid, data):
         return
     # --- FINE BLOCCO MOOD ---
     
-    if not audio_loop:
-        print("[SERVER DEBUG] [Error] Audio loop is None. Cannot send text.")
-        return
-
-    if not audio_loop.session:
-        print("[SERVER DEBUG] [Error] Session is None. Cannot send text.")
+    if not audio_loop or not audio_loop.session:
+        print("[SERVER DEBUG] Gemini not active. Routing to Groq fallback.")
+        if text:
+            await groq_fallback(text)
         return
 
     if text:
@@ -550,6 +828,17 @@ async def user_input(sid, data):
                     except Exception as e:
                         print(f"[SERVER DEBUG] Failed to send piggyback frame: {e}")
 
+                _NIGHT_KEYWORDS = [
+                    "studiato", "studia", "imparato", "stanotte", "notte", "night",
+                    "report", "ciclo", "skill", "recap", "esperiment", "what did you study",
+                    "cosa hai fatto", "sessione", "dark matter", "cnn", "perceptron",
+                ]
+                _normalized = text.lower()
+                if any(kw in _normalized for kw in _NIGHT_KEYWORDS):
+                    night_ctx = _load_last_night_report()
+                    if night_ctx:
+                        text = f"[CONTESTO SESSIONE NOTTURNA: {night_ctx}]\n\n{text}"
+
                 await audio_loop.session.send(input=text, end_of_turn=True)
                 print(f"[SERVER DEBUG] Message sent to Gemini successfully.")
 
@@ -562,18 +851,56 @@ async def user_input(sid, data):
             print("[SERVER DEBUG] Gemini unavailable. Using Groq fallback.")
             await groq_fallback(text)
 
+def _load_last_night_report() -> str:
+    """Load the most recent night session JSON as a compact context string."""
+    try:
+        reports_dir = Path(ROOT_DIR) / "night_reports"
+        sessions = sorted(reports_dir.glob("session_*.json"))
+        if not sessions:
+            return ""
+        last = sessions[-1]
+        data = json.loads(last.read_text(encoding="utf-8"))
+        date = data.get("date", "unknown")
+        cycles = data.get("cycles", [])
+        certified = [c for c in cycles if c.get("certified")]
+        failed = [c for c in cycles if not c.get("certified")]
+        skills_before = cycles[0].get("skills_before", "?") if cycles else "?"
+        skills_after = cycles[-1].get("skills_after", "?") if cycles else "?"
+        topics_ok = ", ".join(f"{c['topic']} (score: {c.get('score', '?')})" for c in certified)
+        best = max(certified, key=lambda c: c.get("score", 0)) if certified else None
+        topics_fail = ", ".join(c["topic"] for c in failed) if failed else "nessuno"
+        best_str = f" Topic migliore: '{best['topic']}' score {best.get('score','?')}/10." if best else ""
+        return (
+            f"[NIGHT REPORT {date}] "
+            f"Cicli completati: {len(certified)}/{len(cycles)}. "
+            f"Skill: {skills_before} → {skills_after} (+{int(skills_after) - int(skills_before) if str(skills_before).isdigit() and str(skills_after).isdigit() else '?'})."
+            f"{best_str} "
+            f"Topic certificati con score: {topics_ok}. "
+            f"Falliti: {topics_fail}."
+        )
+    except Exception:
+        return ""
+
+
 async def groq_fallback(text: str):
     try:
         from groq import Groq
         import os
         groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        
+
+        night_context = _load_last_night_report()
+        system_prompt = (
+            "You are SHARD, an autonomous AI assistant built by Andrea. "
+            "Respond in the same language the user writes in (Italian if they write Italian). "
+            + (f"Here is your most recent autonomous study session data: {night_context}" if night_context else "")
+        )
+
         # Run synchronous Groq client in a thread to avoid blocking the event loop
         def _call_groq():
             return groq_client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[
-                    {"role": "system", "content": "You are SHARD, an autonomous AI assistant. Respond helpfully."},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": text}
                 ],
                 temperature=0.7,
@@ -589,16 +916,18 @@ async def groq_fallback(text: str):
 
 @sio.event
 async def video_frame(sid, data):
-    # data should contain 'image' which is binary (blob) or base64 encoded
     image_data = data.get('image')
-    if image_data and audio_loop:
-        # print(f"[SERVER DEBUG] Received video frame from {sid}")
-        # We don't await this because we don't want to block the socket handler
-        # But send_frame is async, so we create a task
+    if not image_data:
+        return
+    # Route to the active ShardCore (new system) or legacy audio_loop (old system)
+    if _shard_core is not None:
+        asyncio.create_task(_shard_core.audio_video_io.send_frame(image_data))
+    elif audio_loop is not None:
         asyncio.create_task(audio_loop.send_frame(image_data))
 
 @sio.event
 async def save_memory(sid, data):
+    if not await _require_auth(sid, "save_memory"): return
     try:
         messages = data.get('messages', [])
         if not messages:
@@ -638,7 +967,8 @@ async def save_memory(sid, data):
 
 @sio.event
 async def upload_memory(sid, data):
-    print(f"Received memory upload request")
+    if not await _require_auth(sid, "upload_memory"): return
+    logger.info("[SERVER] Memory upload request from sid=%s", sid)
     try:
         memory_text = data.get('memory', '')
         if not memory_text:
@@ -699,9 +1029,10 @@ async def discover_kasa(sid):
 
 @sio.event
 async def iterate_cad(sid, data):
+    if not await _require_auth(sid, "iterate_cad"): return
     # data: { prompt: "make it bigger" }
     prompt = data.get('prompt')
-    print(f"Received iterate_cad request: '{prompt}'")
+    logger.info("[SERVER] iterate_cad from sid=%s: '%s'", sid, prompt)
     
     if not audio_loop or not audio_loop.cad_agent:
         await sio.emit('error', {'msg': "CAD Agent not available"})
@@ -736,9 +1067,10 @@ async def iterate_cad(sid, data):
 
 @sio.event
 async def generate_cad(sid, data):
+    if not await _require_auth(sid, "generate_cad"): return
     # data: { prompt: "make a cube" }
     prompt = data.get('prompt')
-    print(f"Received generate_cad request: '{prompt}'")
+    logger.info("[SERVER] generate_cad from sid=%s: '%s'", sid, prompt)
     
     if not audio_loop or not audio_loop.cad_agent:
         await sio.emit('error', {'msg': "CAD Agent not available"})
@@ -1044,31 +1376,35 @@ async def get_settings(sid):
 
 @sio.event
 async def update_settings(sid, data):
-    # Generic update
-    print(f"Updating settings: {data}")
-    
-    # Handle specific keys if needed
+    if not await _require_auth(sid, "update_settings"): return
+
+    valid, reason = _validate_settings_payload(data)
+    if not valid:
+        logger.warning("[SETTINGS] Rejected invalid payload from sid=%s: %s", sid, reason)
+        await sio.emit('error', {'msg': f'Invalid settings update: {reason}'}, to=sid)
+        return
+
+    logger.info("[SETTINGS] Update from sid=%s: keys=%s", sid, list(data.keys()))
+
     if "tool_permissions" in data:
         SETTINGS["tool_permissions"].update(data["tool_permissions"])
         if audio_loop:
             audio_loop.update_permissions(SETTINGS["tool_permissions"])
-            
+
     if "face_auth_enabled" in data:
         SETTINGS["face_auth_enabled"] = data["face_auth_enabled"]
-        # If turned OFF, maybe emit auth status true?
         if not data["face_auth_enabled"]:
-             await sio.emit('auth_status', {'authenticated': True})
-             # Stop auth loop if running?
-             if authenticator:
-                 authenticator.stop() 
+            _authenticated_sids.add(sid)
+            await sio.emit('auth_status', {'authenticated': True}, to=sid)
+            if authenticator:
+                authenticator.stop()
 
     if "camera_flipped" in data:
         SETTINGS["camera_flipped"] = data["camera_flipped"]
-        print(f"[SERVER] Camera flip set to: {data['camera_flipped']}")
+        logger.info("[SETTINGS] Camera flip set to: %s", data['camera_flipped'])
 
     save_settings()
-    # Broadcast new full settings
-    await sio.emit('settings', SETTINGS)
+    await sio.emit('settings', SETTINGS, to=sid)
 
 
 # Deprecated/Mapped for compatibility if frontend still uses specific events
@@ -1078,10 +1414,15 @@ async def get_tool_permissions(sid):
 
 @sio.event
 async def update_tool_permissions(sid, data):
-    print(f"Updating permissions (legacy event): {data}")
+    if not await _require_auth(sid, "update_tool_permissions"): return
+    valid, reason = _validate_settings_payload({"tool_permissions": data})
+    if not valid:
+        logger.warning("[SETTINGS] Rejected invalid permissions from sid=%s: %s", sid, reason)
+        await sio.emit('error', {'msg': f'Invalid permissions update: {reason}'}, to=sid)
+        return
+    logger.info("[SETTINGS] Permission update from sid=%s: %s", sid, data)
     SETTINGS["tool_permissions"].update(data)
     save_settings()
-    
     if audio_loop:
         audio_loop.update_permissions(SETTINGS["tool_permissions"])
     # Broadcast update to all
@@ -1089,10 +1430,11 @@ async def update_tool_permissions(sid, data):
 
 @sio.event
 async def start_study(sid, data):
+    if not await _require_auth(sid, "start_study"): return
     topic = data.get('topic', '')
     tier = data.get('tier', 1)
     if not topic:
-        await sio.emit('error', {'msg': 'No topic provided'})
+        await sio.emit('error', {'msg': 'No topic provided'}, to=sid)
         return
 
     await sio.emit('status', {'msg': f'SHARD.STUDY starting: {topic} (Tier {tier})'})
@@ -1115,11 +1457,15 @@ async def start_study(sid, data):
         })
         await sio.emit('status', {'msg': f'SHARD STUDY certified: {topic} ({score}/10)'})
         
+        # --- TRACCIA CAUSALE: push evento studio completato alla coscienza ---
+        if audio_loop and hasattr(audio_loop, 'consciousness'):
+            audio_loop.consciousness.push_event("study_done", {"topic": topic, "score": score})
+
         # --- SISTEMA RPG: AGGIUNTA XP AL LIBRETTO ---
         if audio_loop and hasattr(audio_loop, 'consciousness'):
             # Determina la skill in base all'argomento studiato
             skill_target = "Python_Advanced" if "python" in topic.lower() else "Unity_ML_Agents"
-            
+
             # Invia il voto (score) al cervello di SHARD
             leveled_up = audio_loop.consciousness.add_xp(skill_target, float(score))
             
@@ -1205,6 +1551,45 @@ async def test_mood(sid, data):
         'satisfaction': 0.6
     })    
 
+async def _voice_queue_poller():
+    """
+    Polls voice_broadcaster queue every 3 seconds.
+    If Gemini Live is active → injects text into session (native voice).
+    Otherwise → emits shard_voice_event to frontend (Web Speech API fallback).
+    """
+    try:
+        from voice_broadcaster import pop_all
+    except ImportError:
+        return
+
+    while True:
+        await asyncio.sleep(3)
+        try:
+            events = pop_all()
+            for event in events:
+                text = event.get("text", "")
+                if not text:
+                    continue
+                # Approccio B: Gemini Live attivo → inject voce nativa
+                core = _shard_core if _shard_core is not None else audio_loop
+                if core is not None and hasattr(core, "session") and core.session:
+                    try:
+                        await core.session.send(input=text, end_of_turn=True)
+                        print(f"[VOICE POLLER] Injected into Gemini: '{text[:60]}'")
+                        continue
+                    except Exception:
+                        pass
+                # Approccio A fallback: Web Speech API via Socket.IO
+                await sio.emit("shard_voice_event", {
+                    "text": text,
+                    "priority": event.get("priority", "low"),
+                    "event_type": event.get("event_type", "info"),
+                })
+                print(f"[VOICE POLLER] Emitted to frontend: '{text[:60]}'")
+        except Exception as e:
+            print(f"[VOICE POLLER] Error: {e}")
+
+
 async def shard_evolution_heartbeat():
     """Controlla periodicamente se SHARD vuole studiare autonomamente."""
     while True:
@@ -1218,6 +1603,646 @@ async def shard_evolution_heartbeat():
                 if audio_loop and audio_loop.on_study_request:
                     audio_loop.on_study_request(topic, tier)
             await audio_loop.consciousness.check_for_autonomous_study(_study_callback)
+
+@app.get("/health")
+async def health():
+    """Expose system vitals for monitoring and debug."""
+    # ── ChromaDB ─────────────────────────────────────────────────────────────
+    chroma_ok = False
+    try:
+        import chromadb as _chroma
+        _c = _chroma.PersistentClient(path=str(Path("shard_memory")))
+        _c.list_collections()
+        chroma_ok = True
+    except Exception:
+        pass
+
+
+
+    # ── Capability count (SQLite primary, JSON fallback) ─────────────────────
+    cap_count = 0
+    try:
+        from shard_db import query_one
+        row = query_one("SELECT COUNT(*) AS cnt FROM capabilities")
+        cap_count = row["cnt"] if row else 0
+    except Exception:
+        try:
+            cap_path = Path("shard_memory") / "capability_graph.json"
+            if cap_path.exists():
+                cap_data = json.loads(cap_path.read_text(encoding="utf-8"))
+                cap_count = len(cap_data)
+        except Exception:
+            pass
+
+    lock_reason = get_lock_reason() if is_file_locked() else ""
+
+    # ── Meta Learning introspection ───────────────────────────────────────────
+    meta_stats: dict = {}
+    try:
+        raw = study_agent.meta_learning.get_stats()
+        gs = raw.get("global", {})
+        trend = gs.get("score_trend", 0.0)
+        meta_stats = {
+            "total_sessions": gs.get("total_sessions", 0),
+            "avg_score": gs.get("avg_score", 0.0),
+            "cert_rate": gs.get("cert_rate", 0.0),
+            "score_trend": "↑" if trend > 0.05 else ("↓" if trend < -0.05 else "→"),
+            "best_category": gs.get("best_category"),
+            "worst_category": gs.get("worst_category"),
+            "categories": raw.get("categories", {}),
+        }
+    except Exception:
+        pass
+
+    return {
+        "status": "ok",
+        "chromadb": chroma_ok,
+        "capability_count": cap_count,
+        "audio_session_active": audio_loop is not None,
+        "session_lock_active": is_file_locked(),
+        "session_lock_reason": lock_reason,
+        "semaphore_free": not _session_lock_held,
+        "meta_learning": meta_stats,
+    }
+
+
+# ── NightRunner Control ────────────────────────────────────────────────────────
+
+_night_process: asyncio.subprocess.Process = None
+
+
+async def _monitor_night_process():
+    """Reads subprocess stdout line-by-line, logs it, then notifies the frontend."""
+    import re as _re
+    global _night_process
+    if _night_process is None:
+        return
+
+    _study_re   = _re.compile(r'\[SHARD\.STUDY\]\s+\[\s*(\d+)%\]\s+(\w+)\s+\|[^|]*\|\s+(.+)')
+    _cycle_re   = _re.compile(r'===\s+Cycle\s+(\d+)/(\d+)\s+===')
+    _topic_re   = _re.compile(r'Topic selected:\s+(.+)')
+    _certif_re  = _re.compile(r'CERTIFIED|score=(\d+(?:\.\d+)?)/10.*CERTIFIED|✅.*certif', _re.IGNORECASE)
+
+    if _night_process.stdout:
+        async for raw_line in _night_process.stdout:
+            try:
+                line = raw_line.decode("utf-8", errors="replace").rstrip()
+            except Exception:
+                line = repr(raw_line)
+            logger.info("[NR-OUT] %s", line)
+
+            if "[PATCH_READY]" in line:
+                asyncio.create_task(_emit_patch_approval())
+
+            # -- Cycle progress → NightRunnerWidget
+            m = _cycle_re.search(line)
+            if m:
+                await sio.emit("nightrunner_cycle", {
+                    "cycle": int(m.group(1)),
+                    "total": int(m.group(2)),
+                })
+                continue
+
+            # -- Topic selected → NightRunnerWidget
+            m = _topic_re.search(line)
+            if m:
+                await sio.emit("nightrunner_topic", {"topic": m.group(1).strip()})
+                continue
+
+            # -- Study phase progress → StudyWidget
+            m = _study_re.search(line)
+            if m:
+                pct, phase, msg = int(m.group(1)), m.group(2), m.group(3).strip()
+                await sio.emit("study_progress", {
+                    "phase": phase,
+                    "percentage": pct,
+                    "message": msg,
+                    "topic": "",   # filled by nightrunner_topic event
+                })
+                continue
+
+            # -- Certification → StudyWidget complete
+            if _certif_re.search(line):
+                score_m = _re.search(r'score=(\d+(?:\.\d+)?)/10', line)
+                score = float(score_m.group(1)) if score_m else 0
+                await sio.emit("study_complete", {"score": score, "topic": "", "data": {}})
+
+    await _night_process.wait()
+    returncode = _night_process.returncode
+    _night_process = None
+    state = "crashed" if returncode not in (0, None) else "finished"
+    await sio.emit("nightrunner_state_changed", {"running": False, "state": state})
+    await sio.emit("nightrunner_cycle", {"cycle": 0, "total": 0})
+    logger.info(f"[NIGHT RUNNER] Subprocess ended — state: {state} (rc={returncode})")
+
+
+async def _emit_patch_approval():
+    """Read pending_patch.json and emit patch_approval_required to the frontend.
+
+    Enriches the payload with a static PatchSimulator risk assessment
+    (no LLM call — instant) so the human sees risk info immediately.
+    """
+    try:
+        from proactive_refactor import ProactiveRefactor, _ROOT
+        patch = ProactiveRefactor.get_pending_patch()
+        if patch:
+            # Static simulation (no LLM — instant risk estimate)
+            try:
+                from patch_simulator import simulate_patch_sync
+                file_path = _ROOT / patch["file"]
+                old_code = file_path.read_text(encoding="utf-8") if file_path.exists() else ""
+                new_code = old_code
+                for change in patch.get("changes", []):
+                    new_code = new_code.replace(change["old"], change["new"], 1)
+                sim = simulate_patch_sync(str(file_path), old_code, new_code)
+                patch["simulation"] = {
+                    "risk_level": sim.risk_level,
+                    "recommendation": sim.recommendation,
+                    "affected_modules": sim.affected_modules[:8],
+                    "changes_detected": sim.changes_detected[:5],
+                    "summary": sim.summary,
+                }
+                logger.info("[PATCH_SIM] Static risk for %s: %s", patch["file"], sim.risk_level)
+            except Exception as _se:
+                logger.debug("[PATCH_SIM] Static sim skipped: %s", _se)
+
+            await sio.emit("patch_approval_required", patch)
+            logger.info("[PROACTIVE] patch_approval_required emitted to frontend.")
+    except Exception as exc:
+        logger.warning("[PROACTIVE] Could not emit patch_approval_required: %s", exc)
+
+
+class NightRunnerParams(BaseModel):
+    cycles: int = 10
+    timeout: int = 120
+    pause: int = 10
+
+
+# ── Benchmark API ──────────────────────────────────────────────────────────────
+
+BENCHMARK_TASKS = {
+    "ghost_bug":  Path(ROOT_DIR) / "benchmark" / "task_02_ghost_bug",
+    "dirty_data": Path(ROOT_DIR) / "benchmark" / "task_03_dirty_data",
+    "bank_race":  Path(ROOT_DIR) / "benchmark" / "task_04_race_condition",
+}
+
+class BenchmarkStartRequest(BaseModel):
+    tasks: list = ["ghost_bug", "dirty_data", "bank_race"]
+    max_attempts: int = 8
+    use_episodic_memory: bool = False
+    use_swarm: bool = False
+
+_benchmark_task_handle = None
+
+
+async def _run_benchmark_bg(task_keys: list, max_attempts: int, use_episodic_memory: bool = False, use_swarm: bool = False):
+    from benchmark_loop import run_benchmark_loop
+
+    await sio.emit("benchmark_event", {"type": "start", "tasks": task_keys})
+    results = []
+
+    for key in task_keys:
+        task_dir = BENCHMARK_TASKS[key]
+        # Friendly display name
+        display = {"ghost_bug": "Ghost Bug", "dirty_data": "Dirty Data", "bank_race": "Bank Race"}.get(key, key)
+
+        # Read source file for diff
+        try:
+            source_files = sorted(
+                f for f in task_dir.glob("*.py")
+                if not f.name.startswith("test_") and not f.name.startswith("__")
+            )
+            source_code = source_files[0].read_text(encoding="utf-8") if source_files else ""
+        except Exception:
+            source_code = ""
+
+        await sio.emit("benchmark_event", {
+            "type": "task_start", "task": key, "display": display,
+        })
+
+        async def progress_cb(data, _key=key, _display=display):
+            await sio.emit("benchmark_event", {
+                "type": "attempt_event", "task": _key, "display": _display, **data,
+            })
+
+        try:
+            result = await run_benchmark_loop(
+                task_dir, max_attempts=max_attempts,
+                progress_cb=progress_cb,
+                use_episodic_memory=use_episodic_memory,
+                use_swarm=use_swarm,
+            )
+        except asyncio.CancelledError:
+            await sio.emit("benchmark_event", {"type": "cancelled"})
+            return
+        except Exception as e:
+            await sio.emit("benchmark_event", {
+                "type": "task_error", "task": key, "display": display, "error": str(e),
+            })
+            continue
+
+        entry = {
+            "task": key, "display": display,
+            "success": result.success,
+            "attempts": result.total_attempts,
+            "elapsed": round(result.elapsed_total, 1),
+            "source_code": source_code,
+            "fixed_code": result.final_code or "",
+        }
+        results.append(entry)
+        await sio.emit("benchmark_event", {"type": "task_done", **entry})
+
+    await sio.emit("benchmark_event", {"type": "all_done", "results": results})
+
+
+@app.post("/api/benchmark/start")
+async def start_benchmark(req: BenchmarkStartRequest):
+    global _benchmark_task_handle
+    if _benchmark_task_handle and not _benchmark_task_handle.done():
+        return {"ok": False, "error": "Benchmark already running"}
+    valid = [k for k in req.tasks if k in BENCHMARK_TASKS]
+    if not valid:
+        return {"ok": False, "error": "No valid tasks specified"}
+    _benchmark_task_handle = asyncio.create_task(
+        _run_benchmark_bg(valid, req.max_attempts, req.use_episodic_memory, req.use_swarm)
+    )
+    return {"ok": True, "tasks": valid}
+
+
+@app.post("/api/benchmark/stop")
+async def stop_benchmark():
+    global _benchmark_task_handle
+    if _benchmark_task_handle and not _benchmark_task_handle.done():
+        _benchmark_task_handle.cancel()
+        await sio.emit("benchmark_event", {"type": "cancelled"})
+        return {"ok": True}
+    return {"ok": False, "error": "No benchmark running"}
+
+
+@app.post("/api/night_runner/start")
+async def start_night_runner(params: NightRunnerParams):
+    global _night_process
+    if _night_process and _night_process.returncode is None:
+        return {"ok": False, "error": "NightRunner already running"}
+
+    # Safety net: if an audio session lock was left stale (e.g. browser closed without
+    # stop_audio), force-release it now. The user explicitly requested NightRunner.
+    global _session_lock_held
+    if is_file_locked():
+        reason = get_lock_reason()
+        logger.warning("[NIGHT RUNNER] Stale lock detected (reason: %s) — force-releasing before start.", reason)
+        try:
+            release_file_lock()
+        except Exception:
+            pass
+    if _session_lock_held:
+        try:
+            SHARD_SESSION_LOCK.release()
+        except Exception:
+            pass
+        _session_lock_held = False
+
+    script = Path(BACKEND_DIR) / "night_runner.py"
+    cmd = [
+        sys.executable, str(script),
+        "--cycles",  str(params.cycles),
+        "--timeout", str(params.timeout),
+        "--pause",   str(params.pause),
+    ]
+    try:
+        _night_process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            cwd=ROOT_DIR,  # must match terminal launch dir so relative paths resolve correctly
+        )
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+    asyncio.create_task(_monitor_night_process())
+    await sio.emit("nightrunner_state_changed", {"running": True, "state": "running"})
+
+    # Annuncio vocale di avvio
+    greeting = (
+        "Sessione NightRunner avviata, signore. "
+        f"Eseguirò {params.cycles} cicli di studio autonomo. "
+        "Le farò un resoconto appena terminata."
+    )
+    core = _shard_core if _shard_core is not None else audio_loop
+    if core is not None and hasattr(core, "session") and core.session:
+        try:
+            await core.session.send(input=greeting, end_of_turn=True)
+        except Exception:
+            await sio.emit("shard_voice_event", {"text": greeting, "priority": "high", "event_type": "session_start"})
+    else:
+        await sio.emit("shard_voice_event", {"text": greeting, "priority": "high", "event_type": "session_start"})
+
+    logger.info(f"[NIGHT RUNNER] Subprocess started — PID {_night_process.pid}")
+    return {"ok": True, "pid": _night_process.pid}
+
+
+@app.post("/api/night_runner/stop")
+async def stop_night_runner():
+    global _night_process
+    if _night_process is None or _night_process.returncode is not None:
+        return {"ok": False, "error": "NightRunner not running"}
+    try:
+        _night_process.terminate()
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+    await sio.emit("nightrunner_state_changed", {"running": False, "state": "stopped"})
+    return {"ok": True}
+
+
+# ── GUI Dashboard Endpoints ────────────────────────────────────────────────────
+
+@app.get("/api/night_recap")
+async def night_recap():
+    """Last NightRunner session summary for the Night Shift Recap widget."""
+    reports_dir = Path(ROOT_DIR) / "night_reports"
+    try:
+        sessions = sorted(reports_dir.glob("session_*.json"))
+        if not sessions:
+            return {"available": False}
+        data = json.loads(sessions[-1].read_text(encoding="utf-8"))
+        cycles = data.get("cycles", [])
+        skills_start = cycles[0].get("skills_before", 0) if cycles else 0
+        skills_end   = cycles[-1].get("skills_after", skills_start) if cycles else skills_start
+        certified    = [c for c in cycles if c.get("certified")]
+        return {
+            "available":    True,
+            "date":         data.get("date", ""),
+            "runtime_min":  round(data.get("total_runtime_minutes", 0), 1),
+            "total_cycles": len(cycles),
+            "certified":    len(certified),
+            "skills_start": skills_start,
+            "skills_end":   skills_end,
+            "skills_gained":skills_end - skills_start,
+            "top_cycle":    max(cycles, key=lambda c: c.get("score", 0), default={}) if cycles else {},
+            "cycles":       cycles,
+        }
+    except Exception as exc:
+        return {"available": False, "error": str(exc)}
+
+
+@app.get("/api/improvement_queue")
+async def improvement_queue():
+    """ImprovementEngine queue + top chronic failures for the Clinica widget."""
+    try:
+        from improvement_engine import ImprovementEngine
+        engine = ImprovementEngine()
+        status = engine.get_status()
+
+        # Also surface top ticket data from last SelfAnalyzer run (from queue state)
+        return {
+            "available":      True,
+            "queue":          status["pending_queue"],
+            "queue_size":     status["queue_size"],
+            "last_run_at":    status["last_run_at"],
+            "total_queued":   status["total_ever_queued"],
+        }
+    except Exception as exc:
+        return {"available": False, "error": str(exc)}
+
+
+@app.get("/api/consciousness/thought_stats")
+async def thought_stats():
+    """Metriche di interpretabilità sui pensieri di SHARD — per pitch e debug."""
+    if audio_loop and hasattr(audio_loop, 'consciousness'):
+        return audio_loop.consciousness.self_logger.get_stats()
+    return {"total": 0, "summary": "SHARD non ancora inizializzato."}
+
+@app.get("/api/consciousness/reasoning_stats")
+async def reasoning_stats():
+    """Audit trail ragionamenti interni di SHARD — per pitch e debug."""
+    if audio_loop and hasattr(audio_loop, 'consciousness'):
+        return audio_loop.consciousness.interpretability.get_stats()
+    return {"total": 0, "summary": "SHARD non ancora inizializzato."}
+
+@app.get("/api/knowledge/graph_stats")
+async def knowledge_graph_stats():
+    """Statistiche GraphRAG — relazioni causali tra concetti."""
+    try:
+        from graph_rag import get_graph_stats
+        return get_graph_stats()
+    except Exception as exc:
+        return {"total_relations": 0, "error": str(exc)}
+
+@app.get("/api/llm/cache_stats")
+async def llm_cache_stats():
+    """LLM cache hit/miss stats."""
+    try:
+        from llm_cache import get_cache_stats
+        return get_cache_stats()
+    except Exception as exc:
+        return {"entries_in_memory": 0, "error": str(exc)}
+
+@app.post("/api/llm/cache_invalidate")
+async def llm_cache_invalidate():
+    """Svuota la LLM cache (utile dopo modifiche al codice)."""
+    try:
+        from llm_cache import invalidate_all
+        invalidate_all()
+        return {"status": "ok", "message": "Cache invalidated"}
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}
+
+@app.get("/api/skill_radar")
+async def skill_radar():
+    """Per-category scores for the Skill Radar widget (recharts RadarChart)."""
+    from meta_learning import TOPIC_CATEGORIES, META_DB_PATH
+    try:
+        if not META_DB_PATH.exists():
+            return {"available": False}
+        raw = json.loads(META_DB_PATH.read_text(encoding="utf-8"))
+        cats = raw.get("topic_categories", {})
+        global_stats = raw.get("global_stats", {})
+
+        # Build a data point for every known category, even those with 0 sessions
+        all_cats = list(TOPIC_CATEGORIES.keys()) + ["general"]
+        data = []
+        for cat in all_cats:
+            info = cats.get(cat, {})
+            data.append({
+                "category":  cat.replace("_", " ").title(),
+                "key":       cat,
+                "avg_score": round(info.get("avg_score", 0.0), 1),
+                "sessions":  info.get("total", 0),
+                "cert_rate": round(info.get("cert_rate", 0.0) * 100, 1),
+            })
+
+        # Sort: highest avg_score first
+        data.sort(key=lambda x: -x["avg_score"])
+
+        return {
+            "available":    True,
+            "categories":   data,
+            "global": {
+                "avg_score":      global_stats.get("avg_score", 0.0),
+                "cert_rate":      round(global_stats.get("cert_rate", 0.0) * 100, 1),
+                "total_sessions": global_stats.get("total_sessions", 0),
+                "best":           global_stats.get("best_category", ""),
+                "worst":          global_stats.get("worst_category", ""),
+                "trend":          global_stats.get("score_trend", 0.0),
+            },
+        }
+    except Exception as exc:
+        return {"available": False, "error": str(exc)}
+
+
+# ── SSJ4 Phase 3: Proactive Self-Optimization Gate ────────────────────────────
+
+@app.get("/api/patch/pending")
+async def get_pending_patch():
+    """Return the current pending patch proposal, or {available: false}."""
+    try:
+        from proactive_refactor import ProactiveRefactor
+        patch = ProactiveRefactor.get_pending_patch()
+        if patch:
+            return {"available": True, "patch": patch}
+        return {"available": False}
+    except Exception as exc:
+        return {"available": False, "error": str(exc)}
+
+
+@app.post("/api/patch/notify")
+async def notify_pending_patch():
+    """Emit patch_approval_required via Socket.IO if a pending patch exists.
+    Called by test scripts and by the frontend to re-surface a missed notification.
+    """
+    await _emit_patch_approval()
+    try:
+        from proactive_refactor import ProactiveRefactor
+        found = ProactiveRefactor.get_pending_patch() is not None
+    except Exception:
+        found = False
+    return {"ok": True, "patch_found": found}
+
+
+@app.post("/api/patch/simulate")
+async def simulate_pending_patch():
+    """Run full PatchSimulator (static + LLM) on the pending patch.
+
+    Returns SimulationReport with risk_level, affected_modules, module_risks.
+    Async — may take 10-20s (parallel LLM calls for each dependent module).
+    """
+    try:
+        from proactive_refactor import ProactiveRefactor, _ROOT
+        from patch_simulator import simulate_patch
+
+        patch_record = ProactiveRefactor.get_pending_patch()
+        if not patch_record:
+            return {"success": False, "message": "No pending patch found."}
+
+        file_path = _ROOT / patch_record["file"]
+        old_code = file_path.read_text(encoding="utf-8") if file_path.exists() else ""
+        new_code = old_code
+        for change in patch_record.get("changes", []):
+            new_code = new_code.replace(change["old"], change["new"], 1)
+
+        sim = await simulate_patch(str(file_path), old_code, new_code)
+        return {
+            "success": True,
+            "risk_level": sim.risk_level,
+            "recommendation": sim.recommendation,
+            "affected_modules": sim.affected_modules,
+            "changes_detected": sim.changes_detected,
+            "module_risks": sim.module_risks,
+            "summary": sim.summary,
+        }
+    except Exception as exc:
+        logger.error("[PATCH_SIM] simulate endpoint error: %s", exc)
+        return {"success": False, "error": str(exc)}
+
+
+@app.post("/api/patch/approve")
+async def approve_patch():
+    """Apply the pending patch to the target source file, after Impact Analyzer check."""
+    try:
+        from proactive_refactor import ProactiveRefactor, PENDING_PATCH_PATH, _ROOT
+        from impact_analyzer import pre_check
+
+        # 1. Read and simulate the patched content for Impact Analyzer
+        patch_record = ProactiveRefactor.get_pending_patch()
+        if not patch_record:
+            return {"success": False, "message": "No pending patch found."}
+
+        file_path = _ROOT / patch_record["file"]
+        source = file_path.read_text(encoding="utf-8")
+        simulated = source
+        for change in patch_record.get("changes", []):
+            simulated = simulated.replace(change["old"], change["new"], 1)
+
+        # 2. Impact Analyzer gate — BLOCK stops the apply
+        check = await pre_check(str(file_path), simulated)
+        _interp = getattr(getattr(audio_loop, 'consciousness', None), 'interpretability', None)
+        if check["risk"] == "BLOCK":
+            logger.error("[PROACTIVE] Impact Analyzer BLOCKED patch: %s", check["reason"])
+            if _interp:
+                _interp.log_patch_decision(patch_record["file"], "BLOCK", False, check["reason"])
+            return {"success": False, "message": f"Blocked by Impact Analyzer: {check['reason']}"}
+        if check["risk"] in ("HIGH", "MEDIUM"):
+            logger.warning("[PROACTIVE] Impact Analyzer %s: %s — applying anyway (human approved).",
+                           check["risk"], check["reason"])
+
+        # 3. Apply
+        result = ProactiveRefactor(think_fn=lambda p: None).apply_pending_patch()
+        if _interp:
+            _interp.log_patch_decision(
+                patch_record["file"], check["risk"],
+                result.get("success", False),
+                result.get("message", "")
+            )
+        if result["success"]:
+            await sio.emit("patch_applied", {"message": result["message"]})
+            logger.info("[PROACTIVE] Patch approved and applied: %s", result["message"])
+        return result
+    except Exception as exc:
+        logger.error("[PROACTIVE] approve_patch error: %s", exc)
+        return {"success": False, "message": str(exc)}
+
+
+@app.post("/api/patch/reject")
+async def reject_patch():
+    """Discard the pending patch without applying it."""
+    try:
+        from proactive_refactor import ProactiveRefactor
+        result = ProactiveRefactor(think_fn=lambda p: None).discard_pending_patch()
+        await sio.emit("patch_rejected", {"message": result["message"]})
+        logger.info("[PROACTIVE] Patch rejected.")
+        return result
+    except Exception as exc:
+        logger.error("[PROACTIVE] reject_patch error: %s", exc)
+        return {"success": False, "message": str(exc)}
+
+
+@app.get("/api/meta_learning/stats")
+async def meta_learning_stats(topic: str = ""):
+    """Full meta-learning statistics + best strategy suggestion.
+
+    Optional query param ?topic=<string> returns a category-specific suggestion.
+    """
+    try:
+        from meta_learning import MetaLearning, META_DB_PATH
+        from strategy_memory import StrategyMemory
+
+        if not META_DB_PATH.exists():
+            return {"available": False}
+
+        sm = StrategyMemory()
+        ml = MetaLearning(strategy_memory=sm)
+        stats = ml.get_stats()
+        suggestion = ml.suggest_best_strategy(topic or None)
+
+        return {
+            "available":   True,
+            "global":      stats.get("global", {}),
+            "categories":  stats.get("categories", {}),
+            "suggestion":  suggestion,
+        }
+    except Exception as exc:
+        return {"available": False, "error": str(exc)}
+
 
 if __name__ == "__main__":
     uvicorn.run(
