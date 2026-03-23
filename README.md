@@ -2,7 +2,24 @@
 
 **System of Hybrid Autonomous Reasoning and Design**
 
-SHARD is a personal AI system that learns autonomously, repairs itself, and improves over time. It runs locally on a Geekom A5 mini PC and interacts via voice (Gemini Live), a React desktop app, and a fully autonomous nightly study loop.
+SHARD is an **agentic scaffolding** system — a persistent infrastructure that wraps LLMs with memory, feedback loops, self-repair, and autonomous improvement so they can tackle tasks that a single prompt never could.
+
+It learns autonomously, fixes its own bugs, and improves its own code. It runs locally on a Geekom A5 mini PC and interacts via voice (Gemini Live), a React desktop app, and a fully autonomous nightly study loop.
+
+---
+
+## What is Agentic Scaffolding?
+
+A raw LLM call is stateless — it has no memory of what failed last time, no ability to run code and see the result, no way to improve from experience.
+
+SHARD wraps LLMs with:
+- **Persistent memory** — capability graph, episodic memory, strategy memory
+- **Closed feedback loops** — run code → see failure → feed error back → retry
+- **Multi-agent pipelines** — Architect + Coder + parallel specialized reviewers
+- **Causal knowledge** — GraphRAG stores what SHARD learned about why things break
+- **Self-improvement** — analyzes its own performance and queues topics to re-study
+
+The result: the same LLM that fails a hard coding task solo solves it in 2-3 attempts with the scaffold around it.
 
 ---
 
