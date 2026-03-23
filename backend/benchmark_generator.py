@@ -208,4 +208,15 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
     except SyntaxError as e:
         return {"ok": False, "reason": f"SyntaxError: {e}"}
 
+    # Runtime type check — reject input_data = None/True/False (wrong types that
+    # cause AttributeError: 'bool'/'NoneType' has no attribute 'split' etc.)
+    try:
+        ns: dict = {}
+        exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
+        val = ns.get("input_data")
+        if val is None or isinstance(val, bool):
+            return {"ok": False, "reason": f"input_data is {type(val).__name__} — invalid test input"}
+    except Exception:
+        pass  # if eval fails for any reason, let AST validation stand
+
     return {"ok": True}

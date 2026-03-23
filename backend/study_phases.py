@@ -355,7 +355,9 @@ If the task would normally require such libraries, implement a simplified versio
                 # functional failure — code ran but proved nothing.
                 if ctx.sandbox_result.get("success", False):
                     stdout = ctx.sandbox_result.get("stdout", "")
-                    if "✓ All assertions passed" not in stdout:
+                    # Check for marker without the ✓ character to avoid Windows/Docker
+                    # encoding corruption (✓ arrives as âœ" on some Windows setups)
+                    if "All assertions passed" not in stdout:
                         print("[SANDBOX] ⚠️  No assertion marker in stdout — code ran but did not validate behavior")
                         ctx.sandbox_result["success"] = False
                         ctx.sandbox_result["stderr"] = (
