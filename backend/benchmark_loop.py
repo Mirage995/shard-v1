@@ -460,6 +460,10 @@ async def run_benchmark_loop(
         output_filename = "fixed_" + source_path.name
     output_path = task_dir / output_filename
 
+    # Clean up stale output from a previous run so the loop starts fresh
+    if output_path.exists():
+        output_path.unlink()
+
     print()
     print("=" * 68)
     print("  SHARD Benchmark Loop")
