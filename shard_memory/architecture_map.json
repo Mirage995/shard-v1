@@ -316,6 +316,86 @@
       "writes": [],
       "capability_tags": ["impact_analysis", "patch_safety", "dependency_tracking"],
       "notes": "simulate_patch() async (static + LLM). simulate_patch_sync() instant (static only). Wired into server.py _emit_patch_approval() and /api/patch/simulate."
+    },
+
+    "benchmark_loop": {
+      "responsibility": "Closed feedback loop for SWE benchmark tasks — LLM solo → swarm → correction cycles until all pytest tests pass",
+      "layer": "benchmark",
+      "depends_on": ["llm_router", "swarm_engine", "concurrency_simulator", "graph_rag", "knowledge_bridge", "benchmark_memory", "improvement_engine"],
+      "reads": ["benchmark/task_*/README.md", "benchmark/task_*/*.py"],
+      "writes": ["benchmark/task_*/<output>.py", "shard_memory/benchmark_episodes.json"],
+      "capability_tags": ["benchmark", "swe_repair", "stuck_detection", "swarm_integration", "episodic_feedback"],
+      "notes": "stuck_detection: _detect_stuck_tests() injects STUCK TESTS section into both SHARD FEEDBACK and Swarm Architect prompts from attempt 2+."
+    },
+
+    "benchmark_generator": {
+      "responsibility": "LLM-powered test case generator for StudyAgent certification benchmarks",
+      "layer": "benchmark",
+      "depends_on": ["llm_router"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["benchmark", "test_generation", "certification"],
+      "notes": "_validate_test() rejects None/bool/int/float/dict as input_data. Async generate() returns scaffold + validated tests."
+    },
+
+    "swarm_engine": {
+      "responsibility": "Multi-agent Architect→Coder→Critic→Reviewers pipeline for complex code repair tasks",
+      "layer": "benchmark",
+      "depends_on": ["llm_router", "graph_rag", "llm_cache"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["swarm", "multi_agent", "code_repair", "parallel_review", "stuck_detection"],
+      "notes": "5 specialized reviewers (Concurrency, EdgeCases, Security, Performance, DataIntegrity). stuck_tests param injects targeted hints into Architect prompt."
+    },
+
+    "episodic_memory": {
+      "responsibility": "Read/write interface over experiments table — retrieve past study episodes for LLM context injection",
+      "layer": "memory",
+      "depends_on": ["shard_db"],
+      "reads": ["shard_memory/shard.db"],
+      "writes": ["shard_memory/shard.db"],
+      "capability_tags": ["memory", "episodic", "context_injection", "experience_retrieval"],
+      "notes": "retrieve_context() uses word-overlap similarity. get_context_prompt() formats for LLM injection. Guards None score/failure_reason from DB NULLs."
+    },
+
+    "knowledge_bridge": {
+      "responsibility": "Query interface over the shard_workspace knowledge base for benchmark context injection",
+      "layer": "knowledge",
+      "depends_on": [],
+      "reads": ["shard_workspace/knowledge_base/*.md"],
+      "writes": [],
+      "capability_tags": ["knowledge", "context_injection", "retrieval"],
+      "notes": "query_knowledge_base() returns relevant KB articles as formatted string for benchmark_loop prompt injection."
+    },
+
+    "shard_db": {
+      "responsibility": "SQLite connection manager — single shared connection for experiments, knowledge_graph, strategy tables",
+      "layer": "persistence",
+      "depends_on": [],
+      "reads": ["shard_memory/shard.db"],
+      "writes": ["shard_memory/shard.db"],
+      "capability_tags": ["persistence", "sqlite", "shared_state"],
+      "notes": "get_db() returns singleton connection. execute() and query() wrappers with row_factory=sqlite3.Row."
+    },
+
+    "study_phases": {
+      "responsibility": "Discrete phase objects for the study pipeline — PrepPhase, MapPhase, SynthesizePhase, MaterializePhase, EvaluatePhase, BenchmarkPhase",
+      "layer": "learning",
+      "depends_on": ["llm_router", "browser_scraper", "sandbox_runner", "benchmark_generator", "episodic_memory", "graph_rag", "study_context"],
+      "reads": [],
+      "writes": ["shard_workspace/knowledge_base/*.md"],
+      "capability_tags": ["learning", "synthesis", "sandbox_execution", "certification", "episodic_injection"],
+      "notes": "Marker check uses 'All assertions passed' (no UTF-8 checkmark) to avoid Windows/Docker encoding corruption."
+    },
+
+    "study_pipeline": {
+      "responsibility": "Orchestrates study phases in sequence — runs PrepPhase→MapPhase→SynthesizePhase→MaterializePhase→EvaluatePhase→BenchmarkPhase",
+      "layer": "learning",
+      "depends_on": ["study_phases", "study_context"],
+      "reads": [],
+      "writes": [],
+      "capability_tags": ["learning", "orchestration"],
+      "notes": "Thin coordinator. Each phase is self-contained and fatal=True phases abort the pipeline on failure."
     }
   }
 }

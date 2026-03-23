@@ -1,10 +1,6 @@
 {
   "pending_queue": [
-    "# Task 01 — The HTML Trap",
-    "ghost bug handling and debugging",
-    "# Task 02 — The Ghost Bug",
-    "race condition handling and debugging",
-    "# Task 04 — Fix the Banking Module"
+    "ghost bug handling and debugging"
   ],
   "processed_ticket_ids": [
     "cf_api_integration_applied_to_web_scraping",
@@ -15,6 +11,6 @@
     "cf_exception-driven_control_flow_applied_to",
     "nm_dfs_algorithm"
   ],
-  "total_topics_ever_queued": 13,
+  "total_topics_ever_queued": 19,
   "last_run_at": "2026-03-19T17:08:16.895888"
 }

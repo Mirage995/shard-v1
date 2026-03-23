@@ -200,7 +200,10 @@ def _extract_code(response: str) -> str:
 
 # ── Prompt builders ─────────────────────────────────────────────────────────────
 
-def _build_architect_prompt(source: str, tests: str, attempts: list, output_filename: str) -> str:
+def _build_architect_prompt(
+    source: str, tests: str, attempts: list, output_filename: str,
+    stuck_tests: list = None,
+) -> str:
     history_parts = []
     for rec in attempts:
         if not rec.syntax_valid:
@@ -217,6 +220,38 @@ def _build_architect_prompt(source: str, tests: str, attempts: list, output_file
                 f"Errors:\n{rec.error_summary}"
             )
     history = "\n\n".join(history_parts)
+
+    # Stuck tests: explicitly call out tests that failed in EVERY attempt
+    stuck_block = ""
+    if stuck_tests:
+        stuck_list = "\n".join(f"  - {t}" for t in stuck_tests)
+        # Build per-test hints based on test name patterns
+        hints = []
+        for t in stuck_tests:
+            tl = t.lower()
+            if "idempotent" in tl or "calibrat" in tl:
+                hints.append(
+                    f"  [{t}] The function that calibrates values is applying its offset EVERY time "
+                    f"it is called. If you call calibrate_values(calibrate_values(data)), the offset "
+                    f"is added TWICE. Fix: add a guard flag (e.g. r['_calibrated'] = True) to each "
+                    f"reading after calibration, and skip the reading if the flag is already set. "
+                    f"Do NOT apply the offset again to already-calibrated readings."
+                )
+            elif "mutation" in tl or "mutate" in tl:
+                hints.append(
+                    f"  [{t}] The function is mutating its input in-place. "
+                    f"Use copy.deepcopy() before modifying readings."
+                )
+        hint_str = "\n".join(hints) if hints else (
+            "  Previous approaches have NOT fixed these — rethink from scratch. "
+            "Read the test assertions literally and trace your code step by step."
+        )
+        stuck_block = f"""
+=== STUCK TESTS — CRITICAL (failed in EVERY attempt — address these FIRST) ===
+{stuck_list}
+Specific root causes you MUST fix:
+{hint_str}
+"""
 
     # GraphRAG: inject causal warnings from previous studies
     causal_block = ""
@@ -242,7 +277,7 @@ def _build_architect_prompt(source: str, tests: str, attempts: list, output_file
 
 === FAILURE HISTORY ({len(attempts)} attempts) ===
 {history}
-{causal_block}
+{stuck_block}{causal_block}
 Produce your STRATEGY DOCUMENT now."""
 
 
@@ -293,6 +328,7 @@ async def swarm_complete(
     output_filename: str,
     max_tokens: int = 8192,
     temperature: float = 0.05,
+    stuck_tests: list = None,
 ) -> str:
     """Multi-agent pipeline: Architect → Coder → Multi-Reviewer → (Coder patch if needed).
 
@@ -314,7 +350,8 @@ async def swarm_complete(
     current_code = last_valid.code if last_valid else source
 
     # ── Step 1: Architect ────────────────────────────────────────────────────
-    architect_prompt = _build_architect_prompt(source, tests, attempts, output_filename)
+    architect_prompt = _build_architect_prompt(source, tests, attempts, output_filename,
+                                               stuck_tests=stuck_tests)
     strategy = await llm_complete(
         prompt=architect_prompt,
         system=SYSTEM_PROMPT_ARCHITECT,

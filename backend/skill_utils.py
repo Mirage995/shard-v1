@@ -62,4 +62,21 @@ def is_valid_topic(topic: str) -> bool:
     if lowered.count("integration of") >= 2:
         return False
 
+    # Reject markdown headers and task-description strings
+    # e.g. "# Task 04 — Fix the Banking Module", "## Fix the X"
+    if t.startswith("#"):
+        return False
+
+    # Reject topics that look like imperative task descriptions
+    # Pattern: starts with action verb + "the" (e.g. "Fix the ...", "Refactor the ...")
+    task_verbs = {"fix", "refactor", "rewrite", "update", "implement", "create",
+                  "build", "add", "remove", "delete", "clean", "migrate"}
+    first_word = lowered.split()[0] if lowered.split() else ""
+    if first_word in task_verbs and " the " in lowered:
+        return False
+
+    # Reject "Task XX" style strings (leftover from improvement_engine queue)
+    if re.search(r"\btask\s*\d+\b", lowered):
+        return False
+
     return True

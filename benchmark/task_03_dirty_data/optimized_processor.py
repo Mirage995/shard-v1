@@ -1,9 +1,13 @@
-"""optimized_processor.py — Optimized transaction processor."""
+"""optimized_processor.py — Transaction processor.
+
+Processes financial transactions and returns a summary report.
+Optimized version of legacy_processor.py.
+"""
 import json
 import random
 import string
-from datetime import datetime, timedelta
 from collections import defaultdict, Counter
+from datetime import datetime, timedelta
 
 
 def _generate_transactions(n=10000, seed=42):
@@ -112,7 +116,7 @@ def process_transactions(transactions):
         status = tx.get("status", "pending")
 
         raw_ts = tx.get("timestamp", "")
-        if isinstance(raw_ts, int) or isinstance(raw_ts, float):
+        if isinstance(raw_ts, (int, float)):
             try:
                 timestamp = datetime.fromtimestamp(raw_ts)
             except (OSError, ValueError):
@@ -128,23 +132,17 @@ def process_transactions(transactions):
         merchant = tx.get("merchant", "unknown")
         merchants_set.add(merchant)
 
-        if status != "completed":
-            continue
+        if status == "completed":
+            if amount < 0:
+                flagged.append(tid)
 
-        if amount < 0:
-            flagged.append(tid)
-
-        total_completed += amount
-        completed_count += 1
-
-        by_category[category] += amount
-
-        month_key = timestamp.strftime("%Y-%m")
-        by_month[month_key] += amount
-
-        merchant_totals[merchant] += amount
-
-        currency_totals[currency] += amount
+            total_completed += amount
+            completed_count += 1
+            by_category[category] += amount
+            month_key = timestamp.strftime("%Y-%m")
+            by_month[month_key] += amount
+            merchant_totals[merchant] += amount
+            currency_totals[currency] += amount
 
     avg_completed = total_completed / completed_count if completed_count > 0 else 0.0
 
@@ -155,10 +153,10 @@ def process_transactions(transactions):
 
     total_completed = round(total_completed, 2)
     avg_completed = round(avg_completed, 2)
-    by_category = {k: round(v, 2) for k, v in sorted(by_category.items())}
-    by_month = {k: round(v, 2) for k, v in sorted(by_month.items())}
+    by_category = dict(sorted({k: round(v, 2) for k, v in by_category.items()}.items()))
+    by_month = dict(sorted({k: round(v, 2) for k, v in by_month.items()}.items()))
     top_merchants = [(m, round(t, 2)) for m, t in top_merchants]
-    currency_totals = {k: round(v, 2) for k, v in sorted(currency_totals.items())}
+    currency_totals = dict(sorted({k: round(v, 2) for k, v in currency_totals.items()}.items()))
 
     return {
         "total_completed": total_completed,

@@ -163,8 +163,21 @@ Your job: create {output_filename} — an optimized/fixed version of the source 
 Write the COMPLETE {output_filename} file. Output raw Python only."""
 
 
+def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
+    """Return test names that failed in every one of the last min_consecutive valid attempts."""
+    valid = [a for a in attempts if a.syntax_valid]
+    if len(valid) < min_consecutive:
+        return []
+    recent = valid[-min_consecutive:]
+    stuck = set(recent[0].tests_failed)
+    for rec in recent[1:]:
+        stuck &= set(rec.tests_failed)
+    return sorted(stuck)
+
+
 def _build_correction_prompt(
-    source: str, tests: str, current_code: str, attempts: list, output_filename: str
+    source: str, tests: str, current_code: str, attempts: list, output_filename: str,
+    stuck_tests: list = None,
 ) -> str:
     # Full details for every attempt — the LLM must see the complete history to avoid oscillating
     history_parts = []
@@ -213,6 +226,32 @@ def _build_correction_prompt(
     except Exception:
         pass
 
+    # Stuck tests block — tests that haven't improved across attempts
+    stuck_block = ""
+    if stuck_tests:
+        stuck_list = "\n".join(f"  - {t}" for t in stuck_tests)
+        # Detect if any stuck test looks like a performance test
+        perf_keywords = ("fast", "speed", "slow", "scale", "performance", "efficient",
+                         "linear", "quadratic", "bench", "latency", "throughput")
+        is_perf = any(kw in t.lower() for t in stuck_tests for kw in perf_keywords)
+        if is_perf:
+            perf_hint = (
+                "\n  4. These are PERFORMANCE tests — your algorithm may be too slow. "
+                "Consider: replace nested loops with O(n log n) sorting, use dict lookups "
+                "instead of list scans, avoid recomputing values in loops."
+            )
+        else:
+            perf_hint = ""
+        stuck_block = f"""
+=== STUCK TESTS (failed in EVERY attempt so far — prioritize these) ===
+{stuck_list}
+These tests have NOT improved across {len(attempts)} attempt(s). You MUST change your approach:
+  1. Read the test code literally — what exact value/type does it assert?
+  2. Trace your code mentally with the test's input — what does it actually return?
+  3. Your current implementation strategy is wrong for these cases — rethink from scratch.{perf_hint}
+
+"""
+
     return f"""Your previous attempt FAILED the tests. Study the FULL history below and fix ALL failing tests.
 
 === SOURCE CODE (reference) ===
@@ -223,7 +262,7 @@ def _build_correction_prompt(
 
 === FAILURE HISTORY (all attempts) ===
 {history}
-{regression_block}{causal_block}
+{regression_block}{stuck_block}{causal_block}
 === FIX INSTRUCTIONS ===
 1. Read the FULL history — earlier attempts may have solved some problems you later broke.
 2. Fix EVERY currently failing test.
@@ -492,8 +531,12 @@ async def run_benchmark_loop(
                 None,
             )
             current_code = last_valid.code if last_valid else source
+            stuck_tests = _detect_stuck_tests(attempts)
+            if stuck_tests:
+                print(f"  [stuck] {len(stuck_tests)} test(s) stuck across attempts: {stuck_tests}")
             prompt = _build_correction_prompt(
-                source, tests, current_code, attempts, output_filename
+                source, tests, current_code, attempts, output_filename,
+                stuck_tests=stuck_tests,
             )
             print(f"  [SHARD FEEDBACK] Correction prompt ({len(prompt):,} chars)")
 
@@ -505,6 +548,9 @@ async def run_benchmark_loop(
 
         # -- Call LLM or Swarm -----------------------------------------
         if mode == "SWARM":
+            swarm_stuck = _detect_stuck_tests(attempts)
+            if swarm_stuck:
+                print(f"  [stuck] {len(swarm_stuck)} test(s) stuck — injecting into Architect: {swarm_stuck}")
             print("  [swarm] Calling... ", end="", flush=True)
             try:
                 response = await swarm_complete(
@@ -514,6 +560,7 @@ async def run_benchmark_loop(
                     output_filename=output_filename,
                     max_tokens=LLM_MAX_TOKENS,
                     temperature=LLM_TEMPERATURE,
+                    stuck_tests=swarm_stuck if swarm_stuck else None,
                 )
                 print(f"OK ({len(response):,} chars)")
             except Exception as e:

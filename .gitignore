@@ -76,3 +76,19 @@ long_term_memory/
 projects/
 output.stl
 cad_outputs/
+
+# ── SHARD: Runtime state (ephemeral, not source) ───────────────────────────────
+shard_memory/session.lock
+shard_memory/voice_queue.json
+shard_memory/voice_last_emit.json
+shard_memory/persona_history.json
+shard_memory/self_log.json
+shard_memory/shard.db
+shard_memory/shard.db-shm
+shard_memory/shard.db-wal
+
+# ── SHARD: Pitch/demo files ────────────────────────────────────────────────────
+SHARD_Pitch_Deck.pdf
+shard_pitch.html
+MASTER_PROMPT_ANTIGRAVITY.md
+run_vc_demo.py

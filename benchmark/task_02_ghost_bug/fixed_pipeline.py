@@ -1,3 +1,18 @@
+"""fixed_pipeline.py — The Ghost Bug.
+
+A data processing pipeline that looks correct on static analysis
+but crashes at runtime due to subtle state mutation and ordering bugs.
+
+The pipeline processes sensor readings from an IoT system:
+  1. Validates raw readings
+  2. Calibrates values using sensor-specific offsets
+  3. Aggregates by sensor group
+  4. Detects anomalies via z-score
+  5. Generates a summary report
+
+EVERY function looks correct. The bugs are in the INTERACTIONS between them.
+The agent must run the code, read the tracebacks, and fix the root causes.
+"""
 from copy import deepcopy
 import statistics
 
@@ -29,12 +44,16 @@ SAMPLE_READINGS = [
 ]
 
 
-# ── validate_readings uses deepcopy to avoid mutating the original data ─────────
+# ── Bug 1: Shallow copy mutates the original ─────────────────────────────────
+# validate_readings uses copy() on each dict, but the caller reuses SAMPLE_READINGS.
+# After validate_readings runs, the original dicts have an extra "valid" key.
+# The second call behaves differently because the data is already mutated.
+
 def validate_readings(readings, config):
     """Validate readings against sensor config. Returns list of validated readings."""
     results = []
     for reading in readings:
-        r = deepcopy(reading)
+        r = deepcopy(reading)  # BUG: shallow copy is fine for flat dicts... right?
         sid = r["sensor_id"]
 
         if sid not in config:
@@ -44,7 +63,7 @@ def validate_readings(readings, config):
             continue
 
         sensor = config[sid]
-        if sensor["min"] <= r["value"] <= sensor["max"]:
+        if sensor["min"] <= r["value"] <= sensor["max"] :
             r["valid"] = True
         else:
             r["valid"] = False
@@ -54,23 +73,30 @@ def validate_readings(readings, config):
     return results
 
 
-# ── calibrate_values creates a new list to avoid modifying the original data ──
+# ── Bug 2: calibrate_values modifies dicts in-place ──────────────────────────
+# It receives the validated list and mutates each dict's "value" field.
+# But the test calls calibrate twice (calibrate then check idempotency).
+# Second calibration applies the offset AGAIN → values drift.
+
 def calibrate_values(validated_readings, config):
     """Apply sensor-specific calibration offsets to validated readings."""
-    calibrated_readings = []
+    results = []
     for reading in validated_readings:
-        calibrated_reading = deepcopy(reading)
-        if not calibrated_reading.get("valid", False):
-            calibrated_readings.append(calibrated_reading)
-            continue
-        sid = calibrated_reading["sensor_id"]
-        if sid in config:
-            calibrated_reading["value"] = round(calibrated_reading["value"] + config[sid]["offset"], 2)
-        calibrated_readings.append(calibrated_reading)
-    return calibrated_readings
+        r = deepcopy(reading)
+        if r.get("valid"):
+            sid = r["sensor_id"]
+            if sid in config:
+                r["value"] = round(r["value"] + config[sid]["offset"], 2)
+        results.append(r)
+    return results
 
 
-# ── aggregate_by_group only includes valid readings in the group aggregation ──
+# ── Bug 3: aggregate_by_group assumes "value" exists on all readings ─────────
+# Invalid readings don't have a calibrated value but still get included
+# in the group aggregation, causing a division that includes None-like semantics.
+# Actually the bug is subtler: invalid readings DO have "value" (the original),
+# so they silently corrupt the averages.
+
 def aggregate_by_group(calibrated_readings, config):
     """Group readings by sensor group and compute averages."""
     groups = {}
@@ -83,7 +109,6 @@ def aggregate_by_group(calibrated_readings, config):
         group = config[sid]["group"]
         if group not in groups:
             groups[group] = {"readings": [], "sum": 0.0, "count": 0}
-
         groups[group]["readings"].append(reading)
         groups[group]["sum"] += reading["value"]
         groups[group]["count"] += 1
@@ -98,28 +123,37 @@ def aggregate_by_group(calibrated_readings, config):
     return groups
 
 
-# ── detect_anomalies uses the correct key and handles single-reading groups ──
+# ── Bug 4: detect_anomalies crashes on single-reading groups ──────────────────
+# Z-score needs stddev, which needs at least 2 data points.
+# pressure group has only 2 readings, but if one is invalid, it has 1 → crash.
+# Actually with our data it has 2 valid readings, but the math module's stdev
+# requires at least 2 data points. The real crash: we import statistics
+# inside the function but "statistics" isn't imported at module level.
+# Also: we access reading["calibrated_value"] but the key is just "value".
+
 def detect_anomalies(groups, threshold=2.0):
     """Flag readings with z-score above threshold as anomalies."""
+
     anomalies = []
     for group_name, data in groups.items():
-        values = [r["value"] for r in data["readings"]]
+        values = [r["value"] for r in data["readings"] if r.get("valid")]
         if len(values) < 2:
             continue  # can't compute stddev with < 2 points
 
         if not values:
             continue
 
+        mean = statistics.mean(values)
         try:
-            mean = statistics.mean(values)
             stdev = statistics.stdev(values)
         except statistics.StatisticsError:
             continue
-
         if stdev == 0:
             continue
 
         for reading in data["readings"]:
+            if not reading.get("valid"):
+                continue
             z = abs(reading["value"] - mean) / stdev
             if z > threshold:
                 anomalies.append({
@@ -132,17 +166,17 @@ def detect_anomalies(groups, threshold=2.0):
     return anomalies
 
 
-# ── generate_report uses the correct keys and sorts anomalies by z_score ─────
+# ── Bug 5: generate_report uses f-string with wrong key ──────────────────────
+# The report references group["avg"] but the key is "average".
+# Also, it tries to sort anomalies by "z" but the key is "z_score".
+
 def generate_report(groups, anomalies):
     """Generate a plain-text summary report."""
     lines = ["=== Sensor Pipeline Report ===", ""]
 
     lines.append("--- Group Averages ---")
     for name, data in sorted(groups.items()):
-        if "average" in data:
-            lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
-        else:
-            lines.append(f"  {name}: No valid readings")
+        lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
 
     lines.append("")
     lines.append("--- Anomalies Detected ---")

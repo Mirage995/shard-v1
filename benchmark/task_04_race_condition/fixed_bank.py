@@ -1,3 +1,9 @@
+"""bank.py — Account management module.
+
+Used in production for internal fund transfers between departments.
+Some users have reported occasional balance discrepancies.
+"""
+
 import threading
 
 
@@ -39,9 +45,9 @@ class Bank:
             if account_id not in self.accounts:
                 raise KeyError(f"Account {account_id} not found")
             current = self.accounts[account_id]
-            self._audit("deposit", account_id, amount, current)
             new_balance = current + amount
             self.accounts[account_id] = new_balance
+            self._audit("deposit", account_id, amount, current)
 
     def withdraw(self, account_id, amount):
         with self._lock:
@@ -52,9 +58,9 @@ class Bank:
             current = self.accounts[account_id]
             if current < amount:
                 raise ValueError("Insufficient funds")
-            self._audit("withdraw", account_id, amount, current)
             new_balance = current - amount
             self.accounts[account_id] = new_balance
+            self._audit("withdraw", account_id, amount, current)
 
     def transfer(self, from_id, to_id, amount):
         with self._lock:
@@ -70,14 +76,13 @@ class Bank:
             from_balance = self.accounts[from_id]
             if from_balance < amount:
                 raise ValueError("Insufficient funds")
-
             to_balance = self.accounts[to_id]
-
-            self._audit("transfer_out", from_id, amount, from_balance)
-            self._audit("transfer_in", to_id, amount, to_balance)
 
             self.accounts[from_id] = from_balance - amount
             self.accounts[to_id] = to_balance + amount
+
+            self._audit("transfer_out", from_id, amount, from_balance)
+            self._audit("transfer_in", to_id, amount, to_balance)
 
     def total_funds(self):
         with self._lock:

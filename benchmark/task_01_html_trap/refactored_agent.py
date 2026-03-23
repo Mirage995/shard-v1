@@ -106,14 +106,11 @@ class DailySpecial:
 
 
 def prepare_menu_data(menu_data):
-    restaurant_data = menu_data["restaurant"]
-    categories_data = menu_data["categories"]
+    restaurant = Restaurant(menu_data["restaurant"])
+    categories = [Category(cat) for cat in menu_data["categories"]]
     daily_special_data = menu_data.get("daily_special")
-    promo_code = menu_data.get("promo_code", "")
-
-    restaurant = Restaurant(restaurant_data)
-    categories = [Category(cat) for cat in categories_data]
     daily_special = DailySpecial(daily_special_data) if daily_special_data else None
+    promo_code = menu_data.get("promo_code", "")
 
     for category in categories:
         for item in category.items:
@@ -122,7 +119,7 @@ def prepare_menu_data(menu_data):
     return restaurant, categories, daily_special, promo_code
 
 
-def render_html(restaurant, categories, daily_special, promo_code):
+def render_html_page(restaurant, categories, daily_special, promo_code):
     html = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n"
     html += f"<title>{restaurant.name} — Menu</title>\n"
     html += "<style>\n"
@@ -175,17 +172,11 @@ def render_html(restaurant, categories, daily_special, promo_code):
 
 def render_stats_footer(categories):
     total_items = sum(len(c.items) for c in categories)
-    total_stars = sum(1 for c in categories for it in c.items if it.rating >= _STAR_THRESHOLD)
-    all_ratings = [it.rating for c in categories for it in c.items]
+    all_ratings = [item.rating for c in categories for item in c.items]
     overall_avg = sum(all_ratings) / len(all_ratings) if all_ratings else 0
+    star_names = sorted([item.name for c in categories for item in c.items if item.rating >= 4.7])
 
-    star_names = [it.name for c in categories for it in c.items if it.rating >= 4.7]
-    # The order of star_names must match the original implementation
-    star_names_original_order = []
-    for cat in SAMPLE_MENU["categories"]:
-        for item in cat["items"]:
-            if item["rating"] >= 4.7:
-                star_names_original_order.append(item["name"])
+    total_stars = len([item for c in categories for item in c.items if item.rating >= 4.7])
 
     html = "<div class=\"stats-footer\">\n"
     html += f"<div class=\"stat-item\"><span class=\"stat-value\">{total_items}</span>\n"
@@ -194,7 +185,7 @@ def render_stats_footer(categories):
     html += "<span class=\"stat-label\">Star Dishes</span></div>\n"
     html += f"<div class=\"stat-item\"><span class=\"stat-value\">{overall_avg:.1f}</span>\n"
     html += "<span class=\"stat-label\">Media</span></div>\n"
-    html += f"<div class=\"stat-item\"><span class=\"stat-value\">{', '.join(star_names_original_order)}</span>\n"
+    html += f"<div class=\"stat-item\"><span class=\"stat-value\">{', '.join(star_names)}</span>\n"
     html += "<span class=\"stat-label\">I Nostri Migliori</span></div>\n"
     html += "</div>\n"
     return html
@@ -202,7 +193,7 @@ def render_stats_footer(categories):
 
 def generate_restaurant_page(menu_data):
     restaurant, categories, daily_special, promo_code = prepare_menu_data(menu_data)
-    html = render_html(restaurant, categories, daily_special, promo_code)
+    html = render_html_page(restaurant, categories, daily_special, promo_code)
     html += render_stats_footer(categories)
     html += "</body>\n</html>\n"
     return html

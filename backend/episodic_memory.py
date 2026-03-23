@@ -121,9 +121,9 @@ class EpisodicMemory:
         lines = [f"Past experience with '{topic}' ({len(episodes)} relevant attempt(s)):"]
         for ep in episodes:
             date = ep.get("timestamp", "")[:10]
-            score = ep.get("score", 0)
-            reason = ep.get("failure_reason", "unknown")
-            strats = ", ".join(ep.get("strategies_reused", [])) or "none"
+            score = ep.get("score") or 0  # guard: DB NULL → None → 0
+            reason = ep.get("failure_reason") or "unknown"
+            strats = ", ".join(ep.get("strategies_reused") or []) or "none"
             success = "CERTIFIED" if ep.get("success") else f"FAILED ({reason})"
             lines.append(f"  - {date} | score={score:.1f}/10 | {success} | strategies: {strats}")
 

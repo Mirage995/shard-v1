@@ -142,8 +142,27 @@ def generate_curiosity_topic(capabilities):
     return topic
 
 def is_valid_topic(topic: str, logger: logging.Logger) -> bool:
+    import re as _re
     t = topic.lower()
-    
+
+    # Reject markdown headers (e.g. "# Task 03 — Optimize the Transaction Processor")
+    if topic.strip().startswith("#"):
+        logger.info(f"[TOPIC FILTER] Discarded markdown header topic: {topic}")
+        return False
+
+    # Reject "Task XX" style strings (benchmark leftovers from improvement_engine)
+    if _re.search(r"\btask\s*\d+\b", t):
+        logger.info(f"[TOPIC FILTER] Discarded task-description topic: {topic}")
+        return False
+
+    # Reject imperative task descriptions: "Fix the X", "Refactor the X", etc.
+    _task_verbs = {"fix", "refactor", "rewrite", "update", "implement", "create",
+                   "build", "add", "remove", "delete", "clean", "migrate", "optimize"}
+    _first_word = t.split()[0] if t.split() else ""
+    if _first_word in _task_verbs and " the " in t:
+        logger.info(f"[TOPIC FILTER] Discarded imperative task topic: {topic}")
+        return False
+
     ITALIAN_THOUGHT_PATTERNS = [
         "potrei", "vorrei", "penso", "chiedo",
         "facendo", "forse", "dovrei", "momento",
