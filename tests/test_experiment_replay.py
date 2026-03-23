@@ -1,92 +1,118 @@
-"""Tests for ExperimentReplay — logging, failed detection, and replay selection."""
+"""Tests for ExperimentReplay — topic queue, deduplication, and persistence."""
 import sys
 import os
-import json
 import unittest
-import tempfile
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
+import experiment_replay as _er_module
 from experiment_replay import ExperimentReplay
 
 
-class TestExperimentReplay(unittest.TestCase):
+def _make_engine(tmp_path):
+    """Return an ExperimentReplay instance backed by a temp file."""
+    with patch.object(_er_module, 'REPLAY_FILE', tmp_path):
+        engine = ExperimentReplay()
+    engine._replay_file = tmp_path  # stash for patch reuse
+    return engine
+
+
+class TestExperimentReplayQueue(unittest.TestCase):
+
     def setUp(self):
-        self.tmp = tempfile.mktemp(suffix='.json')
-        self.engine = ExperimentReplay(file_path=self.tmp)
+        import tempfile
+        self._tmp = tempfile.mktemp(suffix='.json')
+        self._patcher = patch.object(_er_module, 'REPLAY_FILE', self._tmp)
+        self._patcher.start()
 
     def tearDown(self):
-        if os.path.exists(self.tmp):
-            os.remove(self.tmp)
+        self._patcher.stop()
+        if os.path.exists(self._tmp):
+            os.remove(self._tmp)
 
-    def test_creates_file_on_init(self):
-        self.assertTrue(os.path.exists(self.tmp))
-        with open(self.tmp, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(data, [])
+    def _engine(self):
+        return ExperimentReplay()
 
-    def test_log_experiment(self):
-        self.engine.log_experiment("Python basics", score=9.0, success=True)
-        with open(self.tmp, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["topic"], "Python basics")
-        self.assertEqual(data[0]["score"], 9.0)
-        self.assertTrue(data[0]["success"])
-        self.assertIn("timestamp", data[0])
+    # ── add_experiment ────────────────────────────────────────────────────────
 
-    def test_log_multiple(self):
-        self.engine.log_experiment("Topic A", score=5.0, success=False)
-        self.engine.log_experiment("Topic B", score=9.0, success=True)
-        with open(self.tmp, 'r') as f:
-            data = json.load(f)
-        self.assertEqual(len(data), 2)
+    def test_add_valid_topic_increases_len(self):
+        e = self._engine()
+        e.add_experiment('Python async patterns')
+        self.assertEqual(len(e), 1)
 
-    def test_failed_experiments(self):
-        self.engine.log_experiment("Good", score=9.0, success=True)
-        self.engine.log_experiment("Bad", score=5.0, success=False)
-        self.engine.log_experiment("Meh", score=7.5, success=False)
-        failed = self.engine.failed_experiments()
-        self.assertEqual(len(failed), 1)
-        topics = [e["topic"] for e in failed]
-        self.assertIn("Bad", topics)
-        self.assertNotIn("Meh", topics)
-        self.assertNotIn("Good", topics)
+    def test_add_duplicate_ignored(self):
+        e = self._engine()
+        e.add_experiment('Python async patterns')
+        e.add_experiment('Python async patterns')
+        self.assertEqual(len(e), 1)
 
-    def test_failed_experiments_threshold(self):
-        """Score exactly 7.5 should NOT be considered failed."""
-        self.engine.log_experiment("Edge", score=7.5, success=True)
-        self.assertEqual(len(self.engine.failed_experiments()), 0)
+    def test_add_invalid_topic_ignored(self):
+        """Too-short or empty topics must be rejected by is_valid_topic."""
+        e = self._engine()
+        e.add_experiment('x')   # too short
+        e.add_experiment('')    # empty
+        self.assertEqual(len(e), 0)
 
-    def test_choose_replay_lowest_first(self):
-        self.engine.log_experiment("Low", score=3.0, success=False)
-        self.engine.log_experiment("Mid", score=6.0, success=False)
-        replay = self.engine.choose_replay()
-        self.assertIsNotNone(replay)
-        self.assertEqual(replay["topic"], "Low")
+    def test_add_multiple_topics(self):
+        e = self._engine()
+        e.add_experiment('asyncio concurrency')
+        e.add_experiment('Python decorators')
+        self.assertEqual(len(e), 2)
 
-    def test_choose_replay_none_when_all_pass(self):
-        self.engine.log_experiment("Good", score=9.0, success=True)
-        self.assertIsNone(self.engine.choose_replay())
+    # ── remove_topic ──────────────────────────────────────────────────────────
 
-    def test_choose_replay_empty_history(self):
-        self.assertIsNone(self.engine.choose_replay())
+    def test_remove_existing_topic(self):
+        e = self._engine()
+        e.add_experiment('asyncio concurrency')
+        e.remove_topic('asyncio concurrency')
+        self.assertEqual(len(e), 0)
 
-    def test_next_replay_topic(self):
-        self.engine.log_experiment("Fail", score=4.0, success=False)
-        topic = self.engine.next_replay_topic()
-        self.assertEqual(topic, "Fail")
+    def test_remove_nonexistent_topic_does_not_raise(self):
+        e = self._engine()
+        e.remove_topic('nonexistent topic that was never added')  # must not raise
 
-    def test_next_replay_topic_none(self):
-        self.engine.log_experiment("Pass", score=9.0, success=True)
-        self.assertIsNone(self.engine.next_replay_topic())
+    # ── get_next_replay_topic ─────────────────────────────────────────────────
 
-    def test_persistence_across_instances(self):
-        self.engine.log_experiment("Data", score=6.0, success=False)
-        engine2 = ExperimentReplay(file_path=self.tmp)
-        failed = engine2.failed_experiments()
-        self.assertEqual(len(failed), 1)
-        self.assertEqual(failed[0]["topic"], "Data")
+    def test_returns_none_on_empty_queue(self):
+        e = self._engine()
+        self.assertIsNone(e.get_next_replay_topic())
+
+    def test_returns_topic_from_queue(self):
+        e = self._engine()
+        e.add_experiment('asyncio concurrency')
+        result = e.get_next_replay_topic()
+        self.assertEqual(result, 'asyncio concurrency')
+
+    def test_returns_one_of_many(self):
+        e = self._engine()
+        topics = {'asyncio concurrency', 'Python decorators', 'pytest fixtures'}
+        for t in topics:
+            e.add_experiment(t)
+        result = e.get_next_replay_topic()
+        self.assertIn(result, topics)
+
+    # ── persistence ───────────────────────────────────────────────────────────
+
+    def test_topics_persist_across_instances(self):
+        e1 = self._engine()
+        e1.add_experiment('asyncio concurrency')
+        # New instance reads from the same file
+        e2 = self._engine()
+        self.assertEqual(len(e2), 1)
+        self.assertIn('asyncio concurrency', e2.history)
+
+    def test_remove_persists_across_instances(self):
+        e1 = self._engine()
+        e1.add_experiment('asyncio concurrency')
+        e1.remove_topic('asyncio concurrency')
+        e2 = self._engine()
+        self.assertEqual(len(e2), 0)
+
+    def test_empty_queue_on_fresh_instance_no_file(self):
+        """If REPLAY_FILE doesn't exist yet, starts empty."""
+        e = self._engine()
+        self.assertEqual(len(e), 0)
 
 
 if __name__ == '__main__':

@@ -57,6 +57,7 @@ class TestExtractStrategy(unittest.TestCase):
         self.assertIn("SUCCESS", result["strategy"])
 
     def test_extracts_failure_strategy(self):
+        """score >= 5.0 FAIL is extracted; score < 5.0 FAIL is discarded by sanity filter."""
         experiment = {
             "topic": "Rust ownership",
             "sandbox_result": {
@@ -66,7 +67,7 @@ class TestExtractStrategy(unittest.TestCase):
                 "code": "x = y",
             },
             "eval_data": {
-                "score": 3.0,
+                "score": 5.5,   # above threshold — strategy must be extracted
                 "verdict": "FAIL",
                 "gaps": ["ownership basics", "borrowing rules"],
             },
@@ -77,8 +78,18 @@ class TestExtractStrategy(unittest.TestCase):
         result = StrategyMemory.extract_strategy(experiment)
         self.assertIsNotNone(result)
         self.assertEqual(result["outcome"], "failure")
-        self.assertIn("FAILED", result["strategy"])
         self.assertIn("ownership basics", result["strategy"])
+
+    def test_low_score_fail_discarded(self):
+        """score < 5.0 with verdict FAIL is filtered out by the sanity filter."""
+        experiment = {
+            "topic": "Rust ownership",
+            "sandbox_result": None,
+            "eval_data": {"score": 3.0, "verdict": "FAIL", "gaps": []},
+            "structured": {"concepts": ["ownership"]},
+        }
+        result = StrategyMemory.extract_strategy(experiment)
+        self.assertIsNone(result)
 
     def test_strategy_capped_at_1200(self):
         experiment = {

@@ -1,202 +1,189 @@
-"""
-Tests for AI Tool Definitions and Handlers.
-"""
-import pytest
-import os
+"""Tests for shard.py — ShardCore structure, public API, and constants."""
 import sys
-from pathlib import Path
+import os
+import unittest
+from unittest.mock import MagicMock, AsyncMock, patch
 
-# Add backend to path
-BACKEND_DIR = Path(__file__).parent.parent / "backend"
-sys.path.insert(0, str(BACKEND_DIR))
-
-
-class TestToolDefinitions:
-    """Test tool definition schemas."""
-    
-    def test_generate_cad_tool_schema(self):
-        """Test generate_cad tool has correct schema."""
-        from shard import generate_cad
-        
-        assert generate_cad['name'] == 'generate_cad'
-        assert 'description' in generate_cad
-        assert 'parameters' in generate_cad
-        assert generate_cad['parameters']['type'] == 'OBJECT'
-        assert 'prompt' in generate_cad['parameters']['properties']
-        print(f"generate_cad tool: {generate_cad['name']}")
-    
-    def test_run_web_agent_tool_schema(self):
-        """Test run_web_agent tool has correct schema."""
-        from shard import run_web_agent
-        
-        assert run_web_agent['name'] == 'run_web_agent'
-        assert 'description' in run_web_agent
-        assert 'parameters' in run_web_agent
-        assert 'prompt' in run_web_agent['parameters']['properties']
-        print(f"run_web_agent tool: {run_web_agent['name']}")
-    
-    def test_print_stl_tool_schema(self):
-        """Test print_stl tool has correct schema."""
-        from shard import print_stl_tool
-        
-        assert print_stl_tool['name'] == 'print_stl'
-        assert 'description' in print_stl_tool
-        assert 'parameters' in print_stl_tool
-        print(f"print_stl tool: {print_stl_tool['name']}")
-    
-    def test_discover_printers_tool_schema(self):
-        """Test discover_printers tool has correct schema."""
-        from shard import discover_printers_tool
-        
-        assert discover_printers_tool['name'] == 'discover_printers'
-        assert 'description' in discover_printers_tool
-        print(f"discover_printers tool: {discover_printers_tool['name']}")
-    
-    def test_list_smart_devices_tool_schema(self):
-        """Test list_smart_devices tool has correct schema."""
-        from shard import list_smart_devices_tool
-        
-        assert list_smart_devices_tool['name'] == 'list_smart_devices'
-        assert 'description' in list_smart_devices_tool
-        print(f"list_smart_devices tool: {list_smart_devices_tool['name']}")
-    
-    def test_control_light_tool_schema(self):
-        """Test control_light tool has correct schema."""
-        from shard import control_light_tool
-        
-        assert control_light_tool['name'] == 'control_light'
-        assert 'parameters' in control_light_tool
-        props = control_light_tool['parameters']['properties']
-        assert 'target' in props
-        assert 'action' in props
-        print(f"control_light tool: {control_light_tool['name']}")
-    
-    def test_list_projects_tool_schema(self):
-        """Test list_projects tool has correct schema."""
-        from shard import list_projects_tool
-        
-        assert list_projects_tool['name'] == 'list_projects'
-        print(f"list_projects tool: {list_projects_tool['name']}")
-    
-    def test_iterate_cad_tool_schema(self):
-        """Test iterate_cad tool has correct schema."""
-        from shard import iterate_cad_tool
-        
-        assert iterate_cad_tool['name'] == 'iterate_cad'
-        print(f"iterate_cad tool: {iterate_cad_tool['name']}")
+BACKEND_DIR = os.path.join(os.path.dirname(__file__), '..', 'backend')
+sys.path.insert(0, BACKEND_DIR)
 
 
-class TestAudioLoopClass:
-    """Test AudioLoop class structure."""
-    
-    def test_audioloop_class_exists(self):
-        """Test AudioLoop class can be imported."""
-        from shard import AudioLoop
-        assert AudioLoop is not None
-        print("AudioLoop class imported successfully")
-    
-    def test_audioloop_methods(self):
-        """Test AudioLoop has required methods."""
-        from shard import AudioLoop
-        
-        required_methods = [
-            'run',
-            'stop',
-            'send_frame',
-            'listen_audio',
-            'receive_audio',
-            'play_audio',
-            'handle_cad_request',
-            'handle_web_agent_request',
-            'resolve_tool_confirmation',
-            'update_permissions',
-            'set_paused',
-            'clear_audio_queue',
-        ]
-        
-        for method in required_methods:
-            assert hasattr(AudioLoop, method), f"Missing method: {method}"
-            print(f"  ✓ {method}")
+def _make_shard_core():
+    """Return a ShardCore instance with all heavy dependencies mocked."""
+    mocks = {
+        'pyaudio': MagicMock(),
+        'memory': MagicMock(),
+        'consciousness': MagicMock(),
+        'self_tuning': MagicMock(),
+        'session_orchestrator': MagicMock(),
+        'audio_video_io': MagicMock(),
+        'vad_logic': MagicMock(),
+        'project_manager': MagicMock(),
+    }
+    mock_pyaudio_mod = MagicMock()
+    mock_pyaudio_mod.PyAudio.return_value = MagicMock()
+    mock_pyaudio_mod.paInt16 = 8
+
+    mock_memory_cls = MagicMock(return_value=MagicMock())
+    mock_consciousness_cls = MagicMock(return_value=MagicMock())
+    mock_tuning_cls = MagicMock(return_value=MagicMock())
+    mock_pm_cls = MagicMock(return_value=MagicMock())
+
+    mock_avio = MagicMock()
+    mock_avio_cls = MagicMock(return_value=mock_avio)
+
+    mock_so = MagicMock()
+    mock_so_cls = MagicMock(return_value=mock_so)
+
+    with patch.dict(sys.modules, {
+        'pyaudio': mock_pyaudio_mod,
+        'backend.memory': MagicMock(ShardMemory=mock_memory_cls),
+        'memory': MagicMock(ShardMemory=mock_memory_cls),
+        'consciousness': MagicMock(ShardConsciousness=mock_consciousness_cls),
+        'self_tuning': MagicMock(ShardSelfTuning=mock_tuning_cls),
+        'backend.project_manager': MagicMock(ProjectManager=mock_pm_cls),
+        'project_manager': MagicMock(ProjectManager=mock_pm_cls),
+        'audio_video_io': MagicMock(AudioVideoIO=mock_avio_cls),
+        'session_orchestrator': MagicMock(SessionOrchestrator=mock_so_cls),
+        'vad_logic': MagicMock(VADLogic=MagicMock()),
+    }):
+        import importlib
+        import shard as _shard_mod
+        importlib.reload(_shard_mod)
+        core = _shard_mod.ShardCore()
+    return core, _shard_mod
 
 
-class TestFileOperations:
-    """Test file operation handlers."""
-    
-    def test_read_directory_method_exists(self):
-        """Test handle_read_directory exists."""
-        from shard import AudioLoop
-        assert hasattr(AudioLoop, 'handle_read_directory')
-    
-    def test_read_file_method_exists(self):
-        """Test handle_read_file exists."""
-        from shard import AudioLoop
-        assert hasattr(AudioLoop, 'handle_read_file')
-    
-    def test_write_file_method_exists(self):
-        """Test handle_write_file exists."""
-        from shard import AudioLoop
-        assert hasattr(AudioLoop, 'handle_write_file')
+# ── ShardCore structure ───────────────────────────────────────────────────────
+
+class TestShardCoreImport(unittest.TestCase):
+
+    def test_shardcore_class_importable(self):
+        with patch.dict(sys.modules, {
+            'pyaudio': MagicMock(paInt16=8, PyAudio=MagicMock()),
+            'memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'backend.memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'consciousness': MagicMock(ShardConsciousness=MagicMock(return_value=MagicMock())),
+            'self_tuning': MagicMock(ShardSelfTuning=MagicMock(return_value=MagicMock())),
+            'project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'backend.project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'audio_video_io': MagicMock(AudioVideoIO=MagicMock(return_value=MagicMock())),
+            'session_orchestrator': MagicMock(SessionOrchestrator=MagicMock(return_value=MagicMock())),
+            'vad_logic': MagicMock(VADLogic=MagicMock()),
+        }):
+            import importlib
+            import shard as _s
+            importlib.reload(_s)
+            self.assertTrue(hasattr(_s, 'ShardCore'))
 
 
-class TestLiveConnectConfig:
-    """Test Gemini Live Connect configuration."""
-    
-    def test_config_exists(self):
-        """Test config is defined."""
-        from shard import config
-        assert config is not None
-        print("LiveConnectConfig exists")
-    
-    def test_config_has_audio_modality(self):
-        """Test config includes audio modality."""
-        from shard import config
-        assert 'AUDIO' in config.response_modalities
-        print("Audio modality configured")
+class TestShardCorePublicMethods(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.core, cls.mod = _make_shard_core()
+
+    def test_has_start_system(self):
+        self.assertTrue(hasattr(self.core, 'start_system'))
+
+    def test_has_stop(self):
+        self.assertTrue(hasattr(self.core, 'stop'))
+
+    def test_has_update_permissions(self):
+        self.assertTrue(hasattr(self.core, 'update_permissions'))
+
+    def test_update_permissions_is_callable(self):
+        self.assertTrue(callable(self.core.update_permissions))
+
+    def test_start_system_is_coroutine(self):
+        import asyncio
+        self.assertTrue(asyncio.iscoroutinefunction(self.core.start_system))
+
+    def test_stop_is_coroutine(self):
+        import asyncio
+        self.assertTrue(asyncio.iscoroutinefunction(self.core.stop))
 
 
-class TestToolPermissions:
-    """Test tool permission handling."""
-    
-    def test_update_permissions_method(self):
-        """Test update_permissions method exists."""
-        from shard import AudioLoop
-        assert hasattr(AudioLoop, 'update_permissions')
-        print("update_permissions method exists")
+class TestShardCoreAttributes(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.core, cls.mod = _make_shard_core()
+
+    def test_has_memory(self):
+        self.assertTrue(hasattr(self.core, 'memory'))
+
+    def test_has_consciousness(self):
+        self.assertTrue(hasattr(self.core, 'consciousness'))
+
+    def test_has_session_orchestrator(self):
+        self.assertTrue(hasattr(self.core, 'session_orchestrator'))
+
+    def test_has_audio_video_io(self):
+        self.assertTrue(hasattr(self.core, 'audio_video_io'))
+
+    def test_has_ui_callbacks_dict(self):
+        self.assertTrue(hasattr(self.core, 'ui_callbacks'))
+        self.assertIsInstance(self.core.ui_callbacks, dict)
+
+    def test_ui_callbacks_has_expected_keys(self):
+        expected = {
+            'on_transcription', 'on_tool_confirmation', 'on_cad_data',
+            'on_cad_status', 'on_web_data', 'on_project_update', 'on_study_request',
+        }
+        self.assertTrue(expected.issubset(set(self.core.ui_callbacks.keys())))
+
+    def test_stop_requested_initially_false(self):
+        self.assertFalse(self.core._stop_requested)
+
+    def test_reconnect_base_is_positive(self):
+        self.assertGreater(self.core._RECONNECT_BASE, 0)
+
+    def test_reconnect_max_greater_than_base(self):
+        self.assertGreater(self.core._RECONNECT_MAX, self.core._RECONNECT_BASE)
 
 
-class TestAgentImports:
-    """Test agent module imports in SHARD.py."""
-    
-    def test_cad_agent_import(self):
-        """Test CadAgent is imported."""
-        from shard import CadAgent
-        assert CadAgent is not None
-        print("CadAgent imported")
-    
-    def test_web_agent_import(self):
-        """Test WebAgent is imported."""
-        from shard import WebAgent
-        assert WebAgent is not None
-        print("WebAgent imported")
-    
-    def test_kasa_agent_import(self):
-        """Test KasaAgent is imported."""
-        from shard import KasaAgent
-        assert KasaAgent is not None
-        print("KasaAgent imported")
-    
-    def test_printer_agent_import(self):
-        """Test PrinterAgent is imported."""
-        from shard import PrinterAgent
-        assert PrinterAgent is not None
-        print("PrinterAgent imported")
+class TestShardCoreConstants(unittest.TestCase):
+
+    def test_model_is_gemini(self):
+        with patch.dict(sys.modules, {
+            'pyaudio': MagicMock(paInt16=8, PyAudio=MagicMock()),
+            'memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'backend.memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'consciousness': MagicMock(ShardConsciousness=MagicMock(return_value=MagicMock())),
+            'self_tuning': MagicMock(ShardSelfTuning=MagicMock(return_value=MagicMock())),
+            'project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'backend.project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'audio_video_io': MagicMock(AudioVideoIO=MagicMock(return_value=MagicMock())),
+            'session_orchestrator': MagicMock(SessionOrchestrator=MagicMock(return_value=MagicMock())),
+            'vad_logic': MagicMock(VADLogic=MagicMock()),
+        }):
+            import importlib
+            import shard as _s
+            importlib.reload(_s)
+            self.assertIn('gemini', _s.MODEL.lower())
+
+    def test_audio_constants_are_positive(self):
+        with patch.dict(sys.modules, {
+            'pyaudio': MagicMock(paInt16=8, PyAudio=MagicMock()),
+            'memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'backend.memory': MagicMock(ShardMemory=MagicMock(return_value=MagicMock())),
+            'consciousness': MagicMock(ShardConsciousness=MagicMock(return_value=MagicMock())),
+            'self_tuning': MagicMock(ShardSelfTuning=MagicMock(return_value=MagicMock())),
+            'project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'backend.project_manager': MagicMock(ProjectManager=MagicMock(return_value=MagicMock())),
+            'audio_video_io': MagicMock(AudioVideoIO=MagicMock(return_value=MagicMock())),
+            'session_orchestrator': MagicMock(SessionOrchestrator=MagicMock(return_value=MagicMock())),
+            'vad_logic': MagicMock(VADLogic=MagicMock()),
+        }):
+            import importlib
+            import shard as _s
+            importlib.reload(_s)
+            self.assertGreater(_s.SEND_SAMPLE_RATE, 0)
+            self.assertGreater(_s.RECEIVE_SAMPLE_RATE, 0)
+            self.assertGreater(_s.CHUNK_SIZE, 0)
+            self.assertEqual(_s.CHANNELS, 1)
 
 
-class TestToolConfirmation:
-    """Test tool confirmation handling."""
-    
-    def test_resolve_tool_confirmation_method(self):
-        """Test resolve_tool_confirmation exists."""
-        from shard import AudioLoop
-        assert hasattr(AudioLoop, 'resolve_tool_confirmation')
-        print("resolve_tool_confirmation method exists")
+if __name__ == '__main__':
+    unittest.main()
