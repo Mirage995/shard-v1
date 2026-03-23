@@ -45,3 +45,8 @@ def get_lock_reason() -> str:
         return SESSION_LOCK_FILE.read_text(encoding="utf-8").strip()
     except OSError:
         return ""
+
+
+def is_audio_active() -> bool:
+    """Return True if the lock is held by an active audio session."""
+    return get_lock_reason() == "audio_session"

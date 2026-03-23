@@ -248,6 +248,7 @@ class NightRunner:
         self.seed = random.randint(0, 10_000_000)
         random.seed(self.seed)
         # Priority -1: topics queued by ImprovementEngine (SSJ3 proactive self-improvement)
+        self._background_mode: bool = False  # True when running alongside an audio session
         self._improvement_topics: list = []
         
         self.topic_filter_discards = 0
@@ -494,29 +495,40 @@ class NightRunner:
         # ── Dual-layer session lock ──────────────────────────────────────────
         # In-process:   asyncio.Semaphore(1) blocks if server holds the lock
         # Cross-process: file lock blocks if an audio session is live
+        #
+        # Background mode: if audio is active, NightRunner runs silently
+        # alongside it instead of aborting — voice events are suppressed and
+        # an extra pause is added between cycles to yield CPU to audio.
         _semaphore_acquired = False
         try:
             from backend.shard_semaphore import (
                 SHARD_SESSION_LOCK,
-                is_file_locked, acquire_file_lock, release_file_lock,
-                SESSION_LOCK_FILE,
+                is_file_locked, is_audio_active,
+                acquire_file_lock, release_file_lock,
+                get_lock_reason, SESSION_LOCK_FILE,
             )
             if is_file_locked():
-                self.logger.warning(
-                    "[LOCK] Active session detected (lock file: %s — reason: %s). "
-                    "NightRunner will not start while Boss is talking to SHARD.",
-                    SESSION_LOCK_FILE,
-                    open(SESSION_LOCK_FILE).read().strip() if SESSION_LOCK_FILE.exists() else "?",
-                )
-                return
-            try:
-                await asyncio.wait_for(SHARD_SESSION_LOCK.acquire(), timeout=0.1)
-                _semaphore_acquired = True
-            except asyncio.TimeoutError:
-                self.logger.warning("[LOCK] Semaphore locked in-process (audio session active). Aborting.")
-                return
-            acquire_file_lock("night_runner")
-            self.logger.info("[SESSION LOCK] Acquired by NightRunner.")
+                if is_audio_active():
+                    self._background_mode = True
+                    self.logger.info(
+                        "[LOCK] Audio session active — NightRunner starting in silent background mode."
+                    )
+                    # Do not acquire semaphore or overwrite audio lock file
+                else:
+                    self.logger.warning(
+                        "[LOCK] Session locked by '%s' — NightRunner will not start.",
+                        get_lock_reason(),
+                    )
+                    return
+            else:
+                try:
+                    await asyncio.wait_for(SHARD_SESSION_LOCK.acquire(), timeout=0.1)
+                    _semaphore_acquired = True
+                except asyncio.TimeoutError:
+                    self.logger.warning("[LOCK] Semaphore locked in-process. Aborting.")
+                    return
+                acquire_file_lock("night_runner")
+                self.logger.info("[SESSION LOCK] Acquired by NightRunner.")
         except ImportError:
             self.logger.warning("[LOCK] shard_semaphore not available — running without session lock.")
 
@@ -534,6 +546,10 @@ class NightRunner:
 
     async def _run_session(self):
         """Core study loop — called by run() inside the session lock guard."""
+        # In background mode (audio session active) suppress all voice broadcasts
+        if self._background_mode:
+            def _vb(text, priority="low", event_type="info"):  # noqa: F811
+                pass
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
         # create goal engine tied to the same capability graph
@@ -724,6 +740,21 @@ class NightRunner:
                 self.logger.warning("[DB] Could not write experiment to SQLite: %s", _db_err)
 
             if cycle < self.max_cycles and not self._check_limits(cycle + 1):
+                if self._background_mode:
+                    # Yield extra time to the audio session between cycles
+                    try:
+                        from backend.shard_semaphore import is_audio_active
+                        if is_audio_active():
+                            self.logger.info(
+                                "[BG] Audio still active — adding 60s yield before next cycle."
+                            )
+                            await asyncio.sleep(60)
+                        else:
+                            # Audio ended — exit background mode
+                            self._background_mode = False
+                            self.logger.info("[BG] Audio session ended — resuming normal mode.")
+                    except ImportError:
+                        pass
                 self.logger.info(f"Pausing for {self.pause_minutes} minutes...")
                 await asyncio.sleep(self.pause_minutes * 60)
 
