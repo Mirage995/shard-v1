@@ -23,6 +23,7 @@ import SkillRadarWidget from './components/SkillRadarWidget';
 import VoiceBroadcast from './components/VoiceBroadcast';
 import NightRunnerWidget from './components/NightRunnerWidget';
 import BenchmarkWidget from './components/BenchmarkWidget';
+import SystemStatsWidget from './components/SystemStatsWidget';
 
 
 const socket = io('http://localhost:8000');
@@ -64,6 +65,8 @@ function App() {
     // showMemoryPrompt removed - memory is now actively saved to project
     const [confirmationRequest, setConfirmationRequest] = useState(null); // { id, tool, args }
     const [pendingPatch, setPendingPatch] = useState(null); // SSJ4 proactive refactor proposal
+    const [patchSimResult, setPatchSimResult] = useState(null); // simulate result
+    const [patchSimLoading, setPatchSimLoading] = useState(false);
     const [kasaDevices, setKasaDevices] = useState([]);
     const [showKasaWindow, setShowKasaWindow] = useState(false);
     const [showPrinterWindow, setShowPrinterWindow] = useState(false);
@@ -1233,6 +1236,20 @@ function App() {
             console.error('[PROACTIVE] Reject failed:', e);
         }
         setPendingPatch(null);
+        setPatchSimResult(null);
+    };
+
+    const handleSimulatePatch = async () => {
+        setPatchSimLoading(true);
+        setPatchSimResult(null);
+        try {
+            const res = await fetch('http://localhost:8000/api/patch/simulate', { method: 'POST' });
+            const data = await res.json();
+            setPatchSimResult(data);
+        } catch (e) {
+            setPatchSimResult({ success: false, error: String(e) });
+        }
+        setPatchSimLoading(false);
     };
 
     // Updated Bounds Checking Logic
@@ -1423,6 +1440,7 @@ function App() {
         <NightRecapWidget socket={socket} />
         <ClinicaWidget socket={socket} />
         <SkillRadarWidget socket={socket} />
+        <SystemStatsWidget />
 
         {/* SSJ4 Phase 3 — Proactive Patch Approval Card */}
         {pendingPatch && (
@@ -1472,8 +1490,41 @@ function App() {
                     )}
                 </div>
 
+                {/* Simulate result */}
+                {patchSimResult && (
+                    <div className={`mx-4 mb-2 px-3 py-2 rounded border text-xs ${
+                        patchSimResult.risk_level === 'low'
+                            ? 'border-green-500/40 bg-green-900/20 text-green-300'
+                            : patchSimResult.risk_level === 'high'
+                            ? 'border-red-500/40 bg-red-900/20 text-red-300'
+                            : 'border-yellow-500/40 bg-yellow-900/20 text-yellow-300'
+                    }`}>
+                        {patchSimResult.success === false
+                            ? <span className="text-red-400">Simulate error: {patchSimResult.error}</span>
+                            : <>
+                                <span className="font-bold uppercase tracking-wider">
+                                    {patchSimResult.risk_level} risk
+                                </span>
+                                {' — '}{patchSimResult.recommendation}
+                                {patchSimResult.affected_modules?.length > 0 && (
+                                    <div className="mt-1 text-white/40">
+                                        affected: {patchSimResult.affected_modules.join(', ')}
+                                    </div>
+                                )}
+                            </>
+                        }
+                    </div>
+                )}
+
                 {/* Buttons */}
                 <div className="flex gap-2 px-4 py-3 border-t border-yellow-400/20">
+                    <button
+                        onClick={handleSimulatePatch}
+                        disabled={patchSimLoading}
+                        className="px-3 py-1.5 bg-yellow-600/20 hover:bg-yellow-600/40 border border-yellow-500/50 text-yellow-400 text-xs font-bold rounded tracking-widest transition-colors disabled:opacity-40"
+                    >
+                        {patchSimLoading ? '...' : '⚙ SIM'}
+                    </button>
                     <button
                         onClick={handleApprovePatch}
                         className="flex-1 py-1.5 bg-green-600/20 hover:bg-green-600/40 border border-green-500/50 text-green-400 text-xs font-bold rounded tracking-widest transition-colors"
