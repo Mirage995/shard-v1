@@ -2050,40 +2050,52 @@ async def llm_cache_invalidate():
 @app.get("/api/skill_radar")
 async def skill_radar():
     """Per-category scores for the Skill Radar widget (recharts RadarChart)."""
-    from meta_learning import TOPIC_CATEGORIES, META_DB_PATH
+    from meta_learning import TOPIC_CATEGORIES
+    from shard_db import get_db
     try:
-        if not META_DB_PATH.exists():
-            return {"available": False}
-        raw = json.loads(META_DB_PATH.read_text(encoding="utf-8"))
-        cats = raw.get("topic_categories", {})
-        global_stats = raw.get("global_stats", {})
+        conn = get_db()
+        gs_row = conn.execute("SELECT * FROM global_stats").fetchone()
+        cat_rows = conn.execute("SELECT * FROM category_stats").fetchall()
+        score_rows = conn.execute(
+            "SELECT score FROM experiments WHERE score IS NOT NULL "
+            "ORDER BY timestamp DESC LIMIT 20"
+        ).fetchall()
 
-        # Build a data point for every known category, even those with 0 sessions
+        cats = {r["category"]: r for r in cat_rows}
         all_cats = list(TOPIC_CATEGORIES.keys()) + ["general"]
         data = []
         for cat in all_cats:
-            info = cats.get(cat, {})
+            info = cats.get(cat)
             data.append({
                 "category":  cat.replace("_", " ").title(),
                 "key":       cat,
-                "avg_score": round(info.get("avg_score", 0.0), 1),
-                "sessions":  info.get("total", 0),
-                "cert_rate": round(info.get("cert_rate", 0.0) * 100, 1),
+                "avg_score": round(float(info["avg_score"] or 0), 1) if info else 0.0,
+                "sessions":  info["total"] if info else 0,
+                "cert_rate": round(float(info["cert_rate"] or 0) * 100, 1) if info else 0.0,
             })
 
-        # Sort: highest avg_score first
         data.sort(key=lambda x: -x["avg_score"])
 
+        # Best/worst (min 3 sessions)
+        significant = [d for d in data if d["sessions"] >= 3]
+        best = max(significant, key=lambda x: x["avg_score"])["key"] if significant else ""
+        worst = min(significant, key=lambda x: x["avg_score"])["key"] if significant else ""
+
+        # Score trend (linear slope)
+        from meta_learning import _linear_trend
+        scores = [r["score"] for r in reversed(score_rows)]
+        trend = _linear_trend(scores)
+
         return {
-            "available":    True,
-            "categories":   data,
+            "available":  True,
+            "categories": data,
             "global": {
-                "avg_score":      global_stats.get("avg_score", 0.0),
-                "cert_rate":      round(global_stats.get("cert_rate", 0.0) * 100, 1),
-                "total_sessions": global_stats.get("total_sessions", 0),
-                "best":           global_stats.get("best_category", ""),
-                "worst":          global_stats.get("worst_category", ""),
-                "trend":          global_stats.get("score_trend", 0.0),
+                "avg_score":      round(float(gs_row["avg_score"] or 0), 1) if gs_row else 0.0,
+                "cert_rate":      round(float(gs_row["cert_rate"] or 0) * 100, 1) if gs_row else 0.0,
+                "total_sessions": gs_row["total_sessions"] if gs_row else 0,
+                "best":           best,
+                "worst":          worst,
+                "trend":          trend,
             },
         }
     except Exception as exc:
