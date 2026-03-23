@@ -208,14 +208,14 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
     except SyntaxError as e:
         return {"ok": False, "reason": f"SyntaxError: {e}"}
 
-    # Runtime type check — reject input_data = None/True/False (wrong types that
-    # cause AttributeError: 'bool'/'NoneType' has no attribute 'split' etc.)
+    # Runtime type check — reject input_data = None/bool/int/float (scalar primitives
+    # that cause AttributeError/'X is not iterable' when solve() expects a sequence)
     try:
         ns: dict = {}
         exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
         val = ns.get("input_data")
-        if val is None or isinstance(val, bool):
-            return {"ok": False, "reason": f"input_data is {type(val).__name__} — invalid test input"}
+        if val is None or isinstance(val, (bool, int, float)):
+            return {"ok": False, "reason": f"input_data is {type(val).__name__} — scalar primitive, likely wrong type"}
     except Exception:
         pass  # if eval fails for any reason, let AST validation stand
 
