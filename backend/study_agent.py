@@ -824,13 +824,23 @@ Errori: {sandbox_result.get('stderr', '(nessuno)')[:500]}
 
         teoria = data.get("teoria", data.get("shard_opinion", ""))
 
+        # GraphRAG: inject causal warnings so Q&A probes known pitfalls
+        causal_block = ""
+        try:
+            from graph_rag import query_causal_context
+            causal = query_causal_context(topic)
+            if causal:
+                causal_block = f"\n{causal}\nIncorpora queste relazioni causali nelle domande dove pertinente.\n"
+                print(f"[VALIDATE] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings")
+        except Exception:
+            pass
+
         prompt = f"""
 Sei SHARD. Hai appena studiato "{topic}".
 
 TEORIA APPRESA:
 {teoria[:2000]}
-{sandbox_context}
-
+{sandbox_context}{causal_block}
 GENERA ESATTAMENTE 2 DOMANDE COMPLESSE sull'argomento e rispondi a ciascuna.
 Le domande devono testare comprensione PROFONDA, non semplice recall.
 Le risposte devono essere dettagliate, pratiche, con esempi concreti.
@@ -923,6 +933,17 @@ Respond ONLY with valid JSON:
         answers = validation_data.get("answers", validation_data)
         validation_qa = validation_data.get("validation_qa", [])
 
+        # GraphRAG: inject causal context so evaluator checks causal understanding
+        causal_eval_block = ""
+        try:
+            from graph_rag import query_causal_context
+            causal = query_causal_context(topic)
+            if causal:
+                causal_eval_block = f"\n=== CAUSAL KNOWLEDGE (known pitfalls for this topic) ===\n{causal}\nCheck whether the agent's answers reflect awareness of these causal relations.\n"
+                print(f"[EVALUATE] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings")
+        except Exception:
+            pass
+
         prompt = f"""
 You are evaluating the understanding of an autonomous learning agent.
 
@@ -967,7 +988,7 @@ Sandbox stdout excerpt: {sandbox_stdout}
 Sandbox stderr excerpt: {sandbox_stderr}
 
 If the sandbox failed, code_score cannot be higher than 1.
-
+{causal_eval_block}
 AUTO-EXAM (Questions and Answers):
 {json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
 """
@@ -1136,8 +1157,18 @@ AUTO-EXAM (Questions and Answers):
 
         # Ask the LLM to implement the scaffold, knowing what it just studied
         scaffold = benchmark.get("scaffold", "def solve(input_data):\n    pass")
+        causal_impl_block = ""
+        try:
+            from graph_rag import query_causal_context
+            causal = query_causal_context(topic)
+            if causal:
+                causal_impl_block = f"\n=== CAUSAL KNOWLEDGE (known pitfalls) ===\n{causal}\nAvoid these pitfalls in your implementation.\n"
+                print(f"[BENCHMARK] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings into impl prompt")
+        except Exception:
+            pass
         impl_prompt = (
-            f"You just studied: {topic}\n\n"
+            f"You just studied: {topic}\n"
+            f"{causal_impl_block}\n"
             f"Implement this Python function to satisfy the benchmark tests:\n\n"
             f"{scaffold}\n\n"
             f"Return ONLY the complete Python function. No explanation, no markdown."
