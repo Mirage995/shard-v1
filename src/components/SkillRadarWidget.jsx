@@ -4,6 +4,7 @@ import {
     ResponsiveContainer, Tooltip,
 } from 'recharts';
 import { Brain, WifiOff } from 'lucide-react';
+import { useDraggable } from '../hooks/useDraggable';
 
 const SkillRadarWidget = ({ socket }) => {
     const [data, setData]       = useState(null);
@@ -49,17 +50,23 @@ const SkillRadarWidget = ({ socket }) => {
     const trendArrow = g.trend > 0.05 ? '↑' : g.trend < -0.05 ? '↓' : '→';
     const trendColor = g.trend > 0.05 ? '#4ade80' : g.trend < -0.05 ? '#f87171' : '#22d3ee';
 
+    const { dragStyles, dragHandleProps } = useDraggable('skill-radar-widget', {
+        defaultPos: { offsetX: 130, offsetY: 20 }, anchor: 'bottom-left'
+    });
+
     return (
         <>
             {/* Toggle button — always visible */}
             <button
                 onClick={() => setVisible(v => !v)}
-                className={`fixed bottom-5 left-28 z-[9500] pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-black/75 backdrop-blur-xl transition-all duration-500 ${
+                style={{ ...dragStyles, zIndex: 9500 }}
+                className={`pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border bg-black/75 backdrop-blur-xl transition-all duration-500 ${
                     offline       ? 'border-white/10' :
                     pulse         ? 'border-green-400/60 shadow-[0_0_12px_rgba(74,222,128,0.3)]' :
                                     'border-cyan-500/30 hover:border-cyan-400/60'
                 }`}
             >
+                <span {...dragHandleProps} onClick={e => e.stopPropagation()}>⠿</span>
                 <Brain size={12} className={offline ? 'text-white/30' : pulse ? 'text-green-400' : 'text-cyan-400'} />
                 <span className={`text-[10px] font-bold tracking-wider uppercase ${
                     offline ? 'text-white/30' : pulse ? 'text-green-300' : 'text-cyan-300'
@@ -69,7 +76,7 @@ const SkillRadarWidget = ({ socket }) => {
             </button>
 
             {visible && (
-                <div className="fixed bottom-14 left-28 w-80 z-[9500] pointer-events-auto">
+                <div style={{ position: 'fixed', left: dragStyles.left, top: `calc(${dragStyles.top} - 320px)`, width: '20rem', zIndex: 9500 }} className="pointer-events-auto">
                     <div className="rounded-xl border border-cyan-500/20 bg-black/85 backdrop-blur-xl shadow-[0_0_30px_rgba(0,242,255,0.10)] overflow-hidden">
 
                         {/* Header */}

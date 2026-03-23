@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Activity, RefreshCw, WifiOff } from 'lucide-react';
+import { useDraggable } from '../hooks/useDraggable';
 
 const POLL_MS = 30_000;
 
@@ -42,13 +43,19 @@ const ClinicaWidget = ({ socket }) => {
     const priorityColor = (p) => p === 1 ? '#f87171' : p === 2 ? '#facc15' : '#22d3ee';
     const priorityLabel = (p) => p === 1 ? 'CRITICO' : p === 2 ? 'NORMALE' : 'BASSA';
 
+    const { dragStyles, dragHandleProps } = useDraggable('clinica-widget', {
+        defaultPos: { offsetX: 20, offsetY: 20 }, anchor: 'bottom-left'
+    });
+
     return (
         <>
             {/* Toggle button — always visible */}
             <button
                 onClick={() => setVisible(v => !v)}
-                className="fixed bottom-5 left-5 z-[9500] pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 bg-black/75 backdrop-blur-xl hover:border-red-400/60 transition-all"
+                style={{ ...dragStyles, zIndex: 9500 }}
+                className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 bg-black/75 backdrop-blur-xl hover:border-red-400/60 transition-all"
             >
+                <span {...dragHandleProps} onClick={e => e.stopPropagation()}>⠿</span>
                 <Activity size={12} className={offline ? 'text-white/30' : 'text-red-400'} />
                 <span className={`text-[10px] font-bold tracking-wider uppercase ${offline ? 'text-white/30' : 'text-red-300'}`}>
                     Clinica
@@ -61,7 +68,7 @@ const ClinicaWidget = ({ socket }) => {
             </button>
 
             {visible && (
-                <div className="fixed bottom-14 left-5 w-80 z-[9500] pointer-events-auto">
+                <div style={{ position: 'fixed', left: dragStyles.left, top: `calc(${dragStyles.top} - 260px)`, width: '20rem', zIndex: 9500 }} className="pointer-events-auto">
                     <div className="relative rounded-xl border border-red-500/20 bg-black/85 backdrop-blur-xl shadow-[0_0_30px_rgba(248,113,113,0.10)] overflow-hidden">
 
                         {/* Header */}

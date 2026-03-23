@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useDraggable } from '../hooks/useDraggable';
 
 export default function NightRunnerWidget({ socket }) {
     const [running, setRunning] = useState(false);
@@ -90,11 +91,13 @@ export default function NightRunnerWidget({ socket }) {
         ? Math.round((currentCycle / totalCycles) * 100)
         : 0;
 
+    const { dragStyles, dragHandleProps } = useDraggable('night-runner-widget', {
+        defaultPos: { offsetX: 16, offsetY: 16 }, anchor: 'bottom-right'
+    });
+
     return (
         <div style={{
-            position: 'fixed',
-            bottom: '16px',
-            right: '16px',
+            ...dragStyles,
             zIndex: 50,
             background: 'rgba(0,0,0,0.75)',
             border: '1px solid rgba(34,211,238,0.3)',
@@ -108,6 +111,7 @@ export default function NightRunnerWidget({ socket }) {
         }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span {...dragHandleProps}>⠿</span>
                 <span style={{ color: '#22d3ee', fontSize: '10px', letterSpacing: '0.1em' }}>
                     ◈ NIGHT RUNNER
                 </span>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Moon, TrendingUp, Award, Zap, WifiOff } from 'lucide-react';
+import { useDraggable } from '../hooks/useDraggable';
 
 const NightRecapWidget = ({ socket }) => {
     const [data, setData]         = useState(null);
@@ -35,9 +36,14 @@ const NightRecapWidget = ({ socket }) => {
     const total     = data?.total_cycles ?? 0;
     const topCycle  = data?.top_cycle || {};
 
+    const { dragStyles, dragHandleProps } = useDraggable('night-recap-widget', {
+        defaultPos: { offsetX: 20, offsetY: 20 }, anchor: 'top-right'
+    });
+
     return (
         <div
-            className="fixed top-5 right-5 w-72 z-[9000] cursor-pointer pointer-events-auto"
+            style={{ ...dragStyles, width: '18rem', zIndex: 9000 }}
+            className="cursor-pointer pointer-events-auto"
             onClick={() => !offline && setExpanded(e => !e)}
         >
             <div className={`relative overflow-hidden rounded-xl border bg-black/75 backdrop-blur-xl p-3 transition-all duration-500 ${
@@ -47,7 +53,8 @@ const NightRecapWidget = ({ socket }) => {
             }`}>
 
                 {/* Header */}
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2" onClick={e => e.stopPropagation()}>
+                    <span {...dragHandleProps}>⠿</span>
                     <Moon size={13} className="text-cyan-400" />
                     <span className="text-[10px] font-bold tracking-[0.18em] text-cyan-300 uppercase">
                         Notte Scorsa {data ? `· ${data.date}` : ''}

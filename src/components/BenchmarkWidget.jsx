@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useDraggable } from '../hooks/useDraggable';
 
 const TASKS = [
     { key: 'ghost_bug',  label: 'Ghost Bug',   desc: '5 runtime-only bugs' },
@@ -13,6 +14,9 @@ const yellow = '#fbbf24';
 const dim    = 'rgba(103,232,249,0.45)';
 
 export default function BenchmarkWidget({ socket }) {
+    const { dragStyles, dragHandleProps } = useDraggable('benchmark-widget', {
+        defaultPos: { offsetX: 16, offsetY: 290 }, anchor: 'bottom-right'
+    });
     const [open, setOpen]               = useState(false);
     const [selected, setSelected]       = useState(new Set(['ghost_bug', 'dirty_data', 'bank_race']));
     const [maxAttempts, setMaxAttempts]           = useState(8);
@@ -165,9 +169,7 @@ export default function BenchmarkWidget({ socket }) {
             <button
                 onClick={() => setOpen(true)}
                 style={{
-                    position: 'fixed',
-                    bottom: '270px',
-                    right: '16px',
+                    ...dragStyles,
                     zIndex: 50,
                     background: 'rgba(0,0,0,0.75)',
                     border: `1px solid rgba(34,211,238,${running ? '0.7' : '0.3'})`,
@@ -191,9 +193,7 @@ export default function BenchmarkWidget({ socket }) {
     // ── FULL PANEL ───────────────────────────────────────────────────────────
     return (
         <div style={{
-            position: 'fixed',
-            bottom: '270px',
-            right: '16px',
+            ...dragStyles,
             zIndex: 50,
             width: '520px',
             background: 'rgba(0,0,0,0.88)',
@@ -213,6 +213,7 @@ export default function BenchmarkWidget({ socket }) {
                 padding: '8px 12px',
                 borderBottom: '1px solid rgba(34,211,238,0.15)',
             }}>
+                <span {...dragHandleProps}>⠿</span>
                 <span style={{ color: cyan, letterSpacing: '0.1em', fontSize: '10px' }}>
                     ◈ BENCHMARK MODE
                 </span>
