@@ -1,7 +1,7 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ8 (GraphRAG + Swarm Multi-Reviewer + Patch Simulator)
+Version: SSJ9 (Capability-Driven Refactor + Parallel Audio + Benchmark 7 Tasks)
 Last updated: 2026-03-23
 
 ---
@@ -34,6 +34,8 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Causal knowledge graph** — GraphRAG extracts and reuses causal relations between concepts (SSJ8)
 - **Multi-agent swarm** — 5-7 specialized reviewers run in parallel on benchmark fixes (SSJ8)
 - **Patch Simulator** — impact analysis before any code patch is applied (SSJ8)
+- **Capability-driven refactoring** — ProactiveRefactor targets modules responsible for failed capabilities, not round-robin (SSJ9)
+- **Parallel learning + audio** — NightRunner runs in silent background mode when audio session is active (SSJ9)
 - **Semantic memory** via ChromaDB triple-store
 - **Domain-specific agents**: CAD, web, smart home, 3D printing
 
@@ -108,7 +110,7 @@ shard_v1/
 │   ├── benchmark_generator.py      # Generates objective test cases for a topic
 │   ├── benchmark_runner.py         # Runs tests in sandbox, computes pass_rate
 │   ├── error_watchdog.py           # Monitors logs, triggers SWEAgent on errors
-│   ├── shard_semaphore.py          # Cross-process session locking
+│   ├── shard_semaphore.py          # Cross-process session locking + is_audio_active() [SSJ9]
 │   ├── skill_utils.py              # Shared skill utility functions
 │   │
 │   ├── cad_agent.py                # CAD model generation (build123d)
@@ -153,8 +155,10 @@ shard_v1/
 │       ├── ClinicaWidget.jsx       # [SSJ3] Improvement queue ticker
 │       ├── SkillRadarWidget.jsx    # [SSJ3] Per-category radar chart
 │       ├── NightRunnerWidget.jsx   # NightRunner start/stop controls
+│       ├── BenchmarkWidget.jsx     # [SSJ6] Benchmark runner GUI — real-time logs, diff viewer
+│       ├── SystemStatsWidget.jsx   # [SSJ9] GraphRAG + LLM cache stats, draggable, 30s poll
 │       └── VoiceBroadcast.jsx
-│                                   # [SSJ4] Patch approval card is inline in App.jsx
+│                                   # [SSJ4] Patch approval card (+ SIM button) is inline in App.jsx
 │
 ├── shard_workspace/                # User sandbox (study output, SWE test projects)
 │   └── knowledge_base/             # LLM-generated cheat sheets (Markdown)
@@ -176,15 +180,20 @@ shard_v1/
 ├── logs/                           # Night session logs
 ├── night_reports/                  # Night runner markdown + JSON reports
 ├── backups/                        # Timestamped capability_graph + experiment_replay backups
-├── benchmark/                      # [SSJ6] Legacy Killer Benchmark suite
+├── benchmark/                      # [SSJ6] Legacy Killer Benchmark suite (7 tasks)
 │   ├── task_01_html_trap/          #   Refactoring: tangled HTML → separated concerns
-│   │   ├── legacy_agent.py         #   Source (buggy/tangled code — DO NOT MODIFY)
-│   │   ├── test_task1.py           #   Merciless pytest (17 tests, 3 groups)
-│   │   └── README.md               #   Task manifesto + traps + victory conditions
-│   └── task_02_ghost_bug/          #   Bug fixing: 5 runtime-only bugs in data pipeline
-│       ├── buggy_pipeline.py       #   Source (5 ghost bugs — DO NOT MODIFY)
-│       ├── test_task2.py           #   16 tests: no-crash, bug-fixes, semantics, structure
-│       └── README.md               #   Task manifesto + bug chain description
+│   ├── task_02_ghost_bug/          #   Bug fixing: 5 runtime-only bugs in data pipeline
+│   ├── task_03_dirty_data/         #   Performance: transaction processor + dirty data
+│   ├── task_04_race_condition/     #   Concurrency: banking module thread-safety
+│   ├── task_05_state_mutation/     #   State: mutable shared state leakage
+│   ├── task_06_ttl_cache/          #   [SSJ9] Runtime state: stale TTL read + size count
+│   │   ├── cache.py                #   Buggy: get() returns stale value, size counts expired
+│   │   ├── test_task6.py           #   20 tests: expiry, size, stats, evict_expired
+│   │   └── README.md
+│   └── task_07_metrics_bleed/      #   [SSJ9] Shared state: Histogram class-level buckets + in-place sort
+│       ├── metrics.py              #   Buggy: _buckets class-level, percentile() sorts in-place
+│       ├── test_task7.py           #   21 tests: bucket isolation, percentile stability, collector isolation
+│       └── README.md
 │
 ├── sandbox/                        # Temp Python files for sandbox execution
 └── tests/                          # Pytest suite
@@ -285,7 +294,7 @@ shard_v1/
 | `study_context.py` | **[SSJ5]** `StudyContext` dataclass — mutable state bag flowing through pipeline. Replaces 15+ local variables. Helpers: `emit()` for progress, `report_crash()` for fatal errors. |
 | `study_pipeline.py` | **[SSJ5]** `BasePhase` ABC (`name`, `fatal`, `async run(ctx)`) + `StudyPipeline` orchestrator. Fatal/non-fatal error routing. |
 | `study_phases.py` | **[SSJ5]** 10 pipeline phases extracted verbatim from `study_topic()`: Init, Map, Aggregate, Synthesize, Store (fatal); CrossPollinate, Materialize, Sandbox, PostStudy (non-fatal); CertifyRetryGroup (fatal, composite: VALIDATE→EVALUATE→BENCHMARK→CERTIFY × MAX_RETRY). |
-| `night_runner.py` | Standalone runner for nightly sessions. **[SSJ3]** Priority -1 drains ImprovementEngine queue. **[SSJ4]** Runs `ProactiveRefactor.analyze_next_file()` at end of session. **[SSJ6]** Runs `_run_benchmarks()` after study cycles — auto-discovers all `benchmark/task_*` dirs, executes benchmark_loop on each, logs results to session JSON. |
+| `night_runner.py` | Standalone runner for nightly sessions. **[SSJ3]** Priority -1 drains ImprovementEngine queue. **[SSJ4]** Runs `ProactiveRefactor.analyze_next_file()` at end of session. **[SSJ6]** Runs `_run_benchmarks()` after study cycles. **[SSJ9]** `_background_mode`: if audio session is active, NightRunner starts anyway — suppresses all `_vb()` voice events, adds 60s yield between cycles, auto-exits background mode when audio ends. After each failed cycle calls `ProactiveRefactor.enqueue_from_failure(topic, tags)`. |
 | `research_agenda.py` | Priority topic scheduler: (0) critic feedback → (1) PHOENIX replay → (2) goal prerequisites → (3) frontier recombination. |
 | `experiment_inventor.py` | Generates `"Integration of {A} and {B}"` topics. **Depth guard**: never nests composite topics. Partner filter: only atomic capabilities. |
 | `experiment_replay.py` | **PHOENIX Protocol.** Stores scores 6.0–7.4 for retry. |
@@ -307,7 +316,7 @@ shard_v1/
 
 | Module | Responsibility |
 |--------|---------------|
-| `proactive_refactor.py` | **[SSJ4]** Proactive code optimization engine. Round-robin over 10 core files (one per session). LLM Staff Engineer prompt targeting: performance (Big-O), clean_code, token_savings. Returns `null` if no real optimization found. Validates each `old` string exists exactly once (zero ambiguity). Creates `.bak_YYYYMMDD_HHMMSS` backup before applying. Restores backup if apply fails mid-way. Tracks rotation index + history in `refactor_state.json`. |
+| `proactive_refactor.py` | **[SSJ4+SSJ9]** Proactive code optimization engine. **[SSJ9]** Priority drain: `capability_queue` (modules responsible for recent study failures) → round-robin over 10 core files as fallback. `enqueue_from_failure(topic, tags)` maps capability tags → module paths via `architecture_map.json`. LLM Staff Engineer prompt targeting: performance (Big-O), clean_code, token_savings. Validates each `old` string exactly once. Creates `.bak_YYYYMMDD_HHMMSS` backup; restores on mid-apply failure. |
 | `patch_simulator.py` | **[SSJ8]** What-if impact simulator for code patches. **Static analysis**: removes/renames/signature changes via AST diff. **Dependency lookup**: finds all dependent modules via `architecture_map.json`. **LLM risk assessment**: parallel Gemini Flash call per dependent module. **Risk scoring**: LOW/MEDIUM/HIGH/CRITICAL → `apply`/`apply_with_caution`/`reject`. Wired into `_emit_patch_approval()` (static, instant) and `/api/patch/simulate` (full LLM). |
 
 ### SSJ8 Intelligence Layer
@@ -632,6 +641,8 @@ SessionOrchestrator detects tool requiring approval
 | `ClinicaWidget` | Fixed bottom-left | `GET /api/improvement_queue` | Mount + poll 30s |
 | `SkillRadarWidget` | Fixed bottom-left (+offset) | `GET /api/skill_radar` | Mount + `study_complete` |
 | `NightRunnerWidget` | Fixed (configurable) | Socket `nightrunner_state_changed` | Real-time |
+| `BenchmarkWidget` | Fixed (draggable) | Socket `benchmark_*` events | Real-time |
+| `SystemStatsWidget` | Fixed left (draggable) | `GET /api/knowledge/graph_stats` + `/api/llm/cache_stats` | Mount + poll 30s |
 | Patch Approval Card | Fixed bottom-right | Socket `patch_approval_required` | On event + on mount (polling) |
 
 ---
@@ -697,9 +708,11 @@ SessionOrchestrator detects tool requiring approval
 
 ### Session Locking
 
-`shard_semaphore.py` prevents concurrent:
-- Active Gemini Live audio session
-- Autonomous NightRunner study cycle
+`shard_semaphore.py` coordinates:
+- Active Gemini Live audio session (`reason="audio_session"`)
+- Autonomous NightRunner study cycle (`reason="night_runner"`)
+
+**[SSJ9] Background mode**: if `is_audio_active()` is True when NightRunner starts, it runs in silent background mode instead of aborting — voice broadcast suppressed, +60s inter-cycle yield, auto-exits when audio ends.
 
 File lock (`shard_memory/session.lock`) + in-process `asyncio.Semaphore(1)`.
 
@@ -722,16 +735,21 @@ File lock (`shard_memory/session.lock`) + in-process `asyncio.Semaphore(1)`.
 | **SSJ6 Phase 3** | Complete ✅ | Swarm Engine: `swarm_engine.py` 3-agent pipeline (Architect→Coder→Critic). `use_swarm=True` flag in `run_benchmark_loop` + GUI toggle. Gemini Flash added to `llm_router.py` as 3rd provider. Knowledge Bridge (`knowledge_bridge.py`) built and integrated. |
 | **SSJ7** | Complete ✅ | Knowledge Bridge: NightRunner's ChromaDB accessible to all components via `knowledge_bridge.py`. One-way read — NightRunner writes autonomously, benchmark/study/SWE agents read. |
 | **SSJ8** | Complete ✅ | **Intelligence Layer** — 6 new modules: GraphRAG causal knowledge graph, dynamic study personas, concurrency pre-probe, intelligent ReportAgent, LLM response cache, Patch Simulator. Swarm extended to 5-7 parallel specialized reviewers. GraphRAG injected into Architect prompt + benchmark correction + SYNTHESIZE. Knowledge base cleanup (65→40 articles, 159→153 skills). Topic quality filter hardened (pseudoscience, phrase fragments, hallucination spirals blocked). |
+| **SSJ9** | Complete ✅ | **Scaffold hardening + Capability-Driven Refactor + Parallel Audio** — Benchmark 5/5 (stuck detection wired to Swarm, per-test chirurgical hints). Topic filter patched in both `skill_utils.py` + `night_runner.py`. `ProactiveRefactor` upgraded: `capability_queue` drains before round-robin, `enqueue_from_failure()` maps failed topics → responsible modules via `architecture_map.json`. NightRunner `_background_mode`: runs silently alongside active audio session. `skill_radar` endpoint fixed (was reading stale JSON, now queries SQLite views). Frontend: `SystemStatsWidget` (GraphRAG + LLM cache), SIM button in patch card. Benchmark suite: task_06 (TTL cache stale read), task_07 (Histogram class-level bleed). `architecture_map.json` 31→39 modules. |
 
-### SSJ6 Benchmark Results (2026-03-18)
+### Benchmark Results (2026-03-23 — SSJ9, Gemini Flash)
 
-| Task | Description | Attempts | Tests | Time | SHARD Value |
-|------|-------------|----------|-------|------|-------------|
-| task_01_html_trap | Refactor tangled HTML without changing output | **1/5** | 17/17 | 40s | No (LLM solved solo) |
-| task_02_ghost_bug | Fix 5 runtime-only bugs in data pipeline | **3/5** | 16/16 | 49s | **YES** — bugs invisible to static analysis |
-| task_03_dirty_data | Optimize transaction processor (dirty data + perf gate) | **2/5** | 24/24 | 25s | **YES** — performance threshold unknowable without running tests |
-| task_04_race_condition | Fix race conditions in banking module | **2/5** | 16/16 | 19s | **YES** — concurrency bugs impossible to predict statically |
-| task_05_state_mutation | Fix state leakage bugs in data pipeline | **1/5** | 21/21 | 7s | No (LLM caught all bugs from source) |
+| Task | Description | Attempts | Tests | SHARD Value |
+|------|-------------|----------|-------|-------------|
+| task_01_html_trap | Refactor tangled HTML without changing output | **1** | 17/17 | No (LLM solo) |
+| task_02_ghost_bug | Fix 5 runtime-only bugs in data pipeline | **4** | 16/16 | **YES** — stuck detection + `_calibrated` flag hint |
+| task_03_dirty_data | Optimize transaction processor (dirty data + perf gate) | **2** | 24/24 | **YES** — swarm Performance reviewer |
+| task_04_race_condition | Fix race conditions in banking module | **3** | 16/16 | **YES** — concurrency non-deterministic |
+| task_05_state_mutation | Fix state leakage bugs in data pipeline | **1** | 21/21 | No (LLM solo) |
+| task_06_ttl_cache | TTL cache: stale read + size counts expired entries | pending | 20 | New task (SSJ9) |
+| task_07_metrics_bleed | Histogram class-level shared buckets + in-place sort | pending | 21 | New task (SSJ9) |
+
+**Overall 5/5 (100%)** — confirmed 2026-03-23 on Gemini Flash.
 
 ### SSJ6 Honest Analysis — Where SHARD Adds Real Value
 
