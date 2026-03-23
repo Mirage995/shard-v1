@@ -3,6 +3,9 @@ Tests for Study Agent Evolution: Cross-Pollination & Materialization.
 
 Uses unittest.mock to patch Groq and ChromaDB so tests run fully offline
 without API keys or network access.
+
+NOTE: GoalStorage was removed from study_agent in the SSJ refactor.
+Tests that depend on GoalStorage import are skipped pending rewrite.
 """
 import sys
 import os
@@ -28,28 +31,23 @@ def mock_env(monkeypatch):
 @pytest.fixture
 def agent(mock_env, tmp_path):
     """Create a StudyAgent with mocked Groq client and in-memory ChromaDB."""
+    mock_collection = MagicMock()
+    mock_collection.query.return_value = {
+        "documents": [["Doc about Python basics", "Doc about async patterns", "Doc about web frameworks"]],
+        "metadatas": [[
+            {"topic": "Python Basics", "type": "raw"},
+            {"topic": "Async Patterns", "type": "raw"},
+            {"topic": "Web Frameworks", "type": "raw"},
+        ]],
+        "distances": [[0.3, 0.5, 0.7]],
+    }
+    mock_collection.upsert.return_value = None
+
     with patch("study_agent.Groq") as MockGroq, \
-         patch("study_agent.chromadb") as MockChroma, \
+         patch("study_agent.get_collection", return_value=mock_collection), \
          patch("study_agent.CHROMA_DB_PATH", str(tmp_path / "chroma")), \
          patch("study_agent.SANDBOX_DIR", str(tmp_path / "sandbox")), \
          patch("study_agent.WORKSPACE_DIR", str(tmp_path / "workspace")):
-
-        # Mock ChromaDB client and collection
-        mock_collection = MagicMock()
-        mock_collection.query.return_value = {
-            "documents": [["Doc about Python basics", "Doc about async patterns", "Doc about web frameworks"]],
-            "metadatas": [[
-                {"topic": "Python Basics", "type": "raw"},
-                {"topic": "Async Patterns", "type": "raw"},
-                {"topic": "Web Frameworks", "type": "raw"},
-            ]],
-            "distances": [[0.3, 0.5, 0.7]],
-        }
-        mock_collection.upsert.return_value = None
-
-        mock_client = MagicMock()
-        mock_client.get_or_create_collection.return_value = mock_collection
-        MockChroma.PersistentClient.return_value = mock_client
 
         # Mock Groq client
         mock_groq_response = MagicMock()
@@ -60,19 +58,8 @@ def agent(mock_env, tmp_path):
         mock_groq_client.chat.completions.create.return_value = mock_groq_response
         MockGroq.return_value = mock_groq_client
 
-        # patch GoalStorage so that StudyAgent writes to tmp_path instead of
-        # the real shard_memory directory
-        from study_agent import GoalStorage
-        class TempStorage(GoalStorage):
-            def __init__(self, path=None):
-                super().__init__(path=str(tmp_path / "goals.json"))
-
-        # add our TempStorage to the existing patch context
-        with patch("study_agent.GoalStorage", TempStorage):
-            from study_agent import StudyAgent
-            sa = StudyAgent()
-
-        # `sa` is created with patched storage
+        from study_agent import StudyAgent
+        sa = StudyAgent()
 
         # Store refs for assertions
         sa._mock_collection = mock_collection
@@ -137,11 +124,10 @@ async def test_cross_pollinate_saves_deep_knowledge(agent):
 
 @pytest.mark.asyncio
 async def test_cross_pollinate_llm_called(agent):
-    """Cross-pollinate should call Groq LLM to generate the report."""
-    await agent.phase_cross_pollinate("Advanced Python", "raw text", SAMPLE_STRUCTURED)
-
-    # Groq was called
-    agent._mock_groq_client.chat.completions.create.assert_called()
+    """Cross-pollinate should call llm_complete to generate the report."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="Integration Report: test") as mock_lc:
+        await agent.phase_cross_pollinate("Advanced Python", "raw text", SAMPLE_STRUCTURED)
+    mock_lc.assert_awaited()
 
 
 @pytest.mark.asyncio
@@ -163,49 +149,52 @@ async def test_cross_pollinate_no_existing_knowledge(agent):
 
 @pytest.mark.asyncio
 async def test_materialize_creates_file(agent):
-    """Materialize should write a .md file to shard_workspace/knowledge_base/."""
-    # Patch WORKSPACE_DIR for this agent
-    with patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
+    """Materialize should call write_file with a .md path under knowledge_base/."""
+    written = {}
+
+    def capture_write(path, content, workspace_dir):
+        written["path"] = path
+        written["content"] = content
+        return f"success: file '{path}' written ({len(content)} bytes)."
+
+    with patch("study_agent.write_file", side_effect=capture_write), \
+         patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
         result = await agent.phase_materialize("Advanced Python", SAMPLE_STRUCTURED)
 
-    assert result is True
-
-    # Check the file was created
-    expected_file = os.path.join(agent._tmp_workspace, "knowledge_base", "advanced_python.md")
-    assert os.path.exists(expected_file), f"File not found: {expected_file}"
-
-    # Check it has content
-    with open(expected_file, "r", encoding="utf-8") as f:
-        content = f.read()
-    assert len(content) > 0
+    assert "path" in written, "write_file was never called"
+    assert written["path"].startswith("knowledge_base/")
+    assert written["path"].endswith(".md")
+    assert len(written["content"]) > 0
 
 
 @pytest.mark.asyncio
 async def test_materialize_llm_called(agent):
-    """Materialize should call Groq LLM to generate the cheat sheet."""
-    with patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
+    """Materialize should call llm_complete to generate the cheat sheet."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="# Cheat Sheet\nContent") as mock_lc, \
+         patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
         await agent.phase_materialize("Advanced Python", SAMPLE_STRUCTURED)
-
-    agent._mock_groq_client.chat.completions.create.assert_called()
+    mock_lc.assert_awaited()
 
 
 @pytest.mark.asyncio
 async def test_materialize_filename_sanitization(agent):
-    """Topic names with special chars should be sanitized to safe filenames."""
-    with patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
-        result = await agent.phase_materialize("C++ vs Rust: A Deep Dive!", SAMPLE_STRUCTURED)
+    """Topic names with special chars should produce sanitized filenames."""
+    written = {}
 
-    assert result is True
+    def capture_write(path, content, workspace_dir):
+        written["path"] = path
+        return f"success: file '{path}' written ({len(content)} bytes)."
 
-    # The file should exist with sanitized name
-    kb_dir = os.path.join(agent._tmp_workspace, "knowledge_base")
-    files = os.listdir(kb_dir)
-    assert len(files) == 1
-    assert files[0].endswith(".md")
-    # No special characters in filename
-    assert "!" not in files[0]
-    assert ":" not in files[0]
-    assert "+" not in files[0]
+    with patch("study_agent.write_file", side_effect=capture_write), \
+         patch("study_agent.WORKSPACE_DIR", agent._tmp_workspace):
+        await agent.phase_materialize("C++ vs Rust: A Deep Dive!", SAMPLE_STRUCTURED)
+
+    assert "path" in written, "write_file was never called"
+    filename = os.path.basename(written["path"])
+    assert filename.endswith(".md")
+    assert "!" not in filename
+    assert ":" not in filename
+    assert "+" not in filename
 
 
 # ── Test: Progress Tracking ──────────────────────────────────────────────────

@@ -1,198 +1,123 @@
 """
-Tests for Study Agent Dual LLM Routing:
-    - _think() → Claude (Anthropic) for complex reasoning
-    - _think_fast() → Groq for fast/simple tasks  
-    - _think_local() → Ollama for EVALUATE (independent judge)
+Tests for StudyAgent LLM routing — _think() and _think_fast().
 
-Verifies:
-    - _think_fast() uses Groq successfully
-    - _think_fast() falls back to Claude on Groq RateLimit (429)
-    - _think_fast() falls back to Claude when Groq is disabled (no API key)
-    - _think() still falls back to Ollama on Anthropic errors
+Both methods now route through llm_router.llm_complete.
+Tests verify provider priority, json_mode flag, and result passthrough.
 """
 import sys
 import os
-import json
 
 import pytest
 
-# Ensure backend/ is on the path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 from unittest.mock import patch, MagicMock, AsyncMock
-import httpx
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture
 def mock_env(monkeypatch):
-    """Set API keys so StudyAgent.__init__ doesn't raise."""
     monkeypatch.setenv("GROQ_API_KEY", "test-groq-key")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic-key")
 
 
 @pytest.fixture
 def agent(mock_env, tmp_path):
-    """Create a StudyAgent with mocked clients and in-memory ChromaDB."""
-    with patch("study_agent.Groq") as MockGroq, \
-         patch("study_agent.chromadb") as MockChroma, \
+    """StudyAgent with mocked get_collection and llm_complete."""
+    mock_collection = MagicMock()
+    mock_collection.query.return_value = {"documents": [[]], "metadatas": [[]], "distances": [[]]}
+    mock_collection.upsert.return_value = None
+
+    with patch("study_agent.get_collection", return_value=mock_collection), \
          patch("study_agent.CHROMA_DB_PATH", str(tmp_path / "chroma")), \
          patch("study_agent.SANDBOX_DIR", str(tmp_path / "sandbox")), \
          patch("study_agent.WORKSPACE_DIR", str(tmp_path / "workspace")):
-
-        # Mock ChromaDB client and collection
-        mock_collection = MagicMock()
-        mock_collection.query.return_value = {
-            "documents": [[]],
-            "metadatas": [[]],
-            "distances": [[]],
-        }
-        mock_collection.upsert.return_value = None
-
-        mock_chroma_client = MagicMock()
-        mock_chroma_client.get_or_create_collection.return_value = mock_collection
-        MockChroma.PersistentClient.return_value = mock_chroma_client
-
-        # Mock Anthropic client (patch the class constructor, not the module)
-        mock_anthropic_response = MagicMock()
-        mock_anthropic_response.content = [MagicMock()]
-        mock_anthropic_response.content[0].text = "Mocked Claude response"
-
-        mock_anthropic_client = MagicMock()
-        mock_anthropic_client.messages.create.return_value = mock_anthropic_response
-
-        with patch("study_agent.anthropic.Anthropic", return_value=mock_anthropic_client):
-            # Mock Groq client
-            mock_groq_response = MagicMock()
-            mock_groq_response.choices = [MagicMock()]
-            mock_groq_response.choices[0].message.content = "Mocked Groq response"
-
-            mock_groq_client = MagicMock()
-            mock_groq_client.chat.completions.create.return_value = mock_groq_response
-            MockGroq.return_value = mock_groq_client
-
-            from study_agent import StudyAgent
-            sa = StudyAgent()
-
-            # Store refs for test assertions
-            sa._mock_groq_client = mock_groq_client
-            sa._mock_anthropic_client = mock_anthropic_client
-
-            yield sa
+        from study_agent import StudyAgent
+        sa = StudyAgent()
+    return sa
 
 
-# ── Test: _think_fast() uses Groq ─────────────────────────────────────────────
+# ── _think ────────────────────────────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_think_fast_uses_groq(agent):
-    """_think_fast should use Groq for fast tasks."""
-    result = await agent._think_fast("Generate search queries")
+async def test_think_calls_llm_complete(agent):
+    """_think delegates to llm_complete."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="Claude answer") as mock_lc:
+        result = await agent._think("complex task")
+    assert result == "Claude answer"
+    mock_lc.assert_awaited_once()
 
-    assert result == "Mocked Groq response"
-    agent._mock_groq_client.chat.completions.create.assert_called_once()
-    call_kwargs = agent._mock_groq_client.chat.completions.create.call_args
-    assert call_kwargs.kwargs["model"] == "llama-3.3-70b-versatile"
-
-
-# ── Test: _think_fast() falls back to Claude on RateLimit ─────────────────────
 
 @pytest.mark.asyncio
-async def test_think_fast_fallback_on_groq_rate_limit(agent):
-    """When Groq returns 429, _think_fast should fallback to Claude."""
-    from groq import RateLimitError as GroqRateLimitError
+async def test_think_prefers_claude_provider(agent):
+    """_think passes Claude as first provider."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
+        await agent._think("task")
+    providers = mock_lc.call_args.kwargs["providers"]
+    assert providers[0] == "Claude"
 
-    mock_response = httpx.Response(
-        status_code=429,
-        request=httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions"),
-    )
-    agent._mock_groq_client.chat.completions.create.side_effect = GroqRateLimitError(
-        message="Rate limit exceeded",
-        response=mock_response,
-        body={"error": {"message": "Rate limit exceeded"}},
-    )
-
-    result = await agent._think_fast("test prompt")
-
-    # Should have fallen back to Claude
-    assert result == "Mocked Claude response"
-    agent._mock_anthropic_client.messages.create.assert_called_once()
-
-
-# ── Test: _think_fast() falls back when Groq disabled ─────────────────────────
 
 @pytest.mark.asyncio
-async def test_think_fast_fallback_when_groq_disabled(agent):
-    """When groq_client is None (no API key), _think_fast should use Claude."""
-    agent.groq_client = None
+async def test_think_json_mode_adds_instruction(agent):
+    """json_mode=True appends JSON instruction to system prompt."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="{}") as mock_lc:
+        await agent._think("task", json_mode=True)
+    system = mock_lc.call_args.kwargs["system"]
+    assert "VALID JSON" in system
 
-    result = await agent._think_fast("test prompt")
-
-    # Should have used Claude directly
-    assert result == "Mocked Claude response"
-    agent._mock_anthropic_client.messages.create.assert_called_once()
-
-
-# ── Test: _think() uses Claude normally ───────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_think_uses_claude(agent):
-    """_think should use Anthropic Claude for complex reasoning."""
-    result = await agent._think("Complex reasoning task")
-
-    assert result == "Mocked Claude response"
-    agent._mock_anthropic_client.messages.create.assert_called_once()
-    call_kwargs = agent._mock_anthropic_client.messages.create.call_args
-    assert call_kwargs.kwargs["model"] == "claude-3-5-sonnet-20241022"
+async def test_think_no_json_mode_no_instruction(agent):
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="text") as mock_lc:
+        await agent._think("task", json_mode=False)
+    system = mock_lc.call_args.kwargs["system"]
+    assert "VALID JSON" not in system
 
 
-# ── Test: _think() falls back to Ollama on Anthropic RateLimit ────────────────
+# ── _think_fast ───────────────────────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_think_fallback_on_anthropic_error(agent):
-    """When Anthropic fails, _think should fallback to _think_local (Ollama)."""
-    # Simulate an API error from Anthropic
-    agent._mock_anthropic_client.messages.create.side_effect = Exception("API overloaded")
-
-    # Mock _think_local
-    agent._think_local = AsyncMock(return_value="Fallback to Ollama")
-
-    result = await agent._think("test prompt")
-
-    agent._think_local.assert_called_once()
-    assert result == "Fallback to Ollama"
+async def test_think_fast_calls_llm_complete(agent):
+    """_think_fast delegates to llm_complete."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="fast answer") as mock_lc:
+        result = await agent._think_fast("quick task")
+    assert result == "fast answer"
+    mock_lc.assert_awaited_once()
 
 
-# ── Test: _think_fast() preserves json_mode ───────────────────────────────────
+@pytest.mark.asyncio
+async def test_think_fast_prefers_groq_provider(agent):
+    """_think_fast passes Groq as first provider."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
+        await agent._think_fast("task")
+    providers = mock_lc.call_args.kwargs["providers"]
+    assert providers[0] == "Groq"
+
 
 @pytest.mark.asyncio
 async def test_think_fast_json_mode(agent):
-    """_think_fast with json_mode=True should pass JSON instruction to Groq."""
-    agent._mock_groq_client.chat.completions.create.return_value.choices[0].message.content = '["query1", "query2"]'
+    """json_mode=True also adds JSON instruction to _think_fast."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="[]") as mock_lc:
+        await agent._think_fast("task", json_mode=True)
+    system = mock_lc.call_args.kwargs["system"]
+    assert "VALID JSON" in system
 
-    result = await agent._think_fast("Generate queries", json_mode=True)
-
-    # Verify JSON mode instruction was added to system prompt
-    call_kwargs = agent._mock_groq_client.chat.completions.create.call_args
-    messages = call_kwargs.kwargs["messages"]
-    assert "VALID JSON" in messages[0]["content"]
-    assert result == '["query1", "query2"]'
-
-
-# ── Test: _think_local uses llama3.2 ──────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_think_local_uses_llama32_model(agent):
-    """_think_local should use model='llama3.2'."""
-    mock_local_resp = MagicMock()
-    mock_local_resp.choices = [MagicMock()]
-    mock_local_resp.choices[0].message.content = "Local LLM response"
+async def test_think_fast_different_providers_than_think(agent):
+    """_think_fast and _think must use different provider priority lists."""
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
+        await agent._think("complex")
+        think_providers = mock_lc.call_args.kwargs["providers"]
 
-    agent.local_client = AsyncMock()
-    agent.local_client.chat.completions.create.return_value = mock_local_resp
+    with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
+        await agent._think_fast("quick")
+        fast_providers = mock_lc.call_args.kwargs["providers"]
 
-    result = await agent._think_local("test prompt")
+    assert think_providers != fast_providers
 
-    assert result == "Local LLM response"
-    call_kwargs = agent.local_client.chat.completions.create.call_args
-    assert call_kwargs.kwargs["model"] == "llama3.2"
+
+if __name__ == "__main__":
+    import pytest as _pt
+    _pt.main([__file__, "-v"])
