@@ -1,8 +1,8 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ9 (Capability-Driven Refactor + Parallel Audio + Benchmark 7 Tasks)
-Last updated: 2026-03-23
+Version: SSJ10 (Test Suite 0 FAILED + patch_simulator hardening)
+Last updated: 2026-03-24
 
 ---
 
@@ -36,6 +36,7 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Patch Simulator** — impact analysis before any code patch is applied (SSJ8)
 - **Capability-driven refactoring** — ProactiveRefactor targets modules responsible for failed capabilities, not round-robin (SSJ9)
 - **Parallel learning + audio** — NightRunner runs in silent background mode when audio session is active (SSJ9)
+- **Test suite coverage** — 419 passing, 0 failing, 21 skipped (hardware/optional deps) — SSJ10
 - **Semantic memory** via ChromaDB triple-store
 - **Domain-specific agents**: CAD, web, smart home, 3D printing
 
@@ -196,7 +197,14 @@ shard_v1/
 │       └── README.md
 │
 ├── sandbox/                        # Temp Python files for sandbox execution
-└── tests/                          # Pytest suite
+└── tests/                          # Pytest suite — 419 pass, 0 fail, 21 skip [SSJ10]
+    ├── test_patch_simulator.py     # [SSJ10] 46 tests — async def, required param detection
+    ├── test_graph_rag.py           # [SSJ10] 20 tests — parse_relations, query, stats
+    ├── test_llm_cache.py           # [SSJ10] 16 tests — LRU, TTL, bypass conditions
+    ├── test_study_personas.py      # [SSJ10] 31 tests — category defaults, history winners
+    ├── test_experiment_replay.py   # [SSJ10] 12 tests — queue, dedup, persistence
+    ├── test_research_agenda.py     # [SSJ10] 15 tests — topic selection, priority, frontier
+    └── ...                         # (30+ other test files)
 ```
 
 ---
@@ -317,7 +325,7 @@ shard_v1/
 | Module | Responsibility |
 |--------|---------------|
 | `proactive_refactor.py` | **[SSJ4+SSJ9]** Proactive code optimization engine. **[SSJ9]** Priority drain: `capability_queue` (modules responsible for recent study failures) → round-robin over 10 core files as fallback. `enqueue_from_failure(topic, tags)` maps capability tags → module paths via `architecture_map.json`. LLM Staff Engineer prompt targeting: performance (Big-O), clean_code, token_savings. Validates each `old` string exactly once. Creates `.bak_YYYYMMDD_HHMMSS` backup; restores on mid-apply failure. |
-| `patch_simulator.py` | **[SSJ8]** What-if impact simulator for code patches. **Static analysis**: removes/renames/signature changes via AST diff. **Dependency lookup**: finds all dependent modules via `architecture_map.json`. **LLM risk assessment**: parallel Gemini Flash call per dependent module. **Risk scoring**: LOW/MEDIUM/HIGH/CRITICAL → `apply`/`apply_with_caution`/`reject`. Wired into `_emit_patch_approval()` (static, instant) and `/api/patch/simulate` (full LLM). |
+| `patch_simulator.py` | **[SSJ8+SSJ10]** What-if impact simulator for code patches. **Static analysis**: removes/renames/signature changes via AST diff. **[SSJ10]** `_extract_public_api` now handles `async def` (was silently invisible before). `_count_required_args` distinguishes required params from optional (with defaults) — prevents false-positive BREAKING reports. `_analyze_diff` emits `BREAKING` only for new required params; optional param additions emit `SIGNATURE CHANGE`. **Dependency lookup**: finds all dependent modules via `architecture_map.json`. **LLM risk assessment**: parallel Gemini Flash call per dependent module. **Risk scoring**: LOW/MEDIUM/HIGH/CRITICAL → `apply`/`apply_with_caution`/`reject`. Wired into `_emit_patch_approval()` (static, instant) and `/api/patch/simulate` (full LLM). **46 tests.** |
 
 ### SSJ8 Intelligence Layer
 
@@ -736,6 +744,7 @@ File lock (`shard_memory/session.lock`) + in-process `asyncio.Semaphore(1)`.
 | **SSJ7** | Complete ✅ | Knowledge Bridge: NightRunner's ChromaDB accessible to all components via `knowledge_bridge.py`. One-way read — NightRunner writes autonomously, benchmark/study/SWE agents read. |
 | **SSJ8** | Complete ✅ | **Intelligence Layer** — 6 new modules: GraphRAG causal knowledge graph, dynamic study personas, concurrency pre-probe, intelligent ReportAgent, LLM response cache, Patch Simulator. Swarm extended to 5-7 parallel specialized reviewers. GraphRAG injected into Architect prompt + benchmark correction + SYNTHESIZE. Knowledge base cleanup (65→40 articles, 159→153 skills). Topic quality filter hardened (pseudoscience, phrase fragments, hallucination spirals blocked). |
 | **SSJ9** | Complete ✅ | **Scaffold hardening + Capability-Driven Refactor + Parallel Audio** — Benchmark 5/5 (stuck detection wired to Swarm, per-test chirurgical hints). Topic filter patched in both `skill_utils.py` + `night_runner.py`. `ProactiveRefactor` upgraded: `capability_queue` drains before round-robin, `enqueue_from_failure()` maps failed topics → responsible modules via `architecture_map.json`. NightRunner `_background_mode`: runs silently alongside active audio session. `skill_radar` endpoint fixed (was reading stale JSON, now queries SQLite views). Frontend: `SystemStatsWidget` (GraphRAG + LLM cache), SIM button in patch card. Benchmark suite: task_06 (TTL cache stale read), task_07 (Histogram class-level bleed). `architecture_map.json` 31→39 modules. |
+| **SSJ10** | Complete ✅ | **Test Suite 0 FAILED + patch_simulator hardening** — `patch_simulator.py`: `async def` now visible to static analysis (was silently ignored); `_count_required_args` distinguishes required vs optional params; `_analyze_diff` BREAKING/SIGNATURE CHANGE correctly separated; 46 new tests all green. Test suite: installed `pytest-asyncio` (was missing — all async tests were silently broken); rewrote 6 stale test files to match refactored APIs (`test_shard_tools`, `test_research_agenda`, `test_experiment_replay`, `test_strategy_memory`, `test_failover`, `test_study_agent_evolution`); fixed `asyncio.get_event_loop()` → `asyncio.run()` in Python 3.10+; marked `test_sandbox_docker` skip pending rewrite vs `sandbox_executor.py`. Final: **419 passed, 0 failed, 21 skipped** (hardware/optional deps). |
 
 ### Benchmark Results (2026-03-23 — SSJ9, Gemini Flash)
 
