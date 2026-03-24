@@ -1,4 +1,4 @@
-"""fixed_pipeline.py — Configurable data processing pipeline.
+"""pipeline.py — Configurable data processing pipeline.
 
 Transforms numeric values with a configurable multiplier,
 tracks processing history, and assigns sequential IDs.
@@ -18,7 +18,6 @@ class Pipeline:
     def set_multiplier(self, m):
         """Change the multiplier for future operations."""
         self._multiplier = float(m)
-        # Invalidate cache when multiplier changes
         self._cache = {}
 
     def process(self, values):
@@ -35,7 +34,6 @@ class Pipeline:
                 self._cache[v] = v * self._multiplier
             results.append(self._cache[v])
         self._processed_count += len(values)
-        # Store a copy to prevent mutation issues
         self._history.append(list(values))
         return results
 

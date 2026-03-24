@@ -504,7 +504,7 @@ Example: ["query 1", "query 2", "query 3"]"""
             pass
 
         prompt = f"""
-You must extract structured concepts from the text.{meta_line}{score_line}{episodic_line}{causal_line}
+You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{causal_line}
 Return ONLY valid JSON.
 
 Do not include explanations.
@@ -514,6 +514,7 @@ Do not include text before or after the JSON.
 Required format:
 
 {{
+"shard_opinion": "1-2 sentence evaluation: why this topic matters, what makes it hard, or where people typically go wrong — not a summary",
 "concepts": [
 {{
 "name": "concept_name",
@@ -525,12 +526,14 @@ Required format:
 
 Rules:
 
+• shard_opinion must be an evaluative judgment, not a description
 • name must be a technical concept
 • dependencies must list prerequisite concepts
 • applications must list real-world uses
 • if nothing is found return:
 
 {{
+"shard_opinion": "",
 "concepts": []
 }}
 

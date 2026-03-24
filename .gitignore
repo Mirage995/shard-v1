@@ -92,3 +92,11 @@ SHARD_Pitch_Deck.pdf
 shard_pitch.html
 MASTER_PROMPT_ANTIGRAVITY.md
 run_vc_demo.py
+
+# ── Local / CI artifacts ────────────────────────────────────────────────────────
+.coverage
+.claude/
+test_inspect_live.py
+test_patch_ui.py
+test_popup.txt
+test_swe.py

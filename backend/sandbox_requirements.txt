@@ -4,3 +4,4 @@
 qiskit
 hypothesis
 psutil
+dns

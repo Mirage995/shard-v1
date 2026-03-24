@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-03-24T16:43:53",
+  "results": [
+    {
+      "task": "task_10_template_parser",
+      "naked": {
+        "task": "task_10_template_parser",
+        "mode": "naked",
+        "success": false,
+        "passed": 7,
+        "failed": 3,
+        "total": 10,
+        "pass_rate": 0.7,
+        "elapsed": 4.375698566436768,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_10_template_parser",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 34.94662952423096,
+        "attempts": 5,
+        "error": null
+      },
+      "delta_pass_rate": 0.30000000000000004
+    },
+    {
+      "task": "task_11_stream_decoder",
+      "naked": {
+        "task": "task_11_stream_decoder",
+        "mode": "naked",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 2.075460195541382,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_11_stream_decoder",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 2.4953041076660156,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_12_note_tag",
+      "naked": {
+        "task": "task_12_note_tag",
+        "mode": "naked",
+        "success": false,
+        "passed": 5,
+        "failed": 5,
+        "total": 10,
+        "pass_rate": 0.5,
+        "elapsed": 2.517012357711792,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_12_note_tag",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 14.37821912765503,
+        "attempts": 2,
+        "error": null
+      },
+      "delta_pass_rate": 0.5
+    }
+  ]
+}

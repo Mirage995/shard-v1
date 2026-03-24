@@ -1,13 +1,9 @@
-"""optimized_processor.py — Transaction processor.
-
-Processes financial transactions and returns a summary report.
-Optimized version of legacy_processor.py.
-"""
+"""optimized_processor.py — Optimized transaction processor."""
 import json
 import random
 import string
-from collections import defaultdict, Counter
 from datetime import datetime, timedelta
+from collections import defaultdict, Counter
 
 
 def _generate_transactions(n=10000, seed=42):
@@ -101,62 +97,58 @@ def process_transactions(transactions):
         tid = tx.get("id", "UNKNOWN")
         id_counts[tid] += 1
 
+        merchant = tx.get("merchant", "unknown")
+        merchants_set.add(merchant)
+
         raw_amount = tx.get("amount", 0)
         try:
             amount = float(raw_amount)
         except (ValueError, TypeError):
             amount = 0.0
 
-        currency = tx.get("currency", "EUR")
-
         raw_cat = tx.get("category", "")
         cat = raw_cat.strip() if isinstance(raw_cat, str) else str(raw_cat)
-        category = cat if cat else "uncategorized"
-
-        status = tx.get("status", "pending")
+        cat = cat if cat else "uncategorized"
 
         raw_ts = tx.get("timestamp", "")
+        ts = datetime(2025, 1, 1)  # Default value
         if isinstance(raw_ts, (int, float)):
             try:
-                timestamp = datetime.fromtimestamp(raw_ts)
+                ts = datetime.fromtimestamp(raw_ts)
             except (OSError, ValueError):
-                timestamp = datetime(2025, 1, 1)
+                pass  # Use default datetime
         elif isinstance(raw_ts, str):
             try:
-                timestamp = datetime.fromisoformat(raw_ts)
+                ts = datetime.fromisoformat(raw_ts)
             except ValueError:
-                timestamp = datetime(2025, 1, 1)
-        else:
-            timestamp = datetime(2025, 1, 1)
+                pass  # Use default datetime
 
-        merchant = tx.get("merchant", "unknown")
-        merchants_set.add(merchant)
+        status = tx.get("status", "pending")
+        if status != "completed":
+            continue
 
-        if status == "completed":
-            if amount < 0:
-                flagged.append(tid)
+        if amount < 0:
+            flagged.append(tid)
 
-            total_completed += amount
-            completed_count += 1
-            by_category[category] += amount
-            month_key = timestamp.strftime("%Y-%m")
-            by_month[month_key] += amount
-            merchant_totals[merchant] += amount
-            currency_totals[currency] += amount
+        total_completed += amount
+        completed_count += 1
+        by_category[cat] += amount
+        by_month[ts.strftime("%Y-%m")] += amount
+        merchant_totals[merchant] += amount
+        currency_totals[tx.get("currency", "EUR")] += amount
 
     avg_completed = total_completed / completed_count if completed_count > 0 else 0.0
 
-    sorted_merchants = sorted(merchant_totals.items(), key=lambda x: x[1], reverse=True)
-    top_merchants = sorted_merchants[:5]
+    top_merchants = sorted(merchant_totals.items(), key=lambda x: x[1], reverse=True)[:5]
 
     duplicate_ids = sorted([tid for tid, count in id_counts.items() if count > 1])
 
     total_completed = round(total_completed, 2)
     avg_completed = round(avg_completed, 2)
-    by_category = dict(sorted({k: round(v, 2) for k, v in by_category.items()}.items()))
-    by_month = dict(sorted({k: round(v, 2) for k, v in by_month.items()}.items()))
+    by_category = {k: round(v, 2) for k, v in sorted(by_category.items())}
+    by_month = {k: round(v, 2) for k, v in sorted(by_month.items())}
     top_merchants = [(m, round(t, 2)) for m, t in top_merchants]
-    currency_totals = dict(sorted({k: round(v, 2) for k, v in currency_totals.items()}.items()))
+    currency_totals = {k: round(v, 2) for k, v in sorted(currency_totals.items())}
 
     return {
         "total_completed": total_completed,

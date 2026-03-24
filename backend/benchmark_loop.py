@@ -430,16 +430,13 @@ async def run_benchmark_loop(
     readme_path = task_dir / "README.md"
     readme = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
 
-    # Discover source file (the buggy/legacy code to fix/refactor)
-    # Convention: any .py that isn't test_* or __* is the source
+    # Discover all source files (any .py that isn't test_* or __*)
     source_files = sorted(
         f for f in task_dir.glob("*.py")
         if not f.name.startswith("test_") and not f.name.startswith("__")
     )
     if not source_files:
         raise FileNotFoundError(f"No source file found in {task_dir}")
-    source_path = source_files[0]
-    source = source_path.read_text(encoding="utf-8")
 
     # Discover test file
     test_files = sorted(task_dir.glob("test_task*.py")) or sorted(task_dir.glob("test_*.py"))
@@ -448,17 +445,38 @@ async def run_benchmark_loop(
     test_file = test_files[0]
     tests = test_file.read_text(encoding="utf-8")
 
-    # Discover expected output filename from test file
-    # Look for patterns like: fixed_pipeline.py not found, "refactored_agent.py"
+    # Discover expected output filename from test file FIRST —
+    # then derive which source file is the TARGET to fix.
     output_name_match = re.search(r'(\w+\.py)\s+not found', tests)
     if not output_name_match:
         output_name_match = re.search(r'"(\w+\.py)".*not found', tests)
     if output_name_match:
         output_filename = output_name_match.group(1)
+        # Derive primary source: strip leading "fixed_" from output name
+        primary_name = re.sub(r'^fixed_', '', output_filename)
+        primary_candidate = task_dir / primary_name
+        source_path = primary_candidate if primary_candidate in source_files else source_files[0]
     else:
-        # Fallback: derive from source name
+        source_path = source_files[0]
         output_filename = "fixed_" + source_path.name
     output_path = task_dir / output_filename
+
+    # Build source string — multi-file tasks get all files concatenated with labels
+    context_files = [f for f in source_files if f != source_path]
+    if context_files:
+        parts = []
+        for f in context_files:
+            parts.append(
+                f"# === {f.name} [CONTEXT — read only, do not output this file] ===\n"
+                + f.read_text(encoding="utf-8")
+            )
+        parts.append(
+            f"# === {source_path.name} [TARGET — fix this file, output as {output_filename}] ===\n"
+            + source_path.read_text(encoding="utf-8")
+        )
+        source = "\n\n".join(parts)
+    else:
+        source = source_path.read_text(encoding="utf-8")
 
     # Clean up stale output from a previous run so the loop starts fresh
     if output_path.exists():
@@ -508,6 +526,8 @@ async def run_benchmark_loop(
 
     # -- 2. Loop -----------------------------------------------------------
     attempts = []
+    _best_state = None       # AttemptRecord with highest tests_passed count seen so far
+    _swarm_rollback = False  # True when last attempt regressed — triggers surgical mode next call
 
     for attempt_num in range(1, max_attempts + 1):
         t_attempt = time.time()
@@ -555,6 +575,11 @@ async def run_benchmark_loop(
             swarm_stuck = _detect_stuck_tests(attempts)
             if swarm_stuck:
                 print(f"  [stuck] {len(swarm_stuck)} test(s) stuck — injecting into Architect: {swarm_stuck}")
+            # Consume rollback flag — active for this one call only
+            _rollback_now = _swarm_rollback
+            _swarm_rollback = False
+            if _rollback_now and _best_state:
+                print(f"  [rollback] Modalita' chirurgica — base: tentativo {_best_state.attempt} ({len(_best_state.tests_passed)} pass)")
             print("  [swarm] Calling... ", end="", flush=True)
             try:
                 response = await swarm_complete(
@@ -565,6 +590,8 @@ async def run_benchmark_loop(
                     max_tokens=LLM_MAX_TOKENS,
                     temperature=LLM_TEMPERATURE,
                     stuck_tests=swarm_stuck if swarm_stuck else None,
+                    rollback_hint=_rollback_now,
+                    rollback_code=_best_state.code if (_rollback_now and _best_state) else None,
                 )
                 print(f"OK ({len(response):,} chars)")
             except Exception as e:
@@ -696,6 +723,20 @@ async def run_benchmark_loop(
                 tests_failed=failed, error_summary=error_summary,
                 raw_pytest=raw_pytest, syntax_valid=True, elapsed=elapsed,
             ))
+
+            # -- Early stopping / rollback ---------------------------------
+            current_rec = attempts[-1]
+            if _best_state is None or len(current_rec.tests_passed) >= len(_best_state.tests_passed):
+                _best_state = current_rec
+            elif (mode == "SWARM" and
+                  len(current_rec.tests_passed) < len(_best_state.tests_passed)):
+                # Regression: swarm made things worse — rollback to best state
+                print(f"\n  [rollback] REGRESSIONE: tentativo {attempt_num} ha {len(current_rec.tests_passed)} pass "
+                      f"< best {len(_best_state.tests_passed)} pass (tentativo {_best_state.attempt})")
+                print(f"  [rollback] Scarto la patch regressiva — ripristino tentativo {_best_state.attempt}...")
+                _write_file(output_path, _best_state.code)
+                _swarm_rollback = True
+
             if progress_cb:
                 try:
                     await progress_cb({"event": "attempt_done", "attempt": attempt_num,

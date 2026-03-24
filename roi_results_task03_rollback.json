@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-03-24T13:22:55",
+  "results": [
+    {
+      "task": "task_03_dirty_data",
+      "naked": {
+        "task": "task_03_dirty_data",
+        "mode": "naked",
+        "success": false,
+        "passed": 23,
+        "failed": 1,
+        "total": 24,
+        "pass_rate": 0.9583333333333334,
+        "elapsed": 15.939251184463501,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_03_dirty_data",
+        "mode": "shard",
+        "success": false,
+        "passed": 23,
+        "failed": 1,
+        "total": 24,
+        "pass_rate": 0.9583333333333334,
+        "elapsed": 158.15631461143494,
+        "attempts": 5,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    }
+  ]
+}

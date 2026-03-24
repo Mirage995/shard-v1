@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-03-24T15:06:50",
+  "results": [
+    {
+      "task": "task_08_multi_file_labyrinth",
+      "naked": {
+        "task": "task_08_multi_file_labyrinth",
+        "mode": "naked",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 7.53026008605957,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_08_multi_file_labyrinth",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 3.7047970294952393,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    }
+  ]
+}

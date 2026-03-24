@@ -1,7 +1,5 @@
 {
-  "pending_queue": [
-    "ghost bug handling and debugging"
-  ],
+  "pending_queue": [],
   "processed_ticket_ids": [
     "cf_api_integration_applied_to_web_scraping",
     "cf_observability_applied_to_dark_matter_hyp",
@@ -11,6 +9,6 @@
     "cf_exception-driven_control_flow_applied_to",
     "nm_dfs_algorithm"
   ],
-  "total_topics_ever_queued": 19,
+  "total_topics_ever_queued": 23,
   "last_run_at": "2026-03-19T17:08:16.895888"
 }

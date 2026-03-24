@@ -1165,5 +1165,149 @@
     ],
     "acquired": "2026-03-23T16:03:37.044377",
     "source_topic": "dirty data handling and debugging"
+  },
+  "sliding window technique": {
+    "requires": [],
+    "acquired": "2026-03-24T15:07:02.526764",
+    "source_topic": "sliding window technique"
+  },
+  "time complexity": {
+    "requires": [
+      "sliding window technique"
+    ],
+    "acquired": "2026-03-24T15:07:02.532820",
+    "source_topic": "sliding window technique"
+  },
+  "gradient descent implementation from scratch": {
+    "requires": [],
+    "acquired": "2026-03-24T15:26:58.184546",
+    "source_topic": "gradient descent implementation from scratch"
+  },
+  "cost function": {
+    "requires": [
+      "gradient descent implementation from scratch"
+    ],
+    "acquired": "2026-03-24T15:26:58.189452",
+    "source_topic": "gradient descent implementation from scratch"
+  },
+  "learning rate": {
+    "requires": [
+      "gradient descent implementation from scratch"
+    ],
+    "acquired": "2026-03-24T15:26:58.194301",
+    "source_topic": "gradient descent implementation from scratch"
+  },
+  "batch gradient descent": {
+    "requires": [
+      "gradient descent implementation from scratch"
+    ],
+    "acquired": "2026-03-24T15:26:58.199032",
+    "source_topic": "gradient descent implementation from scratch"
+  },
+  "stochastic gradient descent": {
+    "requires": [
+      "gradient descent implementation from scratch"
+    ],
+    "acquired": "2026-03-24T15:26:58.203648",
+    "source_topic": "gradient descent implementation from scratch"
+  },
+  "clean architecture python": {
+    "requires": [],
+    "acquired": "2026-03-24T15:35:13.349571",
+    "source_topic": "clean architecture python"
+  },
+  "clean architecture": {
+    "requires": [
+      "clean architecture python"
+    ],
+    "acquired": "2026-03-24T15:35:13.354529",
+    "source_topic": "clean architecture python"
+  },
+  "solid principles": {
+    "requires": [
+      "clean architecture python"
+    ],
+    "acquired": "2026-03-24T15:35:13.359306",
+    "source_topic": "clean architecture python"
+  },
+  "design patterns": {
+    "requires": [
+      "clean architecture python"
+    ],
+    "acquired": "2026-03-24T15:35:13.364631",
+    "source_topic": "clean architecture python"
+  },
+  "dependency management": {
+    "requires": [
+      "clean architecture python"
+    ],
+    "acquired": "2026-03-24T15:35:13.369582",
+    "source_topic": "clean architecture python"
+  },
+  "convolutional neural network basics": {
+    "requires": [],
+    "acquired": "2026-03-24T16:02:33.058299",
+    "source_topic": "convolutional neural network basics"
+  },
+  "convolutional neural network (cnn)": {
+    "requires": [
+      "convolutional neural network basics"
+    ],
+    "acquired": "2026-03-24T16:02:33.063604",
+    "source_topic": "convolutional neural network basics"
+  },
+  "convolutional layer (conv2d)": {
+    "requires": [
+      "convolutional neural network basics"
+    ],
+    "acquired": "2026-03-24T16:02:33.068452",
+    "source_topic": "convolutional neural network basics"
+  },
+  "max pooling (maxpool2d)": {
+    "requires": [
+      "convolutional neural network basics"
+    ],
+    "acquired": "2026-03-24T16:02:33.072648",
+    "source_topic": "convolutional neural network basics"
+  },
+  "activation function (relu)": {
+    "requires": [
+      "convolutional neural network basics"
+    ],
+    "acquired": "2026-03-24T16:02:33.076792",
+    "source_topic": "convolutional neural network basics"
+  },
+  "fully connected layer (dense)": {
+    "requires": [
+      "convolutional neural network basics"
+    ],
+    "acquired": "2026-03-24T16:02:33.081076",
+    "source_topic": "convolutional neural network basics"
+  },
+  "logistic regression from scratch": {
+    "requires": [],
+    "acquired": "2026-03-24T16:12:30.179351",
+    "source_topic": "logistic regression from scratch"
+  },
+  "logistic regression": {
+    "requires": [
+      "logistic regression from scratch"
+    ],
+    "acquired": "2026-03-24T16:12:30.183535",
+    "source_topic": "logistic regression from scratch"
+  },
+  "sigmoid function": {
+    "requires": [
+      "logistic regression from scratch"
+    ],
+    "acquired": "2026-03-24T16:12:30.187629",
+    "source_topic": "logistic regression from scratch"
+  },
+  "cross-entropy loss": {
+    "requires": [
+      "logistic regression from scratch"
+    ],
+    "acquired": "2026-03-24T16:12:30.191507",
+    "source_topic": "logistic regression from scratch"
   }
 }

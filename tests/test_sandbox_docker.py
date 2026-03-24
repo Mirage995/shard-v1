@@ -1,353 +1,312 @@
 """
-Tests for Docker Sandbox Hardening in StudyAgent.
+Tests for DockerSandboxRunner — hardened Docker sandbox extracted into sandbox_runner.py.
 
-NOTE: These tests were written against the old StudyAgent._build_docker_command
-API which was removed when the sandbox was refactored into sandbox_executor.py.
-All tests in this file are skipped pending rewrite against the new API.
+Covers: _build_docker_command, _validate_sandbox_path, run(), _ensure_sandbox_image,
+        banned pattern filter, container uniqueness.
 """
-import pytest
-pytestmark = pytest.mark.skip(reason="Docker sandbox API refactored — tests need rewrite against sandbox_executor.py")
-import sys
-import os
-import json
-import pathlib
-import uuid
-import types
 import asyncio
+import os
 import subprocess
+import sys
+import uuid
 
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch, MagicMock
 
-# Ensure backend/ is on the path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
-# Pre-load real modules if available to prevent poisoning sys.modules for subsequent tests
-try:
-    import study_agent
-except Exception:
-    pass
-
-# ── Mock third-party modules so tests run without full dependencies ───────────
-for _mod_name in [
-    "playwright", "playwright.async_api",
-    "playwright_stealth",
-    "bs4",
-    "groq",
-    "ddgs",
-    "chromadb", "chromadb.utils", "chromadb.utils.embedding_functions",
-    "filesystem_tools",
-    "dotenv",
-    "openai",
-]:
-    if _mod_name not in sys.modules:
-        _fake = types.ModuleType(_mod_name)
-        _fake.__dict__.setdefault("load_dotenv", lambda: None)
-        _fake.__dict__.setdefault("Groq", MagicMock)
-        _fake.__dict__.setdefault("RateLimitError", type("RateLimitError", (Exception,), {}))
-        _fake.__dict__.setdefault("GroqRateLimitError", type("GroqRateLimitError", (Exception,), {}))
-        _fake.__dict__.setdefault("DDGS", MagicMock)
-        _fake.__dict__.setdefault("BeautifulSoup", MagicMock)
-        _fake.__dict__.setdefault("async_playwright", MagicMock)
-        _fake.__dict__.setdefault("Page", MagicMock)
-        _fake.__dict__.setdefault("Stealth", MagicMock)
-        _fake.__dict__.setdefault("PersistentClient", MagicMock)
-        _fake.__dict__.setdefault("DefaultEmbeddingFunction", MagicMock)
-        _fake.__dict__.setdefault("embedding_functions", MagicMock())
-        _fake.__dict__.setdefault("write_file", MagicMock(return_value="success"))
-        _fake.__dict__.setdefault("read_file", MagicMock(return_value="success"))
-        _fake.__dict__.setdefault("list_directory", MagicMock(return_value="[]"))
-        sys.modules[_mod_name] = _fake
-
-
-# ── Fixtures ──────────────────────────────────────────────────────────────────
-
-@pytest.fixture
-def mock_env(monkeypatch):
-    """Set GROQ_API_KEY so StudyAgent.__init__ doesn't raise."""
-    monkeypatch.setenv("GROQ_API_KEY", "test-key-fake")
-
-
-@pytest.fixture
-def agent(mock_env, tmp_path):
-    """Create a StudyAgent with mocked Groq/ChromaDB and tmp sandbox dir."""
-    mock_collection = MagicMock()
-    mock_collection.query.return_value = {
-        "documents": [[]], "metadatas": [[]], "distances": [[]],
-    }
-
-    with patch("study_agent.Groq") as MockGroq, \
-         patch("study_agent.get_collection", return_value=mock_collection), \
-         patch("study_agent.CHROMA_DB_PATH", str(tmp_path / "chroma")), \
-         patch("study_agent.SANDBOX_DIR", str(tmp_path / "sandbox")), \
-         patch("study_agent.WORKSPACE_DIR", str(tmp_path / "workspace")):
-
-        mock_groq_response = MagicMock()
-        mock_groq_response.choices = [MagicMock()]
-        mock_groq_response.choices[0].message.content = "Mocked analysis"
-        mock_groq_client = MagicMock()
-        mock_groq_client.chat.completions.create.return_value = mock_groq_response
-        MockGroq.return_value = mock_groq_client
-
-        from study_agent import StudyAgent
-        sa = StudyAgent()
-        sa._tmp_sandbox = str(tmp_path / "sandbox")
-
-        yield sa
+from sandbox_runner import DockerSandboxRunner
 
 
 SAMPLE_CODE = "print('Hello from sandbox')"
 
 
-# ── Test: Docker Command Flags ───────────────────────────────────────────────
+# ── Fixtures ──────────────────────────────────────────────────────────────────
 
-def test_docker_command_contains_all_required_flags(agent):
-    """All 13 mandatory Docker hardening flags must be in the command."""
-    cmd = agent._build_docker_command("/fake/sandbox", "test.py", "test-container")
-    cmd_str = " ".join(cmd)
-
-    assert "--rm" in cmd
-    assert "--network" in cmd and "none" in cmd
-    assert "-m" in cmd and "256m" in cmd
-    assert "--cpus=0.5" in cmd
-    assert "--pids-limit" in cmd and "64" in cmd
-    assert "--read-only" in cmd
-    assert "--tmpfs" in cmd
-    assert "/tmp:rw,noexec,nosuid,size=64m" in cmd
-    assert "--security-opt" in cmd and "no-new-privileges" in cmd
-    assert "--cap-drop" in cmd and "ALL" in cmd
-    assert "--ulimit" in cmd and "nofile=64:64" in cmd
-    assert "--user" in cmd and "1000:1000" in cmd
-    assert "-v" in cmd
-    assert "/fake/sandbox:/app:rw" in cmd_str
-    assert "-w" in cmd and "/app" in cmd
-    assert "--name" in cmd and "test-container" in cmd
-    assert "shard-sandbox:latest" in cmd
-    assert "python" in cmd and "test.py" in cmd
+@pytest.fixture
+def runner(tmp_path):
+    """DockerSandboxRunner with tmp sandbox dir, image pre-marked as checked."""
+    sandbox_dir = str(tmp_path / "sandbox")
+    os.makedirs(sandbox_dir, exist_ok=True)
+    r = DockerSandboxRunner(sandbox_dir=sandbox_dir, analysis_fn=None)
+    r._image_checked = True  # skip docker image inspect in tests
+    return r
 
 
-def test_docker_command_image_is_custom(agent):
-    """Must use shard-sandbox:latest, not python:3.10-slim."""
-    cmd = agent._build_docker_command("/fake", "test.py", "c1")
-    assert "shard-sandbox:latest" in cmd
-    assert "python:3.10-slim" not in cmd
+# ── _build_docker_command ─────────────────────────────────────────────────────
+
+class TestBuildDockerCommand:
+
+    def test_contains_all_required_flags(self, runner):
+        """All mandatory Docker hardening flags must be present."""
+        cmd = runner._build_docker_command("/fake/sandbox", "test.py", "test-container")
+        cmd_str = " ".join(cmd)
+
+        assert "--rm" in cmd
+        assert "--network" in cmd and "none" in cmd
+        assert "-m" in cmd and "256m" in cmd
+        assert "--cpus=0.5" in cmd
+        assert "--pids-limit" in cmd and "64" in cmd
+        assert "--read-only" in cmd
+        assert "--tmpfs" in cmd
+        assert "/tmp:rw,noexec,nosuid,size=64m" in cmd
+        assert "--security-opt" in cmd and "no-new-privileges" in cmd
+        assert "--cap-drop" in cmd and "ALL" in cmd
+        assert "--ulimit" in cmd and "nofile=64:64" in cmd
+        assert "--user" in cmd and "1000:1000" in cmd
+        assert "-v" in cmd
+        assert "/fake/sandbox:/app:rw" in cmd_str
+        assert "-w" in cmd and "/app" in cmd
+        assert "--name" in cmd and "test-container" in cmd
+        assert "shard-sandbox:latest" in cmd
+        assert "python" in cmd and "test.py" in cmd
+
+    def test_image_is_custom(self, runner):
+        """Must use shard-sandbox:latest, not a generic python image."""
+        cmd = runner._build_docker_command("/fake", "test.py", "c1")
+        assert "shard-sandbox:latest" in cmd
+        assert "python:3.10-slim" not in cmd
+
+    def test_mount_path_posix_format(self, runner, tmp_path):
+        """The -v mount path must use forward slashes (Windows compat)."""
+        sandbox = tmp_path / "sandbox"
+        sandbox.mkdir(exist_ok=True)
+        posix_path = sandbox.resolve().as_posix()
+        cmd = runner._build_docker_command(posix_path, "test.py", "c1")
+        v_idx = cmd.index("-v")
+        mount_arg = cmd[v_idx + 1]
+        assert "\\" not in mount_arg, "Mount path must not contain backslashes"
+        assert ":/app:rw" in mount_arg
+
+    def test_container_name_in_command(self, runner):
+        """Container name passed as argument must appear in the command."""
+        cmd = runner._build_docker_command("/fake", "test.py", "my-unique-container")
+        assert "my-unique-container" in cmd
 
 
-# ── Test: Container Name Uniqueness ──────────────────────────────────────────
+# ── Container name uniqueness ─────────────────────────────────────────────────
 
 def test_container_name_unique():
     """Each sandbox invocation must generate a unique container name."""
-    names = set()
-    for _ in range(100):
-        name = f"shard-sandbox-{uuid.uuid4().hex[:12]}"
-        names.add(name)
+    names = {f"shard-sandbox-{uuid.uuid4().hex[:12]}" for _ in range(100)}
     assert len(names) == 100
 
 
-# ── Test: Path Security — Symlink ────────────────────────────────────────────
+# ── _validate_sandbox_path ────────────────────────────────────────────────────
 
-def test_path_security_symlink_rejected(agent, tmp_path):
-    """Sandbox path containing a symlink must be rejected."""
-    real_dir = tmp_path / "real_sandbox"
-    real_dir.mkdir()
-    symlink_dir = tmp_path / "evil_link"
-    try:
-        symlink_dir.symlink_to(real_dir)
-    except OSError:
-        pytest.skip("Cannot create symlinks on this OS/permission level")
+class TestValidateSandboxPath:
 
-    with patch("study_agent.SANDBOX_DIR", str(symlink_dir)):
-        with pytest.raises(ValueError, match="[Ss]ymlink"):
-            agent._validate_sandbox_path(str(symlink_dir))
-
-
-# ── Test: Path Security — Directory Traversal ────────────────────────────────
-
-def test_path_security_traversal_rejected(agent, tmp_path):
-    """Paths with '../' escaping the sandbox parent must be rejected."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    evil_path = str(sandbox / ".." / ".." / ".." / "etc")
-
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)):
-        with pytest.raises(ValueError, match="[Tt]raversal"):
-            agent._validate_sandbox_path(evil_path)
-
-
-# ── Test: Path Normalization ─────────────────────────────────────────────────
-
-def test_path_normalization(agent, tmp_path):
-    """Sandbox path must be resolved to an absolute path without '..' segments."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)):
-        result = agent._validate_sandbox_path(str(sandbox))
+    def test_returns_absolute_path(self, runner, tmp_path):
+        sandbox = tmp_path / "sandbox"
+        sandbox.mkdir(exist_ok=True)
+        result = runner._validate_sandbox_path(str(sandbox))
         assert result.is_absolute()
+
+    def test_no_dotdot_in_result(self, runner, tmp_path):
+        sandbox = tmp_path / "sandbox"
+        sandbox.mkdir(exist_ok=True)
+        result = runner._validate_sandbox_path(str(sandbox))
         assert ".." not in str(result)
 
-
-# ── Test: Docker Mount Path Windows Compatible ──────────────────────────────
-
-def test_docker_mount_path_posix_format(agent, tmp_path):
-    """The -v mount path must be in POSIX format (forward slashes)."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    posix_path = sandbox.resolve().as_posix()
-    cmd = agent._build_docker_command(posix_path, "test.py", "c1")
-
-    v_idx = cmd.index("-v")
-    mount_arg = cmd[v_idx + 1]
-
-    assert "\\" not in mount_arg, "Mount path must not contain backslashes"
-    assert ":/app:rw" in mount_arg
+    def test_traversal_rejected(self, runner, tmp_path):
+        """Paths escaping the sandbox parent via '../' must be rejected."""
+        sandbox = tmp_path / "sandbox"
+        sandbox.mkdir(exist_ok=True)
+        evil_path = str(sandbox / ".." / ".." / ".." / "etc")
+        with pytest.raises(ValueError, match="[Tt]raversal"):
+            runner._validate_sandbox_path(evil_path)
 
 
-# ── Test: Timeout Triggers Docker Kill ───────────────────────────────────────
+# ── run() ─────────────────────────────────────────────────────────────────────
 
-def test_timeout_triggers_docker_kill(agent, tmp_path):
-    """TimeoutExpired must trigger docker kill with the container name."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
+class TestRun:
 
-    call_log = []
-
-    def mock_subprocess_run(cmd, **kwargs):
-        call_log.append(list(cmd))
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=0)
-        elif cmd[:2] == ["docker", "run"]:
-            raise subprocess.TimeoutExpired(cmd=cmd, timeout=30)
-        elif cmd[:2] == ["docker", "kill"]:
-            return MagicMock(returncode=0)
-        return MagicMock(returncode=0)
-
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", SAMPLE_CODE))
-
-    assert result["success"] is False
-    assert "Timeout" in result["stderr"]
-
-    kill_calls = [c for c in call_log if c[:2] == ["docker", "kill"]]
-    assert len(kill_calls) == 1, "docker kill must be called exactly once on timeout"
-    container_name = kill_calls[0][2]
-    assert container_name.startswith("shard-sandbox-")
-
-
-# ── Test: Kill Failure Swallowed ─────────────────────────────────────────────
-
-def test_kill_failure_swallowed(agent, tmp_path):
-    """If docker kill itself fails, the error must be silently handled."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    def mock_subprocess_run(cmd, **kwargs):
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=0)
-        elif cmd[:2] == ["docker", "run"]:
-            raise subprocess.TimeoutExpired(cmd=cmd, timeout=30)
-        elif cmd[:2] == ["docker", "kill"]:
-            raise OSError("Docker daemon not responding")
-        return MagicMock(returncode=0)
-
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", SAMPLE_CODE))
-
-    assert result["success"] is False
-    assert "Timeout" in result["stderr"]
-
-
-# ── Test: Output Truncation ──────────────────────────────────────────────────
-
-def test_output_truncation(agent, tmp_path):
-    """stdout and stderr exceeding 50k chars must be truncated."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    long_output = "x" * 100_000
-
-    def mock_subprocess_run(cmd, **kwargs):
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=0)
-        elif cmd[:2] == ["docker", "run"]:
-            return MagicMock(returncode=0, stdout=long_output, stderr=long_output)
-        return MagicMock(returncode=0)
-
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", SAMPLE_CODE))
-
-    assert len(result["stdout"]) <= 50_000
-    assert len(result["stderr"]) <= 50_000
-
-
-# ── Test: Successful Execution ───────────────────────────────────────────────
-
-def test_successful_execution(agent, tmp_path):
-    """Normal execution must return success=True with stdout/stderr/analysis."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    def mock_subprocess_run(cmd, **kwargs):
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=0)
-        elif cmd[:2] == ["docker", "run"]:
+    def test_successful_execution(self, runner):
+        """Normal execution returns success=True with stdout and code."""
+        def mock_run(cmd, **kwargs):
             return MagicMock(returncode=0, stdout="Hello from sandbox\n", stderr="")
-        return MagicMock(returncode=0)
 
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", SAMPLE_CODE))
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
 
-    assert result["success"] is True
-    assert "Hello from sandbox" in result["stdout"]
-    assert result["code"] == SAMPLE_CODE
-    assert isinstance(result["analysis"], str)
+        assert result["success"] is True
+        assert "Hello from sandbox" in result["stdout"]
+        assert result["code"] == SAMPLE_CODE
 
-
-# ── Test: Docker Failure Handling ────────────────────────────────────────────
-
-def test_docker_failure_returns_error(agent, tmp_path):
-    """Non-zero Docker exit code must result in success=False."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
-
-    def mock_subprocess_run(cmd, **kwargs):
-        if cmd[:2] == ["docker", "image"]:
-            return MagicMock(returncode=0)
-        elif cmd[:2] == ["docker", "run"]:
+    def test_docker_failure_returns_error(self, runner):
+        """Non-zero Docker exit code must result in success=False."""
+        def mock_run(cmd, **kwargs):
             return MagicMock(returncode=1, stdout="", stderr="SyntaxError: invalid syntax")
-        return MagicMock(returncode=0)
 
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", "invalid python!!!"))
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", "invalid python!!!"))
 
-    assert result["success"] is False
-    assert "SyntaxError" in result["stderr"]
+        assert result["success"] is False
+        assert "SyntaxError" in result["stderr"]
+
+    def test_timeout_triggers_docker_kill(self, runner):
+        """TimeoutExpired must trigger docker kill with the correct container name."""
+        call_log = []
+
+        def mock_run(cmd, **kwargs):
+            call_log.append(list(cmd))
+            if cmd[:2] == ["docker", "run"]:
+                raise subprocess.TimeoutExpired(cmd=cmd, timeout=30)
+            return MagicMock(returncode=0)
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
+
+        assert result["success"] is False
+        assert "Timeout" in result["stderr"]
+        kill_calls = [c for c in call_log if c[:2] == ["docker", "kill"]]
+        assert len(kill_calls) == 1, "docker kill must be called exactly once on timeout"
+        assert kill_calls[0][2].startswith("shard-sandbox-")
+
+    def test_kill_failure_swallowed(self, runner):
+        """If docker kill itself fails, the error must be silently absorbed."""
+        def mock_run(cmd, **kwargs):
+            if cmd[:2] == ["docker", "run"]:
+                raise subprocess.TimeoutExpired(cmd=cmd, timeout=30)
+            if cmd[:2] == ["docker", "kill"]:
+                raise OSError("Docker daemon not responding")
+            return MagicMock(returncode=0)
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
+
+        assert result["success"] is False
+        assert "Timeout" in result["stderr"]
+
+    def test_output_truncation(self, runner):
+        """stdout and stderr exceeding MAX_OUTPUT_CHARS must be truncated."""
+        long_output = "x" * 100_000
+
+        def mock_run(cmd, **kwargs):
+            return MagicMock(returncode=0, stdout=long_output, stderr=long_output)
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
+
+        assert len(result["stdout"]) <= DockerSandboxRunner.MAX_OUTPUT_CHARS
+        assert len(result["stderr"]) <= DockerSandboxRunner.MAX_OUTPUT_CHARS
+
+    def test_analysis_fn_called_on_success(self, tmp_path):
+        """analysis_fn must be called and its result stored in 'analysis'."""
+        sandbox_dir = str(tmp_path / "sandbox")
+        os.makedirs(sandbox_dir, exist_ok=True)
+
+        async def mock_analysis(prompt):
+            return "mocked analysis"
+
+        r = DockerSandboxRunner(sandbox_dir=sandbox_dir, analysis_fn=mock_analysis)
+        r._image_checked = True
+
+        def mock_run(cmd, **kwargs):
+            return MagicMock(returncode=0, stdout="ok", stderr="")
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(r.run("test topic", SAMPLE_CODE))
+
+        assert result["analysis"] == "mocked analysis"
+
+    def test_analysis_skipped_when_none(self, runner):
+        """analysis_fn=None must produce 'Analysis skipped.' in result."""
+        def mock_run(cmd, **kwargs):
+            return MagicMock(returncode=0, stdout="ok", stderr="")
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
+
+        assert result["analysis"] == "Analysis skipped."
+
+    def test_result_contains_file_path(self, runner):
+        """Successful run must include 'file_path' in result."""
+        def mock_run(cmd, **kwargs):
+            return MagicMock(returncode=0, stdout="ok", stderr="")
+
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(runner.run("test topic", SAMPLE_CODE))
+
+        assert "file_path" in result
+        assert result["file_path"] is not None
 
 
-# ── Test: Missing Docker Image ───────────────────────────────────────────────
+# ── _ensure_sandbox_image ─────────────────────────────────────────────────────
 
-def test_missing_docker_image_returns_clear_error(agent, tmp_path):
-    """If shard-sandbox:latest doesn't exist, return a clear error message."""
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir(exist_ok=True)
+class TestEnsureSandboxImage:
 
-    def mock_subprocess_run(cmd, **kwargs):
-        import subprocess
-        if cmd[:2] == ["docker", "image"] or cmd[:2] == ["docker", "build"]:
+    def test_image_check_runs_once(self, tmp_path):
+        """_ensure_sandbox_image must only call docker image inspect once per instance."""
+        sandbox_dir = str(tmp_path / "sandbox2")
+        os.makedirs(sandbox_dir, exist_ok=True)
+        r = DockerSandboxRunner(sandbox_dir=sandbox_dir)
+
+        call_count = [0]
+
+        def mock_run(cmd, **kwargs):
+            if cmd[:2] == ["docker", "image"]:
+                call_count[0] += 1
+            return MagicMock(returncode=0)
+
+        with patch("subprocess.run", side_effect=mock_run):
+            asyncio.run(r._ensure_sandbox_image())
+            # Second call: _image_checked is True, must short-circuit
+            asyncio.run(r._ensure_sandbox_image())
+
+        assert call_count[0] == 1
+
+    def test_missing_image_raises_runtime_error(self, tmp_path):
+        """If docker build fails, RuntimeError must be raised."""
+        sandbox_dir = str(tmp_path / "sandbox3")
+        os.makedirs(sandbox_dir, exist_ok=True)
+        r = DockerSandboxRunner(sandbox_dir=sandbox_dir)
+
+        def mock_run(cmd, **kwargs):
+            raise subprocess.CalledProcessError(1, cmd, stderr="build failed")
+
+        with patch("subprocess.run", side_effect=mock_run):
+            with pytest.raises(RuntimeError, match="Failed to automatically build"):
+                asyncio.run(r._ensure_sandbox_image())
+
+    def test_missing_image_propagates_to_run(self, tmp_path):
+        """If image build fails, run() must return success=False with clear message."""
+        sandbox_dir = str(tmp_path / "sandbox4")
+        os.makedirs(sandbox_dir, exist_ok=True)
+        r = DockerSandboxRunner(sandbox_dir=sandbox_dir)
+
+        def mock_run(cmd, **kwargs):
             raise subprocess.CalledProcessError(1, cmd, stderr="Simulated build failure")
-        return MagicMock(returncode=0)
 
-    with patch("study_agent.SANDBOX_DIR", str(sandbox)), \
-         patch("subprocess.run", side_effect=mock_subprocess_run):
-        result = asyncio.run(agent.run_sandbox("test topic", SAMPLE_CODE))
+        with patch("subprocess.run", side_effect=mock_run):
+            result = asyncio.run(r.run("test topic", SAMPLE_CODE))
 
-    assert result["success"] is False
-    assert "shard-sandbox:latest" in result["stderr"]
-    assert "Build" in result["stderr"] or "build" in result["stderr"]
+        assert result["success"] is False
+        assert result["stderr"] != ""
+
+
+# ── Banned patterns ───────────────────────────────────────────────────────────
+
+class TestBannedPatterns:
+
+    @pytest.mark.parametrize("pattern", [
+        "serve_forever",
+        "HTTPServer(",
+        "app.run(",
+        "uvicorn.run(",
+        "Flask(__name__)",
+        ".listen(",
+        "while True",
+    ])
+    def test_persistent_server_pattern_blocked(self, runner, pattern):
+        """Code containing persistent server patterns must be blocked before execution."""
+        code = f"import something\n{pattern}\nprint('done')"
+        result = asyncio.run(runner.run("test", code))
+        assert result["success"] is False
+        assert result.get("error") == "persistent_server_detected"
+        assert result.get("pattern") == pattern
+
+
+if __name__ == "__main__":
+    import pytest as _pt
+    _pt.main([__file__, "-v"])

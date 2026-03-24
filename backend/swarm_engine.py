@@ -49,6 +49,16 @@ SYSTEM_PROMPT_CODER = (
     "Follow the Architect's constraints explicitly: if the strategy says 'do not change X', do not change X."
 )
 
+SYSTEM_PROMPT_CODER_SURGICAL = (
+    "You are a precise Python implementation agent in SURGICAL FIX mode. "
+    "A regression was detected: a previous refactor broke tests that were passing. "
+    "You must make ONLY the minimal change needed to fix the single remaining failing test. "
+    "FORBIDDEN: renaming variables, adding validation, adding html.escape, restructuring classes, "
+    "adding error handling, adding comments, or ANY change not directly required by the failing test. "
+    "If in doubt, leave it unchanged. "
+    "Output ONLY valid Python source code. No markdown fences, no explanations."
+)
+
 SYSTEM_PROMPT_CRITIC = (
     "You are a strict Python code reviewer. "
     "You receive code and the tests it must pass. "
@@ -203,6 +213,7 @@ def _extract_code(response: str) -> str:
 def _build_architect_prompt(
     source: str, tests: str, attempts: list, output_filename: str,
     stuck_tests: list = None,
+    rollback_hint: bool = False,
 ) -> str:
     history_parts = []
     for rec in attempts:
@@ -267,9 +278,23 @@ Specific root causes you MUST fix:
     except Exception as e:
         logger.debug("[SWARM] GraphRAG query skipped: %s", e)
 
+    rollback_block = ""
+    if rollback_hint:
+        rollback_block = (
+            "=== REGRESSIONE RILEVATA — CRITICO ===\n"
+            "Il tentativo precedente ha REGRESSIONATO il codice: test che passavano ora falliscono.\n"
+            "Il BEST STATE e' stato ripristinato su disco. Parti OBBLIGATORIAMENTE da quel codice.\n"
+            "Regole TASSATIVE per la tua strategia:\n"
+            "  1. Correggi SOLO il singolo test ancora fallito — nient'altro.\n"
+            "  2. VIETATO suggerire: rinominare variabili, aggiungere validazione, aggiungere\n"
+            "     html.escape, ristrutturare classi, aggiungere commenti, o qualsiasi cambio\n"
+            "     non direttamente richiesto dal test fallito.\n"
+            "  3. Cambio minimo chirurgico. Zero over-engineering.\n\n"
+        )
+
     return f"""Analyze the following failed benchmark task and produce a strategy document.
 
-=== SOURCE CODE (reference — do NOT optimize unless explicitly needed) ===
+{rollback_block}=== SOURCE CODE (reference — do NOT optimize unless explicitly needed) ===
 {source}
 
 === TEST FILE (all tests must pass) ===
@@ -329,6 +354,8 @@ async def swarm_complete(
     max_tokens: int = 8192,
     temperature: float = 0.05,
     stuck_tests: list = None,
+    rollback_hint: bool = False,
+    rollback_code: str = None,
 ) -> str:
     """Multi-agent pipeline: Architect → Coder → Multi-Reviewer → (Coder patch if needed).
 
@@ -343,15 +370,21 @@ async def swarm_complete(
         max_tokens:      Forwarded to Coder calls only.
         temperature:     Forwarded to Coder calls only.
     """
-    logger.info("[SWARM] Starting pipeline (%d prior attempts)", len(attempts))
+    logger.info("[SWARM] Starting pipeline (%d prior attempts, rollback=%s)", len(attempts), rollback_hint)
 
-    # Always start Coder from last syntactically valid code, never from broken code
-    last_valid = next((r for r in reversed(attempts) if r.syntax_valid), None)
-    current_code = last_valid.code if last_valid else source
+    # Rollback mode: start from the best known state, not the last (regressive) attempt
+    if rollback_hint and rollback_code:
+        current_code = rollback_code
+        logger.info("[SWARM] Rollback mode: using best state as base (%d chars)", len(current_code))
+    else:
+        # Always start Coder from last syntactically valid code, never from broken code
+        last_valid = next((r for r in reversed(attempts) if r.syntax_valid), None)
+        current_code = last_valid.code if last_valid else source
 
     # ── Step 1: Architect ────────────────────────────────────────────────────
     architect_prompt = _build_architect_prompt(source, tests, attempts, output_filename,
-                                               stuck_tests=stuck_tests)
+                                               stuck_tests=stuck_tests,
+                                               rollback_hint=rollback_hint)
     strategy = await llm_complete(
         prompt=architect_prompt,
         system=SYSTEM_PROMPT_ARCHITECT,
@@ -364,9 +397,10 @@ async def swarm_complete(
     coder_prompt = _build_coder_prompt(
         source, current_code, strategy, output_filename, attempts
     )
+    coder_system = SYSTEM_PROMPT_CODER_SURGICAL if rollback_hint else SYSTEM_PROMPT_CODER
     raw_code = await llm_complete(
         prompt=coder_prompt,
-        system=SYSTEM_PROMPT_CODER,
+        system=coder_system,
         max_tokens=max_tokens,
         temperature=temperature,
     )

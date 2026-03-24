@@ -1,184 +1,6 @@
 {
   "task_03_dirty_data": [
     {
-      "run_id": "ed097eef",
-      "timestamp": "2026-03-18T22:34:50",
-      "success": true,
-      "total_attempts": 5,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "    \n        speedup = legacy_time / optimized_time if optimized_time > 0 else 999\n        threshold = 1.3  # must be at least 1.3x faster\n    \n>       assert speedup >= threshold, (\n            f\"Not fast enough. Legacy: {legacy_time*1000:.1f}ms, \"\n            f\"Optimized: {optimized_time*1000:.1f}ms, \"\n            f\"Speedup: {speedup:.2f}x (need >= {threshold}x). \"\n            f\"A try/except wrapper has the same algorithmic complexity as legacy. \"\n            f\"Use defaultdict, Counter, single-pass aggregation, or batch validation.\"\n        )\nE       AssertionError: Not fast enough. Legacy: "
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "    \n        speedup = legacy_time / optimized_time if optimized_time > 0 else 999\n        threshold = 1.3  # must be at least 1.3x faster\n    \n>       assert speedup >= threshold, (\n            f\"Not fast enough. Legacy: {legacy_time*1000:.1f}ms, \"\n            f\"Optimized: {optimized_time*1000:.1f}ms, \"\n            f\"Speedup: {speedup:.2f}x (need >= {threshold}x). \"\n            f\"A try/except wrapper has the same algorithmic complexity as legacy. \"\n            f\"Use defaultdict, Counter, single-pass aggregation, or batch validation.\"\n        )\nE       AssertionError: Not fast enough. Legacy: "
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "    \n        speedup = legacy_time / optimized_time if optimized_time > 0 else 999\n        threshold = 1.3  # must be at least 1.3x faster\n    \n>       assert speedup >= threshold, (\n            f\"Not fast enough. Legacy: {legacy_time*1000:.1f}ms, \"\n            f\"Optimized: {optimized_time*1000:.1f}ms, \"\n            f\"Speedup: {speedup:.2f}x (need >= {threshold}x). \"\n            f\"A try/except wrapper has the same algorithmic complexity as legacy. \"\n            f\"Use defaultdict, Counter, single-pass aggregation, or batch validation.\"\n        )\nE       AssertionError: Not fast enough. Legacy: "
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "    \n        speedup = legacy_time / optimized_time if optimized_time > 0 else 999\n        threshold = 1.3  # must be at least 1.3x faster\n    \n>       assert speedup >= threshold, (\n            f\"Not fast enough. Legacy: {legacy_time*1000:.1f}ms, \"\n            f\"Optimized: {optimized_time*1000:.1f}ms, \"\n            f\"Speedup: {speedup:.2f}x (need >= {threshold}x). \"\n            f\"A try/except wrapper has the same algorithmic complexity as legacy. \"\n            f\"Use defaultdict, Counter, single-pass aggregation, or batch validation.\"\n        )\nE       AssertionError: Not fast enough. Legacy: "
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_faster_than_legacy",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 5. Passing tests: test_total_completed, test_avg_completed, test_by_category, test_by_month, test_unique_merchants, test_top_merchants"
-    },
-    {
       "run_id": "a0fd4634",
       "timestamp": "2026-03-18T22:42:12",
       "success": false,
@@ -955,6 +777,444 @@
             "test_faster_than_legacy"
           ],
           "error_summary": "\nself = <test_task3.TestPerformance object at 0x0000024CCBA0A210>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_faster_than_legacy",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_total_completed, test_avg_completed, test_by_category, test_by_month, test_unique_merchants, test_top_merchants"
+    },
+    {
+      "run_id": "2aca0f78",
+      "timestamp": "2026-03-24T12:55:02",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 3658,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_faster_than_legacy"
+          ],
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001C89A0C8E10>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        }
+      ]
+    },
+    {
+      "run_id": "0346ab0f",
+      "timestamp": "2026-03-24T13:22:55",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 3658,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_faster_than_legacy"
+          ],
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x0000016952048E10>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_top_merchants",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_duplicate_ids",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_missing_merchant",
+            "test_duplicate_ids_detected"
+          ],
+          "error_summary": "             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m3\"},\n        ]\n        result = optimized_module.process_transactions(tx)\n>       assert result[\"duplicate_ids\"] == [\"DUP\"]\nE       AssertionError: assert [] == ['DUP']\nE         \nE         Right contains one more item: 'DUP'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'DUP',\nE         - ]\n\ntest_task3.py:336: AssertionError\n------------------------------ Captured log call ------------------------------\nWARNING  root:optimized_processor.py:134 D"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_currency_totals",
+            "test_faster_than_legacy",
+            "test_negative_completed_flagged"
+          ],
+          "error_summary": "optimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_negative_completed_flagged(self, optimized_module):\n        \"\"\"Negative amount on completed transaction must be flagged.\"\"\"\n        tx = [\n            {\"id\": \"T1\", \"amount\": 100.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed\",\n             \"timestamp\": \"2025-06-15T10:00:00\", \"merchant\": \"m1\"},\n            {\"id\": \"T2\", \"amount\": -25.0, \"currency\": \"EUR\",\n             \"category\": \"food\", \"status\": \"completed"
+        }
+      ]
+    },
+    {
+      "run_id": "061e62cf",
+      "timestamp": "2026-03-24T16:14:27",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3501,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [
+            "test_faster_than_legacy"
+          ],
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001B6494F8F50>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         },
         {
           "attempt": 2,
@@ -2215,6 +2475,156 @@
           "error_summary": "self = <test_task2.TestBugFixes object at 0x000001685E82A850>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
         }
       ]
+    },
+    {
+      "run_id": "6d57bee3",
+      "timestamp": "2026-03-24T12:52:04",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 3664,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000025E25019310>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000282F1A89310>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+    },
+    {
+      "run_id": "c8307a4a",
+      "timestamp": "2026-03-24T16:13:59",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3664,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000259A4A09310>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
     }
   ],
   "task_04_race_condition": [
@@ -2444,6 +2854,157 @@
         }
       ],
       "winning_hint": "Solved on attempt 3. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "0b47e05b",
+      "timestamp": "2026-03-24T12:11:22",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 3554,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [],
+          "failed": [],
+          "error_summary": "(no details)"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [],
+          "failed": [],
+          "error_summary": "(no details)"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "705e80ad",
+      "timestamp": "2026-03-24T12:56:34",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3554,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_mixed_operations",
+            "test_has_required_methods"
+          ],
+          "failed": [
+            "test_concurrent_transfers_conserve_money",
+            "test_no_deadlock_bidirectional",
+            "test_uses_threading_primitives",
+            "test_concurrent_transfers_conserve_money"
+          ],
+          "error_summary": ">       assert abs(total - 200000.0) < 0.01, (\n            f\"Money conservation violated after bidirectional transfers: {total}\"\n        )\nE       AssertionError: Money conservation violated after bidirectional transfers: 200141.0\nE       assert 141.0 < 0.01\nE        +  where 141.0 = abs((200141.0 - 200000.0))\n\ntest_task4.py:302: AssertionError\n________________ TestStructure.test_uses_threading_primitives _________________\n\nself = <test_task4.TestStructure object at 0x000002044E859810>\n\n    def test_uses_threading_primitives(self):\n        \"\"\"The fix must use proper synchronization.\"\"\"\n       "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "cd6d4d10",
+      "timestamp": "2026-03-24T16:14:36",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3554,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
     }
   ],
   "task_01_html_trap": [
@@ -2812,6 +3373,365 @@
         }
       ],
       "winning_hint": "Solved on attempt 2. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
+    },
+    {
+      "run_id": "da7dad24",
+      "timestamp": "2026-03-24T12:05:30",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 3549,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_generate_restaurant_page_is_thin"
+          ],
+          "error_summary": "test_task1.py::TestStructuralQuality::test_generate_restaurant_page_is_thin FAILED [ 82%]\ntest_task1.py::TestStructuralQuality::test_no_global_mutation PASSED     [ 88%]\ntest_task1.py::TestDataContract::test_sample_menu_importable PASSED      [ 94%]\ntest_task1.py::TestDataContract::test_works_with_different_data PASSED   [100%]\n\n================================== FAILURES ===================================\n_________ TestStructuralQuality.test_generate_restaurant_page_is_thin _________\n\nself = <test_task1.TestStructuralQuality object at 0x0000022261924050>\nrefactored_source = '\"\"\"refactored_ag"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_works_with_different_data",
+            "test_dalle_placeholders_present"
+          ],
+          "error_summary": "[SETUP ERRORS]\n_________ ERROR at setup of TestOutputEquivalence.test_html_identical _________\n\nrefactored_module = <module 'refactored_agent' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_01_html_trap\\\\refactored_agent.py'>\n\n    @pytest.fixture(scope=\"session\")\n    def refactored_html(refactored_module):\n        \"\"\"HTML generated by the refactored code.\"\"\"\n        fn = getattr(refactored_module, \"generate_restaurant_page\", None)\n        if fn is None:\n            pytest.fail(\n                \"refactored_agent.py must expose a generate_restaurant_page(menu_data) function.\"\n       "
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_works_with_different_data",
+            "test_dalle_placeholders_present"
+          ],
+          "error_summary": "[SETUP ERRORS]\n_________ ERROR at setup of TestOutputEquivalence.test_html_identical _________\n\nrefactored_module = <module 'refactored_agent' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_01_html_trap\\\\refactored_agent.py'>\n\n    @pytest.fixture(scope=\"session\")\n    def refactored_html(refactored_module):\n        \"\"\"HTML generated by the refactored code.\"\"\"\n        fn = getattr(refactored_module, \"generate_restaurant_page\", None)\n        if fn is None:\n            pytest.fail(\n                \"refactored_agent.py must expose a generate_restaurant_page(menu_data) function.\"\n       "
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_works_with_different_data",
+            "test_dalle_placeholders_present"
+          ],
+          "error_summary": "[SETUP ERRORS]\n_________ ERROR at setup of TestOutputEquivalence.test_html_identical _________\n\nrefactored_module = <module 'refactored_agent' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_01_html_trap\\\\refactored_agent.py'>\n\n    @pytest.fixture(scope=\"session\")\n    def refactored_html(refactored_module):\n        \"\"\"HTML generated by the refactored code.\"\"\"\n        fn = getattr(refactored_module, \"generate_restaurant_page\", None)\n        if fn is None:\n            pytest.fail(\n                \"refactored_agent.py must expose a generate_restaurant_page(menu_data) function.\"\n       "
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_works_with_different_data",
+            "test_dalle_placeholders_present"
+          ],
+          "error_summary": "[SETUP ERRORS]\n_________ ERROR at setup of TestOutputEquivalence.test_html_identical _________\n\nrefactored_module = <module 'refactored_agent' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_01_html_trap\\\\refactored_agent.py'>\n\n    @pytest.fixture(scope=\"session\")\n    def refactored_html(refactored_module):\n        \"\"\"HTML generated by the refactored code.\"\"\"\n        fn = getattr(refactored_module, \"generate_restaurant_page\", None)\n        if fn is None:\n            pytest.fail(\n                \"refactored_agent.py must expose a generate_restaurant_page(menu_data) function.\"\n       "
+        }
+      ]
+    },
+    {
+      "run_id": "c6ca97fd",
+      "timestamp": "2026-03-24T12:50:31",
+      "success": true,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 3549,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_sample_menu_importable",
+            "test_dalle_placeholders_present"
+          ],
+          "error_summary": "[SETUP ERRORS]\n_________ ERROR at setup of TestOutputEquivalence.test_html_identical _________\n\nrefactored_module = <module 'refactored_agent' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_01_html_trap\\\\refactored_agent.py'>\n\n    @pytest.fixture(scope=\"session\")\n    def refactored_html(refactored_module):\n        \"\"\"HTML generated by the refactored code.\"\"\"\n        fn = getattr(refactored_module, \"generate_restaurant_page\", None)\n        if fn is None:\n            pytest.fail(\n                \"refactored_agent.py must expose a generate_restaurant_page(menu_data) function.\"\n       "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_star_names_in_footer",
+            "test_sample_menu_importable"
+          ],
+          "error_summary": "        expected = \", \".join(star_names)\n>       assert expected in refactored_html, (\n            f\"Star names '{expected}' not found in stats footer\"\n        )\nE       AssertionError: Star names 'Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu' not found in stats footer\nE       assert 'Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu' in '<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset=\"utf-8\">\\n<title>Pizzeria Da Mario — Menu</title>\\n<style>\\nbody { font-family: \\'Segoe UI\\', Tahoma, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; color: #2d3748; }\\n."
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_star_names_in_footer",
+            "test_no_global_mutation"
+          ],
+          "error_summary": "        # They appear comma-joined in the stats footer\n        expected = \", \".join(star_names)\n>       assert expected in refactored_html, (\n            f\"Star names '{expected}' not found in stats footer\"\n        )\nE       AssertionError: Star names 'Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu' not found in stats footer\nE       assert 'Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu' in '<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset=\"utf-8\">\\n<title>Pizzeria Da Mario — Menu</title>\\n<style>\\nbody { font-family: \\'Segoe UI\\', Tahoma, sans-serif; margin: 0; p"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_star_names_in_footer"
+          ],
+          "error_summary": "E               Failed: HTML differs at line 131:\nE                 EXPECTED: '<div class=\"stat-item\"><span class=\"stat-value\">Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu</span>'\nE                 GOT:      '<div class=\"stat-item\"><span class=\"stat-value\">Quattro Formaggi, Margherita, Spaghetti allo Scoglio, Tiramisu</span>'\n\ntest_task1.py:92: Failed\n_______________ TestOutputEquivalence.test_star_names_in_footer _______________\n\nself = <test_task1.TestOutputEquivalence object at 0x0000011A5909EE50>\nrefactored_html = '<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset=\"utf-8\">\\n"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 5. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
+    },
+    {
+      "run_id": "79d50bfb",
+      "timestamp": "2026-03-24T16:13:32",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3549,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [
+            "test_html_identical",
+            "test_star_names_in_footer"
+          ],
+          "error_summary": "E               Failed: HTML differs at line 131:\nE                 EXPECTED: '<div class=\"stat-item\"><span class=\"stat-value\">Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu</span>'\nE                 GOT:      '<div class=\"stat-item\"><span class=\"stat-value\">Quattro Formaggi, Margherita, Spaghetti allo Scoglio, Tiramisu</span>'\n\ntest_task1.py:92: Failed\n_______________ TestOutputEquivalence.test_star_names_in_footer _______________\n\nself = <test_task1.TestOutputEquivalence object at 0x00000250A1ECEE50>\nrefactored_html = '<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset=\"utf-8\">\\n"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
     }
   ],
   "task_05_state_mutation": [
@@ -2937,6 +3857,626 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "0de5a26c",
+      "timestamp": "2026-03-24T12:56:41",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3914,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "99ed8c1e",
+      "timestamp": "2026-03-24T16:14:40",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3914,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    }
+  ],
+  "task_07_metrics_bleed": [
+    {
+      "run_id": "1a6d7440",
+      "timestamp": "2026-03-24T12:11:34",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4607,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_counter_basic",
+            "test_counter_reset",
+            "test_counter_invalid_increment",
+            "test_counters_are_independent",
+            "test_histograms_do_not_share_buckets",
+            "test_new_histogram_does_not_reset_existing",
+            "test_bucket_counts_correct",
+            "test_percentile_does_not_mutate_samples",
+            "test_percentile_values",
+            "test_percentile_empty",
+            "test_percentile_stable_across_calls",
+            "test_count_and_mean",
+            "test_collector_counter",
+            "test_collector_histogram",
+            "test_collector_snapshot",
+            "test_two_collectors_isolated"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
+    },
+    {
+      "run_id": "c76688d9",
+      "timestamp": "2026-03-24T12:57:06",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4607,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_counter_basic",
+            "test_counter_reset",
+            "test_counter_invalid_increment",
+            "test_counters_are_independent",
+            "test_histograms_do_not_share_buckets",
+            "test_new_histogram_does_not_reset_existing",
+            "test_bucket_counts_correct",
+            "test_percentile_does_not_mutate_samples",
+            "test_percentile_values",
+            "test_percentile_empty",
+            "test_percentile_stable_across_calls",
+            "test_count_and_mean",
+            "test_collector_counter",
+            "test_collector_histogram",
+            "test_collector_snapshot",
+            "test_two_collectors_isolated"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
+    },
+    {
+      "run_id": "3386cc22",
+      "timestamp": "2026-03-24T16:14:50",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4607,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_counter_basic",
+            "test_counter_reset",
+            "test_counter_invalid_increment",
+            "test_counters_are_independent",
+            "test_histograms_do_not_share_buckets",
+            "test_new_histogram_does_not_reset_existing",
+            "test_bucket_counts_correct",
+            "test_percentile_does_not_mutate_samples",
+            "test_percentile_values",
+            "test_percentile_empty",
+            "test_percentile_stable_across_calls",
+            "test_count_and_mean",
+            "test_collector_counter",
+            "test_collector_histogram",
+            "test_collector_snapshot",
+            "test_two_collectors_isolated"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
+    }
+  ],
+  "task_06_ttl_cache": [
+    {
+      "run_id": "398c4c4b",
+      "timestamp": "2026-03-24T12:56:50",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4817,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_set_and_get",
+            "test_get_missing_returns_none",
+            "test_overwrite",
+            "test_delete",
+            "test_delete_nonexistent_is_noop",
+            "test_clear",
+            "test_expired_entry_returns_none",
+            "test_expired_entry_counted_as_miss",
+            "test_non_expired_entry_still_accessible",
+            "test_multiple_keys_independent_ttl",
+            "test_size_excludes_expired_entries",
+            "test_size_live_only",
+            "test_size_after_clear",
+            "test_stats_hits_misses",
+            "test_stats_reset_on_clear",
+            "test_evict_expired_removes_stale",
+            "test_evict_expired_leaves_live_entries"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
+    },
+    {
+      "run_id": "8208f9fc",
+      "timestamp": "2026-03-24T16:14:44",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4817,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_set_and_get",
+            "test_get_missing_returns_none",
+            "test_overwrite",
+            "test_delete",
+            "test_delete_nonexistent_is_noop",
+            "test_clear",
+            "test_expired_entry_returns_none",
+            "test_expired_entry_counted_as_miss",
+            "test_non_expired_entry_still_accessible",
+            "test_multiple_keys_independent_ttl",
+            "test_size_excludes_expired_entries",
+            "test_size_live_only",
+            "test_size_after_clear",
+            "test_stats_hits_misses",
+            "test_stats_reset_on_clear",
+            "test_evict_expired_removes_stale",
+            "test_evict_expired_leaves_live_entries"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
+    }
+  ],
+  "task_08_multi_file_labyrinth": [
+    {
+      "run_id": "12651133",
+      "timestamp": "2026-03-24T15:06:50",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3772,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_dict_mode_default_value",
+            "test_dict_mode_value_10",
+            "test_dict_mode_value_0",
+            "test_dict_mode_value_100",
+            "test_dict_mode_no_config",
+            "test_int_mode_default_value",
+            "test_int_mode_value_10",
+            "test_int_mode_value_0",
+            "test_int_mode_value_100",
+            "test_both_modes_same_result"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_dict_mode_default_value, test_dict_mode_value_10, test_dict_mode_value_0, test_dict_mode_value_100, test_dict_mode_no_config, test_int_mode_default_value"
+    },
+    {
+      "run_id": "320b428c",
+      "timestamp": "2026-03-24T16:09:15",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3817,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_a1",
+            "test_a2",
+            "test_a3",
+            "test_a4",
+            "test_a5",
+            "test_b1",
+            "test_b2",
+            "test_b3",
+            "test_b4",
+            "test_b5"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
+    },
+    {
+      "run_id": "069fef4d",
+      "timestamp": "2026-03-24T16:14:52",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3817,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_a1",
+            "test_a2",
+            "test_a3",
+            "test_a4",
+            "test_a5",
+            "test_b1",
+            "test_b2",
+            "test_b3",
+            "test_b4",
+            "test_b5"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
+    }
+  ],
+  "task_09_ghost_mutation": [
+    {
+      "run_id": "87a5766e",
+      "timestamp": "2026-03-24T16:19:53",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3303,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    }
+  ],
+  "task_10_template_parser": [
+    {
+      "run_id": "5d9cb6dd",
+      "timestamp": "2026-03-24T16:43:31",
+      "success": true,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 1713,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_unknown_field_warns",
+            "test_empty_template"
+          ],
+          "failed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_mixed_known_unknown",
+            "test_format_spec_with_custom_braces",
+            "test_all_message_fields"
+          ],
+          "error_summary": "[test_simple_field]\ndef test_simple_field():\n>       assert _proc().parse_template(\"{category}\") == [\"category\"]\nE       AssertionError: assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'category',\nE         - ]\n\ntest_task10.py:21: AssertionError\n\n[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_unknown_field_warns",
+            "test_empty_template"
+          ],
+          "failed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_mixed_known_unknown",
+            "test_format_spec_with_custom_braces",
+            "test_all_message_fields"
+          ],
+          "error_summary": "[test_simple_field]\ndef test_simple_field():\n>       assert _proc().parse_template(\"{category}\") == [\"category\"]\nE       AssertionError: assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'category',\nE         - ]\n\ntest_task10.py:21: AssertionError\n\n[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_format_spec_with_custom_braces",
+            "test_all_message_fields"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 5. Passing tests: test_simple_field, test_format_spec, test_multiple_fields, test_custom_braces_json_style, test_custom_braces_no_false_warnings, test_unknown_field_warns"
+    }
+  ],
+  "task_11_stream_decoder": [
+    {
+      "run_id": "766d6745",
+      "timestamp": "2026-03-24T16:43:36",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3874,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_utf8_encoding_returns_str",
+            "test_latin1_encoding_returns_str",
+            "test_none_encoding_uses_apparent",
+            "test_none_encoding_correct_content",
+            "test_none_encoding_apparent_latin1",
+            "test_explicit_encoding_multiline",
+            "test_empty_iterator",
+            "test_empty_iterator_none_encoding",
+            "test_single_chunk",
+            "test_unicode_chars_across_chunks"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_utf8_encoding_returns_str, test_latin1_encoding_returns_str, test_none_encoding_uses_apparent, test_none_encoding_correct_content, test_none_encoding_apparent_latin1, test_explicit_encoding_multiline"
+    }
+  ],
+  "task_12_note_tag": [
+    {
+      "run_id": "899ab4d1",
+      "timestamp": "2026-03-24T16:43:53",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 2725,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_tag_not_matched_mid_word",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_multiple_punctuation_tags"
+          ],
+          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_tag_not_matched_mid_word",
+            "test_multiple_punctuation_tags",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_alphanumeric_tag_found, test_alphanumeric_tag_no_space, test_punctuation_tag_found, test_punctuation_tag_no_space, test_punctuation_tag_end_of_line, test_mixed_tags"
+    }
+  ],
+  "shard_challenge_bymvudq8": [
+    {
+      "run_id": "18ba97a4",
+      "timestamp": "2026-03-24T16:49:36",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3991,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_tag_not_matched_mid_word",
+            "test_multiple_punctuation_tags",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_alphanumeric_tag_found, test_alphanumeric_tag_no_space, test_punctuation_tag_found, test_punctuation_tag_no_space, test_punctuation_tag_end_of_line, test_mixed_tags"
     }
   ]
 }

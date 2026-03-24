@@ -7,7 +7,7 @@ export default function SystemStatsWidget() {
     const [graph, setGraph] = useState(null);
     const [cache, setCache] = useState(null);
 
-    const { position, handleMouseDown } = useDraggable({ x: 20, y: 400 });
+    const { pos, dragHandleProps } = useDraggable('system-stats', { defaultPos: { x: 20, y: 400 } });
 
     const fetchStats = async () => {
         try {
@@ -39,12 +39,12 @@ export default function SystemStatsWidget() {
     return (
         <div
             className="fixed z-[150] w-56 bg-black/90 border border-cyan-400/30 rounded-lg shadow-lg font-mono text-xs select-none"
-            style={{ left: position.x, top: position.y }}
+            style={{ left: pos.x, top: pos.y }}
         >
             {/* Header */}
             <div
                 className="flex items-center justify-between px-3 py-1.5 border-b border-cyan-400/20 cursor-move bg-cyan-400/5"
-                onMouseDown={handleMouseDown}
+                onMouseDown={dragHandleProps.onMouseDown}
             >
                 <span className="text-cyan-400 font-bold tracking-widest uppercase text-[10px]">System Stats</span>
                 <button

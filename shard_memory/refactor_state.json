@@ -1,5 +1,5 @@
 {
-  "current_index": 3,
+  "current_index": 4,
   "history": [
     {
       "id": "d75bd75d-4551-4a2f-bba2-a383f38909ba",
@@ -53,5 +53,6 @@
       "status": "rejected",
       "rejected_at": "2026-03-20T17:24:42.572682"
     }
-  ]
+  ],
+  "capability_queue": []
 }
