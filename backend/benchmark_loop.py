@@ -124,6 +124,10 @@ def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
     """
     topics = []
 
+    # Skip temp dirs from shard_challenge (random names like "shard_challenge_abc123")
+    if task_key.startswith("shard_challenge"):
+        return []
+
     # Topic 1: from task name (e.g. "task_03_dirty_data" → "dirty data handling and validation")
     name_part = task_key.lower().replace("task_", "").strip()
     # strip leading index number (e.g. "03_dirty_data" → "dirty data")
@@ -136,10 +140,16 @@ def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
         topics.append(f"{name_part} handling and debugging")
 
     # Topic 2: from README first sentence (captures domain context)
+    # Skip HTML comments and XML/Repomix injected content
     if readme:
-        first_line = next((l.strip() for l in readme.splitlines() if len(l.strip()) > 20), "")
+        first_line = next(
+            (l.strip() for l in readme.splitlines()
+             if len(l.strip()) > 20
+             and not l.strip().startswith("<!--")
+             and not l.strip().startswith("<")),
+            ""
+        )
         if first_line and len(first_line.split()) >= 4:
-            # Truncate to reasonable topic length
             words = first_line.split()[:10]
             readme_topic = " ".join(words).rstrip(".,:")
             if readme_topic not in topics:

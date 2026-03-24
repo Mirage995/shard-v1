@@ -1,7 +1,7 @@
 # SHARD Architecture ROI Benchmark
 
-**Date:** 2026-03-24 16:43  
-**Tasks:** 3  
+**Date:** 2026-03-24 23:58  
+**Tasks:** 12  
 **Modes:** Naked Gemini Flash (1 attempt, no memory, no swarm) vs SHARD Full Pipeline
 
 ---
@@ -10,8 +10,8 @@
 
 | Metric | Naked LLM | SHARD Full | Delta |
 |--------|-----------|------------|-------|
-| Avg pass rate | 73.3% | 100.0% | **+26.7 pp** |
-| Tasks fully solved | 1/3 | 3/3 | **+2 tasks** |
+| Avg pass rate | 87.7% | 100.0% | **+12.3 pp** |
+| Tasks fully solved | 9/12 | 12/12 | **+3 tasks** |
 
 ---
 
@@ -19,9 +19,18 @@
 
 | Task | Naked pass rate | SHARD pass rate | Delta | SHARD solved? | SHARD attempts |
 |------|----------------|----------------|-------|---------------|----------------|
-| task_10_template_parser | 70.0% (7/10) | 100.0% (10/10) | **+30.0%** | YES | 5 |
+| task_01_html_trap | 38.9% (7/18) | 100.0% (17/17) | **+61.1%** | YES | 2 |
+| task_02_ghost_bug | 93.8% (15/16) | 100.0% (16/16) | **+6.2%** | YES | 3 |
+| task_03_dirty_data | 100.0% (24/24) | 100.0% (24/24) | **+0.0%** | YES | 3 |
+| task_04_race_condition | 100.0% (16/16) | 100.0% (16/16) | **+0.0%** | YES | 1 |
+| task_05_state_mutation | 100.0% (21/21) | 100.0% (21/21) | **+0.0%** | YES | 1 |
+| task_06_ttl_cache | 100.0% (17/17) | 100.0% (17/17) | **+0.0%** | YES | 1 |
+| task_07_metrics_bleed | 100.0% (16/16) | 100.0% (16/16) | **+0.0%** | YES | 1 |
+| task_08_multi_file_labyrinth | 100.0% (10/10) | 100.0% (10/10) | **+0.0%** | YES | 1 |
+| task_09_ghost_mutation | 100.0% (10/10) | 100.0% (10/10) | **+0.0%** | YES | 1 |
+| task_10_template_parser | 20.0% (2/10) | 100.0% (10/10) | **+80.0%** | YES | 1 |
 | task_11_stream_decoder | 100.0% (10/10) | 100.0% (10/10) | **+0.0%** | YES | 1 |
-| task_12_note_tag | 50.0% (5/10) | 100.0% (10/10) | **+50.0%** | YES | 2 |
+| task_12_note_tag | 100.0% (10/10) | 100.0% (10/10) | **+0.0%** | YES | 1 |
 
 ---
 
@@ -29,21 +38,31 @@
 
 | Task | Naked time | SHARD time | SHARD attempts |
 |------|-----------|-----------|----------------|
-| task_10_template_parser | 4.4s | 34.9s | 5 |
+| task_01_html_trap | 27.2s | 84.4s | 2 |
+| task_02_ghost_bug | 14.4s | 50.5s | 3 |
+| task_03_dirty_data | 12.2s | 70.7s | 3 |
+| task_04_race_condition | 8.2s | 11.4s | 1 |
+| task_05_state_mutation | 3.7s | 4.1s | 1 |
+| task_06_ttl_cache | 4.2s | 5.0s | 1 |
+| task_07_metrics_bleed | 5.0s | 5.3s | 1 |
+| task_08_multi_file_labyrinth | 1.4s | 1.6s | 1 |
+| task_09_ghost_mutation | 2.3s | 2.6s | 1 |
+| task_10_template_parser | 2.4s | 2.4s | 1 |
 | task_11_stream_decoder | 2.1s | 2.5s | 1 |
-| task_12_note_tag | 2.5s | 14.4s | 2 |
+| task_12_note_tag | 2.7s | 3.1s | 1 |
 
 ---
 
 ## Key Findings
 
-**Highest delta task:** `task_12_note_tag` — Naked 50.0% vs SHARD 100.0% (+50.0 pp)
+**Highest delta task:** `task_10_template_parser` — Naked 20.0% vs SHARD 100.0% (+80.0 pp)
 
-**Tasks where Naked LLM failed but SHARD succeeded (2):**
-- `task_10_template_parser`: naked 7/10 tests, SHARD 10/10 tests
-- `task_12_note_tag`: naked 5/10 tests, SHARD 10/10 tests
+**Tasks where Naked LLM failed but SHARD succeeded (3):**
+- `task_01_html_trap`: naked 7/18 tests, SHARD 17/17 tests
+- `task_02_ghost_bug`: naked 15/16 tests, SHARD 16/16 tests
+- `task_10_template_parser`: naked 2/10 tests, SHARD 10/10 tests
 
-**Tasks SHARD solved on the first attempt (1):** `task_11_stream_decoder`
+**Tasks SHARD solved on the first attempt (9):** `task_04_race_condition`, `task_05_state_mutation`, `task_06_ttl_cache`, `task_07_metrics_bleed`, `task_08_multi_file_labyrinth`, `task_09_ghost_mutation`, `task_10_template_parser`, `task_11_stream_decoder`, `task_12_note_tag`
 
 ---
 

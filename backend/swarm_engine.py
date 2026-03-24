@@ -141,6 +141,20 @@ _REVIEWERS: list[ReviewerSpec] = [
 ]
 
 
+def _consecutive_stuck_rounds(attempts: list, stuck_tests: list) -> int:
+    """Count how many trailing attempts all failed the same stuck_tests set."""
+    if not stuck_tests:
+        return 0
+    stuck_set = set(stuck_tests)
+    count = 0
+    for rec in reversed(attempts):
+        if stuck_set.issubset(set(getattr(rec, "tests_failed", []))):
+            count += 1
+        else:
+            break
+    return count
+
+
 def _select_reviewers(source: str, tests: str) -> list[ReviewerSpec]:
     """Activate only reviewers whose trigger keywords appear in source+tests."""
     combined = (source + "\n" + tests).lower()
@@ -418,9 +432,21 @@ async def swarm_complete(
     logger.info("[SWARM] Critic verdict: %s", verdict[:80])
 
     # ── Step 4: Multi-reviewer (parallel specialized critics) ─────────────────
-    active_reviewers = _select_reviewers(source, tests)
-    logger.info("[SWARM] Activating %d specialized reviewer(s): %s",
-                len(active_reviewers), [r.name for r in active_reviewers])
+    # Focus Mode: if the same tests have been stuck for ≥2 consecutive rounds,
+    # mute ALL reviewers. Their noise is overriding the Architect's targeted fix.
+    stuck_rounds = _consecutive_stuck_rounds(attempts, stuck_tests)
+    focus_mode = stuck_rounds >= 2
+    if focus_mode:
+        logger.warning(
+            "[SWARM] FOCUS MODE activated (stuck %d rounds) — reviewers muted, "
+            "trusting Architect strategy directly.", stuck_rounds
+        )
+        print(f"  [SWARM] FOCUS MODE — reviewers muted ({stuck_rounds} stuck rounds)")
+
+    active_reviewers = [] if focus_mode else _select_reviewers(source, tests)
+    if not focus_mode:
+        logger.info("[SWARM] Activating %d specialized reviewer(s): %s",
+                    len(active_reviewers), [r.name for r in active_reviewers])
 
     critical_findings: list[tuple[str, str]] = []
 

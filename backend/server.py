@@ -2019,6 +2019,64 @@ async def reasoning_stats():
         return audio_loop.consciousness.interpretability.get_stats()
     return {"total": 0, "summary": "SHARD non ancora inizializzato."}
 
+@app.get("/api/brain_graph")
+async def brain_graph():
+    """Brain Graph data — nodes (skills) + edges (requires/improves) for 3D visualization."""
+    import json, os
+    from datetime import datetime
+
+    cap_path = os.path.join(os.path.dirname(__file__), "..", "shard_memory", "capability_graph.json")
+    meta_path = os.path.join(os.path.dirname(__file__), "..", "shard_memory", "meta_learning.json")
+
+    try:
+        with open(cap_path, encoding="utf-8") as f:
+            cap = json.load(f)
+    except Exception:
+        cap = {}
+
+    score_map = {}
+    try:
+        with open(meta_path, encoding="utf-8") as f:
+            meta = json.load(f)
+        for entry in meta.get("sessions", []):
+            raw_topic = entry.get("topic", "")
+            s = entry.get("score")
+            if not raw_topic or s is None:
+                continue
+            score = float(s)
+            # Session topics can be composite: "A applied to B" — split and score all parts
+            parts = [p.strip() for p in raw_topic.replace(" applied to ", "\n").splitlines()]
+            for part in parts:
+                if part and (part not in score_map or score_map[part] < score):
+                    score_map[part] = score
+    except Exception:
+        pass
+
+    nodes = []
+    links = []
+    seen_links = set()
+
+    for name, data in cap.items():
+        score = score_map.get(name, 0)
+        certified = score >= 7.0
+        acquired = data.get("acquired", "")
+        nodes.append({
+            "id": name,
+            "label": name,
+            "score": round(score, 1),
+            "certified": certified,
+            "acquired": acquired[:10] if acquired else "",
+            "requires_count": len(data.get("requires", [])),
+        })
+        for req in data.get("requires", []):
+            key = (req, name)
+            if key not in seen_links and req in cap:
+                links.append({"source": req, "target": name, "type": "requires"})
+                seen_links.add(key)
+
+    return {"nodes": nodes, "links": links, "total": len(nodes)}
+
+
 @app.get("/api/knowledge/graph_stats")
 async def knowledge_graph_stats():
     """Statistiche GraphRAG — relazioni causali tra concetti."""

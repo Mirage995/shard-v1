@@ -1,17 +1,269 @@
 {
-  "timestamp": "2026-03-24T16:43:53",
+  "timestamp": "2026-03-24T23:58:49",
   "results": [
+    {
+      "task": "task_01_html_trap",
+      "naked": {
+        "task": "task_01_html_trap",
+        "mode": "naked",
+        "success": false,
+        "passed": 7,
+        "failed": 11,
+        "total": 18,
+        "pass_rate": 0.3888888888888889,
+        "elapsed": 27.24298071861267,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_01_html_trap",
+        "mode": "shard",
+        "success": true,
+        "passed": 17,
+        "failed": 0,
+        "total": 17,
+        "pass_rate": 1.0,
+        "elapsed": 84.42908358573914,
+        "attempts": 2,
+        "error": null
+      },
+      "delta_pass_rate": 0.6111111111111112
+    },
+    {
+      "task": "task_02_ghost_bug",
+      "naked": {
+        "task": "task_02_ghost_bug",
+        "mode": "naked",
+        "success": false,
+        "passed": 15,
+        "failed": 1,
+        "total": 16,
+        "pass_rate": 0.9375,
+        "elapsed": 14.420291185379028,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_02_ghost_bug",
+        "mode": "shard",
+        "success": true,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "pass_rate": 1.0,
+        "elapsed": 50.51917052268982,
+        "attempts": 3,
+        "error": null
+      },
+      "delta_pass_rate": 0.0625
+    },
+    {
+      "task": "task_03_dirty_data",
+      "naked": {
+        "task": "task_03_dirty_data",
+        "mode": "naked",
+        "success": true,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "pass_rate": 1.0,
+        "elapsed": 12.152954578399658,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_03_dirty_data",
+        "mode": "shard",
+        "success": true,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "pass_rate": 1.0,
+        "elapsed": 70.71619391441345,
+        "attempts": 3,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_04_race_condition",
+      "naked": {
+        "task": "task_04_race_condition",
+        "mode": "naked",
+        "success": true,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "pass_rate": 1.0,
+        "elapsed": 8.216166496276855,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_04_race_condition",
+        "mode": "shard",
+        "success": true,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "pass_rate": 1.0,
+        "elapsed": 11.38236117362976,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_05_state_mutation",
+      "naked": {
+        "task": "task_05_state_mutation",
+        "mode": "naked",
+        "success": true,
+        "passed": 21,
+        "failed": 0,
+        "total": 21,
+        "pass_rate": 1.0,
+        "elapsed": 3.6608726978302,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_05_state_mutation",
+        "mode": "shard",
+        "success": true,
+        "passed": 21,
+        "failed": 0,
+        "total": 21,
+        "pass_rate": 1.0,
+        "elapsed": 4.130375385284424,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_06_ttl_cache",
+      "naked": {
+        "task": "task_06_ttl_cache",
+        "mode": "naked",
+        "success": true,
+        "passed": 17,
+        "failed": 0,
+        "total": 17,
+        "pass_rate": 1.0,
+        "elapsed": 4.227553606033325,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_06_ttl_cache",
+        "mode": "shard",
+        "success": true,
+        "passed": 17,
+        "failed": 0,
+        "total": 17,
+        "pass_rate": 1.0,
+        "elapsed": 5.004571199417114,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_07_metrics_bleed",
+      "naked": {
+        "task": "task_07_metrics_bleed",
+        "mode": "naked",
+        "success": true,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "pass_rate": 1.0,
+        "elapsed": 5.0262815952301025,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_07_metrics_bleed",
+        "mode": "shard",
+        "success": true,
+        "passed": 16,
+        "failed": 0,
+        "total": 16,
+        "pass_rate": 1.0,
+        "elapsed": 5.314392805099487,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_08_multi_file_labyrinth",
+      "naked": {
+        "task": "task_08_multi_file_labyrinth",
+        "mode": "naked",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 1.3813843727111816,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_08_multi_file_labyrinth",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 1.5805754661560059,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
+    {
+      "task": "task_09_ghost_mutation",
+      "naked": {
+        "task": "task_09_ghost_mutation",
+        "mode": "naked",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 2.3250131607055664,
+        "attempts": 1,
+        "error": null
+      },
+      "shard": {
+        "task": "task_09_ghost_mutation",
+        "mode": "shard",
+        "success": true,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "pass_rate": 1.0,
+        "elapsed": 2.605365753173828,
+        "attempts": 1,
+        "error": null
+      },
+      "delta_pass_rate": 0.0
+    },
     {
       "task": "task_10_template_parser",
       "naked": {
         "task": "task_10_template_parser",
         "mode": "naked",
         "success": false,
-        "passed": 7,
-        "failed": 3,
+        "passed": 2,
+        "failed": 8,
         "total": 10,
-        "pass_rate": 0.7,
-        "elapsed": 4.375698566436768,
+        "pass_rate": 0.2,
+        "elapsed": 2.3765649795532227,
         "attempts": 1,
         "error": null
       },
@@ -23,11 +275,11 @@
         "failed": 0,
         "total": 10,
         "pass_rate": 1.0,
-        "elapsed": 34.94662952423096,
-        "attempts": 5,
+        "elapsed": 2.402933359146118,
+        "attempts": 1,
         "error": null
       },
-      "delta_pass_rate": 0.30000000000000004
+      "delta_pass_rate": 0.8
     },
     {
       "task": "task_11_stream_decoder",
@@ -39,7 +291,7 @@
         "failed": 0,
         "total": 10,
         "pass_rate": 1.0,
-        "elapsed": 2.075460195541382,
+        "elapsed": 2.1151957511901855,
         "attempts": 1,
         "error": null
       },
@@ -51,7 +303,7 @@
         "failed": 0,
         "total": 10,
         "pass_rate": 1.0,
-        "elapsed": 2.4953041076660156,
+        "elapsed": 2.541428565979004,
         "attempts": 1,
         "error": null
       },
@@ -62,12 +314,12 @@
       "naked": {
         "task": "task_12_note_tag",
         "mode": "naked",
-        "success": false,
-        "passed": 5,
-        "failed": 5,
+        "success": true,
+        "passed": 10,
+        "failed": 0,
         "total": 10,
-        "pass_rate": 0.5,
-        "elapsed": 2.517012357711792,
+        "pass_rate": 1.0,
+        "elapsed": 2.650275230407715,
         "attempts": 1,
         "error": null
       },
@@ -79,11 +331,11 @@
         "failed": 0,
         "total": 10,
         "pass_rate": 1.0,
-        "elapsed": 14.37821912765503,
-        "attempts": 2,
+        "elapsed": 3.070601224899292,
+        "attempts": 1,
         "error": null
       },
-      "delta_pass_rate": 0.5
+      "delta_pass_rate": 0.0
     }
   ]
 }

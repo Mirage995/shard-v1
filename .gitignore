@@ -100,3 +100,4 @@ test_inspect_live.py
 test_patch_ui.py
 test_popup.txt
 test_swe.py
+.shard_cache/

@@ -57,6 +57,7 @@ class DockerSandboxRunner:
 
     def __init__(self, sandbox_dir: str, analysis_fn: Optional[Callable] = None):
         self.sandbox_dir = sandbox_dir
+        self.resolved_sandbox_dir = pathlib.Path(sandbox_dir).resolve()
         self.analysis_fn = analysis_fn
         self._image_checked = False
         self._image_lock = asyncio.Lock()
@@ -139,7 +140,7 @@ class DockerSandboxRunner:
         # 3. Verify the resolved path hasn't escaped the expected parent
         #    (prevents crafted paths like sandbox/../../etc)
         #    Uses Path.is_relative_to() — correct path-aware check, not string startswith.
-        expected_parent = pathlib.Path(self.sandbox_dir).resolve().parent
+        expected_parent = self.resolved_sandbox_dir.parent
         try:
             sandbox_path.relative_to(expected_parent)
         except ValueError:

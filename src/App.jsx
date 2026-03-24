@@ -20,6 +20,7 @@ import CircuitBackground from './components/CircuitBackground';
 import NightRecapWidget from './components/NightRecapWidget';
 import ClinicaWidget from './components/ClinicaWidget';
 import SkillRadarWidget from './components/SkillRadarWidget';
+import BrainGraphWidget from './components/BrainGraphWidget';
 import VoiceBroadcast from './components/VoiceBroadcast';
 import NightRunnerWidget from './components/NightRunnerWidget';
 import BenchmarkWidget from './components/BenchmarkWidget';
@@ -1440,6 +1441,7 @@ function App() {
         <NightRecapWidget socket={socket} />
         <ClinicaWidget socket={socket} />
         <SkillRadarWidget socket={socket} />
+        <BrainGraphWidget socket={socket} />
         <SystemStatsWidget />
 
         {/* SSJ4 Phase 3 — Proactive Patch Approval Card */}

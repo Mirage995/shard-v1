@@ -25,6 +25,7 @@ from swarm_engine import (
     _build_architect_prompt,
     _build_coder_prompt,
     _build_critic_prompt,
+    _consecutive_stuck_rounds,
     swarm_complete,
     ReviewerSpec,
     _REVIEWERS,
@@ -441,6 +442,128 @@ class TestBuildArchitectPromptRollback:
         prompt = _build_architect_prompt("src", "tests", attempts, "fix.py", rollback_hint=True)
         # Should mention minimal/surgical change
         assert any(kw in prompt.lower() for kw in ("chirurgic", "surgical", "minimal", "minimo"))
+
+
+# ── Focus Mode ───────────────────────────────────────────────────────────────
+
+class TestConsecutiveStuckRounds:
+
+    def test_no_stuck_tests_returns_zero(self):
+        attempts = [FakeAttempt(1, True, [], ["t1"], "")]
+        assert _consecutive_stuck_rounds(attempts, []) == 0
+
+    def test_single_attempt_stuck(self):
+        attempts = [FakeAttempt(1, True, [], ["t1"], "")]
+        assert _consecutive_stuck_rounds(attempts, ["t1"]) == 1
+
+    def test_two_consecutive_stuck(self):
+        attempts = [
+            FakeAttempt(1, True, [], ["t1"], ""),
+            FakeAttempt(2, True, [], ["t1"], ""),
+        ]
+        assert _consecutive_stuck_rounds(attempts, ["t1"]) == 2
+
+    def test_three_consecutive_stuck(self):
+        attempts = [
+            FakeAttempt(1, True, [], ["t1"], ""),
+            FakeAttempt(2, True, [], ["t1"], ""),
+            FakeAttempt(3, True, [], ["t1"], ""),
+        ]
+        assert _consecutive_stuck_rounds(attempts, ["t1"]) == 3
+
+    def test_broken_streak_resets_count(self):
+        """If attempt 2 passed t1, streak breaks — only attempt 3 counts."""
+        attempts = [
+            FakeAttempt(1, True, [], ["t1"], ""),
+            FakeAttempt(2, True, ["t1"], [], ""),   # t1 passed here
+            FakeAttempt(3, True, [], ["t1"], ""),
+        ]
+        assert _consecutive_stuck_rounds(attempts, ["t1"]) == 1
+
+    def test_subset_match(self):
+        """Stuck if stuck_tests ⊆ tests_failed (other tests can also fail)."""
+        attempts = [
+            FakeAttempt(1, True, [], ["t1", "t2"], ""),
+            FakeAttempt(2, True, [], ["t1", "t2"], ""),
+        ]
+        assert _consecutive_stuck_rounds(attempts, ["t1"]) == 2
+
+    def test_empty_attempts_returns_zero(self):
+        assert _consecutive_stuck_rounds([], ["t1"]) == 0
+
+
+class TestFocusMode:
+
+    @pytest.mark.asyncio
+    async def test_focus_mode_mutes_reviewers(self):
+        """After 2+ stuck rounds, reviewers must NOT be called."""
+        # 2 attempts both failing test_calibration_idempotent
+        attempts = [
+            FakeAttempt(1, True, ["t1", "t2"], ["test_calibration_idempotent"], ""),
+            FakeAttempt(2, True, ["t1", "t2"], ["test_calibration_idempotent"], ""),
+        ]
+        call_log = []
+
+        async def fake_llm(prompt, system="", **kw):
+            call_log.append(system[:40] if system else "no-system")
+            return "def fixed(): pass"
+
+        with patch("swarm_engine.llm_complete", side_effect=fake_llm):
+            await swarm_complete(
+                source="def calibrate(): pass",
+                tests="def test_calibration_idempotent(): pass",
+                attempts=attempts,
+                output_filename="fix.py",
+                stuck_tests=["test_calibration_idempotent"],
+            )
+
+        # Focus mode: only Architect + Coder + Critic = 3 calls (no reviewer calls)
+        assert len(call_log) == 3, (
+            f"Expected 3 LLM calls in focus mode (Architect+Coder+Critic), got {len(call_log)}"
+        )
+
+    @pytest.mark.asyncio
+    async def test_no_focus_mode_with_one_stuck_round(self):
+        """With only 1 stuck round, reviewers should still be active."""
+        attempts = [
+            FakeAttempt(1, True, ["t1"], ["test_calibration_idempotent"], ""),
+        ]
+
+        async def fake_llm(prompt, system="", **kw):
+            return "def fixed(): pass"
+
+        with patch("swarm_engine.llm_complete", side_effect=fake_llm):
+            with patch("swarm_engine._select_reviewers") as mock_sel:
+                mock_sel.return_value = []  # no reviewers to avoid extra calls
+                await swarm_complete(
+                    source="def calibrate(): pass",
+                    tests="def test_calibration_idempotent(): pass",
+                    attempts=attempts,
+                    output_filename="fix.py",
+                    stuck_tests=["test_calibration_idempotent"],
+                )
+            # _select_reviewers should have been called (not bypassed)
+            mock_sel.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_focus_mode_skips_select_reviewers(self):
+        """Focus mode must bypass _select_reviewers entirely."""
+        attempts = [
+            FakeAttempt(1, True, [], ["t_stuck"], ""),
+            FakeAttempt(2, True, [], ["t_stuck"], ""),
+        ]
+
+        async def fake_llm(prompt, system="", **kw):
+            return "def fixed(): pass"
+
+        with patch("swarm_engine.llm_complete", side_effect=fake_llm):
+            with patch("swarm_engine._select_reviewers") as mock_sel:
+                await swarm_complete(
+                    source="src", tests="tests",
+                    attempts=attempts, output_filename="fix.py",
+                    stuck_tests=["t_stuck"],
+                )
+            mock_sel.assert_not_called()
 
 
 if __name__ == "__main__":
