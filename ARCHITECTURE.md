@@ -1,8 +1,8 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ10 (Test Suite 0 FAILED + patch_simulator hardening)
-Last updated: 2026-03-24
+Version: SSJ8 (Focus Mode + Repomix bridge + Brain Graph 2D + benchmark 12/12)
+Last updated: 2026-03-25
 
 ---
 
@@ -36,6 +36,12 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Patch Simulator** — impact analysis before any code patch is applied (SSJ8)
 - **Capability-driven refactoring** — ProactiveRefactor targets modules responsible for failed capabilities, not round-robin (SSJ9)
 - **Parallel learning + audio** — NightRunner runs in silent background mode when audio session is active (SSJ9)
+- **Focus Mode** — stuck test ≥2 rounds → mute all reviewers, force Architect→Coder direct (SSJ8)
+- **Early Stopping + Rollback** — track best_state, auto-restore on swarm regression (SSJ8)
+- **Repomix bridge** — pack any GitHub repo into LLM context via `npx repomix` (SSJ8)
+- **shard_challenge.py** — `--repo URL` flag, smart truncation with `--max-context` (SSJ8)
+- **Brain Graph 2D** — react-force-graph-2d widget, NodeInspector, live socket refresh (SSJ8)
+- **Benchmark 12/12** — naked Gemini 9/12 → SHARD 12/12, 100% avg pass rate (SSJ8)
 - **Test suite coverage** — 419 passing, 0 failing, 21 skipped (hardware/optional deps) — SSJ10
 - **Semantic memory** via ChromaDB triple-store
 - **Domain-specific agents**: CAD, web, smart home, 3D printing
@@ -158,6 +164,7 @@ shard_v1/
 │       ├── NightRunnerWidget.jsx   # NightRunner start/stop controls
 │       ├── BenchmarkWidget.jsx     # [SSJ6] Benchmark runner GUI — real-time logs, diff viewer
 │       ├── SystemStatsWidget.jsx   # [SSJ9] GraphRAG + LLM cache stats, draggable, 30s poll
+│       ├── BrainGraphWidget.jsx    # [SSJ8] 2D force-directed capability graph, NodeInspector, Legend
 │       └── VoiceBroadcast.jsx
 │                                   # [SSJ4] Patch approval card (+ SIM button) is inline in App.jsx
 │
@@ -181,7 +188,10 @@ shard_v1/
 ├── logs/                           # Night session logs
 ├── night_reports/                  # Night runner markdown + JSON reports
 ├── backups/                        # Timestamped capability_graph + experiment_replay backups
-├── benchmark/                      # [SSJ6] Legacy Killer Benchmark suite (7 tasks)
+├── repomix_bridge.py               # [SSJ8] npx repomix wrapper — packs any GitHub repo into LLM context
+├── shard_challenge.py              # [SSJ8] CLI: buggy.py + tests.py [--repo URL] [--max-context N]
+│
+├── benchmark/                      # [SSJ8] Benchmark suite — 12 tasks (naked 9/12 → SHARD 12/12)
 │   ├── task_01_html_trap/          #   Refactoring: tangled HTML → separated concerns
 │   ├── task_02_ghost_bug/          #   Bug fixing: 5 runtime-only bugs in data pipeline
 │   ├── task_03_dirty_data/         #   Performance: transaction processor + dirty data
