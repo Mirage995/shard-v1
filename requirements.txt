@@ -4,6 +4,12 @@ python-socketio
 python-multipart
 # Google GenAI SDK (v1beta)
 google-genai
+# LLM providers
+anthropic
+groq
+openai
+# Memory & Knowledge
+chromadb
 # Computer Vision & Audio
 opencv-python
 pyaudio
@@ -11,6 +17,9 @@ pillow
 mss
 # Browser Automation
 playwright
+# Web search (NightRunner)
+duckduckgo-search
+requests
 # Smart Home
 python-kasa
 # 3D Printing
@@ -18,11 +27,10 @@ zeroconf>=0.131.0
 aiohttp>=3.9.0
 # Utilities
 python-dotenv
-# OpenAI-compatible client (for Ollama local LLM)
-openai
-# Anthropic Claude (Main Brain for Study Agent)
-anthropic
 # Face & Hand tracking
 mediapipe
 # CAD Generation
 build123d
+# Testing
+pytest
+pytest-asyncio
