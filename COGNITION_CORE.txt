@@ -1,0 +1,205 @@
+================================================================================
+SHARD — CognitionCore / Senso Interno
+Documento di riferimento architetturale
+Autori: Andrea Bonizzato + Claudio (Claude Sonnet 4.6) + Gemini
+Data: 2026-03-25
+================================================================================
+
+OBIETTIVO
+─────────
+Creare le basi architetturali per comportamenti emergenti in SHARD.
+Non programmare l'intelligenza — creare le condizioni perché emerga.
+
+I comportamenti emergenti nascono quando sistemi indipendenti condividono
+informazione in modo non previsto. Il CognitionCore è lo spazio dove questo
+accade.
+
+
+PRINCIPIO FONDAMENTALE
+──────────────────────
+SHARD non deve leggere un database. Deve leggere tensioni interne.
+
+Esempio:
+  "La tua Identità dice che sei esperto di Concorrenza,
+   MA la tua Esperienza mostra 2 fallimenti critici su questo topic.
+   Questa discrepanza suggerisce cautela."
+
+È da questa tensione tra layer che nasce l'emergenza.
+
+
+STRUTTURA A STRATI
+──────────────────
+
+Layer 0 — ANCHOR (sempre attivo, ~100 token)
+  Ground truth oggettivo. Ha sempre l'ultima parola.
+  Contenuto: ultimo risultato sandbox (pass/fail), benchmark score corrente,
+             certification rate, data ultima sessione.
+  Regola: nessuna riflessione interna può contraddire questo layer.
+  Scopo: prevenire allucinazione ricorsiva (SHARD che pensa troppo a se stesso).
+
+Layer 1 — EXECUTIVE SUMMARY (sempre caricato, ~200 token)
+  Chi è SHARD in questo momento. Snapshot sintetico.
+  Contenuto: certification rate, gap critici, ultimo topic certificato,
+             score medio ultima sessione, stato attuale (studying/idle/stuck).
+  Aggiornato: ad ogni ciclo NightRunner.
+
+Layer 2 — IDENTITÀ (interrogato su richiesta)
+  Fonte: SelfModel
+  Contenuto: capabilities certificate, gap assessment, frontier topics,
+             avg repair loops, architecture summary.
+  Query: core.query_identity()
+  Usato da: NightRunner (selezione topic), CriticAgent (umiltà cognitiva).
+
+Layer 3 — CONOSCENZA (interrogato su richiesta)
+  Fonte: GraphRAG + CapabilityGraph
+  Contenuto: relazioni causali tra concetti, dipendenze tra skill,
+             complessità strutturale di un topic (n° dipendenze nel grafo).
+  Query: core.query_knowledge(topic)
+  Usato da: SYNTHESIZE (phase_synthesize), MetaLearning (scelta strategia).
+
+Layer 4 — ESPERIENZA (interrogato su richiesta)
+  Fonte: EpisodicMemory + StrategyMemory
+  Contenuto: storia del topic (score passati, failure reasons, strategie usate),
+             pattern di fallimento ricorrenti, strategie che hanno funzionato.
+  Query: core.query_experience(topic)
+  Usato da: SYNTHESIZE (retry), Architect (fix non convenzionale).
+
+Layer 5 — CRITICA (interrogato su richiesta)
+  Fonte: CriticAgent + MetaLearning
+  Contenuto: errori sistematici per categoria, confidence adjustment,
+             strategia consigliata basata su storia + complessità strutturale.
+  Query: core.query_critique(topic)
+  Usato da: EVALUATE, CertifyRetryGroup (attempt >= 2).
+
+
+MATRICE DELL'EMERGENZA
+──────────────────────
+Comportamenti NON programmati che vogliamo emergano dalla composizione dei layer.
+
+Vettore 1 — ESPERIENZA + SINTESI (priorità: alta, impatto immediato)
+  Layer A: EpisodicMemory (Layer 4)
+  Layer B: SYNTHESIZE (phase_synthesize)
+  Emergenza: "Intuizione del Fallimento"
+    SHARD propone approccio non convenzionale perché il Core suggerisce
+    che la soluzione standard ha già fallito in contesti simili.
+  Misurabile: improvement_focus più specifico, meno retry su topic già visti.
+
+Vettore 2 — IDENTITÀ + CRITICA (priorità: alta, impatto immediato)
+  Layer A: SelfModel (Layer 2)
+  Layer B: CriticAgent (Layer 5)
+  Emergenza: "Umiltà Cognitiva"
+    Se identità dice "esperto" ma esperienza dice "3 fallimenti",
+    SHARD abbassa confidence e attiva controlli extra autonomamente.
+    CriticAgent evolve i propri criteri in base alle debolezze strutturali.
+  Misurabile: riduzione falsi positivi in phase_certify.
+
+Vettore 3 — CONOSCENZA + STRATEGIA (priorità: media, impatto a lungo termine)
+  Layer A: GraphRAG (Layer 3)
+  Layer B: MetaLearning
+  Emergenza: "Strategia Predittiva"
+    Se il grafo mostra molte dipendenze complesse per un topic,
+    MetaLearning sceglie approccio "Safe" anche se il topic sembra facile,
+    perché "sente" la complessità strutturale sottostante.
+  Misurabile: meno fallimenti su topic con alta complessità strutturale.
+
+
+RELATIONAL CONTEXT INJECTION
+─────────────────────────────
+Funzione chiave del CognitionCore.
+
+Invece di dare a SHARD solo dati, gli diamo le relazioni tra dati.
+Il Core non filtra — aggrega e espone tensioni.
+
+Esempio di output:
+  "Topic: python generators and coroutines
+   Identità: categoria python_advanced — 2 skill certificate su 8 (gap critico)
+   Esperienza: 3 fallimenti, miglior score 7.4/10 (mancava 0.1 alla certificazione)
+   Critica: approccio teorico insufficiente — sandbox score sempre 0
+   Conoscenza: generators dipende da iterators, coroutines dipende da async_io
+   Tensione rilevata: score teoria alto (7+) ma sandbox sempre 0
+                      → problema implementativo, non teorico
+   Suggerimento emergente: focus su codice eseguibile, non teoria"
+
+Nessuna di queste righe è programmata come regola.
+Emergono dalla composizione dei layer.
+
+
+API DEL COGNITIONCORE
+──────────────────────
+core.executive()              → Layer 0 + Layer 1 (sempre, lightweight)
+core.query_identity()         → Layer 2
+core.query_knowledge(topic)   → Layer 3
+core.query_experience(topic)  → Layer 4
+core.query_critique(topic)    → Layer 5
+core.relational_context(topic) → composizione di tutti i layer rilevanti
+                                  con tensioni evidenziate
+
+
+PUNTI DI INTEGRAZIONE NEL PIPELINE
+────────────────────────────────────
+NightRunner (selezione topic)    → core.executive() + core.query_identity()
+phase_synthesize                 → core.query_knowledge() + core.query_experience()
+phase_evaluate                   → core.query_critique()
+CertifyRetryGroup (attempt >= 2) → core.relational_context() (tensioni complete)
+BenchmarkLoop (Architect)        → core.query_experience() (fallimenti simili)
+
+
+RISCHI E GUARDRAIL
+──────────────────
+1. Allucinazione Ricorsiva
+   SHARD che pensa troppo a se stesso e si dimentica di programmare.
+   Guardrail: Layer 0 (Anchor) ha sempre l'ultima parola. Sandbox pass/fail
+   è ground truth — nessuna riflessione interna può contraddirlo.
+
+2. Conflitti tra layer
+   Layer A dice "sono esperto", Layer B dice "hai fallito 3 volte".
+   Soluzione: gerarchia di priorità. Layer 0 > Layer 1 > Layer 2-5.
+   In caso di conflitto, il layer più basso vince.
+
+3. Token budget
+   relational_context() non deve superare ~500 token.
+   Ogni layer deve essere sintetico — non dump completo.
+
+4. Dipendenze circolari
+   I layer non si chiamano tra loro. Parlano solo col Core.
+   Il Core aggrega, non orchestra.
+
+
+STATO ATTUALE DEI MODULI
+──────────────────────────
+SelfModel      ✅ solido — metrics, gaps, certification rate, describe()
+WorldModel     ⚠️  stub — raccoglie concetti e fallimenti ma non li usa
+GraphRAG       ✅ funziona — 69 relazioni causali, query_causal_context()
+EpisodicMemory ✅ funziona — retrieve_context(), get_context_prompt()
+StrategyMemory ✅ funziona — store/retrieve strategies
+MetaLearning   ✅ funziona — per-category stats, strategy injection
+CriticAgent    ✅ appena potenziato — analyze_with_llm() su attempt >= 2
+
+WorldModel va integrato nel CognitionCore come wrapper leggero su GraphRAG
++ CapabilityGraph, non potenziato separatamente.
+
+
+PROSSIMI STEP
+──────────────
+1. Implementare backend/cognition/cognition_core.py
+   - Classe CognitionCore con i 5 layer
+   - Metodi: executive(), query_identity(), query_knowledge(),
+             query_experience(), query_critique(), relational_context()
+   - executive() cached e aggiornato ogni ciclo NightRunner
+
+2. Integrare Vettore 1 (Esperienza + Sintesi)
+   - phase_synthesize chiama core.query_experience(topic)
+   - Misurare: improvement_focus più specifico
+
+3. Integrare Vettore 2 (Identità + Critica)
+   - CriticAgent legge core.query_identity() prima di analyze_with_llm()
+   - Misurare: riduzione falsi positivi in phase_certify
+
+4. Integrare Vettore 3 (Conoscenza + Strategia)
+   - MetaLearning legge core.query_knowledge() prima di strategy selection
+   - Misurare: meno fallimenti su topic ad alta complessità strutturale
+
+5. Aggiungere /api/cognition_state endpoint in server.py
+   - Esporre executive() al frontend per widget
+
+================================================================================
