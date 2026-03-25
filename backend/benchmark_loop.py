@@ -557,7 +557,7 @@ async def run_benchmark_loop(
             prompt = _build_initial_prompt(source, readme, output_filename, experience_summary)
             print(f"  [LLM SOLO] Initial prompt ({len(prompt):,} chars)")
         elif mode == "SWARM":
-            print(f"  [SWARM] Architect → Coder → Critic pipeline")
+            print(f"  [SWARM] Architect -> Coder -> Critic pipeline")
         else:
             # Always pass the last *syntactically valid* code — never pass broken code
             last_valid = next(
@@ -777,9 +777,9 @@ async def run_benchmark_loop(
         study_topics = _derive_study_topics(task_key, readme, best)
         if study_topics:
             added = ImprovementEngine().enqueue_topics(study_topics)
-            print(f"  [benchmark→NightRunner] Queued {added} study topic(s): {study_topics}")
+            print(f"  [benchmark->NightRunner] Queued {added} study topic(s): {study_topics}")
     except Exception as e:
-        print(f"  [benchmark→NightRunner] Could not queue topics: {e}")
+        print(f"  [benchmark->NightRunner] Could not queue topics: {e}")
     return BenchmarkResult(
         task_dir=str(task_dir), success=False,
         total_attempts=max_attempts, attempts=attempts,
