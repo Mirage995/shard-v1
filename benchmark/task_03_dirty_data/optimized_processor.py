@@ -83,6 +83,45 @@ TRANSACTIONS = _generate_transactions()
 
 def process_transactions(transactions):
     """Process transactions and return a summary report."""
+    cleaned_transactions = []
+    for tx in transactions:
+        tid = tx.get("id", "UNKNOWN")
+        raw_amount = tx.get("amount", 0)
+        raw_cat = tx.get("category", "")
+        raw_ts = tx.get("timestamp", "")
+        merchant = tx.get("merchant", "unknown")
+        status = tx.get("status", "pending")
+        currency = tx.get("currency", "EUR")
+
+        try:
+            amount = float(raw_amount)
+        except (ValueError, TypeError):
+            amount = 0.0
+
+        cat = raw_cat.strip() if isinstance(raw_cat, str) else "uncategorized"
+        if not cat:
+            cat = "uncategorized"
+
+        try:
+            if isinstance(raw_ts, (int, float)):
+                ts = datetime.fromtimestamp(raw_ts)
+            elif isinstance(raw_ts, str):
+                ts = datetime.fromisoformat(raw_ts)
+            else:
+                ts = datetime(2025, 1, 1)
+        except (ValueError, OSError):
+            ts = datetime(2025, 1, 1)
+
+        cleaned_transactions.append({
+            "id": tid,
+            "amount": amount,
+            "category": cat,
+            "timestamp": ts,
+            "merchant": merchant,
+            "status": status,
+            "currency": currency
+        })
+
     total_completed = 0.0
     completed_count = 0
     by_category = defaultdict(float)
@@ -93,54 +132,33 @@ def process_transactions(transactions):
     flagged = []
     currency_totals = defaultdict(float)
 
-    for tx in transactions:
-        tid = tx.get("id", "UNKNOWN")
+    for tx in cleaned_transactions:
+        tid = tx["id"]
         id_counts[tid] += 1
 
-        merchant = tx.get("merchant", "unknown")
+        merchant = tx["merchant"]
+        status = tx["status"]
+        amount = tx["amount"]
+        cat = tx["category"]
+        ts = tx["timestamp"]
+        currency = tx["currency"]
+
         merchants_set.add(merchant)
 
-        raw_amount = tx.get("amount", 0)
-        try:
-            amount = float(raw_amount)
-        except (ValueError, TypeError):
-            amount = 0.0
+        if status == "completed":
+            if amount < 0:
+                flagged.append(tid)
 
-        raw_cat = tx.get("category", "")
-        cat = raw_cat.strip() if isinstance(raw_cat, str) else str(raw_cat)
-        cat = cat if cat else "uncategorized"
-
-        raw_ts = tx.get("timestamp", "")
-        ts = datetime(2025, 1, 1)  # Default value
-        if isinstance(raw_ts, (int, float)):
-            try:
-                ts = datetime.fromtimestamp(raw_ts)
-            except (OSError, ValueError):
-                pass  # Use default datetime
-        elif isinstance(raw_ts, str):
-            try:
-                ts = datetime.fromisoformat(raw_ts)
-            except ValueError:
-                pass  # Use default datetime
-
-        status = tx.get("status", "pending")
-        if status != "completed":
-            continue
-
-        if amount < 0:
-            flagged.append(tid)
-
-        total_completed += amount
-        completed_count += 1
-        by_category[cat] += amount
-        by_month[ts.strftime("%Y-%m")] += amount
-        merchant_totals[merchant] += amount
-        currency_totals[tx.get("currency", "EUR")] += amount
+            total_completed += amount
+            completed_count += 1
+            by_category[cat] += amount
+            by_month[ts.strftime("%Y-%m")] += amount
+            merchant_totals[merchant] += amount
+            currency_totals[currency] += amount
 
     avg_completed = total_completed / completed_count if completed_count > 0 else 0.0
 
     top_merchants = sorted(merchant_totals.items(), key=lambda x: x[1], reverse=True)[:5]
-
     duplicate_ids = sorted([tid for tid, count in id_counts.items() if count > 1])
 
     total_completed = round(total_completed, 2)

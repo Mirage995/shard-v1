@@ -11,7 +11,7 @@ def parse_template(template: str) -> list[str]:
     Warns if an unknown field is referenced.
     Returns the list of valid argument names found.
     """
-    arguments = re.findall(r"(?<!\{)\{([^{}]+?)(:.*?)?\}", template)
+    arguments = re.findall(r"(?<!\{)(?:\{\{)*\{([^{}]+?)(:.*?)?\}(?:\}\})*(?!\})", template)
     valid = []
     for argument in arguments:
         if argument[0] not in MESSAGE_FIELDS:

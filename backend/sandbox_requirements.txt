@@ -9,3 +9,4 @@ websocket
 bcrypt
 docker
 pika
+pytest

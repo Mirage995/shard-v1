@@ -41,7 +41,11 @@ class TTLCache:
     def size(self):
         """Number of *live* entries currently in the cache."""
         now = time.time()
-        return sum(1 for _, expires_at in self._store.values() if now <= expires_at)
+        count = 0
+        for key, (value, expires_at) in self._store.items():
+            if now <= expires_at:
+                count += 1
+        return count
 
     @property
     def stats(self):

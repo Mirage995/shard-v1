@@ -1309,5 +1309,213 @@
     ],
     "acquired": "2026-03-24T16:12:30.191507",
     "source_topic": "logistic regression from scratch"
+  },
+  "websocket protocol implementation": {
+    "requires": [],
+    "acquired": "2026-03-25T00:29:17.161099",
+    "source_topic": "websocket protocol implementation"
+  },
+  "websocket protocol": {
+    "requires": [
+      "websocket protocol implementation"
+    ],
+    "acquired": "2026-03-25T00:29:17.167688",
+    "source_topic": "websocket protocol implementation"
+  },
+  "websocket api": {
+    "requires": [
+      "websocket protocol implementation"
+    ],
+    "acquired": "2026-03-25T00:29:17.173206",
+    "source_topic": "websocket protocol implementation"
+  },
+  "websocketstream interface": {
+    "requires": [
+      "websocket protocol implementation"
+    ],
+    "acquired": "2026-03-25T00:29:17.178551",
+    "source_topic": "websocket protocol implementation"
+  },
+  "realtime_communication": {
+    "requires": [
+      "websocket protocol implementation"
+    ],
+    "acquired": "2026-03-25T00:29:17.184883",
+    "source_topic": "websocket protocol implementation"
+  },
+  "http client implementation python": {
+    "requires": [],
+    "acquired": "2026-03-25T00:42:28.793833",
+    "source_topic": "http client implementation python"
+  },
+  "python typing system and generics": {
+    "requires": [],
+    "acquired": "2026-03-25T01:40:41.253413",
+    "source_topic": "python typing system and generics"
+  },
+  "type hints": {
+    "requires": [
+      "python typing system and generics"
+    ],
+    "acquired": "2026-03-25T01:40:41.258756",
+    "source_topic": "python typing system and generics"
+  },
+  "static type checkers": {
+    "requires": [
+      "python typing system and generics"
+    ],
+    "acquired": "2026-03-25T01:40:41.263621",
+    "source_topic": "python typing system and generics"
+  },
+  "type aliases": {
+    "requires": [
+      "python typing system and generics"
+    ],
+    "acquired": "2026-03-25T01:40:41.268141",
+    "source_topic": "python typing system and generics"
+  },
+  "typing module": {
+    "requires": [
+      "python typing system and generics"
+    ],
+    "acquired": "2026-03-25T01:40:41.272907",
+    "source_topic": "python typing system and generics"
+  },
+  "design patterns factory singleton observer": {
+    "requires": [],
+    "acquired": "2026-03-25T01:52:57.037945",
+    "source_topic": "design patterns factory singleton observer"
+  },
+  "singleton pattern": {
+    "requires": [
+      "design patterns factory singleton observer"
+    ],
+    "acquired": "2026-03-25T01:52:57.043451",
+    "source_topic": "design patterns factory singleton observer"
+  },
+  "factory pattern": {
+    "requires": [
+      "design patterns factory singleton observer"
+    ],
+    "acquired": "2026-03-25T01:52:57.048227",
+    "source_topic": "design patterns factory singleton observer"
+  },
+  "observer pattern": {
+    "requires": [
+      "design patterns factory singleton observer"
+    ],
+    "acquired": "2026-03-25T01:52:57.053086",
+    "source_topic": "design patterns factory singleton observer"
+  },
+  "graph traversal algorithms bfs dfs": {
+    "requires": [],
+    "acquired": "2026-03-25T02:07:42.526766",
+    "source_topic": "graph traversal algorithms bfs dfs"
+  },
+  "graph traversal": {
+    "requires": [
+      "graph traversal algorithms bfs dfs"
+    ],
+    "acquired": "2026-03-25T02:07:42.532476",
+    "source_topic": "graph traversal algorithms bfs dfs"
+  },
+  "breadth-first search (bfs)": {
+    "requires": [
+      "graph traversal algorithms bfs dfs"
+    ],
+    "acquired": "2026-03-25T02:07:42.537483",
+    "source_topic": "graph traversal algorithms bfs dfs"
+  },
+  "depth-first search (dfs)": {
+    "requires": [
+      "graph traversal algorithms bfs dfs"
+    ],
+    "acquired": "2026-03-25T02:07:42.542511",
+    "source_topic": "graph traversal algorithms bfs dfs"
+  },
+  "binary search tree operations": {
+    "requires": [],
+    "acquired": "2026-03-25T18:48:37.359164",
+    "source_topic": "binary search tree operations"
+  },
+  "binary search tree": {
+    "requires": [
+      "binary search tree operations"
+    ],
+    "acquired": "2026-03-25T18:48:37.365784",
+    "source_topic": "binary search tree operations"
+  },
+  "deletion (bst)": {
+    "requires": [
+      "binary search tree operations"
+    ],
+    "acquired": "2026-03-25T18:48:37.371837",
+    "source_topic": "binary search tree operations"
+  },
+  "insertion (bst)": {
+    "requires": [
+      "binary search tree operations"
+    ],
+    "acquired": "2026-03-25T18:48:37.376539",
+    "source_topic": "binary search tree operations"
+  },
+  "search (bst)": {
+    "requires": [
+      "binary search tree operations"
+    ],
+    "acquired": "2026-03-25T18:48:37.381480",
+    "source_topic": "binary search tree operations"
+  },
+  "k-nearest neighbors classifier": {
+    "requires": [],
+    "acquired": "2026-03-25T18:56:42.210885",
+    "source_topic": "k-nearest neighbors classifier"
+  },
+  "k-nearest neighbors (knn)": {
+    "requires": [
+      "k-nearest neighbors classifier"
+    ],
+    "acquired": "2026-03-25T18:56:42.216938",
+    "source_topic": "k-nearest neighbors classifier"
+  },
+  "distance metrics": {
+    "requires": [
+      "k-nearest neighbors classifier"
+    ],
+    "acquired": "2026-03-25T18:56:42.221832",
+    "source_topic": "k-nearest neighbors classifier"
+  },
+  "hyperparameter tuning": {
+    "requires": [
+      "k-nearest neighbors classifier"
+    ],
+    "acquired": "2026-03-25T18:56:42.226651",
+    "source_topic": "k-nearest neighbors classifier"
+  },
+  "dynamic programming memoization": {
+    "requires": [],
+    "acquired": "2026-03-25T19:21:48.452741",
+    "source_topic": "dynamic programming memoization"
+  },
+  "dynamic programming": {
+    "requires": [
+      "dynamic programming memoization"
+    ],
+    "acquired": "2026-03-25T19:21:48.458181",
+    "source_topic": "dynamic programming memoization"
+  },
+  "overlapping subproblems": {
+    "requires": [
+      "dynamic programming memoization"
+    ],
+    "acquired": "2026-03-25T19:21:48.463020",
+    "source_topic": "dynamic programming memoization"
+  },
+  "recursive_algorithm_design": {
+    "requires": [
+      "dynamic programming memoization"
+    ],
+    "acquired": "2026-03-25T19:21:48.468780",
+    "source_topic": "dynamic programming memoization"
   }
 }

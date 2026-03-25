@@ -40,9 +40,14 @@ Return a JSON object with EXACTLY this structure:
 
 Rules:
 - The function signature must ALWAYS be: def solve(input_data)
-- Each test must use ONLY Python builtins (no imports)
+- Each test must use ONLY Python builtins (no imports in setup or assert_expr)
 - 'setup' must define exactly the variables 'input_data' and 'expected'
-- 'assert_expr' must be exactly: assert solve(input_data) == expected
+- 'expected' must ALWAYS be a plain Python literal (int, float, str, bool, list, tuple) — NEVER a numpy array or other non-builtin object
+- Choose 'assert_expr' based on the output type:
+    * exact match (int, bool, str, list of int/str, tuple): assert solve(input_data) == expected
+    * single float (approximate): assert abs(solve(input_data) - expected) < 1e-6
+    * list of floats (approximate): assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))
+- If solve() returns a numpy array, convert to list in assert_expr: assert list(solve(input_data)) == expected
 - Tests must cover: basic case, edge case, and a larger/harder input
 - All values must be valid Python literals (no placeholders like '...')
 - If the topic cannot be expressed as a callable function, return {{"scaffold": "", "tests": []}}\
@@ -212,12 +217,31 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
     # Scalar primitives (None/bool/int/float) cause 'not iterable' errors.
     # Dicts cause AttributeError when solve() treats input_data as a string/sequence.
     # Valid inputs: str, list, tuple, set — sequences the scaffold can iterate over.
+    # Also: auto-rewrite assert_expr for float/list-of-float expected values so that
+    # numpy outputs don't cause "ValueError: truth value of array is ambiguous".
     try:
         ns: dict = {}
         exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
         val = ns.get("input_data")
         if val is None or isinstance(val, (bool, int, float, dict)):
             return {"ok": False, "reason": f"input_data is {type(val).__name__} — scalar/mapping, likely wrong type"}
+
+        # Auto-rewrite assert for float/list-of-float expected values.
+        # This guards against "ValueError: truth value of array ambiguous" when
+        # solve() returns a numpy array and the LLM used == instead of allclose.
+        expected_val = ns.get("expected")
+        boilerplate = "assert solve(input_data) == expected"
+        if assert_expr == boilerplate:
+            if isinstance(expected_val, float):
+                test["assert_expr"] = "assert abs(solve(input_data) - expected) < 1e-6"
+            elif (
+                isinstance(expected_val, (list, tuple))
+                and expected_val
+                and all(isinstance(v, float) for v in expected_val)
+            ):
+                test["assert_expr"] = (
+                    "assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))"
+                )
     except Exception:
         pass  # if eval fails for any reason, let AST validation stand
 

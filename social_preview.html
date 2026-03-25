@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1280px;
+    height: 640px;
+    background: #000000;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Sci-fi grid */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    z-index: 0;
+  }
+
+  /* Ciano glow — top left radial */
+  .glow-tl {
+    position: absolute;
+    top: -160px;
+    left: -100px;
+    width: 560px;
+    height: 560px;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.09) 0%, transparent 65%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Verde glow — bottom right */
+  .glow-br {
+    position: absolute;
+    bottom: -160px;
+    right: -100px;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(0, 255, 102, 0.06) 0%, transparent 65%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Scanlines */
+  .scanline {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.12) 3px,
+      rgba(0, 0, 0, 0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Corner brackets */
+  .corner-tr {
+    position: absolute;
+    top: 28px; right: 72px;
+    width: 48px; height: 48px;
+    border-top: 1px solid rgba(0,229,255,0.35);
+    border-right: 1px solid rgba(0,229,255,0.35);
+    z-index: 2;
+  }
+  .corner-bl {
+    position: absolute;
+    bottom: 28px; left: 72px;
+    width: 48px; height: 48px;
+    border-bottom: 1px solid rgba(0,229,255,0.35);
+    border-left: 1px solid rgba(0,229,255,0.35);
+    z-index: 2;
+  }
+  .corner-tl {
+    position: absolute;
+    top: 28px; left: 72px;
+    width: 48px; height: 48px;
+    border-top: 1px solid rgba(0,229,255,0.15);
+    border-left: 1px solid rgba(0,229,255,0.15);
+    z-index: 2;
+  }
+  .corner-br {
+    position: absolute;
+    bottom: 28px; right: 72px;
+    width: 48px; height: 48px;
+    border-bottom: 1px solid rgba(0,229,255,0.15);
+    border-right: 1px solid rgba(0,229,255,0.15);
+    z-index: 2;
+  }
+
+  /* MAIN LAYOUT */
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 1280px;
+    height: 640px;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* ── TOP ── */
+  .top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: rgba(0, 229, 255, 0.55);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 112px;
+    font-weight: 800;
+    letter-spacing: -5px;
+    line-height: 1;
+    color: #00e5ff;
+    text-shadow:
+      0 0 20px rgba(0, 229, 255, 0.6),
+      0 0 60px rgba(0, 229, 255, 0.25),
+      0 0 120px rgba(0, 229, 255, 0.1);
+  }
+
+  .tagline {
+    margin-top: 14px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.5px;
+    line-height: 1.7;
+  }
+
+  .tagline strong {
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* ── A/B CARD ── */
+  .ab-card {
+    flex-shrink: 0;
+    background: rgba(0, 229, 255, 0.03);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    border-left: 2px solid #00e5ff;
+    border-radius: 6px;
+    padding: 26px 32px 22px;
+    min-width: 330px;
+    position: relative;
+  }
+
+  .ab-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(0,229,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .ab-badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00e5ff;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 2px;
+    padding: 3px 8px;
+    margin-bottom: 18px;
+  }
+
+  .ab-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .ab-tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    width: 68px;
+    flex-shrink: 0;
+  }
+
+  .ab-score {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .ab-score.fail {
+    color: #ff3b3b;
+    text-shadow: 0 0 16px rgba(255, 59, 59, 0.5);
+  }
+
+  .ab-score.pass {
+    color: #00ff66;
+    text-shadow:
+      0 0 16px rgba(0, 255, 102, 0.6),
+      0 0 40px rgba(0, 255, 102, 0.2);
+  }
+
+  .ab-sub {
+    font-size: 10px;
+    letter-spacing: 1px;
+    align-self: flex-end;
+    padding-bottom: 6px;
+  }
+  .ab-sub.fail { color: rgba(255,59,59,0.5); }
+  .ab-sub.pass { color: rgba(0,255,102,0.5); }
+
+  .ab-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 14px 0;
+  }
+
+  .ab-verdict {
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .ab-verdict strong {
+    color: #00ff66;
+    text-shadow: 0 0 8px rgba(0,255,102,0.4);
+  }
+
+  /* ── BOTTOM ── */
+  .bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    max-width: 680px;
+  }
+
+  .pill {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    padding: 5px 12px;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+  }
+
+  .pill.cyan {
+    border-color: rgba(0,229,255,0.25);
+    color: rgba(0,229,255,0.7);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .pill.green {
+    border-color: rgba(0,255,102,0.25);
+    color: rgba(0,255,102,0.7);
+    background: rgba(0,255,102,0.04);
+  }
+
+  /* ── BENCH ── */
+  .benchmark {
+    text-align: right;
+  }
+
+  .bench-row {
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .bench-row .score {
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .bench-row .score.top {
+    font-size: 20px;
+    color: #00ff66;
+    text-shadow: 0 0 10px rgba(0,255,102,0.4);
+  }
+
+  .gh-link {
+    margin-top: 10px;
+    font-size: 10px;
+    color: rgba(0,229,255,0.25);
+    letter-spacing: 1.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-tl"></div>
+<div class="glow-br"></div>
+<div class="scanline"></div>
+<div class="corner-tl"></div>
+<div class="corner-tr"></div>
+<div class="corner-bl"></div>
+<div class="corner-br"></div>
+
+<div class="card">
+
+  <!-- TOP -->
+  <div class="top">
+    <div class="title-block">
+      <div class="label">System of Hybrid Autonomous Reasoning and Design</div>
+      <h1>SHARD</h1>
+      <div class="tagline">
+        <strong>LLM scaffolding with a sense of self.</strong><br>
+        5-layer CognitionCore &nbsp;·&nbsp; Shadow Diagnostic &nbsp;·&nbsp; Directed behavioral pivots
+      </div>
+    </div>
+
+    <div class="ab-card">
+      <div class="ab-badge">Lobotomy A/B Test</div>
+
+      <div class="ab-row">
+        <div class="ab-tag">without</div>
+        <div class="ab-score fail">7.0</div>
+        <div class="ab-sub fail">not certified</div>
+      </div>
+
+      <div class="ab-row">
+        <div class="ab-tag">with</div>
+        <div class="ab-score pass">8.6</div>
+        <div class="ab-sub pass">certified ✓</div>
+      </div>
+
+      <div class="ab-divider"></div>
+      <div class="ab-verdict">
+        same topic · same model · same night<br>
+        <strong>+1.6 pts — CognitionCore is not decorative</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom">
+    <div class="pills">
+      <div class="pill cyan">12/12 benchmark</div>
+      <div class="pill cyan">CognitionCore</div>
+      <div class="pill green">Vettore 1+2+3</div>
+      <div class="pill green">Shadow Diagnostic</div>
+      <div class="pill">Gemini Live · Groq · Claude</div>
+      <div class="pill">Docker sandbox</div>
+      <div class="pill">GraphRAG</div>
+      <div class="pill">Swarm Engine</div>
+      <div class="pill">NightRunner</div>
+    </div>
+
+    <div class="benchmark">
+      <div class="bench-row">
+        <span>naked LLM</span>
+        <span class="score">9 / 12</span>
+      </div>
+      <div class="bench-row">
+        <span>SHARD</span>
+        <span class="score top">12 / 12</span>
+      </div>
+      <div class="gh-link">github.com/Mirage995/shard-v1</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

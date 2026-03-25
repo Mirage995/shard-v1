@@ -4,7 +4,7 @@ Used in production to track counters, gauges, and histograms.
 Some users report metric values from one collector bleeding into
 another, and percentile calculations returning inconsistent results.
 """
-import copy
+
 
 class Counter:
     """A monotonically increasing integer counter."""
@@ -48,14 +48,14 @@ class Histogram:
 
     def bucket_counts(self):
         """Return counts per bucket (including overflow)."""
-        return list(copy.copy(self._buckets))
+        return list(self._buckets)
 
     def percentile(self, p):
         """Return the p-th percentile of observed values (0-100)."""
         if not self.samples:
             return 0.0
         sorted_samples = sorted(self.samples)
-        idx = max(0, int(len(sorted_samples) * p / 100.0) - 1)
+        idx = max(0, int(len(sorted_samples) * p / 100) - 1)
         return float(sorted_samples[idx])
 
     def count(self):
@@ -65,9 +65,6 @@ class Histogram:
         if not self.samples:
             return 0.0
         return sum(self.samples) / len(self.samples)
-
-    def reset_buckets(self):
-        self._buckets = [0] * (len(self.bucket_bounds) + 1)
 
 
 class MetricsCollector:
