@@ -170,6 +170,16 @@ def is_valid_topic(topic: str, logger: logging.Logger) -> bool:
         "riflessione", "sistema", "stabile",
         "energia", "lealtà", "analizzare"
     ]
+
+    # Hard reject: any topic containing these patterns is junk regardless of length
+    HARD_REJECT_PATTERNS = [
+        "chiedo", "potrei", "vorrei", "facendo", "analizzare",
+        "post-quantum security margin", "hubble-scale casimir",
+        "quantized inertia",
+    ]
+    if any(p in t for p in HARD_REJECT_PATTERNS):
+        logger.info(f"[TOPIC FILTER] Hard-rejected junk topic: '{topic}'")
+        return False
     
     whitelist = [
         "algorithm", "data structure", "python", "recursion", "sorting", "search", "graph", "tree",
