@@ -538,7 +538,7 @@ Rules:
 }}
 
 RAW CONTENT:
-{raw[:8000]}
+{raw[:16000]}
 """
         self.progress.set_phase("SYNTHESIZE", 0.5)
         prompt = "You MUST respond with valid JSON only.\n\n" + prompt
@@ -960,7 +960,8 @@ Return ONLY JSON.
  "synthesis_score": 0.0,
  "explanation": "short explanation",
  "gaps": ["specific gap 1", "specific gap 2"],
- "hypotheses": ["hypothesis 1", "hypothesis 2"]
+ "hypotheses": ["hypothesis 1", "hypothesis 2"],
+ "improvement_focus": "one concrete thing to focus on in the next attempt"
 }}
 
 Important rules:
@@ -1007,6 +1008,7 @@ AUTO-EXAM (Questions and Answers):
             explanation = parsed.get("explanation", "")
             gaps_out = parsed.get("gaps", [])
             hypotheses = parsed.get("hypotheses", [])
+            improvement_focus = parsed.get("improvement_focus", "")
             
             # Enforce constraints
             if sandbox_failed:
@@ -1021,6 +1023,7 @@ AUTO-EXAM (Questions and Answers):
             explanation = "JSONDecodeError Fallback"
             gaps_out = ["Parse error"]
             hypotheses = []
+            improvement_focus = ""
 
         # ── Rule-based fallback for invalid or inconsistent LLM scores ────
         _scores_out_of_range = (
@@ -1060,6 +1063,7 @@ AUTO-EXAM (Questions and Answers):
             "gaps": gaps_out,
             "hypotheses": hypotheses,
             "explanation": explanation,
+            "improvement_focus": improvement_focus,
             "details": {
                 "theory": theory_score,
                 "code": code_score,
