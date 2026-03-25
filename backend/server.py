@@ -266,6 +266,145 @@ async def query_knowledge(topic: str, n: int = 3):
     result = query_knowledge_base(topic, n_results=n)
     return {"topic": topic, "result": result}
 
+
+@app.get("/api/cognition_state")
+async def cognition_state():
+    """CognitionCore pulse — the living state of SHARD's Senso Interno.
+
+    Returns:
+        executive:      Layer 0+1 snapshot (ground truth + summary)
+        mood:           SHARD's current cognitive mood derived from metrics
+        active_tensions: which emergence vectors are pushing right now
+        shadow_audit:   last 5 emergence audit entries (HITS and MISSES)
+        emergence_stats: session-level emergence metrics
+        identity:       Layer 2 — capability gaps and certification rate
+        top_gaps:       top 3 critical capability gaps
+    """
+    core = getattr(study_agent, "cognition_core", None)
+
+    if core is None:
+        return {
+            "status": "unavailable",
+            "reason": "CognitionCore not initialized — study_agent may still be starting",
+        }
+
+    # ── Layer 0+1: Executive ────────────────────────────────────────────────
+    exec_data = core.executive()
+    anchor    = exec_data["anchor"]
+    summary   = exec_data["summary"]
+
+    # ── Layer 2: Identity ───────────────────────────────────────────────────
+    identity = core.query_identity()
+
+    # ── Mood derivation ──────────────────────────────────────────────────────
+    # Mood is a human-readable signal for the dashboard, derived from Layer 0+2.
+    # It summarizes SHARD's cognitive posture in one word.
+    cert_rate    = anchor.get("certification_rate", 0.0)
+    avg_score    = anchor.get("avg_score", 0.0)
+    gap_severity = identity.get("gap_severity", "none") if "error" not in identity else "none"
+
+    if cert_rate >= 0.65 and avg_score >= 7.0:
+        mood = "Confident"
+        mood_reason = f"cert_rate={cert_rate:.0%}, avg_score={avg_score}"
+    elif gap_severity == "critical" or cert_rate < 0.25:
+        mood = "Struggling"
+        mood_reason = f"gap_severity={gap_severity}, cert_rate={cert_rate:.0%}"
+    elif gap_severity == "medium" and cert_rate < 0.45:
+        mood = "Skeptical"
+        mood_reason = f"Identity weak in critical categories (gap_severity={gap_severity})"
+    elif avg_score >= 5.0:
+        mood = "Focused"
+        mood_reason = f"cert_rate={cert_rate:.0%}, avg_score={avg_score}"
+    else:
+        mood = "Frustrated"
+        mood_reason = f"Low avg_score={avg_score}, cert_rate={cert_rate:.0%}"
+
+    # ── Active tensions (which emergence vectors are firing right now) ───────
+    # We detect tensions from the last relational_context computed — or compute fresh
+    # from identity + experience on the last studied topic.
+    active_tensions = []
+    last_topic = anchor.get("last_topic", "")
+    if last_topic and last_topic != "—":
+        try:
+            exp  = core.query_experience(last_topic)
+            know = core.query_knowledge(last_topic)
+            from cognition.cognition_core import _detect_tensions
+            raw_tensions = _detect_tensions(identity if "error" not in identity else {}, exp, know, anchor)
+            active_tensions = [t[:120] for t in raw_tensions[:3]]  # max 3, truncated for UI
+        except Exception:
+            pass
+
+    # ── Shadow Audit: last 5 emergence events ───────────────────────────────
+    log = core.get_emergence_log(last_n=5)
+    shadow_audit = [
+        {
+            "timestamp": e.get("timestamp", "")[:19],
+            "topic":     e.get("topic", ""),
+            "action":    e.get("action", ""),
+            "result":    e.get("result", ""),
+            "cause":     e.get("cause", ""),
+        }
+        for e in log
+    ]
+
+    # ── Emergence stats ──────────────────────────────────────────────────────
+    stats = core.get_emergence_stats()
+    emergence_stats = {
+        "opportunities":   stats.get("opportunities", 0),
+        "hits":            stats.get("hits", 0),
+        "misses":          stats.get("misses", 0),
+        "emergence_rate":  stats.get("emergence_rate", 0.0),
+        "miss_causes":     stats.get("miss_causes", {}),
+    }
+
+    # ── Top 3 capability gaps ────────────────────────────────────────────────
+    top_gaps = []
+    if "error" not in identity:
+        top_gaps = identity.get("critical_gaps", [])[:3]
+
+    return {
+        "status": "ok",
+        "mood":   mood,
+        "mood_reason": mood_reason,
+        "executive": {
+            "summary":            summary,
+            "certification_rate": anchor.get("certification_rate", 0.0),
+            "total_experiments":  anchor.get("total_experiments", 0),
+            "avg_score":          anchor.get("avg_score", 0.0),
+            "last_topic":         anchor.get("last_topic", "—"),
+            "last_pass":          anchor.get("last_pass", False),
+            "last_date":          anchor.get("last_date", "—"),
+        },
+        "active_tensions": active_tensions,
+        "active_vectors":  _describe_active_vectors(active_tensions),
+        "shadow_audit":    shadow_audit,
+        "emergence_stats": emergence_stats,
+        "identity": {
+            "gap_severity":    identity.get("gap_severity", "none") if "error" not in identity else "n/a",
+            "gap_rate":        identity.get("gap_rate", 0.0)        if "error" not in identity else 0.0,
+            "frontier_topics": identity.get("frontier_topics", [])  if "error" not in identity else [],
+        },
+        "top_gaps": top_gaps,
+    }
+
+
+def _describe_active_vectors(tensions: list) -> list:
+    """Map active tension strings to their vector labels for the UI."""
+    labels = []
+    for t in tensions:
+        if "Vettore 1" in t or "sandbox" in t.lower():
+            labels.append("V1: Intuizione del Fallimento (Experience→Synthesis)")
+        elif "Vettore 2" in t or "Identit" in t:
+            labels.append("V2: Scettico Informato (Identity→Critique)")
+        elif "Vettore 3" in t or "complessit" in t.lower():
+            labels.append("V3: Strategia Predittiva (Knowledge→Strategy)")
+        elif "Near-miss" in t:
+            labels.append("Near-miss: piccolo aggiustamento può sbloccare")
+        elif "gap" in t.lower():
+            labels.append("Performance gap: topic sistematicamente difficile")
+    return labels
+
+
 # --- Goal Engine Endpoints ------------------------------------------------
 @app.get("/goals")
 async def list_goals():
