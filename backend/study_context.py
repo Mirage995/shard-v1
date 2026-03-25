@@ -65,6 +65,7 @@ class StudyContext:
     pivot_directive: Optional[str] = None                 # structural pivot from Vettore 1
     core_relational_ctx: Optional[str] = None             # relational_context() injected at attempt>=2
     prev_strategy_used: Optional[str] = None              # tracks strategy across attempts for audit_emergence
+    v3_recommended_strategy: Optional[str] = None         # [SSJ11] Vettore 3 directed strategy (MetaLearning)
 
     # ── Helper ────────────────────────────────────────────────────────────────
 

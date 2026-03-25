@@ -177,7 +177,7 @@ class CognitionCore:
             "hits":          0,
             "misses":        0,
             "false_positives": 0,
-            "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0},
+            "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0, "ignored_v3": 0},
         }
 
     # ── Initialization ────────────────────────────────────────────────────────
@@ -314,7 +314,7 @@ class CognitionCore:
             scores          = []
 
             for ep in episodes:
-                score = ep.get("score", 0.0)
+                score = float(ep.get("score") or 0.0)
                 scores.append(score)
                 if score > best_score:
                     best_score = score
@@ -396,6 +396,55 @@ class CognitionCore:
             return {"topic": topic, "recommended_strategy": None,
                     "category": "unknown", "error": str(exc)}
 
+    # ── Vettore 3 — Strategy Recommendation ──────────────────────────────────
+
+    def query_strategy_recommendation(self, topic: str) -> Dict[str, Any]:
+        """Cross-layer: MetaLearning category stats + best historical strategy.
+
+        Used by Vettore 3: when pivot fires, provides a DIRECTED recommendation
+        instead of the generic 'try implementation_first' fallback.
+
+        Returns:
+            {
+              "category":            str   — topic category (concurrency, web, etc.)
+              "best_strategy_text":  str   — formatted strategy description from MetaLearning
+              "category_cert_rate":  float — historical cert_rate for this category
+              "category_avg_score":  float — historical avg_score for this category
+              "has_history":         bool  — True if MetaLearning has data for this category
+            }
+        """
+        result: Dict[str, Any] = {
+            "topic":               topic,
+            "category":            "general",
+            "best_strategy_text":  None,
+            "category_cert_rate":  0.0,
+            "category_avg_score":  0.0,
+            "has_history":         False,
+        }
+        try:
+            if self._meta_learning is None:
+                return result
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from meta_learning import _classify_topic
+
+            category = _classify_topic(topic)
+            result["category"] = category
+
+            best_strategy = self._meta_learning.suggest_best_strategy(topic)
+            if best_strategy:
+                result["best_strategy_text"] = best_strategy
+                result["has_history"] = True
+
+            stats = self._meta_learning.get_stats()
+            cat_stats = stats.get("categories", {}).get(category, {})
+            result["category_cert_rate"] = float(cat_stats.get("cert_rate") or 0.0)
+            result["category_avg_score"] = float(cat_stats.get("avg_score") or 0.0)
+
+        except Exception as exc:
+            logger.warning("[COGNITION] query_strategy_recommendation failed: %s", exc)
+        return result
+
     # ── Relational Context — composite view with tensions ─────────────────────
 
     def relational_context(self, topic: str) -> str:
@@ -448,13 +497,23 @@ class CognitionCore:
                 causal_lines = know["causal_context"].strip().split("\n")
                 lines.extend(causal_lines[:3])
 
-        # Layer 5: Critique
-        critique = self.query_critique(topic)
-        if critique.get("recommended_strategy"):
-            lines.append(f"Strategia consigliata: {critique['recommended_strategy']}")
+        # Vettore 3: MetaLearning directed strategy recommendation
+        strat_rec = self.query_strategy_recommendation(topic)
+        if strat_rec.get("has_history"):
+            cat = strat_rec["category"]
+            cr  = strat_rec["category_cert_rate"]
+            avg = strat_rec["category_avg_score"]
+            lines.append(
+                f"MetaLearning [{cat}]: cert_rate={cr:.0%} avg={avg:.1f}/10"
+            )
+            lines.append(
+                f"[VETTORE 3 — DIRECTED PIVOT]: {strat_rec['best_strategy_text']}"
+            )
+        else:
+            strat_rec = {}
 
         # ── Tension Detection ─────────────────────────────────────────────────
-        tensions = _detect_tensions(identity, exp, know, anchor)
+        tensions = _detect_tensions(identity, exp, know, anchor, strategy_rec=strat_rec)
         if tensions:
             lines.append("")
             lines.append("[TENSIONI RILEVATE]")
@@ -538,11 +597,16 @@ class CognitionCore:
             self._emergence_stats["hits"] += 1
             cause_str = "; ".join(hits)
         else:
-            result = "[MISSED EMERGENCE]"
             self._emergence_stats["misses"] += 1
-            # Classify miss cause
-            cause_str = _classify_miss_cause(delta)
-            miss_cause_key = _map_miss_cause(delta)
+            # Vettore 3: directive was active but SHARD didn't respond
+            if delta.get("v3_active"):
+                result    = "[MISSED EMERGENCE - IGNORED V3 DIRECTIVE]"
+                cause_str = "V3 Ignored: directed pivot was active but no behavioral change detected"
+                miss_cause_key = "ignored_v3"
+            else:
+                result         = "[MISSED EMERGENCE]"
+                cause_str      = _classify_miss_cause(delta)
+                miss_cause_key = _map_miss_cause(delta)
             self._emergence_stats["miss_causes"][miss_cause_key] = (
                 self._emergence_stats["miss_causes"].get(miss_cause_key, 0) + 1
             )
@@ -604,6 +668,7 @@ def _detect_tensions(
     experience: Dict,
     knowledge: Dict,
     anchor: Dict,
+    strategy_rec: Optional[Dict] = None,
 ) -> List[str]:
     """Detect meaningful conflicts between layers.
 
@@ -637,9 +702,21 @@ def _detect_tensions(
     complexity = knowledge.get("complexity_level", "low")
     if complexity == "high":
         tensions.append(
-            f"Vettore 3 (Conoscenza↔Strategia): topic ad alta complessità strutturale "
+            f"Vettore 3 (Conoscenza->Strategia): topic ad alta complessità strutturale "
             f"({knowledge.get('topic_complexity', 0)} dipendenze causali) "
             "-> usare approccio 'Safe' anche se il topic sembra semplice"
+        )
+
+    # Vettore 3 (directed): MetaLearning has a concrete strategy recommendation
+    if strategy_rec and strategy_rec.get("has_history"):
+        cat  = strategy_rec.get("category", "general")
+        cr   = strategy_rec.get("category_cert_rate", 0.0)
+        avg  = strategy_rec.get("category_avg_score", 0.0)
+        text = (strategy_rec.get("best_strategy_text") or "")[:120]
+        tensions.append(
+            f"Vettore 3 (MetaLearning->Strategia): categoria '{cat}' "
+            f"cert_rate={cr:.0%} avg={avg:.1f}/10 storico. "
+            f"DIRECTED PIVOT disponibile: {text}"
         )
 
     # Near-miss tension: so close, yet keeps failing

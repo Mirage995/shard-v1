@@ -105,17 +105,34 @@ class SynthesizePhase(BasePhase):
                 exp = core.query_experience(ctx.topic)
                 ctx.core_experience = exp
                 if exp.get("sandbox_always_zero") or (exp.get("chronic_fail") and exp.get("attempt_count", 0) >= 2):
-                    ctx.pivot_directive = (
-                        f"PAST FAILURE PATTERN DETECTED: sandbox returned 0 in "
-                        f"{exp['attempt_count']} previous attempts for this topic. "
-                        "The theoretical approach is NOT working. "
-                        "This synthesis MUST prioritize EXECUTABLE implementation patterns: "
-                        "concrete algorithms, step-by-step code structures, real data examples. "
-                        "Avoid abstract theory. Think: what Python code do I write, "
-                        "in what exact order, with what data structures."
-                    )
+                    # Vettore 3: try to get a DIRECTED recommendation from MetaLearning
+                    strat_rec = core.query_strategy_recommendation(ctx.topic)
+                    if strat_rec.get("has_history") and strat_rec.get("best_strategy_text"):
+                        cat = strat_rec["category"]
+                        cr  = strat_rec["category_cert_rate"]
+                        ctx.v3_recommended_strategy = strat_rec["best_strategy_text"]
+                        ctx.pivot_directive = (
+                            f"PAST FAILURE PATTERN DETECTED: sandbox returned 0 in "
+                            f"{exp['attempt_count']} previous attempts for this topic. "
+                            "The theoretical approach is NOT working. "
+                            f"[VETTORE 3 — DIRECTED PIVOT for '{cat}' (cert_rate={cr:.0%} storico)]: "
+                            f"{strat_rec['best_strategy_text']} "
+                            "Apply this pattern concretely: executable code, step-by-step, real data."
+                        )
+                        print(f"[VETTORE 1+3] Directed pivot for '{ctx.topic}' — category={cat} cr={cr:.0%}")
+                    else:
+                        # Fallback: generic pivot (no MetaLearning history yet)
+                        ctx.pivot_directive = (
+                            f"PAST FAILURE PATTERN DETECTED: sandbox returned 0 in "
+                            f"{exp['attempt_count']} previous attempts for this topic. "
+                            "The theoretical approach is NOT working. "
+                            "This synthesis MUST prioritize EXECUTABLE implementation patterns: "
+                            "concrete algorithms, step-by-step code structures, real data examples. "
+                            "Avoid abstract theory. Think: what Python code do I write, "
+                            "in what exact order, with what data structures."
+                        )
+                        print(f"[VETTORE 1] Generic pivot for '{ctx.topic}' — no MetaLearning history")
                     await ctx.emit("SYNTHESIZE", 0, "[COGNITION] Structural pivot activated — shifting to executable focus")
-                    print(f"[VETTORE 1] Pivot directive injected for '{ctx.topic}' — sandbox always 0 pattern")
             except Exception as _ce:
                 pass  # non-fatal
 
@@ -893,13 +910,15 @@ Rules:
                         new_score = ctx.sandbox_result.get("score", 0.0) or 0.0
                         new_strategy = ctx.strategy_used or "retry"
                         delta = {
-                            "strategy_used":      new_strategy,
-                            "strategy_prev":      prev_strategy,
-                            "sandbox_score":      new_score,
-                            "sandbox_score_prev": prev_sandbox_score,
-                            "attempt_number":     ctx.attempt,
-                            "tension_present":    bool(ctx.core_relational_ctx),
-                            "prompt_tokens":      len(regen_prompt) // 4,
+                            "strategy_used":           new_strategy,
+                            "strategy_prev":           prev_strategy,
+                            "sandbox_score":           new_score,
+                            "sandbox_score_prev":      prev_sandbox_score,
+                            "attempt_number":          ctx.attempt,
+                            "tension_present":         bool(ctx.core_relational_ctx),
+                            "prompt_tokens":           len(regen_prompt) // 4,
+                            "v3_active":               bool(getattr(ctx, "v3_recommended_strategy", None)),
+                            "v3_recommended_strategy": getattr(ctx, "v3_recommended_strategy", None),
                         }
                         audit = await core.audit_emergence(ctx.topic, "retry", delta)
                         print(f"[SHADOW DIAGNOSTIC] {audit} — topic='{ctx.topic}' attempt={ctx.attempt}")
