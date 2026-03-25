@@ -552,9 +552,9 @@ class NightRunner:
     async def _run_session(self):
         """Core study loop — called by run() inside the session lock guard."""
         # In background mode (audio session active) suppress all voice broadcasts
-        if self._background_mode:
-            def _vb(text, priority="low", event_type="info"):  # noqa: F811
-                pass
+        # Always assign _vb as a local to avoid UnboundLocalError from Python scoping rules
+        _module_vb = globals()["_vb"]
+        _vb = (lambda text, priority="low", event_type="info": None) if self._background_mode else _module_vb  # noqa: F841
         self._transition(SessionState.INIT, "loading memory + capability graph")
         memory = ShardMemory()
         capability_graph = CapabilityGraph()

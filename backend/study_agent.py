@@ -298,7 +298,7 @@ class StudyAgent:
 
     async def _think(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
         """Core reasoning call using the global llm_router.
-        Prefers Claude -> Groq -> Gemini.
+        Prefers Gemini (free) -> Groq -> Claude.
         """
         effective_system = system
         if json_mode:
@@ -309,12 +309,12 @@ class StudyAgent:
             system=effective_system,
             max_tokens=2000,
             temperature=0.3,
-            providers=["Claude", "Groq", "Gemini"]
+            providers=["Gemini", "Groq", "Claude"]
         )
 
     async def _think_fast(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
         """Fast reasoning call using the global llm_router.
-        Prefers Groq -> Gemini -> Claude (or just Groq -> Gemini to stay fast).
+        Prefers Gemini (free) -> Groq -> Claude.
         """
         effective_system = system
         if json_mode:
@@ -325,7 +325,7 @@ class StudyAgent:
             system=effective_system,
             max_tokens=2000,
             temperature=0.3,
-            providers=["Groq", "Gemini", "Claude"]
+            providers=["Gemini", "Groq", "Claude"]
         )
 
     # ── PHASE 1: MAP ──────────────────────────────────────────────────────────
