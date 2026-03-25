@@ -245,7 +245,7 @@ def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
 
 def _build_correction_prompt(
     source: str, tests: str, current_code: str, attempts: list, output_filename: str,
-    stuck_tests: list = None, lang: str = "python",
+    stuck_tests: list = None, lang: str = "python", diagnostic: str = "",
 ) -> str:
     # Full details for every attempt — the LLM must see the complete history to avoid oscillating
     history_parts = []
@@ -334,7 +334,7 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 
 === FAILURE HISTORY (all attempts) ===
 {history}
-{regression_block}{stuck_block}{causal_block}
+{regression_block}{stuck_block}{diagnostic}{causal_block}
 === FIX INSTRUCTIONS ===
 1. Read the FULL history — earlier attempts may have solved some problems you later broke.
 2. Fix EVERY currently failing test.
@@ -456,6 +456,62 @@ def _run_tests(task_dir: Path, test_file: str, lang: str = "python",
 # Legacy alias for any external callers
 def _run_pytest(task_dir: Path, test_file: str) -> tuple:
     return _run_tests(task_dir, test_file, lang="python")
+
+
+# -- Execution diagnostics -----------------------------------------------------
+
+def _run_diagnostic(task_dir: Path, output_path: Path, test_source: str,
+                    stuck_tests: list) -> str:
+    """Run stuck tests individually with pytest --tb=short and capture actual values.
+
+    Extracts the assert expression from each stuck test, rewrites it to also
+    print the actual value before asserting, then executes it. This gives the
+    LLM concrete "Expected X, Got Y" feedback instead of just an assertion error.
+
+    Returns a formatted diagnostic block ready to inject into the correction prompt.
+    Only runs for Python (other languages use their own assertion messages).
+    """
+    if not stuck_tests or not output_path.exists():
+        return ""
+
+    diag_parts = []
+
+    for test_name in stuck_tests[:4]:  # cap at 4 to avoid bloating the prompt
+        # Run this single test with pytest -s to capture prints
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "pytest", "-x", f"::{test_name}",
+                 "--tb=short", "--no-header", "-q"],
+                cwd=str(task_dir),
+                capture_output=True, text=True, timeout=15,
+                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            )
+            output = (result.stdout + result.stderr).strip()
+        except Exception as e:
+            output = f"(diagnostic run failed: {e})"
+
+        # Extract the most useful part: the AssertionError line
+        diag_lines = []
+        for line in output.splitlines():
+            line_s = line.strip()
+            # Keep assert lines, E lines (pytest error detail), and short context
+            if (line_s.startswith("E ") or line_s.startswith("assert ")
+                    or "AssertionError" in line_s or "TypeError" in line_s
+                    or "ValueError" in line_s or line_s.startswith(">")):
+                diag_lines.append(line_s)
+
+        detail = "\n".join(diag_lines[:12]) if diag_lines else output[-300:]
+        if detail:
+            diag_parts.append(f"[{test_name}] actual execution:\n{detail}")
+
+    if not diag_parts:
+        return ""
+
+    return (
+        "\n=== EXECUTION DIAGNOSTICS (what your code actually returns on stuck tests) ===\n"
+        + "\n\n".join(diag_parts)
+        + "\n"
+    )
 
 
 def _parse_test_output(raw: str, lang: str = "python") -> tuple:
@@ -771,9 +827,15 @@ async def run_benchmark_loop(
             stuck_tests = _detect_stuck_tests(attempts)
             if stuck_tests:
                 print(f"  [stuck] {len(stuck_tests)} test(s) stuck across attempts: {stuck_tests}")
+            # Run execution diagnostics on stuck tests (Python only)
+            diagnostic = ""
+            if stuck_tests and lang == "python":
+                diagnostic = _run_diagnostic(task_dir, output_path, tests, stuck_tests)
+                if diagnostic:
+                    print(f"  [diag] Execution diagnostics injected for {len(stuck_tests)} stuck test(s)")
             prompt = _build_correction_prompt(
                 source, tests, current_code, attempts, output_filename,
-                stuck_tests=stuck_tests, lang=lang,
+                stuck_tests=stuck_tests, lang=lang, diagnostic=diagnostic,
             )
             print(f"  [SHARD FEEDBACK] Correction prompt ({len(prompt):,} chars)")
 
@@ -788,6 +850,12 @@ async def run_benchmark_loop(
             swarm_stuck = _detect_stuck_tests(attempts)
             if swarm_stuck:
                 print(f"  [stuck] {len(swarm_stuck)} test(s) stuck — injecting into Architect: {swarm_stuck}")
+                if lang == "python":
+                    swarm_diag = _run_diagnostic(task_dir, output_path, tests, swarm_stuck)
+                    if swarm_diag:
+                        print(f"  [diag] Execution diagnostics injected for {len(swarm_stuck)} stuck test(s)")
+                        # Inject into tests string so swarm_complete sees it
+                        tests = tests + swarm_diag
             # Consume rollback flag — active for this one call only
             _rollback_now = _swarm_rollback
             _swarm_rollback = False
