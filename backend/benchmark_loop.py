@@ -461,54 +461,96 @@ def _run_pytest(task_dir: Path, test_file: str) -> tuple:
 # -- Execution diagnostics -----------------------------------------------------
 
 def _run_diagnostic(task_dir: Path, output_path: Path, test_source: str,
-                    stuck_tests: list) -> str:
-    """Run stuck tests individually with pytest --tb=short and capture actual values.
+                    stuck_tests: list, lang: str = "python") -> str:
+    """Run stuck tests individually and capture actual vs expected values.
 
-    Extracts the assert expression from each stuck test, rewrites it to also
-    print the actual value before asserting, then executes it. This gives the
-    LLM concrete "Expected X, Got Y" feedback instead of just an assertion error.
+    Gives the LLM concrete "your code returned X, test expected Y" feedback
+    instead of just an assertion error. Works for Python, JavaScript, C++.
 
     Returns a formatted diagnostic block ready to inject into the correction prompt.
-    Only runs for Python (other languages use their own assertion messages).
     """
     if not stuck_tests or not output_path.exists():
         return ""
 
     diag_parts = []
 
-    for test_name in stuck_tests[:4]:  # cap at 4 to avoid bloating the prompt
-        # Run this single test with pytest -s to capture prints
+    if lang == "python":
+        for test_name in stuck_tests[:4]:
+            try:
+                result = subprocess.run(
+                    [sys.executable, "-m", "pytest", "-x", f"::{test_name}",
+                     "--tb=short", "--no-header", "-q"],
+                    cwd=str(task_dir),
+                    capture_output=True, text=True, timeout=15,
+                    env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+                )
+                output = (result.stdout + result.stderr).strip()
+            except Exception as e:
+                output = f"(diagnostic run failed: {e})"
+
+            diag_lines = []
+            for line in output.splitlines():
+                s = line.strip()
+                if (s.startswith("E ") or s.startswith("assert ")
+                        or "AssertionError" in s or "TypeError" in s
+                        or "ValueError" in s or s.startswith(">")):
+                    diag_lines.append(s)
+
+            detail = "\n".join(diag_lines[:12]) if diag_lines else output[-300:]
+            if detail:
+                diag_parts.append(f"[{test_name}]\n{detail}")
+
+    elif lang == "javascript":
+        # Jest already prints Expected/Received — re-run and filter those lines
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "pytest", "-x", f"::{test_name}",
-                 "--tb=short", "--no-header", "-q"],
+                ["npx", "jest", "--verbose", "--no-coverage",
+                 "--testNamePattern", "|".join(re.escape(t) for t in stuck_tests[:4])],
                 cwd=str(task_dir),
-                capture_output=True, text=True, timeout=15,
-                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+                capture_output=True, text=True, timeout=30,
+                env={**os.environ, "NODE_ENV": "test"},
             )
             output = (result.stdout + result.stderr).strip()
         except Exception as e:
             output = f"(diagnostic run failed: {e})"
 
-        # Extract the most useful part: the AssertionError line
         diag_lines = []
         for line in output.splitlines():
-            line_s = line.strip()
-            # Keep assert lines, E lines (pytest error detail), and short context
-            if (line_s.startswith("E ") or line_s.startswith("assert ")
-                    or "AssertionError" in line_s or "TypeError" in line_s
-                    or "ValueError" in line_s or line_s.startswith(">")):
-                diag_lines.append(line_s)
-
-        detail = "\n".join(diag_lines[:12]) if diag_lines else output[-300:]
+            s = line.strip()
+            if any(kw in s for kw in ("Expected", "Received", "●", "✕", "✗", "FAIL")):
+                diag_lines.append(s)
+        detail = "\n".join(diag_lines[:20]) if diag_lines else output[-400:]
         if detail:
-            diag_parts.append(f"[{test_name}] actual execution:\n{detail}")
+            diag_parts.append(f"[jest diagnostics]\n{detail}")
+
+    elif lang == "cpp":
+        # GoogleTest prints "Value of: ...\nActual: ...\nExpected: ..." — extract those
+        try:
+            exe_path = task_dir / "_shard_test_runner"
+            if exe_path.exists():
+                filter_expr = ":".join(f"*{t}*" for t in stuck_tests[:4])
+                result = subprocess.run(
+                    [str(exe_path), f"--gtest_filter={filter_expr}"],
+                    cwd=str(task_dir),
+                    capture_output=True, text=True, timeout=15,
+                )
+                output = (result.stdout + result.stderr).strip()
+                diag_lines = [
+                    l.strip() for l in output.splitlines()
+                    if any(kw in l for kw in ("Value of", "Actual", "Expected",
+                                               "FAILED", "error:", "which is"))
+                ]
+                detail = "\n".join(diag_lines[:20]) if diag_lines else output[-400:]
+                if detail:
+                    diag_parts.append(f"[gtest diagnostics]\n{detail}")
+        except Exception as e:
+            diag_parts.append(f"[gtest diagnostic failed: {e}]")
 
     if not diag_parts:
         return ""
 
     return (
-        "\n=== EXECUTION DIAGNOSTICS (what your code actually returns on stuck tests) ===\n"
+        "\n=== EXECUTION DIAGNOSTICS (what your code actually does on stuck tests) ===\n"
         + "\n\n".join(diag_parts)
         + "\n"
     )
@@ -829,8 +871,8 @@ async def run_benchmark_loop(
                 print(f"  [stuck] {len(stuck_tests)} test(s) stuck across attempts: {stuck_tests}")
             # Run execution diagnostics on stuck tests (Python only)
             diagnostic = ""
-            if stuck_tests and lang == "python":
-                diagnostic = _run_diagnostic(task_dir, output_path, tests, stuck_tests)
+            if stuck_tests:
+                diagnostic = _run_diagnostic(task_dir, output_path, tests, stuck_tests, lang=lang)
                 if diagnostic:
                     print(f"  [diag] Execution diagnostics injected for {len(stuck_tests)} stuck test(s)")
             prompt = _build_correction_prompt(
@@ -850,9 +892,8 @@ async def run_benchmark_loop(
             swarm_stuck = _detect_stuck_tests(attempts)
             if swarm_stuck:
                 print(f"  [stuck] {len(swarm_stuck)} test(s) stuck — injecting into Architect: {swarm_stuck}")
-                if lang == "python":
-                    swarm_diag = _run_diagnostic(task_dir, output_path, tests, swarm_stuck)
-                    if swarm_diag:
+                swarm_diag = _run_diagnostic(task_dir, output_path, tests, swarm_stuck, lang=lang)
+                if swarm_diag:
                         print(f"  [diag] Execution diagnostics injected for {len(swarm_stuck)} stuck test(s)")
                         # Inject into tests string so swarm_complete sees it
                         tests = tests + swarm_diag

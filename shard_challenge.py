@@ -16,17 +16,88 @@ The script:
   6. Prints results + the winning fix
 """
 import argparse
+import json
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 BACKEND = ROOT / "backend"
 sys.path.insert(0, str(BACKEND))
 sys.path.insert(0, str(ROOT))
+
+
+# -- Standalone CognitionCore observer ----------------------------------------
+# Lightweight implementation of the ShardConsciousness interface.
+# Activates CognitionCore features (event tracking, XP, brain graph updates)
+# in shard_challenge without requiring the full server stack.
+
+class _BenchmarkConsciousness:
+    """Minimal consciousness for standalone benchmark runs.
+
+    Implements the same interface as ShardConsciousness so benchmark_loop
+    can call push_event() and add_xp() without knowing it's standalone.
+    Events are persisted to shard_memory/challenge_events.jsonl.
+    """
+
+    def __init__(self, log_path: Path):
+        self._log_path = log_path
+        self._log_path.parent.mkdir(exist_ok=True)
+        self._session_events = []
+
+    def push_event(self, event_type: str, data: dict):
+        ev = {"type": event_type, "data": data, "ts": datetime.now().isoformat()}
+        self._session_events.append(ev)
+        # Emit a real-time cognition pulse to the console
+        if event_type == "benchmark":
+            attempt = data.get("attempt", "?")
+            passed  = data.get("passed", 0)
+            failed  = data.get("failed", 0)
+            mode    = data.get("mode", "")
+            total   = passed + failed
+            bar     = "#" * passed + "." * failed
+            print(f"  [cognition] attempt {attempt} | {passed}/{total} [{bar}] | {mode}")
+        # Append to persistent log
+        try:
+            with open(self._log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(ev) + "\n")
+        except Exception:
+            pass
+
+    def add_xp(self, skill_name: str, amount: float):
+        """Update capability graph XP — delegates to CapabilityGraph if available."""
+        try:
+            cap_path = ROOT / "shard_memory" / "capability_graph.json"
+            if not cap_path.exists():
+                return
+            graph = json.loads(cap_path.read_text(encoding="utf-8"))
+            nodes = graph.get("nodes", {})
+            # Find the closest matching node
+            skill_lower = skill_name.lower()
+            match = next(
+                (k for k in nodes if skill_lower in k.lower() or k.lower() in skill_lower),
+                None
+            )
+            if match:
+                nodes[match]["xp"] = round(nodes[match].get("xp", 0) + amount, 3)
+                cap_path.write_text(json.dumps(graph, indent=2), encoding="utf-8")
+                print(f"  [cognition] +{amount} XP → {match}")
+        except Exception:
+            pass
+
+    def flush_summary(self):
+        """Print a session summary of all benchmark events."""
+        if not self._session_events:
+            return
+        benchmark_events = [e for e in self._session_events if e["type"] == "benchmark"]
+        if benchmark_events:
+            last = benchmark_events[-1]["data"]
+            print(f"\n  [cognition] Session: {len(benchmark_events)} attempt(s) observed | "
+                  f"final {last.get('passed',0)}p/{last.get('failed',0)}f")
 
 
 _LANG_EXTS = {
@@ -270,7 +341,14 @@ def main():
 
         # Import and run benchmark loop
         import asyncio
-        from benchmark_loop import run_benchmark_loop
+        from benchmark_loop import run_benchmark_loop, set_consciousness
+
+        # Wire CognitionCore — active even in standalone challenge runs
+        _consciousness = _BenchmarkConsciousness(
+            ROOT / "shard_memory" / "challenge_events.jsonl"
+        )
+        set_consciousness(_consciousness)
+        print("  [cognition] CognitionCore: ACTIVE (standalone mode)\n")
 
         t0 = time.perf_counter()
         result = asyncio.run(run_benchmark_loop(
@@ -279,6 +357,14 @@ def main():
             use_swarm=not args.no_swarm,
         ))
         elapsed = time.perf_counter() - t0
+
+        # CognitionCore: award XP based on result
+        total_tests = len(result.attempts[-1].tests_passed) + len(result.attempts[-1].tests_failed) if result.attempts else 0
+        if result.success:
+            xp = round(1.0 + (total_tests / 20), 2)
+            _consciousness.add_xp("software debugging", xp)
+            _consciousness.add_xp("test driven development", xp * 0.5)
+        _consciousness.flush_summary()
 
         # Print summary
         print(f"\n{'='*60}")
