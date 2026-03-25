@@ -256,12 +256,13 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
         self.pause_minutes = pause
         self.max_api_calls = api_limit
+        self.topic_budget = topic_budget
 
         self.start_time = None
         self.api_calls_used = 0
@@ -572,6 +573,7 @@ class NightRunner:
         storage = GoalStorage()
         self.goal_engine = GoalEngine(storage, capability_graph)
         study_agent = StudyAgent(goal_engine=self.goal_engine)
+        study_agent._topic_llm_budget = self.topic_budget
 
         # ── SSJ3: Proactive self-improvement (ImprovementEngine) ──────────────
         try:
@@ -688,10 +690,21 @@ class NightRunner:
                         pass  # non-fatal
 
             except Exception as e:
-                self.logger.error(f"Cycle failed with exception: {str(e)}")
-                cycle_data["certified"] = False
-                cycle_data["score"] = 0.0
-                cycle_data["failures"] = [f"CRASH: {str(e)}"]
+                from backend.study_agent import TopicBudgetExceeded as _TBE
+                if isinstance(e, _TBE):
+                    self.logger.warning(
+                        "[BUDGET] Topic '%s' hard-stopped: %s — skipping to next topic",
+                        topic, e,
+                    )
+                    print(f"[API BUDGET] Hard stop: '{topic}' — {e}")
+                    cycle_data["certified"] = False
+                    cycle_data["score"] = 0.0
+                    cycle_data["failures"] = [f"BUDGET_EXCEEDED: {e}"]
+                else:
+                    self.logger.error(f"Cycle failed with exception: {str(e)}")
+                    cycle_data["certified"] = False
+                    cycle_data["score"] = 0.0
+                    cycle_data["failures"] = [f"CRASH: {str(e)}"]
                 
             self._transition(
                 SessionState.COMPLETE if cycle_data["certified"] else SessionState.FAILED,
@@ -1041,6 +1054,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=MAX_RUNTIME_MINUTES_DEFAULT, help="Max runtime in minutes")
     parser.add_argument("--pause", type=int, default=PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT, help="Pause between cycles in minutes")
     parser.add_argument("--api-limit", type=int, default=MAX_API_CALLS_DEFAULT, help="Maximum API calls allowed")
+    parser.add_argument("--topic-budget", type=int, default=50, help="Max LLM calls per topic (default 50)")
     parser.add_argument("--no-core", action="store_true", help="Disable CognitionCore (lobotomy test)")
 
     args = parser.parse_args()
@@ -1059,7 +1073,8 @@ if __name__ == "__main__":
         cycles=args.cycles,
         timeout=args.timeout,
         pause=args.pause,
-        api_limit=args.api_limit
+        api_limit=args.api_limit,
+        topic_budget=args.topic_budget,
     )
     
     try:

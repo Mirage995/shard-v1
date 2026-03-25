@@ -45,6 +45,15 @@ except ImportError:
     from backend.llm_router import llm_complete
 
 
+class TopicBudgetExceeded(Exception):
+    """Raised when a single topic burns more LLM calls than the per-topic budget."""
+    pass
+
+
+# Default per-topic LLM call limit. Overridable via StudyAgent._topic_llm_budget.
+DEFAULT_TOPIC_LLM_BUDGET = 50
+
+
 def _load_reliability_module(relative_path: str, module_name: str):
     """Load reliability extension modules from repo-level shard/ without refactoring imports."""
     repo_root = pathlib.Path(__file__).resolve().parents[1]
@@ -112,6 +121,10 @@ class StudyAgent:
         self.playwright  = None
         self.bctx        = None
         self.progress    = ProgressTracker()
+
+        # ── Per-topic LLM budget (SSJ12) ──────────────────────────────────────
+        self._topic_llm_calls  = 0
+        self._topic_llm_budget = DEFAULT_TOPIC_LLM_BUDGET
 
         # ── Extracted sub-components (SSJ3 Phase 1) ──
         self.sandbox_runner = DockerSandboxRunner(
@@ -294,6 +307,11 @@ class StudyAgent:
         """Core reasoning call using the global llm_router.
         Prefers Gemini (free) -> Groq -> Claude.
         """
+        self._topic_llm_calls += 1
+        if self._topic_llm_calls > self._topic_llm_budget:
+            raise TopicBudgetExceeded(
+                f"Topic burned {self._topic_llm_calls} LLM calls (budget={self._topic_llm_budget})"
+            )
         effective_system = system
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
@@ -310,6 +328,11 @@ class StudyAgent:
         """Fast reasoning call using the global llm_router.
         Prefers Gemini (free) -> Groq -> Claude.
         """
+        self._topic_llm_calls += 1
+        if self._topic_llm_calls > self._topic_llm_budget:
+            raise TopicBudgetExceeded(
+                f"Topic burned {self._topic_llm_calls} LLM calls (budget={self._topic_llm_budget})"
+            )
         effective_system = system
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
@@ -1324,6 +1347,7 @@ AUTO-EXAM (Questions and Answers):
         )
 
         self.is_running = True
+        self._topic_llm_calls = 0  # reset per-topic budget counter
         self.on_web_data = on_web_data
         self.progress = ProgressTracker()
 
