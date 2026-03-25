@@ -594,6 +594,18 @@ class CertifyRetryGroup(BasePhase):
                 await ctx.emit("VALIDATE", ctx.score, f"Score {ctx.score}/10 — Retrying. Focus: {focus[:80]}")
 
                 if ctx.attempt < MAX_RETRY:
+                    # On attempt 2+: ask CriticAgent for LLM meta-critique
+                    # "What am I doing wrong systematically?" — injects into retry prompt
+                    if ctx.attempt >= 2:
+                        try:
+                            critique = await ctx.agent.critic_agent.analyze_with_llm(
+                                ctx.topic, ctx.score, ctx.gaps, ctx.attempt
+                            )
+                            if critique:
+                                ctx.critic_meta_critique = critique
+                                await ctx.emit("VALIDATE", ctx.score, f"[CRITIC] {critique[:100]}...")
+                        except Exception as _ce:
+                            pass  # non-fatal
                     await self._retry_gap_fill(ctx)
 
         if not ctx.certified:
@@ -774,12 +786,19 @@ Please analyze the problem and propose a minimal patch.
         gaps = ctx.gaps
         focus = ctx.eval_data.get("improvement_focus", "")
 
+        # Inject meta-critique if CriticAgent produced one (attempt >= 2)
+        critique_block = ""
+        if ctx.critic_meta_critique:
+            critique_block = f"\n\nCRITICAL SELF-EVALUATION (read carefully — this is what you keep getting wrong):\n{ctx.critic_meta_critique}\n"
+            print(f"[CRITIC-LLM] Injecting meta-critique into retry prompt for '{ctx.topic}'")
+
         # 1. Re-synthesize theory with gap focus
         gap_prompt = f"""
 Previous study of "{ctx.topic}" had these gaps: {gaps}
-Focus area: {focus}
+Focus area: {focus}{critique_block}
 
 Re-synthesize with emphasis on filling these specific gaps.
+If the critical self-evaluation above identifies a systematic mistake, change your approach accordingly.
 Use the same JSON format as before.
 """
         raw_gap = await ctx.agent._think_fast(gap_prompt, json_mode=True)
@@ -801,9 +820,10 @@ Use the same JSON format as before.
 Rewrite a minimal executable Python script for: {ctx.topic}
 
 The previous attempt had these gaps: {', '.join(str(g) for g in gaps[:3])}
-Focus area: {focus}
+Focus area: {focus}{critique_block}
 
 Fix those gaps explicitly in the new implementation.
+If the critical self-evaluation above identifies a systematic mistake, change your implementation approach accordingly.
 
 Rules:
 - valid Python, no markdown, no explanations, terminates automatically

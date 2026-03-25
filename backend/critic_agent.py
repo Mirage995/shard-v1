@@ -96,8 +96,12 @@ def _extract_error_line(stderr: str) -> str:
 
 class CriticAgent:
     """
-    Analyzes sandbox failures and produces structured feedback with a
-    remediation topic that can be injected into the research agenda.
+    Analyzes sandbox and benchmark failures.
+
+    Two modes:
+    - analyze_failure(): fast regex-based, synchronous, for immediate feedback
+    - analyze_with_llm(): LLM-powered meta-critique, async, for stuck topics
+      Reads episodic history and asks: "what is SHARD doing wrong systematically?"
     """
 
     def __init__(self, capability_graph=None, strategy_memory=None):
@@ -143,3 +147,71 @@ class CriticAgent:
             "capability": capability,
             "data": data,
         }
+
+    async def analyze_with_llm(self, topic: str, current_score: float,
+                                current_gaps: list, attempt: int) -> str:
+        """
+        LLM-powered meta-critique for stuck topics.
+
+        Called when attempt >= 2 — SHARD is not converging.
+        Reads episodic history for this topic and asks Gemini:
+        "What is SHARD doing wrong systematically? What should it try differently?"
+
+        Returns a critique string ready to inject into the retry prompt.
+        Returns empty string on any error (non-fatal).
+        """
+        try:
+            from llm_router import llm_complete
+            from episodic_memory import get_episodic_memory
+
+            # Load past episodes for this topic
+            memory = get_episodic_memory()
+            episodes = memory.retrieve_context(topic, k=5)
+
+            history_lines = []
+            for ep in episodes:
+                score = ep.get("score", 0)
+                success = ep.get("success", False)
+                reason = ep.get("failure_reason", "")
+                date = ep.get("timestamp", "")[:10]
+                status = "CERTIFIED" if success else f"FAILED (score {score})"
+                line = f"- {date}: {status}"
+                if reason:
+                    line += f" — reason: {reason}"
+                history_lines.append(line)
+
+            history_text = "\n".join(history_lines) if history_lines else "No prior history."
+
+            gaps_text = ", ".join(str(g) for g in current_gaps[:5]) if current_gaps else "none identified"
+
+            prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach — not just what went wrong, but WHY the current strategy keeps failing.
+
+Topic: "{topic}"
+Current attempt: {attempt}
+Current score: {current_score}/10
+Current gaps identified: {gaps_text}
+
+Past study history for this topic:
+{history_text}
+
+Analyze this pattern critically:
+1. What is SHARD consistently getting wrong across attempts?
+2. Is the approach to this topic fundamentally flawed (e.g. too abstract, wrong implementation focus, missing prerequisite)?
+3. What ONE specific change in approach would most likely break the failure pattern?
+
+Be direct and concrete. Output 3-4 sentences maximum. This will be injected directly into the next attempt prompt."""
+
+            critique = await llm_complete(
+                prompt=prompt,
+                system="You are a sharp, honest critic. No flattery. Identify the root cause of repeated failure.",
+                max_tokens=300,
+                temperature=0.4,
+                providers=["Gemini", "Groq", "Claude"],
+            )
+
+            print(f"[CRITIC-LLM] Meta-critique for '{topic}' (attempt {attempt}): {critique[:120]}...")
+            return critique.strip()
+
+        except Exception as e:
+            print(f"[CRITIC-LLM] Non-fatal error: {e}")
+            return ""
