@@ -1,3 +1,6 @@
+
+![Gemini_Generated_Image_mh1xkomh1xkomh1x](https://github.com/user-attachments/assets/6083bb92-c373-4526-baea-788996095d9d)
+
 # SHARD
 
 **System of Hybrid Autonomous Reasoning and Design**
