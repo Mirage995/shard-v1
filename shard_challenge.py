@@ -29,15 +29,26 @@ sys.path.insert(0, str(BACKEND))
 sys.path.insert(0, str(ROOT))
 
 
-def _detect_output_filename(test_path: Path, buggy_stem: str) -> str:
+_LANG_EXTS = {
+    ".py":  "python",
+    ".js":  "javascript",
+    ".ts":  "javascript",
+    ".cpp": "cpp",
+    ".cc":  "cpp",
+    ".rs":  "rust",
+    ".go":  "go",
+    ".java":"java",
+}
+
+def _detect_output_filename(test_path: Path, buggy_stem: str, ext: str = ".py") -> str:
     """Try to detect what filename the test expects as output."""
     src = test_path.read_text(encoding="utf-8")
-    # Look for patterns like fixed_processor.py or fixed_bank.py
     import re
-    m = re.search(r'fixed_[\w]+\.py', src)
+    ext_escaped = re.escape(ext)
+    m = re.search(rf'fixed_[\w]+{ext_escaped}', src)
     if m:
         return m.group(0)
-    return f"fixed_{buggy_stem}.py"
+    return f"fixed_{buggy_stem}{ext}"
 
 
 _DEFAULT_MAX_CONTEXT = 400_000  # ~100k tokens (4 chars/token avg)
@@ -218,7 +229,8 @@ def main():
 
     try:
         buggy_stem = buggy_path.stem
-        output_filename = _detect_output_filename(test_path, buggy_stem)
+        buggy_ext = buggy_path.suffix or ".py"
+        output_filename = _detect_output_filename(test_path, buggy_stem, ext=buggy_ext)
 
         # Copy files into task dir
         shutil.copy(buggy_path, task_dir / "processor.py")

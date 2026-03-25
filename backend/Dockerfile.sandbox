@@ -1,11 +1,26 @@
 FROM python:3.10-slim
 
-# Aggiorniamo apt e installiamo dipendenze base di sistema necessarie per alcune lib (compilazione, ecc.)
+# Base system deps + C++ toolchain + GoogleTest
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libsqlite3-dev \
     gcc \
+    g++ \
+    cmake \
+    libgtest-dev \
+    curl \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
+
+# Compile GoogleTest from source (libgtest-dev ships only headers + source on Debian)
+RUN cd /usr/src/googletest && cmake . && make && cp lib/*.a /usr/lib
+
+# Node.js 20 LTS + Jest (global install so any task dir can use jest without package.json)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g jest
 
 RUN pip install --no-cache-dir --upgrade pip
 

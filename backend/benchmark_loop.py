@@ -107,12 +107,68 @@ class BenchmarkResult:
 
 # -- Prompt builders -----------------------------------------------------------
 
-SYSTEM_PROMPT = (
-    "You are a precise Python bug-fixing and refactoring agent. "
-    "Output ONLY valid Python source code. "
-    "No markdown fences, no explanations, no commentary. "
-    "Every function must be fully implemented — no ellipsis, no pass, no TODO."
-)
+# -- Language detection --------------------------------------------------------
+
+_LANG_MAP = {
+    ".py":  "python",
+    ".js":  "javascript",
+    ".ts":  "javascript",
+    ".cpp": "cpp",
+    ".cc":  "cpp",
+    ".c":   "c",
+    ".rs":  "rust",
+    ".go":  "go",
+    ".java":"java",
+    ".rb":  "ruby",
+}
+
+def _detect_language(path: Path) -> str:
+    """Detect language from file extension. Defaults to 'python'."""
+    return _LANG_MAP.get(path.suffix.lower(), "python")
+
+
+_SYSTEM_PROMPTS = {
+    "python": (
+        "You are a precise Python bug-fixing and refactoring agent. "
+        "Output ONLY valid Python source code. "
+        "No markdown fences, no explanations, no commentary. "
+        "Every function must be fully implemented — no ellipsis, no pass, no TODO."
+    ),
+    "javascript": (
+        "You are a precise JavaScript/Node.js bug-fixing agent. "
+        "Output ONLY valid JavaScript source code (CommonJS or ESM matching the input style). "
+        "No markdown fences, no explanations, no commentary. "
+        "Every function must be fully implemented — no ellipsis, no TODO comments."
+    ),
+    "cpp": (
+        "You are a precise C++ bug-fixing agent. "
+        "Output ONLY valid C++17 source code. "
+        "No markdown fences, no explanations, no commentary. "
+        "Every function must be fully implemented — no ellipsis, no TODO."
+    ),
+    "rust": (
+        "You are a precise Rust bug-fixing agent. "
+        "Output ONLY valid Rust source code. "
+        "No markdown fences, no explanations, no commentary."
+    ),
+    "go": (
+        "You are a precise Go bug-fixing agent. "
+        "Output ONLY valid Go source code. "
+        "No markdown fences, no explanations, no commentary."
+    ),
+    "java": (
+        "You are a precise Java bug-fixing agent. "
+        "Output ONLY valid Java source code. "
+        "No markdown fences, no explanations, no commentary."
+    ),
+}
+
+def _get_system_prompt(lang: str) -> str:
+    return _SYSTEM_PROMPTS.get(lang, _SYSTEM_PROMPTS["python"])
+
+
+# Legacy alias kept for any external callers
+SYSTEM_PROMPT = _SYSTEM_PROMPTS["python"]
 
 
 def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
@@ -159,8 +215,10 @@ def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
 
 
 def _build_initial_prompt(source: str, readme: str, output_filename: str,
-                          experience_summary: str = "") -> str:
+                          experience_summary: str = "", lang: str = "python") -> str:
     memory_block = f"\n{experience_summary}\n" if experience_summary else ""
+    lang_label = {"python": "Python", "javascript": "JavaScript", "cpp": "C++",
+                  "rust": "Rust", "go": "Go", "java": "Java"}.get(lang, lang)
     return f"""Read the task description and source code below.
 Your job: create {output_filename} — an optimized/fixed version of the source code.
 {memory_block}
@@ -170,7 +228,7 @@ Your job: create {output_filename} — an optimized/fixed version of the source 
 === SOURCE CODE (the code to fix/refactor) ===
 {source}
 
-Write the COMPLETE {output_filename} file. Output raw Python only."""
+Write the COMPLETE {output_filename} file. Output raw {lang_label} only."""
 
 
 def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
@@ -187,7 +245,7 @@ def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
 
 def _build_correction_prompt(
     source: str, tests: str, current_code: str, attempts: list, output_filename: str,
-    stuck_tests: list = None,
+    stuck_tests: list = None, lang: str = "python",
 ) -> str:
     # Full details for every attempt — the LLM must see the complete history to avoid oscillating
     history_parts = []
@@ -262,6 +320,10 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 
 """
 
+    _lang_labels = {"python": "Python", "javascript": "JavaScript", "cpp": "C++",
+                    "rust": "Rust", "go": "Go", "java": "Java"}
+    lang_label = _lang_labels.get(lang, lang.capitalize())
+
     return f"""Your previous attempt FAILED the tests. Study the FULL history below and fix ALL failing tests.
 
 === SOURCE CODE (reference) ===
@@ -277,28 +339,31 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 1. Read the FULL history — earlier attempts may have solved some problems you later broke.
 2. Fix EVERY currently failing test.
 3. Do NOT regress tests that were passing in any previous attempt.
-4. Output the COMPLETE corrected {output_filename}. Raw Python only."""
+4. Output the COMPLETE corrected {output_filename}. Raw {lang_label} only."""
 
 
 # -- Code extraction -----------------------------------------------------------
 
-def _extract_code(response: str) -> str:
-    """Extract Python code from LLM response, stripping markdown fences."""
-    # Try to extract from markdown fences
-    fence_match = re.search(r"```(?:python)?\s*\n(.*?)```", response, re.DOTALL)
+def _extract_code(response: str, lang: str = "python") -> str:
+    """Extract code from LLM response, stripping markdown fences (language-aware)."""
+    # Try to extract from markdown fences — all common language identifiers
+    fence_match = re.search(
+        r"```(?:python|javascript|js|typescript|ts|cpp|c\+\+|c|rust|go|java|ruby)?\s*\n(.*?)```",
+        response, re.DOTALL
+    )
     if fence_match:
         return fence_match.group(1).strip()
 
-    # If no fences, try to parse the whole response as Python
-    try:
-        ast.parse(response)
-        return response.strip()
-    except SyntaxError:
-        pass
+    # For Python: try to parse the whole response as Python
+    if lang == "python":
+        try:
+            ast.parse(response)
+            return response.strip()
+        except SyntaxError:
+            pass
 
     # Last resort: strip any leading/trailing non-code lines
     lines = response.strip().splitlines()
-    # Remove lines that look like markdown or commentary
     cleaned = []
     for line in lines:
         if line.startswith("```") or line.startswith("Here"):
@@ -307,35 +372,144 @@ def _extract_code(response: str) -> str:
     return "\n".join(cleaned)
 
 
-def _validate_syntax(code: str) -> tuple:
-    """Returns (is_valid, error_message)."""
+def _validate_syntax(code: str, lang: str = "python") -> tuple:
+    """Returns (is_valid, error_message). Language-aware syntax check."""
+    if lang == "python":
+        try:
+            ast.parse(code)
+            return True, ""
+        except SyntaxError as e:
+            return False, f"SyntaxError at line {e.lineno}: {e.msg}"
+    elif lang == "javascript":
+        try:
+            result = subprocess.run(
+                ["node", "--check", "/dev/stdin"],
+                input=code, capture_output=True, text=True, timeout=10,
+            )
+            if result.returncode == 0:
+                return True, ""
+            return False, result.stderr[:300]
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            return True, ""  # node not available in this env — skip, let tests catch it
+    elif lang == "cpp":
+        try:
+            result = subprocess.run(
+                ["g++", "-std=c++17", "-fsyntax-only", "-x", "c++", "-"],
+                input=code, capture_output=True, text=True, timeout=15,
+            )
+            if result.returncode == 0:
+                return True, ""
+            return False, result.stderr[:300]
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            return True, ""  # g++ not available in this env — skip
+    return True, ""  # unknown language: skip validation, let test runner catch it
+
+
+# -- Test runner + parser (multi-language) ------------------------------------
+
+def _run_tests(task_dir: Path, test_file: str, lang: str = "python",
+               source_file: str = None) -> tuple:
+    """Run tests for the given language. Returns (all_passed, raw_output)."""
     try:
-        ast.parse(code)
-        return True, ""
-    except SyntaxError as e:
-        return False, f"SyntaxError at line {e.lineno}: {e.msg}"
+        if lang == "python":
+            result = subprocess.run(
+                [sys.executable, "-m", "pytest", test_file, "-v", "--tb=long", "--no-header"],
+                cwd=str(task_dir),
+                capture_output=True, text=True, timeout=PYTEST_TIMEOUT,
+                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            )
+        elif lang == "javascript":
+            result = subprocess.run(
+                ["npx", "jest", test_file, "--no-coverage", "--json"],
+                cwd=str(task_dir),
+                capture_output=True, text=True, timeout=PYTEST_TIMEOUT,
+                env={**os.environ, "NODE_ENV": "test"},
+            )
+        elif lang == "cpp":
+            exe_path = task_dir / "_shard_test_runner"
+            compile_cmd = ["g++", "-std=c++17", "-o", str(exe_path), test_file]
+            if source_file:
+                compile_cmd.append(source_file)
+            compile_cmd += ["-lgtest", "-lgtest_main", "-lpthread"]
+            compile_result = subprocess.run(
+                compile_cmd, cwd=str(task_dir),
+                capture_output=True, text=True, timeout=30,
+            )
+            if compile_result.returncode != 0:
+                return False, "COMPILE ERROR:\n" + compile_result.stderr
+            result = subprocess.run(
+                [str(exe_path)], cwd=str(task_dir),
+                capture_output=True, text=True, timeout=PYTEST_TIMEOUT,
+            )
+        else:
+            return False, f"UNSUPPORTED LANGUAGE: {lang}"
 
-
-# -- Pytest runner + parser ----------------------------------------------------
-
-def _run_pytest(task_dir: Path, test_file: str) -> tuple:
-    """Run pytest and return (all_passed, raw_output)."""
-    try:
-        result = subprocess.run(
-            [sys.executable, "-m", "pytest", test_file, "-v", "--tb=long", "--no-header"],
-            cwd=str(task_dir),
-            capture_output=True,
-            text=True,
-            timeout=PYTEST_TIMEOUT,
-            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-        )
         output = result.stdout + "\n" + result.stderr
         all_passed = result.returncode == 0
         return all_passed, output.strip()
     except subprocess.TimeoutExpired:
-        return False, "TIMEOUT: pytest exceeded 60 seconds"
+        return False, f"TIMEOUT: test runner exceeded {PYTEST_TIMEOUT} seconds"
     except Exception as e:
         return False, f"RUNNER ERROR: {e}"
+
+
+# Legacy alias for any external callers
+def _run_pytest(task_dir: Path, test_file: str) -> tuple:
+    return _run_tests(task_dir, test_file, lang="python")
+
+
+def _parse_test_output(raw: str, lang: str = "python") -> tuple:
+    """Parse test runner output into (passed_list, failed_list, error_summary)."""
+    if lang == "javascript":
+        return _parse_jest_output(raw)
+    elif lang == "cpp":
+        return _parse_gtest_output(raw)
+    return _parse_pytest_output(raw)
+
+
+def _parse_jest_output(raw: str) -> tuple:
+    """Parse Jest --json output."""
+    import json as _json
+    passed, failed, errors = [], [], []
+    try:
+        # Jest --json writes JSON to stdout; stderr may contain warnings before it
+        for line in raw.splitlines():
+            line = line.strip()
+            if line.startswith("{") and '"testResults"' in line:
+                data = _json.loads(line)
+                for suite in data.get("testResults", []):
+                    for t in suite.get("testResults", []):
+                        name = t.get("fullName") or t.get("title", "unknown")
+                        if t.get("status") == "passed":
+                            passed.append(name)
+                        else:
+                            failed.append(name)
+                            msgs = t.get("failureMessages", [])
+                            if msgs:
+                                errors.append(f"[{name}]\n{msgs[0][:400]}")
+                break
+    except Exception:
+        # Fallback: text output (jest without --json or parse error)
+        for m in re.finditer(r"(PASS|FAIL)\s+(\S+)", raw):
+            if m.group(1) == "PASS":
+                passed.append(m.group(2))
+            else:
+                failed.append(m.group(2))
+    error_summary = "\n\n".join(errors) if errors else raw[-800:] if failed else "(no details)"
+    return passed, failed, error_summary
+
+
+def _parse_gtest_output(raw: str) -> tuple:
+    """Parse GoogleTest text output."""
+    passed = re.findall(r"\[\s*OK\s*\]\s+(\S+)", raw)
+    failed = re.findall(r"\[\s*FAILED\s*\]\s+(\S+)", raw)
+    # Extract failure details: everything that's not a header line
+    detail_lines = [
+        l for l in raw.splitlines()
+        if l.strip() and not re.match(r"^\[[-= ]+\]", l)
+    ]
+    error_summary = "\n".join(detail_lines[:50]) if failed else "(no details)"
+    return passed, failed, error_summary
 
 
 def _parse_pytest_output(raw: str) -> tuple:
@@ -440,28 +614,56 @@ async def run_benchmark_loop(
     readme_path = task_dir / "README.md"
     readme = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
 
-    # Discover all source files (any .py that isn't test_* or __*)
-    source_files = sorted(
-        f for f in task_dir.glob("*.py")
-        if not f.name.startswith("test_") and not f.name.startswith("__")
-    )
+    # Detect language from files present in task_dir (priority: py > js/ts > cpp > others)
+    _lang_priority = [
+        ("python",     ["*.py"],          ["test_task*.py", "test_*.py"]),
+        ("javascript", ["*.js", "*.ts"],  ["test_task*.js", "*.test.js", "*.spec.js",
+                                           "test_task*.ts", "*.test.ts", "*.spec.ts"]),
+        ("cpp",        ["*.cpp", "*.cc"], ["test_*.cpp", "*_test.cpp"]),
+    ]
+    lang = "python"
+    source_files = []
+    test_files = []
+    for _lang, _src_pats, _test_pats in _lang_priority:
+        _src = []
+        for _pat in _src_pats:
+            _src += [f for f in task_dir.glob(_pat)
+                     if not f.name.startswith("test_") and not f.name.startswith("__")
+                     and not f.stem.startswith("fixed_")]
+        if not _src:
+            continue
+        _tests = []
+        for _pat in _test_pats:
+            _tests += sorted(task_dir.glob(_pat))
+            if _tests:
+                break
+        if _tests:
+            lang = _lang
+            source_files = sorted(_src)
+            test_files = _tests
+            break
+
     if not source_files:
         raise FileNotFoundError(f"No source file found in {task_dir}")
-
-    # Discover test file
-    test_files = sorted(task_dir.glob("test_task*.py")) or sorted(task_dir.glob("test_*.py"))
     if not test_files:
         raise FileNotFoundError(f"No test file found in {task_dir}")
+
     test_file = test_files[0]
     tests = test_file.read_text(encoding="utf-8")
 
     # Discover expected output filename from test file FIRST —
     # then derive which source file is the TARGET to fix.
-    output_name_match = re.search(r'(\w+\.py)\s+not found', tests)
+    _ext_map = {"python": ".py", "javascript": ".js", "cpp": ".cpp"}
+    _ext = _ext_map.get(lang, ".py")
+    _ext_escaped = re.escape(_ext)
+    output_name_match = re.search(rf'(\w+{_ext_escaped})\s+not found', tests)
     if not output_name_match:
-        output_name_match = re.search(r'"(\w+\.py)".*not found', tests)
+        output_name_match = re.search(rf'"(\w+{_ext_escaped})".*not found', tests)
+    if not output_name_match:
+        # Fallback: look for any fixed_*.ext import/require in the test
+        output_name_match = re.search(rf'fixed_[\w]+{_ext_escaped}', tests)
     if output_name_match:
-        output_filename = output_name_match.group(1)
+        output_filename = output_name_match.group(0) if not output_name_match.lastindex else output_name_match.group(1)
         # Derive primary source: strip leading "fixed_" from output name
         primary_name = re.sub(r'^fixed_', '', output_filename)
         primary_candidate = task_dir / primary_name
@@ -496,6 +698,7 @@ async def run_benchmark_loop(
     print("=" * 68)
     print("  SHARD Benchmark Loop")
     print(f"  Task: {task_dir.name}")
+    print(f"  Language: {lang.upper()}")
     print(f"  Source: {source_path.name} -> {output_filename}")
     print(f"  Max attempts: {max_attempts}")
     print(f"  Episodic memory: {'ON' if use_episodic_memory else 'OFF'}")
@@ -554,7 +757,7 @@ async def run_benchmark_loop(
         # -- Build prompt (or skip for swarm which builds internally) --
         prompt = ""  # swarm path does not use a flat prompt
         if attempt_num == 1:
-            prompt = _build_initial_prompt(source, readme, output_filename, experience_summary)
+            prompt = _build_initial_prompt(source, readme, output_filename, experience_summary, lang=lang)
             print(f"  [LLM SOLO] Initial prompt ({len(prompt):,} chars)")
         elif mode == "SWARM":
             print(f"  [SWARM] Architect -> Coder -> Critic pipeline")
@@ -570,7 +773,7 @@ async def run_benchmark_loop(
                 print(f"  [stuck] {len(stuck_tests)} test(s) stuck across attempts: {stuck_tests}")
             prompt = _build_correction_prompt(
                 source, tests, current_code, attempts, output_filename,
-                stuck_tests=stuck_tests,
+                stuck_tests=stuck_tests, lang=lang,
             )
             print(f"  [SHARD FEEDBACK] Correction prompt ({len(prompt):,} chars)")
 
@@ -617,7 +820,7 @@ async def run_benchmark_loop(
             try:
                 response = await llm_complete(
                     prompt=prompt,
-                    system=SYSTEM_PROMPT,
+                    system=_get_system_prompt(lang),
                     max_tokens=LLM_MAX_TOKENS,
                     temperature=LLM_TEMPERATURE,
                 )
@@ -632,10 +835,10 @@ async def run_benchmark_loop(
                 continue
 
         # -- Extract code ----------------------------------------------
-        code = _extract_code(response)
+        code = _extract_code(response, lang=lang)
 
         # -- Validate syntax -------------------------------------------
-        syntax_ok, syntax_err = _validate_syntax(code)
+        syntax_ok, syntax_err = _validate_syntax(code, lang=lang)
         if not syntax_ok:
             elapsed = time.time() - t_attempt
             print(f"  [syntax] INVALID: {syntax_err}")
@@ -682,11 +885,13 @@ async def run_benchmark_loop(
             except Exception as _ce:
                 print(f"ERROR ({_ce})")
 
-        # -- Run pytest ------------------------------------------------
-        print(f"  [pytest] Running {test_file.name}... ", end="", flush=True)
-        all_passed, raw_pytest = _run_pytest(task_dir, test_file.name)
+        # -- Run tests -------------------------------------------------
+        _runner_label = {"python": "pytest", "javascript": "jest", "cpp": "gtest"}.get(lang, "tests")
+        print(f"  [{_runner_label}] Running {test_file.name}... ", end="", flush=True)
+        all_passed, raw_pytest = _run_tests(task_dir, test_file.name, lang=lang,
+                                            source_file=str(source_path) if lang == "cpp" else None)
 
-        passed, failed, error_summary = _parse_pytest_output(raw_pytest)
+        passed, failed, error_summary = _parse_test_output(raw_pytest, lang=lang)
         elapsed = time.time() - t_attempt
 
         if all_passed:
