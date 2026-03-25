@@ -126,7 +126,7 @@ def _executive_summary(anchor: Dict) -> str:
         f"Status: {status}",
         f"Certification rate: {cert_pct} ({anchor['total_certified']}/{anchor['total_experiments']})",
         f"Average score: {anchor['avg_score']}/10",
-        f"Last topic: {anchor['last_topic']} → {last_info}",
+        f"Last topic: {anchor['last_topic']} -> {last_info}",
     ]
     return "\n".join(lines)
 
@@ -457,9 +457,9 @@ class CognitionCore:
         tensions = _detect_tensions(identity, exp, know, anchor)
         if tensions:
             lines.append("")
-            lines.append("⚡ TENSIONI RILEVATE:")
+            lines.append("[TENSIONI RILEVATE]")
             for t in tensions:
-                lines.append(f"  → {t}")
+                lines.append(f"  >> {t}")
 
         return "\n".join(lines)
 
@@ -505,12 +505,12 @@ class CognitionCore:
         strategy_now  = delta.get("strategy_used")
         strategy_prev = delta.get("strategy_prev")
         if strategy_now and strategy_prev and strategy_now != strategy_prev:
-            hits.append(f"strategy_changed: {strategy_prev!r} → {strategy_now!r}")
+            hits.append(f"strategy_changed: {strategy_prev!r} -> {strategy_now!r}")
 
         score_now  = delta.get("sandbox_score")
         score_prev = delta.get("sandbox_score_prev")
         if score_now is not None and score_prev is not None and score_now > score_prev:
-            hits.append(f"score_improved: {score_prev} → {score_now}")
+            hits.append(f"score_improved: {score_prev} -> {score_now}")
 
         # Novel approach: strategy never used before on this topic
         if strategy_now and strategy_prev is None:
@@ -519,12 +519,16 @@ class CognitionCore:
             if strategy_now not in past_strats:
                 hits.append(f"novel_approach: {strategy_now!r} (not in history)")
 
-        # Fewer retries than average (early resolution)
+        # Fewer retries than average (early resolution).
+        # Only valid when current session has already produced a passing score —
+        # comparing attempt=1 against historical count is always a false positive.
         attempt_num  = delta.get("attempt_number", 1)
-        exp          = self.query_experience(topic)
-        avg_attempts = exp.get("attempt_count", attempt_num)
-        if attempt_num < avg_attempts:
-            hits.append(f"resolved_early: attempt {attempt_num} < avg {avg_attempts}")
+        score_now_ea = score_now if score_now is not None else 0.0
+        if attempt_num >= 2 and score_now_ea >= 7.5:
+            exp_ea       = self.query_experience(topic)
+            avg_attempts = exp_ea.get("attempt_count", attempt_num)
+            if attempt_num < avg_attempts:
+                hits.append(f"resolved_early: certified at attempt {attempt_num} < avg {avg_attempts}")
 
         # ── Verdict ───────────────────────────────────────────────────────────
         timestamp = datetime.now().isoformat()
@@ -619,14 +623,14 @@ def _detect_tensions(
     if cert_rate >= 0.5 and chronic:
         tensions.append(
             f"Vettore 2 (Identità↔Critica): Identità indica buona cert_rate ({cert_rate:.0%}) "
-            f"ma questo topic ha {attempts} fallimenti (best={best}/10) → cautela"
+            f"ma questo topic ha {attempts} fallimenti (best={best}/10) -> cautela"
         )
 
     # Vettore 1: Experience shows sandbox always 0 despite decent theory
     if experience.get("theory_high_sandbox_low"):
         tensions.append(
             "Vettore 1 (Esperienza↔Sintesi): score teorico accettabile ma sandbox sempre 0 "
-            "→ problema implementativo, non teorico — focus su codice eseguibile"
+            "-> problema implementativo, non teorico — focus su codice eseguibile"
         )
 
     # Vettore 3: Knowledge shows high structural complexity
@@ -635,14 +639,14 @@ def _detect_tensions(
         tensions.append(
             f"Vettore 3 (Conoscenza↔Strategia): topic ad alta complessità strutturale "
             f"({knowledge.get('topic_complexity', 0)} dipendenze causali) "
-            "→ usare approccio 'Safe' anche se il topic sembra semplice"
+            "-> usare approccio 'Safe' anche se il topic sembra semplice"
         )
 
     # Near-miss tension: so close, yet keeps failing
     if near_miss and attempts >= 2:
         tensions.append(
             f"Near-miss rilevato: best={best}/10 con {attempts} tentativi "
-            "→ mancava pochissimo — piccolo aggiustamento può sbloccare certificazione"
+            "-> mancava pochissimo, piccolo aggiustamento puo sbloccare certificazione"
         )
 
     # Global performance tension
@@ -651,7 +655,7 @@ def _detect_tensions(
     if topic_avg < global_avg - 2.0 and attempts >= 2:
         tensions.append(
             f"Performance gap: avg_globale={global_avg}/10 ma avg_topic={topic_avg}/10 "
-            "→ questo topic è sistematicamente più difficile della media"
+            "-> questo topic e' sistematicamente piu difficile della media"
         )
 
     return tensions
