@@ -1041,9 +1041,20 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=MAX_RUNTIME_MINUTES_DEFAULT, help="Max runtime in minutes")
     parser.add_argument("--pause", type=int, default=PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT, help="Pause between cycles in minutes")
     parser.add_argument("--api-limit", type=int, default=MAX_API_CALLS_DEFAULT, help="Maximum API calls allowed")
-    
+    parser.add_argument("--no-core", action="store_true", help="Disable CognitionCore (lobotomy test)")
+
     args = parser.parse_args()
-    
+
+    # Lobotomy mode: disable CognitionCore before StudyAgent is created
+    if args.no_core:
+        import backend.study_agent as _sa_mod
+        _orig_init = _sa_mod.StudyAgent.__init__
+        def _lobotomized_init(self, *a, **kw):
+            _orig_init(self, *a, **kw)
+            self.cognition_core = None
+            print("[LOBOTOMY] CognitionCore DISABLED — naked baseline mode")
+        _sa_mod.StudyAgent.__init__ = _lobotomized_init
+
     runner = NightRunner(
         cycles=args.cycles,
         timeout=args.timeout,

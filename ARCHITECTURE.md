@@ -1,7 +1,7 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ8 (Focus Mode + Repomix bridge + Brain Graph 2D + benchmark 12/12)
+Version: SSJ11 (CognitionCore / Senso Interno + Lobotomy A/B proof)
 Last updated: 2026-03-25
 
 ---
@@ -31,6 +31,7 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Proactive self-improvement** via SelfAnalyzer + ImprovementEngine (SSJ3)
 - **Meta-learning** — learns which study strategies work best per topic category (SSJ4)
 - **Proactive self-optimization** — proposes code refactors with human approval gate (SSJ4)
+- **CognitionCore / Senso Interno** — 5-layer Global Workspace: ANCHOR, EXECUTIVE, IDENTITY, KNOWLEDGE, EXPERIENCE + Shadow Diagnostic Layer. Tracks [EMERGENCE HIT] / [MISSED EMERGENCE] based on behavioral deltas only (anti-recita rule). Vettore 1 injects STRUCTURAL PIVOT DIRECTIVE when sandbox always 0. Vettore 2 puts CriticAgent in SKEPTICAL mode when gap_severity is critical/medium. Lobotomy A/B test confirmed: WITH Core → 8.6 certified; WITHOUT Core → 7.0 near_miss (SSJ11)
 - **Causal knowledge graph** — GraphRAG extracts and reuses causal relations between concepts (SSJ8)
 - **Multi-agent swarm** — 5-7 specialized reviewers run in parallel on benchmark fixes (SSJ8)
 - **Patch Simulator** — impact analysis before any code patch is applied (SSJ8)
@@ -111,7 +112,7 @@ shard_v1/
 │   │
 │   ├── llm_router.py               # Multi-provider fallback + circuit breaker + exp. backoff
 │   ├── swe_agent.py                # Code repair with AST security gates + git
-│   ├── critic_agent.py             # Failure analysis (stub)
+│   ├── critic_agent.py             # [SSJ11] Failure analysis — SKEPTICAL mode when gap_severity critical/medium
 │   ├── critic_feedback_engine.py   # Feeds critic output back to research agenda
 │   ├── frontier_detector.py        # Identifies capability gaps at learning frontier
 │   ├── benchmark_generator.py      # Generates objective test cases for a topic
@@ -136,6 +137,19 @@ shard_v1/
 │   ├── sandbox_requirements.txt    # Dynamic deps layer — auto-populated by sandbox_runner
 │   │
 │   ├── cognition/                  # Self-awareness subsystem
+│   │   ├── cognition_core.py       # [SSJ11] CognitionCore — 5-layer Global Workspace
+│   │   │                           #   Layer 0 ANCHOR: global cert_rate, avg_score, total_experiments
+│   │   │                           #   Layer 1 EXECUTIVE: 6-line narrative summary
+│   │   │                           #   Layer 2 IDENTITY: SelfModel gap analysis (severity, critical_gaps)
+│   │   │                           #   Layer 3 KNOWLEDGE: GraphRAG complexity + relation count
+│   │   │                           #   Layer 4 EXPERIENCE: episodic memory per topic (attempts, best_score,
+│   │   │                           #     sandbox_always_zero, theory_high_sandbox_low, chronic_fail, near_miss)
+│   │   │                           #   Layer 5 CRITIQUE: query_critique() (reserved)
+│   │   │                           #   relational_context(topic) → ~500-token tension-aware string
+│   │   │                           #   audit_emergence(topic, action, delta) → [EMERGENCE HIT] / [MISSED EMERGENCE]
+│   │   │                           #   Shadow Diagnostic: records all hits+misses, get_emergence_stats()
+│   │   │                           #   Anti-recita rule: judges ONLY behavioral deltas, never LLM text
+│   │   │                           #   get_cognition_core() singleton factory
 │   │   ├── self_model.py
 │   │   ├── simulation_engine.py
 │   │   └── world_model.py
@@ -311,8 +325,8 @@ shard_v1/
 | `study_agent.py` | Main learning orchestrator (1439 lines). **[SSJ5]** `study_topic()` reduced to 57-line declarative pipeline setup. Phase logic extracted to `study_phases.py`. LLM engines (`_think`, `_think_fast`, `_think_local`) and `phase_*` methods remain here. **[SSJ4]** Injects `strategy_hint` from MetaLearning. |
 | `study_context.py` | **[SSJ5]** `StudyContext` dataclass — mutable state bag flowing through pipeline. Replaces 15+ local variables. Helpers: `emit()` for progress, `report_crash()` for fatal errors. |
 | `study_pipeline.py` | **[SSJ5]** `BasePhase` ABC (`name`, `fatal`, `async run(ctx)`) + `StudyPipeline` orchestrator. Fatal/non-fatal error routing. |
-| `study_phases.py` | **[SSJ5]** 10 pipeline phases extracted verbatim from `study_topic()`: Init, Map, Aggregate, Synthesize, Store (fatal); CrossPollinate, Materialize, Sandbox, PostStudy (non-fatal); CertifyRetryGroup (fatal, composite: VALIDATE→EVALUATE→BENCHMARK→CERTIFY × MAX_RETRY). |
-| `night_runner.py` | Standalone runner for nightly sessions. **[SSJ3]** Priority -1 drains ImprovementEngine queue. **[SSJ4]** Runs `ProactiveRefactor.analyze_next_file()` at end of session. **[SSJ6]** Runs `_run_benchmarks()` after study cycles. **[SSJ9]** `_background_mode`: if audio session is active, NightRunner starts anyway — suppresses all `_vb()` voice events, adds 60s yield between cycles, auto-exits background mode when audio ends. After each failed cycle calls `ProactiveRefactor.enqueue_from_failure(topic, tags)`. |
+| `study_phases.py` | **[SSJ5]** 10 pipeline phases extracted verbatim from `study_topic()`: Init, Map, Aggregate, Synthesize, Store (fatal); CrossPollinate, Materialize, Sandbox, PostStudy (non-fatal); CertifyRetryGroup (fatal, composite: VALIDATE→EVALUATE→BENCHMARK→CERTIFY × MAX_RETRY). **[SSJ11]** `SynthesizePhase.run()` queries `core.query_experience()` before synthesis — if sandbox_always_zero or chronic_fail → injects STRUCTURAL PIVOT DIRECTIVE (Vettore 1). `_retry_gap_fill()`: at attempt≥2 injects `core.relational_context()` into both gap_prompt and regen_prompt; calls `audit_emergence()` post-retry; tracks `prev_strategy` delta. `CertifyRetryGroup` passes `core.query_identity()` to `CriticAgent.analyze_with_llm()` as `identity_context`. |
+| `night_runner.py` | Standalone runner for nightly sessions. **[SSJ3]** Priority -1 drains ImprovementEngine queue. **[SSJ4]** Runs `ProactiveRefactor.analyze_next_file()` at end of session. **[SSJ6]** Runs `_run_benchmarks()` after study cycles. **[SSJ9]** `_background_mode`: if audio session is active, NightRunner starts anyway — suppresses all `_vb()` voice events, adds 60s yield between cycles, auto-exits background mode when audio ends. After each failed cycle calls `ProactiveRefactor.enqueue_from_failure(topic, tags)`. **[SSJ11]** `--no-core` flag: patches `backend.study_agent.StudyAgent.__init__` to set `self.cognition_core = None` — used for Lobotomy A/B test (CognitionCore disabled, naked baseline). |
 | `research_agenda.py` | Priority topic scheduler: (0) critic feedback → (1) PHOENIX replay → (2) goal prerequisites → (3) frontier recombination. |
 | `experiment_inventor.py` | Generates `"Integration of {A} and {B}"` topics. **Depth guard**: never nests composite topics. Partner filter: only atomic capabilities. |
 | `experiment_replay.py` | **PHOENIX Protocol.** Stores scores 6.0–7.4 for retry. |
@@ -336,6 +350,12 @@ shard_v1/
 |--------|---------------|
 | `proactive_refactor.py` | **[SSJ4+SSJ9]** Proactive code optimization engine. **[SSJ9]** Priority drain: `capability_queue` (modules responsible for recent study failures) → round-robin over 10 core files as fallback. `enqueue_from_failure(topic, tags)` maps capability tags → module paths via `architecture_map.json`. LLM Staff Engineer prompt targeting: performance (Big-O), clean_code, token_savings. Validates each `old` string exactly once. Creates `.bak_YYYYMMDD_HHMMSS` backup; restores on mid-apply failure. |
 | `patch_simulator.py` | **[SSJ8+SSJ10]** What-if impact simulator for code patches. **Static analysis**: removes/renames/signature changes via AST diff. **[SSJ10]** `_extract_public_api` now handles `async def` (was silently invisible before). `_count_required_args` distinguishes required params from optional (with defaults) — prevents false-positive BREAKING reports. `_analyze_diff` emits `BREAKING` only for new required params; optional param additions emit `SIGNATURE CHANGE`. **Dependency lookup**: finds all dependent modules via `architecture_map.json`. **LLM risk assessment**: parallel Gemini Flash call per dependent module. **Risk scoring**: LOW/MEDIUM/HIGH/CRITICAL → `apply`/`apply_with_caution`/`reject`. Wired into `_emit_patch_approval()` (static, instant) and `/api/patch/simulate` (full LLM). **46 tests.** |
+
+### SSJ11 CognitionCore / Senso Interno
+
+| Module | Responsibility |
+|--------|---------------|
+| `cognition/cognition_core.py` | **[SSJ11]** 5-layer Global Workspace + Shadow Diagnostic Layer. `_anchor()` (Layer 0): reads SQLite for global cert_rate, avg_score, total_experiments — `_is_mock()` guard prevents cross-test pollution. `executive()` (Layer 1): 6-line narrative. `query_identity()` (Layer 2): SelfModel gap_severity + critical_gaps. `query_knowledge()` (Layer 3): GraphRAG complexity from `knowledge_graph` table. `query_experience()` (Layer 4): EpisodicMemory per-topic stats — sandbox_always_zero, theory_high_sandbox_low, chronic_fail, near_miss flags. `relational_context(topic)` composes all layers into ~500-token tension-aware string injected at retry attempt≥2. `audit_emergence(topic, action, delta)` — anti-recita behavioral audit: [EMERGENCE HIT] only when strategy_changed OR (score_improved AND attempt≥2) OR novel_approach. [MISSED EMERGENCE] for Context Dilution (tokens>3800), Model Inertia (same strategy), low tension. Shadow Diagnostic tracks all events → `get_emergence_stats()`, `get_emergence_log(last_n)`. Vettore 1: sandbox_always_zero or chronic_fail → STRUCTURAL PIVOT DIRECTIVE injected by SynthesizePhase. Vettore 2: gap_severity critical/medium or cert_rate<0.4 → CriticAgent SKEPTICAL mode. **Lobotomy A/B test (2026-03-25)**: WITH Core → score 8.6/10 certified; WITHOUT Core → score 7.0/10 near_miss — same topic, same infra, delta=1.6 measured. |
 
 ### SSJ8 Intelligence Layer
 
@@ -436,6 +456,7 @@ NightRunner.run()
   │   │     [SSJ4] strategy_hint injected from MetaLearning
   │   │     [SSJ8] query_causal_context(topic) → causal warnings injected
   │   │     [SSJ8] extract_and_store_relations() → GraphRAG async write
+  │   │     [SSJ11] core.query_experience() → PIVOT DIRECTIVE if sandbox_always_zero (Vettore 1)
   │   ├── StorePhase [fatal]         → ChromaDB knowledge_db
   │   ├── CrossPollinatePhase [~]    → integration report
   │   ├── MaterializePhase [~]       → Cheat Sheet .md to workspace
@@ -445,6 +466,9 @@ NightRunner.run()
   │   │     BENCHMARK→CERTIFY × MAX_RETRY(3)
   │   │     score ≥ 7.5 → CapabilityGraph + StrategyMemory
   │   │     blended: 0.4×llm + 0.6×pass_rate×10
+  │   │     [SSJ11] attempt≥2 → core.relational_context() injected into retry prompt
+  │   │     [SSJ11] audit_emergence() called post-retry → [EMERGENCE HIT] / [MISSED EMERGENCE]
+  │   │     [SSJ11] CriticAgent receives core.query_identity() → SKEPTICAL mode if gap critical (Vettore 2)
   │   └── PostStudyPhase [~]         → meta-learning update, episodic store
   │   [~] = non-fatal (logged, pipeline continues)
   │
@@ -634,6 +658,7 @@ SessionOrchestrator detects tool requiring approval
 | `/api/llm/cache_invalidate` | POST | **[SSJ8]** Flush all LLM cache entries |
 | `/api/night_runner/start` | POST | Start NightRunner subprocess |
 | `/api/night_runner/stop` | POST | Kill NightRunner subprocess |
+| `/api/cognition_state` | GET | **[SSJ11]** Real-time CognitionCore telemetry: mood, executive summary, active_tensions, active_vectors (V1/V2/V3), shadow_audit (last 5), emergence_stats, identity, top_gaps |
 
 ### Key Socket.IO Events
 
@@ -754,6 +779,7 @@ File lock (`shard_memory/session.lock`) + in-process `asyncio.Semaphore(1)`.
 | **SSJ7** | Complete ✅ | Knowledge Bridge: NightRunner's ChromaDB accessible to all components via `knowledge_bridge.py`. One-way read — NightRunner writes autonomously, benchmark/study/SWE agents read. |
 | **SSJ8** | Complete ✅ | **Intelligence Layer** — 6 new modules: GraphRAG causal knowledge graph, dynamic study personas, concurrency pre-probe, intelligent ReportAgent, LLM response cache, Patch Simulator. Swarm extended to 5-7 parallel specialized reviewers. GraphRAG injected into Architect prompt + benchmark correction + SYNTHESIZE. Knowledge base cleanup (65→40 articles, 159→153 skills). Topic quality filter hardened (pseudoscience, phrase fragments, hallucination spirals blocked). |
 | **SSJ9** | Complete ✅ | **Scaffold hardening + Capability-Driven Refactor + Parallel Audio** — Benchmark 5/5 (stuck detection wired to Swarm, per-test chirurgical hints). Topic filter patched in both `skill_utils.py` + `night_runner.py`. `ProactiveRefactor` upgraded: `capability_queue` drains before round-robin, `enqueue_from_failure()` maps failed topics → responsible modules via `architecture_map.json`. NightRunner `_background_mode`: runs silently alongside active audio session. `skill_radar` endpoint fixed (was reading stale JSON, now queries SQLite views). Frontend: `SystemStatsWidget` (GraphRAG + LLM cache), SIM button in patch card. Benchmark suite: task_06 (TTL cache stale read), task_07 (Histogram class-level bleed). `architecture_map.json` 31→39 modules. |
+| **SSJ11** | Complete ✅ | **CognitionCore / Senso Interno** — `cognition/cognition_core.py` (400+ lines): 5-layer Global Workspace (ANCHOR, EXECUTIVE, IDENTITY, KNOWLEDGE, EXPERIENCE) + Shadow Diagnostic Layer. Anti-recita rule: `audit_emergence()` judges ONLY behavioral deltas (strategy_changed, score_improved, novel_approach, resolved_early) — never LLM text. Vettore 1: `SynthesizePhase` queries `core.query_experience()` before synthesis — sandbox_always_zero or chronic_fail → injects STRUCTURAL PIVOT DIRECTIVE. Vettore 2: `CriticAgent.analyze_with_llm()` receives `identity_context` — gap_severity critical/medium or cert_rate<0.4 → SKEPTICAL mode + extra question 4. `_retry_gap_fill()` at attempt≥2 injects `relational_context(topic)` into retry prompt. `get_cognition_core()` singleton. `_is_mock()` guard against cross-test pollution. `study_context.py` extended: `core_experience`, `pivot_directive`, `core_relational_ctx`, `prev_strategy_used`. `GET /api/cognition_state` endpoint: mood, executive, active_tensions, active_vectors, shadow_audit (last 5), emergence_stats. `night_runner.py --no-core` flag for lobotomy test (patches `backend.study_agent.StudyAgent.__init__`). `stress_test_emergence.py`: simulates 3 rounds on real DB data — Round 1+2 → [MISSED EMERGENCE], Round 3 (pivot + score delta) → [EMERGENCE HIT]. **Lobotomy A/B test confirmed (2026-03-25)**: WITH Core → 8.6/10 certified; WITHOUT Core → 7.0/10 near_miss. Delta=1.6. Tests: 22 new tests in `tests/test_cognition_core.py`, all passing. |
 | **SSJ10** | Complete ✅ | **Test Suite 0 FAILED + patch_simulator hardening** — `patch_simulator.py`: `async def` now visible to static analysis (was silently ignored); `_count_required_args` distinguishes required vs optional params; `_analyze_diff` BREAKING/SIGNATURE CHANGE correctly separated; 46 new tests all green. Test suite: installed `pytest-asyncio` (was missing — all async tests were silently broken); rewrote 6 stale test files to match refactored APIs (`test_shard_tools`, `test_research_agenda`, `test_experiment_replay`, `test_strategy_memory`, `test_failover`, `test_study_agent_evolution`); fixed `asyncio.get_event_loop()` → `asyncio.run()` in Python 3.10+; marked `test_sandbox_docker` skip pending rewrite vs `sandbox_executor.py`. Final: **419 passed, 0 failed, 21 skipped** (hardware/optional deps). |
 
 ### Benchmark Results (2026-03-23 — SSJ9, Gemini Flash)

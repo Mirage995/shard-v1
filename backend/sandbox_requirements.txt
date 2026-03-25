@@ -5,3 +5,7 @@ qiskit
 hypothesis
 psutil
 dns
+websocket
+bcrypt
+docker
+pika

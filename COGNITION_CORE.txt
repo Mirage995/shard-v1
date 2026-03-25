@@ -198,15 +198,40 @@ FEEDBACK LOOP — Il salto in più rispetto a Gemini:
           ↓
     Tensione più forte nel prompt → maggiore probabilità di emergenza
 
+ANTI-RECITA — Regola Fondamentale
+  ⚠️  PROBLEMA: L'LLM può produrre output che SEMBRA una risposta alla tensione
+  ma in realtà sta solo parafrasando il contesto. Il log dice [EMERGENCE HIT]
+  ma è un falso positivo — le parole giuste senza il comportamento giusto.
+
+  SOLUZIONE: audit_emergence() NON giudica il testo prodotto.
+  Giudica ESCLUSIVAMENTE metriche comportamentali oggettive:
+
+  Evidenza valida di emergenza (DEVE essere almeno una):
+    ✅ strategy_used != strategy_used_last_attempt (cambio strategia reale)
+    ✅ sandbox_score > sandbox_score_prev_attempt (miglioramento misurabile)
+    ✅ approccio mai usato prima su questo topic (novelty check su history)
+    ✅ retry_count < avg_retry_count_for_topic (risolto prima del solito)
+
+  Evidenza NON valida (non conta):
+    ❌ "ha scritto parole coerenti con la tensione"
+    ❌ "il prompt menziona la tensione rilevata"
+    ❌ qualsiasi giudizio basato su testo generato dall'LLM
+
+  [EMERGENCE HIT] si guadagna solo con delta comportamentale misurabile.
+  Se il comportamento non cambia, è sempre [MISSED EMERGENCE].
+  Layer 0 (Anchor) è il giudice finale — la realtà dei fatti batte tutto.
+
 METRICHE DI EMERGENZA (quello che possiamo misurare):
   - emergence_opportunities: n° volte il Core ha rilevato una tensione forte
-  - emergence_hits: n° volte l'agente ha risposto alla tensione cambiando rotta
-  - emergence_misses: n° volte la tensione è stata ignorata
+  - emergence_hits: n° volte con delta comportamentale misurabile
+  - emergence_misses: n° volte la tensione è stata ignorata (comportamento invariato)
   - miss_causes: distribuzione delle cause (signal_weak / model_inertia / dilution)
-  - emergence_rate: emergence_hits / emergence_opportunities
+  - false_positives: n° volte output corretto ma comportamento invariato
+  - emergence_rate: emergence_hits / emergence_opportunities (esclude false_positives)
 
-  Esempio report: "Nelle ultime 10 sessioni: 5 opportunità, 3 colte, 2 mancate
-                   per model_inertia. Tuning consigliato: aumentare peso tensione."
+  Esempio report: "Nelle ultime 10 sessioni: 5 opportunità, 3 colte (comportamento
+                   cambiato), 1 falso positivo (parole giuste, stesso errore),
+                   2 mancate per model_inertia."
 
 
 PUNTI DI INTEGRAZIONE NEL PIPELINE
