@@ -1,0 +1,716 @@
+"""cognition_core.py — SHARD CognitionCore / Senso Interno.
+
+5-layer Global Workspace that aggregates internal tensions and exposes them
+to the rest of the pipeline. Designed to create the *conditions* for
+emergent behavior — not to program it.
+
+Architecture (COGNITION_CORE.txt):
+  Layer 0 — ANCHOR       : ground truth (sandbox pass/fail, score, cert rate)
+  Layer 1 — EXECUTIVE    : who SHARD is right now (lightweight snapshot)
+  Layer 2 — IDENTITY     : SelfModel — capabilities, gaps, frontier topics
+  Layer 3 — KNOWLEDGE    : GraphRAG  — causal relations, structural complexity
+  Layer 4 — EXPERIENCE   : EpisodicMemory + StrategyMemory — history, patterns
+  Layer 5 — CRITIQUE     : CriticAgent + MetaLearning — systematic errors, strategy
+
+Shadow Diagnostic Layer:
+  audit_emergence(topic, action, delta) → [EMERGENCE HIT] or [MISSED EMERGENCE]
+  Judges ONLY measurable behavioral metrics — never text output (anti-recita rule).
+
+Token budget:
+  executive()         ~200 tokens  (always loaded)
+  relational_context  ~500 tokens  (on request, one topic)
+"""
+import asyncio
+import json
+import logging
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger("shard.cognition_core")
+
+_ROOT = Path(__file__).resolve().parent.parent.parent
+
+
+def _get_db():
+    import sys as _sys
+    _sys.path.insert(0, str(_ROOT / "backend"))
+    from shard_db import get_db
+    return get_db()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Layer 0 — ANCHOR
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _anchor() -> Dict[str, Any]:
+    """Read ground-truth metrics directly from SQLite. No LLM, no inference."""
+    try:
+        conn = _get_db()
+        row = conn.execute(
+            "SELECT COUNT(*) AS total, SUM(certified) AS cert FROM experiments"
+        ).fetchone()
+        total = row["total"] or 0
+        cert  = int(row["cert"] or 0) if row else 0
+        cert_rate = round(cert / total, 3) if total else 0.0
+
+        last = conn.execute(
+            "SELECT topic, score, certified, timestamp FROM experiments "
+            "ORDER BY timestamp DESC LIMIT 1"
+        ).fetchone()
+
+        last_topic   = last["topic"]   if last else "—"
+        last_score   = last["score"]   if last else 0.0
+        last_pass    = bool(last["certified"]) if last else False
+        last_date    = last["timestamp"][:10] if last and last["timestamp"] else "—"
+
+        avg_score = conn.execute(
+            "SELECT AVG(score) AS avg FROM experiments"
+        ).fetchone()["avg"] or 0.0
+
+        return {
+            "certification_rate": cert_rate,
+            "total_experiments":  total,
+            "total_certified":    cert,
+            "last_topic":         last_topic,
+            "last_score":         round(last_score, 2),
+            "last_pass":          last_pass,
+            "last_date":          last_date,
+            "avg_score":          round(avg_score, 2),
+        }
+    except Exception as exc:
+        logger.warning("[ANCHOR] Failed: %s", exc)
+        return {
+            "certification_rate": 0.0, "total_experiments": 0,
+            "total_certified": 0, "last_topic": "—", "last_score": 0.0,
+            "last_pass": False, "last_date": "—", "avg_score": 0.0,
+        }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Layer 1 — EXECUTIVE SUMMARY
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _executive_summary(anchor: Dict) -> str:
+    """Lightweight snapshot (~200 tokens). Always loaded by executive()."""
+    cert_pct  = f"{anchor['certification_rate']:.0%}"
+    last_info = (
+        f"PASS ({anchor['last_score']})" if anchor["last_pass"]
+        else f"FAIL ({anchor['last_score']})"
+    )
+
+    # Determine status
+    rate = anchor["certification_rate"]
+    if rate >= 0.6:
+        status = "performing"
+    elif rate >= 0.3:
+        status = "developing"
+    else:
+        status = "struggling"
+
+    lines = [
+        f"SHARD Executive Summary — {anchor['last_date']}",
+        f"Status: {status}",
+        f"Certification rate: {cert_pct} ({anchor['total_certified']}/{anchor['total_experiments']})",
+        f"Average score: {anchor['avg_score']}/10",
+        f"Last topic: {anchor['last_topic']} → {last_info}",
+    ]
+    return "\n".join(lines)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CognitionCore
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CognitionCore:
+    """Central aggregator for SHARD's internal state.
+
+    The Core does NOT orchestrate — it aggregates and exposes tensions.
+    Layers never call each other; they only talk to the Core.
+
+    Usage:
+        core = CognitionCore(
+            self_model=..., episodic_memory=...,
+            strategy_memory=..., meta_learning=..., critic_agent=...
+        )
+        await core.initialize()                  # warm up Layer 0+1 cache
+        ctx = await core.relational_context(topic)  # inject into prompt
+        await core.audit_emergence(topic, action, delta)  # after each action
+    """
+
+    def __init__(
+        self,
+        self_model=None,
+        episodic_memory=None,
+        strategy_memory=None,
+        meta_learning=None,
+        critic_agent=None,
+    ):
+        self._self_model      = self_model
+        self._episodic_memory = episodic_memory
+        self._strategy_memory = strategy_memory
+        self._meta_learning   = meta_learning
+        self._critic_agent    = critic_agent
+
+        # Layer 0+1 cache — refreshed every NightRunner cycle
+        self._anchor_cache:    Optional[Dict]  = None
+        self._exec_cache:      Optional[str]   = None
+        self._cache_timestamp: float           = 0.0
+
+        # Shadow Diagnostic Layer — emergence tracking
+        self._emergence_log: List[Dict] = []
+        self._emergence_stats = {
+            "opportunities": 0,
+            "hits":          0,
+            "misses":        0,
+            "false_positives": 0,
+            "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0},
+        }
+
+    # ── Initialization ────────────────────────────────────────────────────────
+
+    async def initialize(self):
+        """Pre-warm Layer 0+1 cache. Call once at NightRunner startup."""
+        self._refresh_anchor_cache()
+        logger.info(
+            "[COGNITION CORE] Initialized — cert_rate=%.1f%% experiments=%d",
+            self._anchor_cache["certification_rate"] * 100,
+            self._anchor_cache["total_experiments"],
+        )
+
+    def _refresh_anchor_cache(self):
+        anchor = _anchor()
+        self._anchor_cache    = anchor
+        self._exec_cache      = _executive_summary(anchor)
+        self._cache_timestamp = time.time()
+
+    # ── Layer 0 + 1 — executive() — always available ──────────────────────────
+
+    def executive(self) -> Dict[str, Any]:
+        """Return Layer 0 (Anchor) + Layer 1 (Executive Summary).
+
+        Cached and lightweight. The only method that is always pre-loaded.
+        Returns:
+            {"anchor": {...}, "summary": "...plain text..."}
+        """
+        # Refresh if stale (>15 minutes)
+        if self._anchor_cache is None or (time.time() - self._cache_timestamp) > 900:
+            self._refresh_anchor_cache()
+        return {
+            "anchor":  self._anchor_cache,
+            "summary": self._exec_cache,
+        }
+
+    # ── Layer 2 — IDENTITY ────────────────────────────────────────────────────
+
+    def query_identity(self) -> Dict[str, Any]:
+        """Layer 2: SelfModel snapshot.
+
+        Returns certified capabilities, gap assessment, frontier topics,
+        avg repair loops. Used by: NightRunner, CriticAgent.
+        """
+        if self._self_model is None:
+            return {"error": "SelfModel not available"}
+        try:
+            cert_rate  = self._self_model.get_certification_rate()
+            avg_loops  = self._self_model.get_avg_repair_loops()
+            gaps       = self._self_model.self_assess_gaps()
+            caps       = self._self_model.summarize_capabilities()
+            frontier   = self._self_model.summarize_frontier()
+
+            return {
+                "certification_rate": cert_rate,
+                "avg_repair_loops":   avg_loops,
+                "critical_gaps":      gaps.get("critical_gaps", []),
+                "gap_severity":       gaps.get("severity", "none"),
+                "gap_rate":           gaps.get("gap_rate", 0.0),
+                "certified_count":    len(caps.get("certified", [])),
+                "frontier_topics":    frontier[:5],
+                "top_capabilities":   caps.get("certified", [])[:8],
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_identity failed: %s", exc)
+            return {"error": str(exc)}
+
+    # ── Layer 3 — KNOWLEDGE ───────────────────────────────────────────────────
+
+    def query_knowledge(self, topic: str) -> Dict[str, Any]:
+        """Layer 3: GraphRAG causal context for a topic.
+
+        Returns structural complexity (# causal dependencies) and
+        the causal context string ready for prompt injection.
+        Used by: SYNTHESIZE, MetaLearning (strategy selection).
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from graph_rag import query_causal_context
+            from shard_db import query as db_query
+
+            causal_str = query_causal_context(topic)
+
+            # Count direct dependencies (structural complexity)
+            words = topic.lower().split()[:5]
+            rows = db_query(
+                "SELECT COUNT(*) AS n FROM knowledge_graph WHERE confidence >= 0.6"
+            )
+            total_relations = rows[0]["n"] if rows else 0
+
+            # Topic-specific complexity: # relations mentioning any word
+            topic_rows = db_query("""
+                SELECT COUNT(*) AS n FROM knowledge_graph
+                WHERE confidence >= 0.6
+                  AND (LOWER(source_concept) LIKE ? OR LOWER(target_concept) LIKE ?)
+            """, (f"%{topic.lower()[:20]}%", f"%{topic.lower()[:20]}%"))
+            topic_complexity = topic_rows[0]["n"] if topic_rows else 0
+
+            return {
+                "topic":            topic,
+                "causal_context":   causal_str or "No causal relations found.",
+                "topic_complexity": topic_complexity,
+                "total_relations":  total_relations,
+                "complexity_level": (
+                    "high"   if topic_complexity >= 5 else
+                    "medium" if topic_complexity >= 2 else
+                    "low"
+                ),
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_knowledge failed: %s", exc)
+            return {"topic": topic, "causal_context": "", "topic_complexity": 0,
+                    "total_relations": 0, "complexity_level": "unknown", "error": str(exc)}
+
+    # ── Layer 4 — EXPERIENCE ──────────────────────────────────────────────────
+
+    def query_experience(self, topic: str) -> Dict[str, Any]:
+        """Layer 4: EpisodicMemory + StrategyMemory history for a topic.
+
+        Returns past scores, failure reasons, strategies used.
+        Used by: SYNTHESIZE (retry), Architect (non-conventional fix).
+        """
+        try:
+            episodes: List[Dict] = []
+            if self._episodic_memory is not None:
+                episodes = self._episodic_memory.retrieve_context(topic, k=5)
+
+            strategies_used = []
+            best_score      = 0.0
+            worst_score     = 10.0
+            failure_reasons = []
+            attempt_count   = len(episodes)
+            scores          = []
+
+            for ep in episodes:
+                score = ep.get("score", 0.0)
+                scores.append(score)
+                if score > best_score:
+                    best_score = score
+                if score < worst_score:
+                    worst_score = score
+                reason = ep.get("failure_reason") or ep.get("improvement_focus", "")
+                if reason:
+                    failure_reasons.append(reason)
+                strat = ep.get("strategies_reused", "")
+                if strat and strat not in strategies_used:
+                    strategies_used.append(strat)
+
+            avg_score = round(sum(scores) / len(scores), 2) if scores else 0.0
+
+            # Pattern detection
+            sandbox_always_zero = all(s == 0 for s in scores[-3:]) if len(scores) >= 3 else False
+            theory_high_sandbox_low = (
+                avg_score > 5.0 and sandbox_always_zero
+            )
+
+            # Best strategy from StrategyMemory
+            best_strategy = None
+            if self._strategy_memory is not None:
+                try:
+                    best_strategy = self._strategy_memory.get_best_strategy(topic)
+                except Exception:
+                    pass
+
+            return {
+                "topic":              topic,
+                "attempt_count":      attempt_count,
+                "avg_score":          avg_score,
+                "best_score":         best_score,
+                "worst_score":        worst_score if attempt_count > 0 else 0.0,
+                "failure_reasons":    failure_reasons[:3],
+                "strategies_used":    strategies_used[:3],
+                "best_strategy":      best_strategy,
+                "sandbox_always_zero": sandbox_always_zero,
+                "theory_high_sandbox_low": theory_high_sandbox_low,
+                "near_miss":          best_score >= 7.4,
+                "chronic_fail":       attempt_count >= 4 and best_score < 7.0,
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_experience failed: %s", exc)
+            return {"topic": topic, "attempt_count": 0, "avg_score": 0.0,
+                    "error": str(exc)}
+
+    # ── Layer 5 — CRITIQUE ────────────────────────────────────────────────────
+
+    def query_critique(self, topic: str) -> Dict[str, Any]:
+        """Layer 5: MetaLearning strategy recommendation + systematic error patterns.
+
+        Used by: EVALUATE, CertifyRetryGroup (attempt >= 2).
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from meta_learning import MetaLearning
+
+            rec_strategy = None
+            category     = "unknown"
+
+            if self._meta_learning is not None:
+                rec_strategy = self._meta_learning.suggest_best_strategy(topic)
+                # Get category from topic classifier
+                try:
+                    from meta_learning import classify_topic
+                    category = classify_topic(topic)
+                except Exception:
+                    pass
+
+            return {
+                "topic":               topic,
+                "recommended_strategy": rec_strategy,
+                "category":            category,
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_critique failed: %s", exc)
+            return {"topic": topic, "recommended_strategy": None,
+                    "category": "unknown", "error": str(exc)}
+
+    # ── Relational Context — composite view with tensions ─────────────────────
+
+    def relational_context(self, topic: str) -> str:
+        """Compose all relevant layers into a tension-aware context string.
+
+        This is the key CognitionCore output: not raw data, but TENSIONS
+        between layers. Target: ~500 tokens max.
+
+        Used by: CertifyRetryGroup (attempt >= 2), phase_synthesize.
+        """
+        lines = [f"[COGNITION CORE] Topic: {topic}"]
+
+        exec_data = self.executive()
+        anchor    = exec_data["anchor"]
+
+        # Layer 2: Identity
+        identity = self.query_identity()
+        if "error" not in identity:
+            gaps_str = ", ".join(identity.get("critical_gaps", [])[:3]) or "none"
+            lines.append(
+                f"Identità: cert_rate={identity['certification_rate']:.0%} "
+                f"| gap_severity={identity['gap_severity']} "
+                f"| critical_gaps=[{gaps_str}] "
+                f"| avg_repair_loops={identity['avg_repair_loops']:.1f}"
+            )
+
+        # Layer 4: Experience
+        exp = self.query_experience(topic)
+        if "error" not in exp and exp.get("attempt_count", 0) > 0:
+            lines.append(
+                f"Esperienza: attempts={exp['attempt_count']} "
+                f"| best={exp['best_score']} avg={exp['avg_score']}/10 "
+                f"| strategies_tried={', '.join(exp['strategies_used'][:2]) or 'none'}"
+            )
+            if exp.get("failure_reasons"):
+                lines.append(f"  Failure pattern: {exp['failure_reasons'][0]}")
+        else:
+            lines.append("Esperienza: nessuna storia per questo topic")
+
+        # Layer 3: Knowledge (structural complexity)
+        know = self.query_knowledge(topic)
+        if "error" not in know:
+            lines.append(
+                f"Conoscenza: complessità_strutturale={know['complexity_level']} "
+                f"({know['topic_complexity']} relazioni causali dirette) "
+                f"| KB totale: {know['total_relations']} relazioni"
+            )
+            if know.get("causal_context") and know["causal_context"] != "No causal relations found.":
+                # Trim to 2 lines max
+                causal_lines = know["causal_context"].strip().split("\n")
+                lines.extend(causal_lines[:3])
+
+        # Layer 5: Critique
+        critique = self.query_critique(topic)
+        if critique.get("recommended_strategy"):
+            lines.append(f"Strategia consigliata: {critique['recommended_strategy']}")
+
+        # ── Tension Detection ─────────────────────────────────────────────────
+        tensions = _detect_tensions(identity, exp, know, anchor)
+        if tensions:
+            lines.append("")
+            lines.append("⚡ TENSIONI RILEVATE:")
+            for t in tensions:
+                lines.append(f"  → {t}")
+
+        return "\n".join(lines)
+
+    # ── Shadow Diagnostic Layer — audit_emergence() ───────────────────────────
+
+    async def audit_emergence(
+        self,
+        topic: str,
+        action: str,
+        delta: Dict[str, Any],
+    ) -> str:
+        """Evaluate whether a behavioral change occurred after a tension was detected.
+
+        ANTI-RECITA RULE: This function judges ONLY measurable behavioral deltas.
+        It NEVER reads or evaluates text generated by the LLM.
+
+        Args:
+            topic:  The study topic being processed.
+            action: The pipeline action taken (e.g. "synthesize", "retry", "critique").
+            delta:  Dict with behavioral measurements:
+                    {
+                      "strategy_used":      str  — strategy used this attempt
+                      "strategy_prev":      str  — strategy used last attempt (or None)
+                      "sandbox_score":      float — score this attempt
+                      "sandbox_score_prev": float — score last attempt (or None)
+                      "attempt_number":     int   — current attempt index
+                      "tension_present":    bool  — was a tension injected into the prompt?
+                    }
+
+        Returns:
+            "[EMERGENCE HIT]" or "[MISSED EMERGENCE]" or "[NO TENSION]"
+        """
+        tension_present = delta.get("tension_present", False)
+
+        if not tension_present:
+            return "[NO TENSION]"  # Nothing to audit — no tension was signaled
+
+        self._emergence_stats["opportunities"] += 1
+
+        # ── Behavioral metric checks (Layer 0 is final judge) ─────────────────
+        hits = []
+
+        strategy_now  = delta.get("strategy_used")
+        strategy_prev = delta.get("strategy_prev")
+        if strategy_now and strategy_prev and strategy_now != strategy_prev:
+            hits.append(f"strategy_changed: {strategy_prev!r} → {strategy_now!r}")
+
+        score_now  = delta.get("sandbox_score")
+        score_prev = delta.get("sandbox_score_prev")
+        if score_now is not None and score_prev is not None and score_now > score_prev:
+            hits.append(f"score_improved: {score_prev} → {score_now}")
+
+        # Novel approach: strategy never used before on this topic
+        if strategy_now and strategy_prev is None:
+            exp = self.query_experience(topic)
+            past_strats = set(exp.get("strategies_used", []))
+            if strategy_now not in past_strats:
+                hits.append(f"novel_approach: {strategy_now!r} (not in history)")
+
+        # Fewer retries than average (early resolution)
+        attempt_num  = delta.get("attempt_number", 1)
+        exp          = self.query_experience(topic)
+        avg_attempts = exp.get("attempt_count", attempt_num)
+        if attempt_num < avg_attempts:
+            hits.append(f"resolved_early: attempt {attempt_num} < avg {avg_attempts}")
+
+        # ── Verdict ───────────────────────────────────────────────────────────
+        timestamp = datetime.now().isoformat()
+
+        if hits:
+            result = "[EMERGENCE HIT]"
+            self._emergence_stats["hits"] += 1
+            cause_str = "; ".join(hits)
+        else:
+            result = "[MISSED EMERGENCE]"
+            self._emergence_stats["misses"] += 1
+            # Classify miss cause
+            cause_str = _classify_miss_cause(delta)
+            miss_cause_key = _map_miss_cause(delta)
+            self._emergence_stats["miss_causes"][miss_cause_key] = (
+                self._emergence_stats["miss_causes"].get(miss_cause_key, 0) + 1
+            )
+
+        entry = {
+            "timestamp": timestamp,
+            "topic":     topic,
+            "action":    action,
+            "result":    result,
+            "hits":      hits,
+            "cause":     cause_str,
+            "delta":     delta,
+        }
+        self._emergence_log.append(entry)
+
+        # Persist missed emergence to EpisodicMemory for future CriticAgent reads
+        if result == "[MISSED EMERGENCE]" and self._episodic_memory is not None:
+            try:
+                await _save_missed_emergence(self._episodic_memory, entry)
+            except Exception as exc:
+                logger.warning("[COGNITION] Failed to save missed emergence: %s", exc)
+
+        logger.info(
+            "[SHADOW DIAGNOSTIC] %s topic=%r action=%r cause=%r",
+            result, topic, action, cause_str
+        )
+        return result
+
+    # ── Emergence Stats ───────────────────────────────────────────────────────
+
+    def get_emergence_stats(self) -> Dict[str, Any]:
+        """Return current session emergence metrics."""
+        opp = self._emergence_stats["opportunities"]
+        hits = self._emergence_stats["hits"]
+        rate = round(hits / opp, 3) if opp > 0 else 0.0
+        return {
+            **self._emergence_stats,
+            "emergence_rate": rate,
+            "log_entries":    len(self._emergence_log),
+        }
+
+    def get_emergence_log(self, last_n: int = 10) -> List[Dict]:
+        """Return the last N audit entries."""
+        return self._emergence_log[-last_n:]
+
+    # ── Cache invalidation (called by NightRunner after each cycle) ───────────
+
+    def refresh(self):
+        """Force-refresh Layer 0+1 cache. Call after each NightRunner cycle."""
+        self._refresh_anchor_cache()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Internal helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _detect_tensions(
+    identity: Dict,
+    experience: Dict,
+    knowledge: Dict,
+    anchor: Dict,
+) -> List[str]:
+    """Detect meaningful conflicts between layers.
+
+    Returns a list of human-readable tension strings.
+    These tensions are injected into the prompt to create the conditions
+    for emergent behavior — not as rules, but as signals.
+    """
+    tensions = []
+
+    # Vettore 2: Identity says "expert" but Experience says "3 failures"
+    cert_rate = identity.get("certification_rate", 0.0)
+    attempts  = experience.get("attempt_count", 0)
+    best      = experience.get("best_score", 0.0)
+    chronic   = experience.get("chronic_fail", False)
+    near_miss = experience.get("near_miss", False)
+
+    if cert_rate >= 0.5 and chronic:
+        tensions.append(
+            f"Vettore 2 (Identità↔Critica): Identità indica buona cert_rate ({cert_rate:.0%}) "
+            f"ma questo topic ha {attempts} fallimenti (best={best}/10) → cautela"
+        )
+
+    # Vettore 1: Experience shows sandbox always 0 despite decent theory
+    if experience.get("theory_high_sandbox_low"):
+        tensions.append(
+            "Vettore 1 (Esperienza↔Sintesi): score teorico accettabile ma sandbox sempre 0 "
+            "→ problema implementativo, non teorico — focus su codice eseguibile"
+        )
+
+    # Vettore 3: Knowledge shows high structural complexity
+    complexity = knowledge.get("complexity_level", "low")
+    if complexity == "high":
+        tensions.append(
+            f"Vettore 3 (Conoscenza↔Strategia): topic ad alta complessità strutturale "
+            f"({knowledge.get('topic_complexity', 0)} dipendenze causali) "
+            "→ usare approccio 'Safe' anche se il topic sembra semplice"
+        )
+
+    # Near-miss tension: so close, yet keeps failing
+    if near_miss and attempts >= 2:
+        tensions.append(
+            f"Near-miss rilevato: best={best}/10 con {attempts} tentativi "
+            "→ mancava pochissimo — piccolo aggiustamento può sbloccare certificazione"
+        )
+
+    # Global performance tension
+    global_avg = anchor.get("avg_score", 0.0)
+    topic_avg  = experience.get("avg_score", 0.0)
+    if topic_avg < global_avg - 2.0 and attempts >= 2:
+        tensions.append(
+            f"Performance gap: avg_globale={global_avg}/10 ma avg_topic={topic_avg}/10 "
+            "→ questo topic è sistematicamente più difficile della media"
+        )
+
+    return tensions
+
+
+def _classify_miss_cause(delta: Dict) -> str:
+    """Produce a human-readable miss cause string."""
+    prompt_tokens = delta.get("prompt_tokens", 0)
+    if prompt_tokens > 3000:
+        return f"Context Dilution (prompt ~{prompt_tokens} tokens — tensione sepolta)"
+    if not delta.get("strategy_prev"):
+        return "Model Inertia (nessun cambiamento di strategia tentato)"
+    return "Low Signal-to-Noise (tensione presente ma comportamento invariato)"
+
+
+def _map_miss_cause(delta: Dict) -> str:
+    """Map miss cause to one of the 3 known killer categories."""
+    prompt_tokens = delta.get("prompt_tokens", 0)
+    if prompt_tokens > 3000:
+        return "dilution"
+    if not delta.get("strategy_prev"):
+        return "model_inertia"
+    return "signal_weak"
+
+
+async def _save_missed_emergence(episodic_memory, entry: Dict):
+    """Persist [MISSED EMERGENCE] to EpisodicMemory as a learning case study.
+
+    Future CriticAgent reads this and injects it into relational_context().
+    This closes the feedback loop: cognitive failures become future signals.
+    """
+    try:
+        from shard_db import execute
+        # Store as a special experiment record tagged as cognitive_failure
+        execute(
+            """INSERT OR IGNORE INTO experiments
+               (topic, score, certified, timestamp, failure_reason, source)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (
+                f"[MISSED_EMERGENCE] {entry['topic']}",
+                0.0,
+                0,
+                entry["timestamp"],
+                f"action={entry['action']} | cause={entry['cause']}",
+                "shadow_diagnostic",
+            )
+        )
+    except Exception as exc:
+        logger.warning("[SHADOW DIAGNOSTIC] Could not persist missed emergence: %s", exc)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Module-level singleton factory
+# ─────────────────────────────────────────────────────────────────────────────
+
+_core_instance: Optional["CognitionCore"] = None
+
+
+def get_cognition_core(**kwargs) -> "CognitionCore":
+    """Return or create the singleton CognitionCore.
+
+    Pass module instances on first call:
+        core = get_cognition_core(
+            self_model=self_model,
+            episodic_memory=episodic_memory,
+            strategy_memory=strategy_memory,
+            meta_learning=meta_learning,
+        )
+    Subsequent calls without kwargs return the cached instance.
+    """
+    global _core_instance
+    if _core_instance is None or kwargs:
+        _core_instance = CognitionCore(**kwargs)
+    return _core_instance
