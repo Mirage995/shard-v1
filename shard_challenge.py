@@ -52,7 +52,8 @@ class _BenchmarkConsciousness:
     def push_event(self, event_type: str, data: dict):
         ev = {"type": event_type, "data": data, "ts": datetime.now().isoformat()}
         self._session_events.append(ev)
-        # Emit a real-time cognition pulse to the console
+
+        # Real-time cognition pulse per event type
         if event_type == "benchmark":
             attempt = data.get("attempt", "?")
             passed  = data.get("passed", 0)
@@ -61,6 +62,28 @@ class _BenchmarkConsciousness:
             total   = passed + failed
             bar     = "#" * passed + "." * failed
             print(f"  [cognition] attempt {attempt} | {passed}/{total} [{bar}] | {mode}")
+
+        elif event_type == "capability_probe":
+            lang      = data.get("lang", "?")
+            ready     = data.get("ready", False)
+            missing   = data.get("missing", [])
+            status    = "READY" if ready else "MISSING RUNTIME"
+            miss_str  = f" | missing: {', '.join(missing)}" if missing else ""
+            print(f"  [cognition] env probe | lang={lang} | {status}{miss_str}")
+
+        elif event_type == "self_assessment":
+            lang  = data.get("lang", "?")
+            lines = data.get("profile_lines", 0)
+            print(f"  [cognition] self-profile | lang={lang} | {lines} lines injected into prompt")
+
+        elif event_type == "mastery_achieved":
+            task     = data.get("task", "?")
+            attempts = data.get("attempts", "?")
+            tests    = data.get("tests", "?")
+            first    = data.get("first_try", False)
+            tag      = " [FIRST TRY]" if first else ""
+            print(f"  [cognition] MASTERY{tag} | {task} | {tests} tests | {attempts} attempt(s)")
+
         # Append to persistent log
         try:
             with open(self._log_path, "a", encoding="utf-8") as f:

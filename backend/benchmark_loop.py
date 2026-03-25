@@ -16,6 +16,7 @@ Usage:
 import ast
 import asyncio
 import glob
+import json
 import logging
 import os
 from benchmark_memory import load_episodes, save_episode, build_experience_summary
@@ -78,6 +79,154 @@ MAX_ATTEMPTS_DEFAULT = 5
 LLM_MAX_TOKENS = 8192
 LLM_TEMPERATURE = 0.05
 PYTEST_TIMEOUT = 60  # seconds
+
+
+# -- Environment capability probe ----------------------------------------------
+
+def _probe_environment() -> dict:
+    """Check what runtimes/tools are actually available in this environment.
+
+    Returns a dict: {tool: {"available": bool, "version": str|None}}
+    Results are cached for the process lifetime (probing is slow).
+    """
+    if hasattr(_probe_environment, "_cache"):
+        return _probe_environment._cache
+
+    probes = {
+        "python":  [sys.executable, "--version"],
+        "pytest":  [sys.executable, "-m", "pytest", "--version"],
+        "node":    ["node", "--version"],
+        "npm":     ["npm",  "--version"],
+        "jest":    ["npx",  "jest", "--version"],
+        "g++":     ["g++",  "--version"],
+        "cargo":   ["cargo","--version"],
+        "go":      ["go",   "version"],
+        "java":    ["java", "-version"],
+    }
+    results = {}
+    for tool, cmd in probes.items():
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+            ok = r.returncode == 0
+            ver_line = (r.stdout + r.stderr).strip().splitlines()
+            version = ver_line[0][:60] if ver_line else None
+            results[tool] = {"available": ok, "version": version if ok else None}
+        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+            results[tool] = {"available": False, "version": None}
+
+    _probe_environment._cache = results
+    return results
+
+
+def _format_env_summary(probe: dict) -> str:
+    """Return a compact one-line string of available runtimes."""
+    available = [t for t, v in probe.items() if v["available"]]
+    missing   = [t for t, v in probe.items() if not v["available"]]
+    lines = [f"Available: {', '.join(available)}"]
+    if missing:
+        lines.append(f"Missing:   {', '.join(missing)}")
+    return "\n".join(lines)
+
+
+# -- Self-profile builder ------------------------------------------------------
+
+def _build_self_profile(task_key: str, lang: str) -> str:
+    """Build a self-awareness summary to inject into the initial prompt.
+
+    Combines:
+    - Environment capabilities (what runtimes are present)
+    - Capability graph node count (breadth of knowledge)
+    - Benchmark episode history (past success rate on similar tasks)
+    - Language-specific confidence level
+
+    Returns a formatted string ready to include in the prompt.
+    """
+    sections = []
+
+    # 1. Environment probe
+    probe = _probe_environment()
+    lang_tool = {"python": "pytest", "javascript": "jest", "cpp": "g++",
+                 "rust": "cargo", "go": "go", "java": "java"}.get(lang, "pytest")
+    lang_available = probe.get(lang_tool, {}).get("available", False)
+    lang_version   = probe.get(lang_tool, {}).get("version", "unknown")
+
+    env_status = f"READY ({lang_version})" if lang_available else "NOT AVAILABLE — expect runner errors"
+    sections.append(f"Runtime ({lang}): {env_status}")
+
+    # 2. Capability graph — count acquired nodes as proxy for knowledge breadth
+    try:
+        cap_path = Path(__file__).resolve().parent.parent / "shard_memory" / "capability_graph.json"
+        if cap_path.exists():
+            graph = json.loads(cap_path.read_text(encoding="utf-8"))
+            n_nodes = len(graph)
+            # Find nodes related to current language/task
+            lang_keywords = {
+                "python": ["python", "algorithm", "data structure", "debugging"],
+                "javascript": ["javascript", "node", "async", "web"],
+                "cpp": ["c++", "memory", "pointer", "system"],
+            }.get(lang, [])
+            related = [k for k in graph if any(kw in k.lower() for kw in lang_keywords)]
+            sections.append(
+                f"Knowledge graph: {n_nodes} acquired concepts"
+                + (f", {len(related)} related to {lang}" if related else "")
+            )
+    except Exception:
+        pass
+
+    # 3. Benchmark episode history — success rate on similar tasks
+    try:
+        from benchmark_memory import load_episodes
+        past = load_episodes(task_key)
+        if past:
+            n_total   = len(past)
+            n_success = sum(1 for e in past if e.get("success"))
+            rate      = round(n_success / n_total * 100)
+            best_ep   = max(past, key=lambda e: e.get("total_attempts", 99), default=None)
+            sections.append(
+                f"Episode history ({task_key}): {n_success}/{n_total} sessions solved ({rate}%)"
+            )
+            # Warn if this task has a poor track record
+            if n_total >= 2 and rate < 50:
+                sections.append(
+                    f"  WARNING: this task has been hard historically — "
+                    f"prioritize reading the failure history carefully"
+                )
+        else:
+            sections.append(f"Episode history: no prior sessions for '{task_key}' — first attempt")
+    except Exception:
+        pass
+
+    if not sections:
+        return ""
+
+    return (
+        "=== SHARD SELF-PROFILE ===\n"
+        + "\n".join(f"  {s}" for s in sections)
+        + "\n"
+    )
+
+
+def _push_self_awareness_event(consciousness, probe: dict, profile: str, lang: str):
+    """Push capability probe + self-assessment events to CognitionCore."""
+    if not consciousness:
+        return
+    try:
+        available = [t for t, v in probe.items() if v["available"]]
+        missing   = [t for t, v in probe.items() if not v["available"]]
+        consciousness.push_event("capability_probe", {
+            "lang":      lang,
+            "available": available,
+            "missing":   missing,
+            "ready":     probe.get({"python":"pytest","javascript":"jest",
+                                    "cpp":"g++"}.get(lang,"pytest"), {}).get("available", False),
+        })
+        consciousness.push_event("self_assessment", {
+            "profile_lines": len(profile.splitlines()),
+            "lang": lang,
+            "summary": profile[:300],
+        })
+    except Exception:
+        pass
 
 
 # -- Data structures -----------------------------------------------------------
@@ -792,6 +941,17 @@ async def run_benchmark_loop(
     if output_path.exists():
         output_path.unlink()
 
+    # -- Environment probe + self-profile -------------------------------------
+    env_probe    = _probe_environment()
+    self_profile = _build_self_profile(task_dir.name, lang)
+    _push_self_awareness_event(_consciousness, env_probe, self_profile, lang)
+
+    # Warn early if the required runtime is missing
+    lang_tool = {"python":"pytest","javascript":"jest","cpp":"g++"}.get(lang,"pytest")
+    if not env_probe.get(lang_tool, {}).get("available", False):
+        print(f"\n  [WARNING] Runtime '{lang_tool}' not found — tests will fail to run.")
+        print(f"            Install it before proceeding.\n")
+
     print()
     print("=" * 68)
     print("  SHARD Benchmark Loop")
@@ -817,6 +977,11 @@ async def run_benchmark_loop(
     experience_summary = build_experience_summary(past_episodes) if (use_episodic_memory and past_episodes) else ""
     if experience_summary:
         print(f"  [memory] Injecting {len(past_episodes)} past session(s) into Attempt 1 prompt")
+
+    # Inject self-profile into experience_summary so Attempt 1 sees it
+    if self_profile:
+        experience_summary = self_profile + ("\n" + experience_summary if experience_summary else "")
+        print(f"  [self] Self-profile injected ({len(self_profile)} chars)")
 
     # -- Query Knowledge Base (always run independent of flag) --------------
     kb_used = False
@@ -1028,6 +1193,16 @@ async def run_benchmark_loop(
             save_episode(task_key, success=True, total_attempts=attempt_num,
                          attempts=attempts, final_code=code,
                          kb_used=kb_used, kb_chars=kb_chars)
+            # CognitionCore: signal mastery event
+            if _consciousness:
+                try:
+                    _consciousness.push_event("mastery_achieved", {
+                        "task": task_key, "lang": lang,
+                        "attempts": attempt_num, "tests": len(passed),
+                        "first_try": attempt_num == 1,
+                    })
+                except Exception:
+                    pass
             return BenchmarkResult(
                 task_dir=str(task_dir), success=True,
                 total_attempts=attempt_num, attempts=attempts,
