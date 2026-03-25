@@ -9,8 +9,7 @@ import pathlib
 from typing import List, Dict, Any, Optional, Callable
 from importlib.util import spec_from_file_location, module_from_spec
 from datetime import datetime
-from groq import Groq, RateLimitError as GroqRateLimitError
-import anthropic
+# LLM calls go through llm_router — no direct groq/anthropic clients needed here
 from chromadb.utils import embedding_functions
 from db_manager import get_collection, DB_PATH_KNOWLEDGE_DB
 from filesystem_tools import write_file
@@ -82,8 +81,6 @@ load_dotenv()
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
-GROQ_API_KEY     = os.getenv("GROQ_API_KEY")
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 CHROMA_DB_PATH   = DB_PATH_KNOWLEDGE_DB  # Ora da db_manager (path assoluto, CWD-indipendente)
 SANDBOX_DIR      = os.path.join(os.getcwd(), "sandbox")
 WORKSPACE_DIR    = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "shard_workspace")
@@ -94,32 +91,14 @@ from constants import (
     BENCHMARK_WEIGHT,
 )
 MAX_RETRY        = 3
-GROQ_DELAY       = 1.2  # Seconds between Groq calls to avoid rate limiting
-ANTHROPIC_DELAY  = 0.5  # Seconds between Anthropic calls
-
-
-if not ANTHROPIC_API_KEY:
-    raise ValueError("ANTHROPIC_API_KEY must be set in .env")
-
-# Groq is optional — used for fast/simple LLM tasks only
-if not GROQ_API_KEY:
-    print("[CONFIG] ⚠️  GROQ_API_KEY not set — all LLM calls will use Claude (slower but works)")
 
 os.makedirs(SANDBOX_DIR, exist_ok=True)
 
 
 class StudyAgent:
     def __init__(self, goal_engine: GoalEngine = None):
-        # ── Anthropic Claude (Main Brain — complex reasoning) ──
-        self.anthropic_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-
-        # ── Groq (Fast Brain — simple/quick tasks) ──
-        if GROQ_API_KEY:
-            self.groq_client = Groq(api_key=GROQ_API_KEY)
-            print("[STUDY] ✅ Dual LLM: Claude (complex) + Groq (fast)")
-        else:
-            self.groq_client = None
-            print("[STUDY] ⚠️  Groq disabled — using Claude for all tasks")
+        # LLM calls go through llm_router (Gemini → Groq → Claude fallback chain)
+        # No direct client initialization needed here
         self.emb_fn      = embedding_functions.DefaultEmbeddingFunction()
         self.embed       = self.emb_fn  # Semantic validation use
         # Usa il singleton db_manager — terzo client ChromaDB unificato

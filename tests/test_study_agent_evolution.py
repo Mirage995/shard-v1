@@ -43,27 +43,16 @@ def agent(mock_env, tmp_path):
     }
     mock_collection.upsert.return_value = None
 
-    with patch("study_agent.Groq") as MockGroq, \
-         patch("study_agent.get_collection", return_value=mock_collection), \
+    with patch("study_agent.get_collection", return_value=mock_collection), \
          patch("study_agent.CHROMA_DB_PATH", str(tmp_path / "chroma")), \
          patch("study_agent.SANDBOX_DIR", str(tmp_path / "sandbox")), \
          patch("study_agent.WORKSPACE_DIR", str(tmp_path / "workspace")):
-
-        # Mock Groq client
-        mock_groq_response = MagicMock()
-        mock_groq_response.choices = [MagicMock()]
-        mock_groq_response.choices[0].message.content = "Mocked LLM response"
-
-        mock_groq_client = MagicMock()
-        mock_groq_client.chat.completions.create.return_value = mock_groq_response
-        MockGroq.return_value = mock_groq_client
 
         from study_agent import StudyAgent
         sa = StudyAgent()
 
         # Store refs for assertions
         sa._mock_collection = mock_collection
-        sa._mock_groq_client = mock_groq_client
         sa._tmp_workspace = str(tmp_path / "workspace")
 
         yield sa
