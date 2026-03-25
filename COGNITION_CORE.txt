@@ -126,13 +126,87 @@ Emergono dalla composizione dei layer.
 
 API DEL COGNITIONCORE
 ──────────────────────
-core.executive()              → Layer 0 + Layer 1 (sempre, lightweight)
-core.query_identity()         → Layer 2
-core.query_knowledge(topic)   → Layer 3
-core.query_experience(topic)  → Layer 4
-core.query_critique(topic)    → Layer 5
-core.relational_context(topic) → composizione di tutti i layer rilevanti
-                                  con tensioni evidenziate
+core.executive()                    → Layer 0 + Layer 1 (sempre, lightweight)
+core.query_identity()               → Layer 2
+core.query_knowledge(topic)         → Layer 3
+core.query_experience(topic)        → Layer 4
+core.query_critique(topic)          → Layer 5
+core.relational_context(topic)      → composizione di tutti i layer rilevanti
+                                       con tensioni evidenziate
+core.audit_emergence(topic, action) → Shadow Diagnostic Layer (vedi sotto)
+
+
+SHADOW DIAGNOSTIC LAYER — L'Osservatore Ombra
+───────────────────────────────────────────────
+Progettato con Gemini. Scopo: tracciare i momenti dove l'emergenza
+avrebbe dovuto accadere ma non è accaduta.
+
+Il problema dell'emergenza è che è silenziosa quando manca.
+Non hai un errore nel terminale — hai solo un comportamento standard
+dove ti saresti aspettato un colpo di genio.
+
+FLUSSO:
+  1. Tension Detection
+     Il Core rileva una tensione forte tra layer (es. Identità dice "esperto",
+     Esperienza dice "3 fallimenti su questo topic").
+
+  2. Expected Emergence
+     Il Core segna internamente: "In questa situazione, mi aspetto
+     che l'agente cambi rotta / usi approccio non convenzionale."
+
+  3. Action Audit
+     SHARD esegue l'azione (phase_synthesize, retry, fix, ecc.).
+
+  4. Gap Analysis
+     Se SHARD ignora la tensione e usa la mossa standard:
+     → Shadow Logger scrive [MISSED EMERGENCE] con dettaglio della causa.
+
+I 3 KILLER DELL'EMERGENZA (da Gemini):
+  1. Low Signal-to-Noise
+     La tensione era presente ma scritta in modo "timido" nel prompt.
+     L'LLM l'ha letta come dettaglio minore e ignorata.
+
+  2. Model Inertia (Pigrizia del Modello)
+     Gli LLM tendono al comportamento medio. Se la spinta del Core
+     non è abbastanza forte, il modello sceglie la strada sicura.
+
+  3. Context Dilution
+     Troppe informazioni nel prompt — il suggerimento del Core
+     è finito sepolto tra i dati di contesto.
+
+COGNITIVE FRICTION REPORT — Esempio:
+  Situazione: Tensione alta tra Layer 2 (Identità) e Layer 4 (Esperienza).
+  Core: Suggerisce cautela, approccio alternativo.
+  Agente: Prova approccio standard (e fallisce).
+  Audit output:
+    "[MISSED EMERGENCE] topic='python generators and coroutines' attempt=2
+     Tensione: Vettore 2 (Identità+Critica) — gap critico ignorato
+     Azione attesa: cambio strategia verso implementazione pratica
+     Azione reale: re-sintesi teorica standard
+     Probabile causa: Context Dilution — prompt di 4200 token, Core a 3800"
+
+FEEDBACK LOOP — Il salto in più rispetto a Gemini:
+  Ogni [MISSED EMERGENCE] non si limita al log.
+  Viene salvato in EpisodicMemory come caso di studio.
+  La prossima sessione CriticAgent lo legge e lo inietta nel relational_context().
+  Il sistema impara dai propri fallimenti cognitivi, non solo da quelli tecnici.
+
+  Loop completo:
+    Tensione rilevata → Azione attesa → Azione reale → Gap Analysis
+          ↓ se gap presente
+    [MISSED EMERGENCE] → EpisodicMemory → CriticAgent → sessione successiva
+          ↓
+    Tensione più forte nel prompt → maggiore probabilità di emergenza
+
+METRICHE DI EMERGENZA (quello che possiamo misurare):
+  - emergence_opportunities: n° volte il Core ha rilevato una tensione forte
+  - emergence_hits: n° volte l'agente ha risposto alla tensione cambiando rotta
+  - emergence_misses: n° volte la tensione è stata ignorata
+  - miss_causes: distribuzione delle cause (signal_weak / model_inertia / dilution)
+  - emergence_rate: emergence_hits / emergence_opportunities
+
+  Esempio report: "Nelle ultime 10 sessioni: 5 opportunità, 3 colte, 2 mancate
+                   per model_inertia. Tuning consigliato: aumentare peso tensione."
 
 
 PUNTI DI INTEGRAZIONE NEL PIPELINE
@@ -142,6 +216,7 @@ phase_synthesize                 → core.query_knowledge() + core.query_experie
 phase_evaluate                   → core.query_critique()
 CertifyRetryGroup (attempt >= 2) → core.relational_context() (tensioni complete)
 BenchmarkLoop (Architect)        → core.query_experience() (fallimenti simili)
+Ogni fase post-azione            → core.audit_emergence(topic, action_taken)
 
 
 RISCHI E GUARDRAIL
@@ -164,35 +239,40 @@ RISCHI E GUARDRAIL
    I layer non si chiamano tra loro. Parlano solo col Core.
    Il Core aggrega, non orchestra.
 
+5. Shadow Logger overhead
+   audit_emergence() deve essere non-bloccante e non-fatale.
+   Massimo 50ms. Se fallisce, il pipeline continua senza interruzioni.
+
 
 STATO ATTUALE DEI MODULI
 ──────────────────────────
 SelfModel      ✅ solido — metrics, gaps, certification rate, describe()
-WorldModel     ⚠️  stub — raccoglie concetti e fallimenti ma non li usa
-GraphRAG       ✅ funziona — 69 relazioni causali, query_causal_context()
+WorldModel     ⚠️  stub — verrà integrato come wrapper nel CognitionCore
+GraphRAG       ✅ funziona — 128 relazioni causali, query_causal_context()
 EpisodicMemory ✅ funziona — retrieve_context(), get_context_prompt()
 StrategyMemory ✅ funziona — store/retrieve strategies
 MetaLearning   ✅ funziona — per-category stats, strategy injection
-CriticAgent    ✅ appena potenziato — analyze_with_llm() su attempt >= 2
-
-WorldModel va integrato nel CognitionCore come wrapper leggero su GraphRAG
-+ CapabilityGraph, non potenziato separatamente.
+CriticAgent    ✅ potenziato — analyze_with_llm() su attempt >= 2
 
 
 PROSSIMI STEP
 ──────────────
 1. Implementare backend/cognition/cognition_core.py
-   - Classe CognitionCore con i 5 layer
+   - Classe CognitionCore con i 5 layer + Shadow Diagnostic Layer
    - Metodi: executive(), query_identity(), query_knowledge(),
-             query_experience(), query_critique(), relational_context()
+             query_experience(), query_critique(), relational_context(),
+             audit_emergence()
    - executive() cached e aggiornato ogni ciclo NightRunner
+   - Shadow Logger: salva [MISSED EMERGENCE] in EpisodicMemory
 
 2. Integrare Vettore 1 (Esperienza + Sintesi)
    - phase_synthesize chiama core.query_experience(topic)
-   - Misurare: improvement_focus più specifico
+   - post-action: core.audit_emergence(topic, "synthesize")
+   - Misurare: improvement_focus più specifico, emergence_rate
 
 3. Integrare Vettore 2 (Identità + Critica)
    - CriticAgent legge core.query_identity() prima di analyze_with_llm()
+   - post-action: core.audit_emergence(topic, "critique")
    - Misurare: riduzione falsi positivi in phase_certify
 
 4. Integrare Vettore 3 (Conoscenza + Strategia)
@@ -200,6 +280,6 @@ PROSSIMI STEP
    - Misurare: meno fallimenti su topic ad alta complessità strutturale
 
 5. Aggiungere /api/cognition_state endpoint in server.py
-   - Esporre executive() al frontend per widget
+   - Esporre executive() + emergence metrics al frontend per widget
 
 ================================================================================
