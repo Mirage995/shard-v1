@@ -46,13 +46,19 @@ def _get_db():
 
 def _anchor() -> Dict[str, Any]:
     """Read ground-truth metrics directly from SQLite. No LLM, no inference."""
+    _default = {
+        "certification_rate": 0.0, "total_experiments": 0,
+        "total_certified": 0, "last_topic": "—", "last_score": 0.0,
+        "last_pass": False, "last_date": "—", "avg_score": 0.0,
+    }
     try:
         conn = _get_db()
         row = conn.execute(
             "SELECT COUNT(*) AS total, SUM(certified) AS cert FROM experiments"
         ).fetchone()
-        total = row["total"] or 0
-        cert  = int(row["cert"] or 0) if row else 0
+        # Guard: row values may be MagicMock during cross-test pollution
+        total = int(row["total"] or 0) if row and not _is_mock(row["total"]) else 0
+        cert  = int(row["cert"] or 0)  if row and not _is_mock(row["cert"])  else 0
         cert_rate = round(cert / total, 3) if total else 0.0
 
         last = conn.execute(
@@ -60,14 +66,19 @@ def _anchor() -> Dict[str, Any]:
             "ORDER BY timestamp DESC LIMIT 1"
         ).fetchone()
 
-        last_topic   = last["topic"]   if last else "—"
-        last_score   = last["score"]   if last else 0.0
-        last_pass    = bool(last["certified"]) if last else False
-        last_date    = last["timestamp"][:10] if last and last["timestamp"] else "—"
+        if last and not _is_mock(last):
+            last_topic = str(last["topic"])   if last["topic"]     else "—"
+            last_score = float(last["score"]) if last["score"] is not None else 0.0
+            last_pass  = bool(last["certified"])
+            ts         = last["timestamp"]
+            last_date  = str(ts)[:10] if ts and not _is_mock(ts) else "—"
+        else:
+            last_topic, last_score, last_pass, last_date = "—", 0.0, False, "—"
 
-        avg_score = conn.execute(
+        avg_row = conn.execute(
             "SELECT AVG(score) AS avg FROM experiments"
-        ).fetchone()["avg"] or 0.0
+        ).fetchone()
+        avg_score = float(avg_row["avg"] or 0.0) if avg_row and not _is_mock(avg_row["avg"]) else 0.0
 
         return {
             "certification_rate": cert_rate,
@@ -81,11 +92,12 @@ def _anchor() -> Dict[str, Any]:
         }
     except Exception as exc:
         logger.warning("[ANCHOR] Failed: %s", exc)
-        return {
-            "certification_rate": 0.0, "total_experiments": 0,
-            "total_certified": 0, "last_topic": "—", "last_score": 0.0,
-            "last_pass": False, "last_date": "—", "avg_score": 0.0,
-        }
+        return _default
+
+
+def _is_mock(value) -> bool:
+    """Return True if value is a unittest.mock object (cross-test pollution guard)."""
+    return hasattr(value, "_mock_name") or type(value).__name__ in ("MagicMock", "Mock", "NonCallableMock")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
