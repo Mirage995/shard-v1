@@ -60,6 +60,12 @@ class StudyContext:
     # ── Critical thinking — LLM meta-critique on stuck topics ────────────────
     critic_meta_critique: Optional[str] = None  # set by CritAgent.analyze_with_llm on attempt>=2
 
+    # ── CognitionCore — Senso Interno ─────────────────────────────────────────
+    core_experience: Dict = field(default_factory=dict)   # Layer 4 snapshot for this topic
+    pivot_directive: Optional[str] = None                 # structural pivot from Vettore 1
+    core_relational_ctx: Optional[str] = None             # relational_context() injected at attempt>=2
+    prev_strategy_used: Optional[str] = None              # tracks strategy across attempts for audit_emergence
+
     # ── Helper ────────────────────────────────────────────────────────────────
 
     async def emit(self, phase: str, score: float, msg: str):

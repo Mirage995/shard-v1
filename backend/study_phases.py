@@ -96,11 +96,35 @@ class SynthesizePhase(BasePhase):
 
     async def run(self, ctx: StudyContext) -> None:
         await ctx.emit("SYNTHESIZE", 0, "Building structured knowledge...")
+
+        # Vettore 1 — CognitionCore: query experience before synthesis
+        # If sandbox always returned 0 in past attempts, inject STRUCTURAL PIVOT
+        core = getattr(ctx.agent, "cognition_core", None)
+        if core is not None:
+            try:
+                exp = core.query_experience(ctx.topic)
+                ctx.core_experience = exp
+                if exp.get("sandbox_always_zero") or (exp.get("chronic_fail") and exp.get("attempt_count", 0) >= 2):
+                    ctx.pivot_directive = (
+                        f"PAST FAILURE PATTERN DETECTED: sandbox returned 0 in "
+                        f"{exp['attempt_count']} previous attempts for this topic. "
+                        "The theoretical approach is NOT working. "
+                        "This synthesis MUST prioritize EXECUTABLE implementation patterns: "
+                        "concrete algorithms, step-by-step code structures, real data examples. "
+                        "Avoid abstract theory. Think: what Python code do I write, "
+                        "in what exact order, with what data structures."
+                    )
+                    await ctx.emit("SYNTHESIZE", 0, "[COGNITION] Structural pivot activated — shifting to executable focus")
+                    print(f"[VETTORE 1] Pivot directive injected for '{ctx.topic}' — sandbox always 0 pattern")
+            except Exception as _ce:
+                pass  # non-fatal
+
         ctx.structured = await ctx.agent.phase_synthesize(
             ctx.topic, ctx.raw_text,
             strategy_hint=ctx.best_strategy,
             previous_score=ctx.previous_score,
             episode_context=ctx.episode_context,
+            pivot_directive=ctx.pivot_directive,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
 
@@ -598,8 +622,15 @@ class CertifyRetryGroup(BasePhase):
                     # "What am I doing wrong systematically?" — injects into retry prompt
                     if ctx.attempt >= 2:
                         try:
+                            # Vettore 2 — CognitionCore: pass identity to CriticAgent
+                            # "How confident are we really in this category?"
+                            _identity_ctx = None
+                            _core = getattr(ctx.agent, "cognition_core", None)
+                            if _core is not None:
+                                _identity_ctx = _core.query_identity()
                             critique = await ctx.agent.critic_agent.analyze_with_llm(
-                                ctx.topic, ctx.score, ctx.gaps, ctx.attempt
+                                ctx.topic, ctx.score, ctx.gaps, ctx.attempt,
+                                identity_context=_identity_ctx,
                             )
                             if critique:
                                 ctx.critic_meta_critique = critique
@@ -792,13 +823,27 @@ Please analyze the problem and propose a minimal patch.
             critique_block = f"\n\nCRITICAL SELF-EVALUATION (read carefully — this is what you keep getting wrong):\n{ctx.critic_meta_critique}\n"
             print(f"[CRITIC-LLM] Injecting meta-critique into retry prompt for '{ctx.topic}'")
 
+        # Vettore 1+2 — CognitionCore relational_context on attempt >= 2
+        # Full tension-aware context: Identity vs Experience vs Knowledge
+        core_block = ""
+        core = getattr(ctx.agent, "cognition_core", None)
+        if core is not None and ctx.attempt >= 2:
+            try:
+                ctx.core_relational_ctx = core.relational_context(ctx.topic)
+                core_block = f"\n\n[COGNITION CORE — INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
+                print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
+            except Exception as _cre:
+                pass  # non-fatal
+
+        # Track previous strategy for audit_emergence
+        prev_strategy = ctx.strategy_used
+
         # 1. Re-synthesize theory with gap focus
         gap_prompt = f"""
 Previous study of "{ctx.topic}" had these gaps: {gaps}
-Focus area: {focus}{critique_block}
-
+Focus area: {focus}{critique_block}{core_block}
 Re-synthesize with emphasis on filling these specific gaps.
-If the critical self-evaluation above identifies a systematic mistake, change your approach accordingly.
+If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR APPROACH — do not repeat the same strategy.
 Use the same JSON format as before.
 """
         raw_gap = await ctx.agent._think_fast(gap_prompt, json_mode=True)
@@ -820,16 +865,16 @@ Use the same JSON format as before.
 Rewrite a minimal executable Python script for: {ctx.topic}
 
 The previous attempt had these gaps: {', '.join(str(g) for g in gaps[:3])}
-Focus area: {focus}{critique_block}
-
+Focus area: {focus}{critique_block}{core_block}
 Fix those gaps explicitly in the new implementation.
-If the critical self-evaluation above identifies a systematic mistake, change your implementation approach accordingly.
+If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR IMPLEMENTATION APPROACH — use a different pattern, different data structures, or different algorithm.
 
 Rules:
 - valid Python, no markdown, no explanations, terminates automatically
 - only use: Python stdlib, numpy, math, random, itertools, collections, concurrent.futures
 - NO external APIs, NO pip installs, NO servers or infinite loops
 """
+        prev_sandbox_score = ctx.sandbox_result.get("score", 0.0) if ctx.sandbox_result else 0.0
         try:
             ctx.codice_generato = await ctx.agent._think_fast(regen_prompt)
             if ctx.codice_generato and "```" in ctx.codice_generato:
@@ -841,6 +886,27 @@ Rules:
                 ctx.sandbox_result = await ctx.agent.run_sandbox(ctx.topic, ctx.codice_generato)
                 success_icon = "passed" if ctx.sandbox_result.get("success") else "failed"
                 print(f"[RETRY] Sandbox re-run: {success_icon}")
+
+                # Vettore 1 — Shadow Diagnostic: audit emergence after retry
+                if core is not None and ctx.core_relational_ctx:
+                    try:
+                        new_score = ctx.sandbox_result.get("score", 0.0) or 0.0
+                        new_strategy = ctx.strategy_used or "retry"
+                        delta = {
+                            "strategy_used":      new_strategy,
+                            "strategy_prev":      prev_strategy,
+                            "sandbox_score":      new_score,
+                            "sandbox_score_prev": prev_sandbox_score,
+                            "attempt_number":     ctx.attempt,
+                            "tension_present":    bool(ctx.core_relational_ctx),
+                            "prompt_tokens":      len(regen_prompt) // 4,
+                        }
+                        audit = await core.audit_emergence(ctx.topic, "retry", delta)
+                        print(f"[SHADOW DIAGNOSTIC] {audit} — topic='{ctx.topic}' attempt={ctx.attempt}")
+                        ctx.prev_strategy_used = new_strategy
+                    except Exception:
+                        pass  # non-fatal
+
         except Exception as regen_err:
             print(f"[RETRY] Code regeneration failed (non-fatal): {regen_err}")
 

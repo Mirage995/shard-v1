@@ -169,6 +169,21 @@ class StudyAgent:
             self.world_model
         )
 
+        # ── CognitionCore (Senso Interno) — 5-layer Global Workspace ─────────────
+        try:
+            from cognition.cognition_core import get_cognition_core
+            from episodic_memory import EpisodicMemory
+            self.cognition_core = get_cognition_core(
+                self_model=self.self_model,
+                episodic_memory=EpisodicMemory(),
+                strategy_memory=self.strategy_memory,
+                meta_learning=self.meta_learning,
+            )
+            print("[COGNITION CORE] Senso Interno initialized")
+        except Exception as _cc_err:
+            print(f"[COGNITION CORE] Init failed (non-fatal): {_cc_err}")
+            self.cognition_core = None
+
         # ── CriticAgent for failure analysis ──
         from critic_agent import CriticAgent
         self.critic_agent = CriticAgent(self.capability_graph, self.strategy_memory)
@@ -452,7 +467,8 @@ Example: ["query 1", "query 2", "query 3"]"""
 
     async def phase_synthesize(self, topic: str, raw: str, strategy_hint: str = None,
                                previous_score: float = None,
-                               episode_context: str = None) -> Dict:
+                               episode_context: str = None,
+                               pivot_directive: str = None) -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
@@ -470,6 +486,11 @@ Example: ["query 1", "query 2", "query 3"]"""
             f"\n{episode_context}\n"
             if episode_context else ""
         )
+        # Vettore 1 — CognitionCore Structural Pivot Directive
+        pivot_line = (
+            f"\n[COGNITION CORE — STRUCTURAL PIVOT]\n{pivot_directive}\n"
+            if pivot_directive else ""
+        )
 
         # GraphRAG: inject causal relations already known about this topic
         causal_line = ""
@@ -483,7 +504,7 @@ Example: ["query 1", "query 2", "query 3"]"""
             pass
 
         prompt = f"""
-You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{causal_line}
+You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}
 Return ONLY valid JSON.
 
 Do not include explanations.

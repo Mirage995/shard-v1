@@ -149,13 +149,18 @@ class CriticAgent:
         }
 
     async def analyze_with_llm(self, topic: str, current_score: float,
-                                current_gaps: list, attempt: int) -> str:
+                                current_gaps: list, attempt: int,
+                                identity_context: dict = None) -> str:
         """
         LLM-powered meta-critique for stuck topics.
 
         Called when attempt >= 2 — SHARD is not converging.
         Reads episodic history for this topic and asks Gemini:
         "What is SHARD doing wrong systematically? What should it try differently?"
+
+        Vettore 2: if identity_context shows a critical gap in this category,
+        CriticAgent becomes a skeptical examiner — suspects luck or flawed tests,
+        not genuine mastery.
 
         Returns a critique string ready to inject into the retry prompt.
         Returns empty string on any error (non-fatal).
@@ -184,8 +189,25 @@ class CriticAgent:
 
             gaps_text = ", ".join(str(g) for g in current_gaps[:5]) if current_gaps else "none identified"
 
-            prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach — not just what went wrong, but WHY the current strategy keeps failing.
+            # Vettore 2 — Identity context: skeptical mode if critical gap
+            identity_block = ""
+            skeptical_mode = False
+            if identity_context and "error" not in identity_context:
+                gap_severity = identity_context.get("gap_severity", "none")
+                cert_rate    = identity_context.get("certification_rate", 1.0)
+                critical_gaps = identity_context.get("critical_gaps", [])
+                if gap_severity in ("critical", "medium") or cert_rate < 0.4:
+                    skeptical_mode = True
+                    identity_block = (
+                        f"\nIDENTITY CHECK (from SelfModel):\n"
+                        f"  Overall cert_rate={cert_rate:.0%} | gap_severity={gap_severity} | "
+                        f"critical_categories={critical_gaps[:3]}\n"
+                        f"  ⚠️  SHARD has a documented weakness in this area. "
+                        f"Be extra skeptical — past 'passes' in weak categories are often luck or poorly written tests, not genuine mastery.\n"
+                    )
 
+            prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach — not just what went wrong, but WHY the current strategy keeps failing.
+{identity_block}
 Topic: "{topic}"
 Current attempt: {attempt}
 Current score: {current_score}/10
@@ -198,18 +220,24 @@ Analyze this pattern critically:
 1. What is SHARD consistently getting wrong across attempts?
 2. Is the approach to this topic fundamentally flawed (e.g. too abstract, wrong implementation focus, missing prerequisite)?
 3. What ONE specific change in approach would most likely break the failure pattern?
+{"4. Given the identity weakness above — is SHARD's self-assessment accurate, or is it overconfident in a weak area?" if skeptical_mode else ""}
 
 Be direct and concrete. Output 3-4 sentences maximum. This will be injected directly into the next attempt prompt."""
 
             critique = await llm_complete(
                 prompt=prompt,
-                system="You are a sharp, honest critic. No flattery. Identify the root cause of repeated failure.",
+                system=(
+                    "You are a sharp, skeptical examiner. No flattery. "
+                    "Identify the root cause of repeated failure. "
+                    + ("The student has documented weaknesses here — be rigorous." if skeptical_mode else "")
+                ),
                 max_tokens=300,
                 temperature=0.4,
                 providers=["Gemini", "Groq", "Claude"],
             )
 
-            print(f"[CRITIC-LLM] Meta-critique for '{topic}' (attempt {attempt}): {critique[:120]}...")
+            mode_tag = "[SKEPTICAL]" if skeptical_mode else ""
+            print(f"[CRITIC-LLM]{mode_tag} Meta-critique for '{topic}' (attempt {attempt}): {critique[:120]}...")
             return critique.strip()
 
         except Exception as e:
