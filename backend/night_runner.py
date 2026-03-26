@@ -801,10 +801,10 @@ class NightRunner:
             except Exception:
                 pass
             try:
-                from backend.consciousness import ShardConsciousness
-                from backend.memory import ShardMemory
-                _mem_c = ShardMemory()
-                _consciousness_env = ShardConsciousness(_mem_c, self.capability_graph, self.goal_engine)
+                from backend.consciousness import ShardConsciousness as _SC
+                from backend.memory import ShardMemory as _SM_c
+                _mem_c = _SM_c()
+                _consciousness_env = _SC(_mem_c, self.capability_graph, self.goal_engine)
                 _core_env.register("consciousness", _consciousness_env,
                                    ["skill_certified", "frustration_peak", "momentum_changed"])
             except Exception:

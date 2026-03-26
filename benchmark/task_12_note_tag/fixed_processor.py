@@ -8,24 +8,24 @@ def build_fixme_pattern(notes: list[str], notes_rgx: str = "") -> re.Pattern:
     Args:
         notes: list of tag strings (e.g. ["TODO", "FIXME", "???"])
         notes_rgx: optional additional regex pattern
+
+    Note: uses two branches — one with \\b for alphanumeric tags, one with
+    (?!\\w) for punctuation-only tags (\\b fails after non-word chars like '?').
     """
     escaped = "|".join(re.escape(note) for note in notes)
-    if escaped or notes_rgx:
-        if notes_rgx:
-            if escaped:
-                regex_string = rf"#\s*({escaped}|{notes_rgx})(?!\w)"
-            else:
-                regex_string = rf"#\s*({notes_rgx})(?!\w)"
-        else:
-            regex_string = rf"#\s*({escaped})(?!\w)"
+    if notes_rgx:
+        regex_string = rf"#\s*({escaped}|{notes_rgx})\b|#\s*({escaped}|{notes_rgx})(?!\w)"
     else:
-        regex_string = r"#\s*(?!\w)"  # Match a comment with nothing after it
+        regex_string = rf"#\s*({escaped})\b|#\s*({escaped})(?!\w)"
     return re.compile(regex_string, re.I)
 
 
 def find_tags(source: str, notes: list[str], notes_rgx: str = "") -> list[str]:
     """Return list of matched tags found in source code comments."""
-    if source is None:
-        return []
     pattern = build_fixme_pattern(notes, notes_rgx)
-    return [m.group(1) for m in pattern.finditer(source) if m.group(1)]
+    tags = []
+    for m in pattern.finditer(source):
+        matched = m.group(1) or m.group(2)
+        if matched is not None:
+            tags.append(matched)
+    return tags

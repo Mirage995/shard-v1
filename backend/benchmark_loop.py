@@ -1197,7 +1197,24 @@ async def run_benchmark_loop(
     except Exception as e:
         print(f"  [semantic] Semantic memory query failed: {e}")
 
-    # -- 2. Loop -----------------------------------------------------------
+    # -- 2. Golden solution protection ------------------------------------
+    # If a passing solution already exists, save it before the LLM overwrites it.
+    # If all attempts fail, restore it — never regress a working solution.
+    _golden_code: str = ""
+    _golden_passed: list = []
+    if output_path.exists():
+        try:
+            _golden_code = output_path.read_text(encoding="utf-8")
+            _all_pass, _raw = _run_tests(task_dir, test_file.name, lang=lang,
+                                         source_file=str(source_path) if lang == "cpp" else None)
+            if _all_pass:
+                _p, _f, _ = _parse_test_output(_raw, lang=lang)
+                _golden_passed = _p
+                print(f"  [golden] Existing solution passes {len(_p)} test(s) — will protect on regression")
+        except Exception:
+            _golden_code = ""
+
+    # -- 3. Loop -----------------------------------------------------------
     attempts = []
     _best_state = None       # AttemptRecord with highest tests_passed count seen so far
     _swarm_rollback = False  # True when last attempt regressed — triggers surgical mode next call
@@ -1484,6 +1501,16 @@ async def run_benchmark_loop(
     total_elapsed = time.time() - t_start
     best = max(attempts, key=lambda a: len(a.tests_passed)) if attempts else None
     best_score = len(best.tests_passed) if best else 0
+
+    # -- Golden solution restore -------------------------------------------
+    # If the LLM never beat the original passing solution, restore it.
+    if _golden_code and len(_golden_passed) > best_score:
+        _write_file(output_path, _golden_code)
+        print(f"  [golden] LLM best={best_score} < golden={len(_golden_passed)} — restored verified solution")
+    elif _golden_code and len(_golden_passed) == best_score and best_score > 0:
+        # Tie — keep golden (it's verified, LLM solution is untested at full depth)
+        _write_file(output_path, _golden_code)
+        print(f"  [golden] Tied at {best_score} tests — kept verified solution")
 
     print(f"\n{'=' * 68}")
     print(f"  FAILED after {max_attempts} attempts")
