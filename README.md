@@ -232,6 +232,7 @@ ANTHROPIC_API_KEY=...
 | SSJ11 | CognitionCore / Senso Interno — 5-layer Global Workspace + Shadow Diagnostic + Vettore 1+2 + Lobotomy A/B proof (8.6 vs 7.0) |
 | SSJ12 | Vettore 3 directed pivot from MetaLearning history + per-topic LLM budget |
 | SSJ13 | AGI Layer — SelfModel (momentum, blind spots, quarantine), WorldModel (58-skill map, self_calibrate()), GoalEngine autonomous (SHARD picks its own goals), SemanticMemory bootstrap (171 episodes, 77 knowledge, 14 errors), GapDetector loop closure, CognitionCore +query_world/goal/real_identity + Vettori 4/5/6 |
+| SSJ14 | Desire Layer — DesireEngine: frustration drive (failures increase pull), lateral curiosity (adjacent topics filtered by WorldModel), goal persistence (sessions_active), process reward (engagement_score). NightRunner Priority 0.5, cap 1/session. CognitionCore Vettori 7+8. |
 
 ---
 
