@@ -231,6 +231,7 @@ ANTHROPIC_API_KEY=...
 | SSJ10 | Test suite 0 FAILED + patch_simulator async def visibility fix |
 | SSJ11 | CognitionCore / Senso Interno — 5-layer Global Workspace + Shadow Diagnostic + Vettore 1+2 + Lobotomy A/B proof (8.6 vs 7.0) |
 | SSJ12 | Vettore 3 directed pivot from MetaLearning history + per-topic LLM budget |
+| SSJ13 | AGI Layer — SelfModel (momentum, blind spots, quarantine), WorldModel (58-skill map, self_calibrate()), GoalEngine autonomous (SHARD picks its own goals), SemanticMemory bootstrap (171 episodes, 77 knowledge, 14 errors), GapDetector loop closure, CognitionCore +query_world/goal/real_identity + Vettori 4/5/6 |
 
 ---
 
