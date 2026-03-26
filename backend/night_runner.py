@@ -276,6 +276,7 @@ class NightRunner:
         self._state: SessionState = SessionState.INIT
 
         self.topic_filter_discards = 0
+        self._desire_selections_this_session = 0  # cap: max 1 desire topic per session
 
         self._setup_directories()
         self._setup_logging()
@@ -394,12 +395,12 @@ class NightRunner:
                  self.logger.info("[PHOENIX] No valid candidates found. Falling back to normal selection.")
 
         # Priority 0.5: Desire engine — high-frustration or high-curiosity topics
-        # SHARD is drawn back to things it's been blocked on (frustration drive)
-        # or adjacent to what it just certified (curiosity pull)
+        # Cap: max 1 desire-driven topic per session to avoid thrashing between
+        # frustrated topics instead of advancing the active goal.
         try:
             from backend.desire_engine import get_desire_engine as _get_de
             _de = _get_de()
-            _desire_candidates = _de.top_desire_topics(top_n=3)
+            _desire_candidates = _de.top_desire_topics(top_n=3) if self._desire_selections_this_session == 0 else []
             for _dc in _desire_candidates:
                 _dt = _dc["topic"]
                 if not is_valid_topic(_dt, self.logger) or is_trivial_topic(_dt, self.logger):
@@ -411,6 +412,7 @@ class NightRunner:
                     self.logger.info(
                         "[DESIRE] Curiosity pull: '%s' (pull=%.2f)", _dt, _dc["curiosity_pull"]
                     )
+                    self._desire_selections_this_session += 1
                     return _dt, "curiosity_driven", f"Lateral curiosity — adjacent to recent cert (pull={_dc['curiosity_pull']:.2f})"
                 # Frustration drive: pick frustrated topic 40% of the time
                 if _dc["frustration_hits"] >= 2 and random.random() < 0.40:
@@ -418,6 +420,7 @@ class NightRunner:
                         "[DESIRE] Frustration drive: '%s' (hits=%d score=%.2f)",
                         _dt, _dc["frustration_hits"], _dc["desire_score"],
                     )
+                    self._desire_selections_this_session += 1
                     return _dt, "frustration_driven", f"Frustration drive — {_dc['frustration_hits']} prior blocks (desire={_dc['desire_score']:.2f})"
         except Exception as _de_sel_err:
             self.logger.debug("[DESIRE] Topic selection non-fatal: %s", _de_sel_err)

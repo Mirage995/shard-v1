@@ -172,13 +172,25 @@ class DesireEngine:
             cap = CapabilityGraph()
             certified_skills = set(k.lower() for k in cap.capabilities.keys())
 
+            # WorldModel relevance floor — only boost topics with real learning ROI
+            wm = None
+            try:
+                from world_model import WorldModel
+                wm = WorldModel.load_or_default()
+            except Exception:
+                pass
+
             results = sem.query(certified_topic, collection="knowledge", n_results=n_adjacent + 5)
             adjacent = []
             for r in results:
                 t = r.get("metadata", {}).get("title") or r.get("document", "")[:60]
                 t = t.strip()
-                if t and t.lower() not in certified_skills and t != certified_topic:
-                    adjacent.append(t)
+                if not t or t.lower() in certified_skills or t == certified_topic:
+                    continue
+                # Filter: only admit topics with WorldModel relevance > 0.3
+                if wm is not None and wm.relevance(t) < 0.3:
+                    continue
+                adjacent.append(t)
                 if len(adjacent) >= n_adjacent:
                     break
 
