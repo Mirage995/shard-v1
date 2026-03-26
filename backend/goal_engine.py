@@ -58,6 +58,9 @@ class Goal:
         self.active = active
         self.completed = completed
         self.completed_at = completed_at
+        # Persistence: how many sessions this goal has been active
+        # Goals resist replacement until sessions_active >= min_sessions_for_priority
+        self.sessions_active: int = 0
 
     def alignment_score(self, topic: str) -> float:
         """How well does this topic align with the goal? 0.0–1.0."""
@@ -103,6 +106,7 @@ class Goal:
             "active":          self.active,
             "completed":       self.completed,
             "completed_at":    self.completed_at,
+            "sessions_active": self.sessions_active,
         }
 
     @classmethod
@@ -121,6 +125,8 @@ class Goal:
             completed=d.get("completed", False),
             completed_at=d.get("completed_at"),
         )
+        g.sessions_active = d.get("sessions_active", 0)
+        return g
 
 
 def _infer_keywords(title: str) -> List[str]:
@@ -304,12 +310,18 @@ class GoalEngine:
 
         Returns the newly created (or existing) active goal.
         """
-        # Keep existing active goal if meaningful progress still to make
+        # Keep existing active goal if meaningful progress still to make.
+        # Persistence rule: goals resist replacement based on priority —
+        # higher priority goals require more sessions before being reconsidered.
         current = self.get_active_goal()
         if current and not current.completed:
             progress = current.compute_progress(self.capability_graph) if self.capability_graph else current.progress
-            if progress < 0.8:
-                return current  # still working toward it
+            min_sessions = max(2, round(current.priority * 5))  # priority 1.0 → 5 sessions, 0.5 → 3
+            if progress < 0.8 and current.sessions_active < min_sessions:
+                # Goal is sticky — increment counter and keep it
+                current.sessions_active += 1
+                self.storage.save_goal(current)
+                return current
 
         # Load self model
         try:

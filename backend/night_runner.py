@@ -393,6 +393,35 @@ class NightRunner:
             else:
                  self.logger.info("[PHOENIX] No valid candidates found. Falling back to normal selection.")
 
+        # Priority 0.5: Desire engine — high-frustration or high-curiosity topics
+        # SHARD is drawn back to things it's been blocked on (frustration drive)
+        # or adjacent to what it just certified (curiosity pull)
+        try:
+            from backend.desire_engine import get_desire_engine as _get_de
+            _de = _get_de()
+            _desire_candidates = _de.top_desire_topics(top_n=3)
+            for _dc in _desire_candidates:
+                _dt = _dc["topic"]
+                if not is_valid_topic(_dt, self.logger) or is_trivial_topic(_dt, self.logger):
+                    continue
+                if self._is_quarantined(_dt):
+                    continue
+                # Curiosity pull: pick adjacent topic 30% of the time
+                if _dc["curiosity_pull"] > 0.2 and random.random() < 0.30:
+                    self.logger.info(
+                        "[DESIRE] Curiosity pull: '%s' (pull=%.2f)", _dt, _dc["curiosity_pull"]
+                    )
+                    return _dt, "curiosity_driven", f"Lateral curiosity — adjacent to recent cert (pull={_dc['curiosity_pull']:.2f})"
+                # Frustration drive: pick frustrated topic 40% of the time
+                if _dc["frustration_hits"] >= 2 and random.random() < 0.40:
+                    self.logger.info(
+                        "[DESIRE] Frustration drive: '%s' (hits=%d score=%.2f)",
+                        _dt, _dc["frustration_hits"], _dc["desire_score"],
+                    )
+                    return _dt, "frustration_driven", f"Frustration drive — {_dc['frustration_hits']} prior blocks (desire={_dc['desire_score']:.2f})"
+        except Exception as _de_sel_err:
+            self.logger.debug("[DESIRE] Topic selection non-fatal: %s", _de_sel_err)
+
         # Priority 1: Curated topics list (primary source — replaces ExperimentInventor)
         _curated_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
         if _curated_file.exists():
@@ -712,6 +741,15 @@ class NightRunner:
         except Exception as _ssj3_err:
             self.logger.warning("[SSJ3] ImprovementEngine non-fatal error: %s", _ssj3_err)
 
+        # ── DESIRE ENGINE BOOTSTRAP ───────────────────────────────────────────
+        try:
+            from backend.desire_engine import get_desire_engine
+            _desire = get_desire_engine()
+            self.logger.info("[DESIRE] %s", _desire.summary())
+        except Exception as _de_err:
+            _desire = None
+            self.logger.warning("[DESIRE] Bootstrap non-fatal error: %s", _de_err)
+
         # ── GAP DETECTOR: Autonomous failure-driven study topic injection ──────
         # Reads benchmark_episodes.json, clusters error patterns, enqueues gaps.
         try:
@@ -803,6 +841,33 @@ class NightRunner:
                     certified=cycle_data["certified"],
                     score=cycle_data["score"] or 0.0,
                 )
+
+                # ── DESIRE ENGINE UPDATE per-cycle ────────────────────────
+                try:
+                    from backend.desire_engine import (
+                        get_desire_engine as _get_de2,
+                        compute_engagement_score as _eng_score,
+                    )
+                    _de2 = _get_de2()
+                    if cycle_data["certified"]:
+                        _de2.clear_frustration(topic)
+                        _de2.update_curiosity(topic)
+                    else:
+                        _de2.update_frustration(topic)
+                    # Compute engagement score from session signals
+                    _engagement = _eng_score(
+                        certified=cycle_data["certified"],
+                    )
+                    _de2.record_engagement(topic, _engagement)
+                    self.logger.info(
+                        "[DESIRE] Updated '%s': frustration=%d curiosity=%.2f engagement=%.2f",
+                        topic,
+                        _de2.get_frustration(topic),
+                        _de2.get_desire_context(topic)["curiosity_pull"],
+                        _engagement,
+                    )
+                except Exception:
+                    pass
 
                 # ── SELF/WORLD MODEL UPDATE per-cycle ─────────────────────
                 try:

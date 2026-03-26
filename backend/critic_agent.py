@@ -193,17 +193,24 @@ class CriticAgent:
             identity_block = ""
             skeptical_mode = False
             if identity_context and "error" not in identity_context:
-                gap_severity = identity_context.get("gap_severity", "none")
-                cert_rate    = identity_context.get("certification_rate", 1.0)
+                gap_severity  = identity_context.get("gap_severity", "none")
+                cert_rate     = identity_context.get("certification_rate", 1.0)
                 critical_gaps = identity_context.get("critical_gaps", [])
+                frustration   = identity_context.get("frustration_hits", 0)
                 if gap_severity in ("critical", "medium") or cert_rate < 0.4:
                     skeptical_mode = True
                     identity_block = (
                         f"\nIDENTITY CHECK (from SelfModel):\n"
                         f"  Overall cert_rate={cert_rate:.0%} | gap_severity={gap_severity} | "
                         f"critical_categories={critical_gaps[:3]}\n"
-                        f"  ⚠️  SHARD has a documented weakness in this area. "
+                        f"  SHARD has a documented weakness in this area. "
                         f"Be extra skeptical — past 'passes' in weak categories are often luck or poorly written tests, not genuine mastery.\n"
+                    )
+                if frustration >= 2:
+                    identity_block += (
+                        f"  FRUSTRATION: {frustration} session(s) failed on this topic across history — "
+                        f"this is a persistent block, not a one-off. "
+                        f"Diagnose the *pattern*, not just the last error.\n"
                     )
 
             prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach — not just what went wrong, but WHY the current strategy keeps failing.

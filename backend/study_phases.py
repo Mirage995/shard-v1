@@ -681,6 +681,15 @@ class CertifyRetryGroup(BasePhase):
                             _core = getattr(ctx.agent, "cognition_core", None)
                             if _core is not None:
                                 _identity_ctx = _core.query_identity()
+                            # Desire engine: inject frustration_hits into identity context
+                            try:
+                                from desire_engine import get_desire_engine as _get_de3
+                                _frustration = _get_de3().get_frustration(ctx.topic)
+                                if _identity_ctx is None:
+                                    _identity_ctx = {}
+                                _identity_ctx["frustration_hits"] = _frustration
+                            except Exception:
+                                pass
                             critique = await ctx.agent.critic_agent.analyze_with_llm(
                                 ctx.topic, ctx.score, ctx.gaps, ctx.attempt,
                                 identity_context=_identity_ctx,

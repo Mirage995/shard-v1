@@ -540,6 +540,17 @@ class CognitionCore:
                 f"blind_spots=[{bs_str}]"
             )
 
+        # Layer D: Desire signal
+        desire_data = self.query_desire(topic)
+        if "error" not in desire_data:
+            if desire_data.get("frustration_hits", 0) >= 2 or desire_data.get("curiosity_pull", 0) > 0.2:
+                lines.append(
+                    f"Desiderio: frustrazione={desire_data['frustration_hits']} sessioni | "
+                    f"curiosità={desire_data['curiosity_pull']:.0%} | "
+                    f"engagement_medio={desire_data['avg_engagement']:.0%} | "
+                    f"desire_score={desire_data['desire_score']:.2f}"
+                )
+
         # ── Tension Detection ─────────────────────────────────────────────────
         tensions = _detect_tensions(
             identity, exp, know, anchor,
@@ -547,6 +558,7 @@ class CognitionCore:
             world=world_data,
             goal=goal_data,
             real_identity=real_id,
+            desire=desire_data,
         )
         if tensions:
             lines.append("")
@@ -637,6 +649,22 @@ class CognitionCore:
         except Exception as exc:
             logger.warning("[COGNITION] query_real_identity failed: %s", exc)
             return {"momentum": "unknown", "real_cert_rate": 0.0, "error": str(exc)}
+
+    def query_desire(self, topic: str) -> Dict[str, Any]:
+        """Desire layer: frustration, curiosity, engagement for this topic.
+
+        Uses backend/desire_engine.py.
+        Returns desire_score, frustration_hits, curiosity_pull, avg_engagement.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from desire_engine import get_desire_engine
+            de = get_desire_engine()
+            return de.get_desire_context(topic)
+        except Exception as exc:
+            logger.warning("[COGNITION] query_desire failed: %s", exc)
+            return {"error": str(exc), "frustration_hits": 0, "desire_score": 0.0}
 
     # ── Shadow Diagnostic Layer — audit_emergence() ───────────────────────────
 
@@ -788,6 +816,7 @@ def _detect_tensions(
     world: Optional[Dict] = None,
     goal: Optional[Dict] = None,
     real_identity: Optional[Dict] = None,
+    desire: Optional[Dict] = None,
 ) -> List[str]:
     """Detect meaningful conflicts between layers.
 
@@ -872,6 +901,24 @@ def _detect_tensions(
                 "Vettore 6 (Momentum): SHARD in stagnazione nelle ultime sessioni "
                 "— considera approccio più fondamentale, tier basso, evita topic compositi"
             )
+
+    # Vettore 7: Frustration — persistent block, not a one-off failure
+    if desire and desire.get("frustration_hits", 0) >= 2:
+        frust = desire["frustration_hits"]
+        tensions.append(
+            f"Vettore 7 (Desiderio->Blocco): {frust} sessioni fallite su questo topic "
+            f"— non è un errore isolato, è un pattern persistente. "
+            f"Cambia approccio radicalmente o decomponi il topic."
+        )
+
+    # Vettore 8: Curiosity pull — adjacent territory is calling
+    if desire and desire.get("curiosity_pull", 0.0) > 0.3:
+        pull = desire["curiosity_pull"]
+        tensions.append(
+            f"Vettore 8 (Desiderio->Curiosità): attrazione laterale {pull:.0%} "
+            f"— questo topic è adiacente a qualcosa che SHARD ha appena padroneggiato. "
+            f"Sfrutta il momentum cognitivo recente."
+        )
 
     # Near-miss tension: so close, yet keeps failing
     if near_miss and attempts >= 2:
