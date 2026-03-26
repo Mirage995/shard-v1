@@ -1000,6 +1000,17 @@ async def run_benchmark_loop(
     except Exception as e:
         print(f"  [kb] Knowledge Base injection failed: {e}")
 
+    # -- Semantic memory query -----------------------------------------------
+    try:
+        from semantic_memory import query_semantic_memory
+        _sem_query = f"{task_key} {source[:300]} {tests[:200]}"
+        sem_context = query_semantic_memory(_sem_query, top_k=3, min_score=0.35)
+        if sem_context:
+            experience_summary = (experience_summary + "\n\n" if experience_summary else "") + sem_context
+            print(f"  [semantic] Injected {len(sem_context)} chars of semantic memory into prompt")
+    except Exception as e:
+        print(f"  [semantic] Semantic memory query failed: {e}")
+
     # -- 2. Loop -----------------------------------------------------------
     attempts = []
     _best_state = None       # AttemptRecord with highest tests_passed count seen so far
@@ -1193,6 +1204,16 @@ async def run_benchmark_loop(
             save_episode(task_key, success=True, total_attempts=attempt_num,
                          attempts=attempts, final_code=code,
                          kb_used=kb_used, kb_chars=kb_chars)
+            # Feed success into semantic memory
+            try:
+                from semantic_memory import get_semantic_memory
+                get_semantic_memory().add_episode(
+                    task_key=task_key, error_summary="SUCCESS",
+                    code_snippet=code[:300], success=True,
+                    attempt=attempt_num, lang=lang,
+                )
+            except Exception:
+                pass
             # CognitionCore: signal mastery event
             if _consciousness:
                 try:

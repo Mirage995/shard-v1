@@ -52,6 +52,42 @@ class InitPhase(BasePhase):
         except Exception as _ep_err:
             print(f"[EPISODIC] Non-fatal retrieval error: {_ep_err}")
 
+        # Semantic memory: inject ChromaDB-matched past episodes and knowledge
+        try:
+            from semantic_memory import query_semantic_memory
+            _sem_ctx = query_semantic_memory(ctx.topic, top_k=3, min_score=0.35)
+            if _sem_ctx:
+                ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _sem_ctx
+                print(f"[SEMANTIC] Injected {len(_sem_ctx)} chars of semantic context for '{ctx.topic}'")
+        except Exception:
+            pass  # semantic memory is always non-fatal
+
+        # Self model: inject who SHARD is, what it knows, what it keeps failing
+        try:
+            from self_model import SelfModel
+            _sm = SelfModel.load()
+            if _sm:
+                ctx.episode_context = (_sm.as_prompt_fragment() + "\n\n"
+                                       + (ctx.episode_context or ""))
+        except Exception:
+            pass  # self model is always non-fatal
+
+        # World model: inject relevance signal for this specific topic
+        try:
+            from world_model import WorldModel
+            _wm = WorldModel.load_or_default()
+            _rel = _wm.relevance(ctx.topic)
+            _domain = _wm.domain_of(ctx.topic)
+            if _rel > 0.3:
+                _wm_hint = (
+                    f"[WORLD MODEL] Topic '{ctx.topic}' — "
+                    f"relevance={round(_rel*100)}%  domain={_domain}. "
+                    f"This is a high-value skill in the current software landscape."
+                )
+                ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _wm_hint
+        except Exception:
+            pass  # world model is always non-fatal
+
 
 # ── 2. MapPhase ──────────────────────────────────────────────────────────────
 

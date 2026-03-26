@@ -1,0 +1,412 @@
+{
+  "created_at": "2026-03-26T00:43:55.456004",
+  "updated_at": "2026-03-26T00:43:55.457232",
+  "skills": {
+    "asyncio and async patterns in python": {
+      "relevance": 0.95,
+      "domain": "python",
+      "xp_leverage": 1.4,
+      "known": false,
+      "known_score": null
+    },
+    "python generators and coroutines": {
+      "relevance": 0.88,
+      "domain": "python",
+      "xp_leverage": 1.3,
+      "known": false,
+      "known_score": null
+    },
+    "python typing system and generics": {
+      "relevance": 0.85,
+      "domain": "python",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "python object oriented programming": {
+      "relevance": 0.8,
+      "domain": "python",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "python dictionary operations and error handling": {
+      "relevance": 0.82,
+      "domain": "python",
+      "xp_leverage": 1.0,
+      "known": false,
+      "known_score": null
+    },
+    "python list indexing and bounds checking": {
+      "relevance": 0.75,
+      "domain": "python",
+      "xp_leverage": 0.9,
+      "known": false,
+      "known_score": null
+    },
+    "python string encoding and unicode handling": {
+      "relevance": 0.72,
+      "domain": "python",
+      "xp_leverage": 0.9,
+      "known": false,
+      "known_score": null
+    },
+    "python file system operations": {
+      "relevance": 0.7,
+      "domain": "python",
+      "xp_leverage": 0.8,
+      "known": false,
+      "known_score": null
+    },
+    "python module system and dependency management": {
+      "relevance": 0.78,
+      "domain": "python",
+      "xp_leverage": 1.0,
+      "known": false,
+      "known_score": null
+    },
+    "recursion and stack management in python": {
+      "relevance": 0.73,
+      "domain": "python",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "null safety and defensive programming python": {
+      "relevance": 0.8,
+      "domain": "python",
+      "xp_leverage": 1.0,
+      "known": false,
+      "known_score": null
+    },
+    "regular expressions in python": {
+      "relevance": 0.76,
+      "domain": "python",
+      "xp_leverage": 0.9,
+      "known": false,
+      "known_score": null
+    },
+    "json parsing and serialization python": {
+      "relevance": 0.77,
+      "domain": "python",
+      "xp_leverage": 0.9,
+      "known": false,
+      "known_score": null
+    },
+    "numpy array operations and boolean indexing": {
+      "relevance": 0.9,
+      "domain": "data_science",
+      "xp_leverage": 1.3,
+      "known": false,
+      "known_score": null
+    },
+    "concurrent programming and thread safety python": {
+      "relevance": 0.87,
+      "domain": "python",
+      "xp_leverage": 1.3,
+      "known": false,
+      "known_score": null
+    },
+    "memory management and optimization": {
+      "relevance": 0.83,
+      "domain": "systems",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "algorithm complexity and performance optimization": {
+      "relevance": 0.91,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.5,
+      "known": false,
+      "known_score": null
+    },
+    "test driven development and assertion design": {
+      "relevance": 0.88,
+      "domain": "engineering",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "sql injection prevention and input sanitization": {
+      "relevance": 0.92,
+      "domain": "security",
+      "xp_leverage": 1.3,
+      "known": false,
+      "known_score": null
+    },
+    "password hashing bcrypt argon2": {
+      "relevance": 0.9,
+      "domain": "security",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "http client implementation python": {
+      "relevance": 0.85,
+      "domain": "networking",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "graph traversal algorithms bfs dfs": {
+      "relevance": 0.88,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.4,
+      "known": false,
+      "known_score": null
+    },
+    "union find disjoint set": {
+      "relevance": 0.75,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "sorting algorithms": {
+      "relevance": 0.8,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.0,
+      "known": false,
+      "known_score": null
+    },
+    "dynamic programming": {
+      "relevance": 0.85,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.4,
+      "known": false,
+      "known_score": null
+    },
+    "binary search and variants": {
+      "relevance": 0.82,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "tree structures and traversal": {
+      "relevance": 0.83,
+      "domain": "cs_fundamentals",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "docker container python sdk": {
+      "relevance": 0.86,
+      "domain": "devops",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "websocket protocol implementation": {
+      "relevance": 0.82,
+      "domain": "networking",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "transformer attention mechanism": {
+      "relevance": 0.89,
+      "domain": "ml",
+      "xp_leverage": 1.5,
+      "known": false,
+      "known_score": null
+    },
+    "design patterns factory singleton observer": {
+      "relevance": 0.84,
+      "domain": "engineering",
+      "xp_leverage": 1.3,
+      "known": false,
+      "known_score": null
+    },
+    "javascript async await and promises": {
+      "relevance": 0.87,
+      "domain": "javascript",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "typescript type system": {
+      "relevance": 0.83,
+      "domain": "javascript",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "node.js event loop and streams": {
+      "relevance": 0.8,
+      "domain": "javascript",
+      "xp_leverage": 1.1,
+      "known": false,
+      "known_score": null
+    },
+    "rust ownership and borrowing": {
+      "relevance": 0.82,
+      "domain": "rust",
+      "xp_leverage": 1.4,
+      "known": false,
+      "known_score": null
+    },
+    "go goroutines and channels": {
+      "relevance": 0.78,
+      "domain": "go",
+      "xp_leverage": 1.2,
+      "known": false,
+      "known_score": null
+    },
+    "web scraping with beautifulsoup": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "chiedo facendo": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 10.0
+    },
+    "logging and monitoring patterns": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "interrogative usage applied to quantized inertia theory": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "impossible quantum topic 999 applied to numerical_computation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "neural networks and deep learning basics": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "python exception handling best practices": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "interrogative usage applied to eafp (easier to ask forgiveness than permission)": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "rest api design patterns": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.75
+    },
+    "transitive usage applied to hubble-scale casimir effect": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "impossible differentials in cryptography applied to safe_code_execution": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "fail fast principle applied to dynamic content handling": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "activation functions applied to exception-driven control flow": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "quantized inertia theory applied to sorted data prerequisite": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "exception-driven control flow applied to logarithmic time complexity o(log n)": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "catch narrow exceptions applied to python exception handling best practices": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "binary search applied to quantized inertia theory": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "fully connected layers applied to interrogative usage applied to eafp (easier to ask forgiveness than permission)": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "python applied to post-quantum security margin": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 10.0
+    },
+    "quantized inertia theory applied to hubble-scale casimir effect": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "transitive usage applied to binary search algorithm": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "python decorators and metaclasses": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.75
+    }
+  }
+}

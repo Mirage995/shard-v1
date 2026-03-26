@@ -512,8 +512,42 @@ class CognitionCore:
         else:
             strat_rec = {}
 
+        # Layer W: World model signal
+        world_data = self.query_world(topic)
+        if "error" not in world_data and world_data.get("relevance", 0) > 0.3:
+            lines.append(
+                f"Mondo: rilevanza={world_data['relevance']:.0%}  "
+                f"dominio={world_data['domain']}  "
+                f"noto={'si' if world_data.get('is_known') else 'no'}"
+            )
+
+        # Layer G: Goal signal
+        goal_data = self.query_goal(topic)
+        if "error" not in goal_data and goal_data.get("active_goal"):
+            lines.append(
+                f"Goal: '{goal_data['active_goal']}' | "
+                f"alignment={goal_data['alignment']:.0%} | "
+                f"progress={goal_data.get('goal_progress', 0):.0%}"
+            )
+
+        # Layer R: Real identity (from data-driven SelfModel)
+        real_id = self.query_real_identity()
+        if "error" not in real_id:
+            bs_str = ", ".join(real_id.get("blind_spots", [])[:2]) or "none"
+            lines.append(
+                f"Identità reale: momentum={real_id['momentum']} | "
+                f"cert_rate={real_id['real_cert_rate']:.0%} | "
+                f"blind_spots=[{bs_str}]"
+            )
+
         # ── Tension Detection ─────────────────────────────────────────────────
-        tensions = _detect_tensions(identity, exp, know, anchor, strategy_rec=strat_rec)
+        tensions = _detect_tensions(
+            identity, exp, know, anchor,
+            strategy_rec=strat_rec,
+            world=world_data,
+            goal=goal_data,
+            real_identity=real_id,
+        )
         if tensions:
             lines.append("")
             lines.append("[TENSIONI RILEVATE]")
@@ -521,6 +555,88 @@ class CognitionCore:
                 lines.append(f"  >> {t}")
 
         return "\n".join(lines)
+
+    # ── Layer W — WORLD MODEL ─────────────────────────────────────────────────
+
+    def query_world(self, topic: str) -> Dict[str, Any]:
+        """World model signal: how relevant is this topic in the real software landscape?
+
+        Uses backend/world_model.py — 58 seeded skills, self-calibrating from
+        SHARD's own cert data. No external calls.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from world_model import WorldModel
+            wm = WorldModel.load_or_default()
+            relevance = wm.relevance(topic)
+            domain    = wm.domain_of(topic)
+            gaps      = wm.priority_gaps(set(), top_n=3)
+            return {
+                "topic":     topic,
+                "relevance": relevance,
+                "domain":    domain,
+                "is_known":  wm._data["skills"].get(topic.lower(), {}).get("known", False),
+                "top_world_gaps": [g["skill"] for g in gaps],
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_world failed: %s", exc)
+            return {"topic": topic, "relevance": 0.0, "domain": "unknown", "error": str(exc)}
+
+    # ── Layer G — GOAL ENGINE ─────────────────────────────────────────────────
+
+    def query_goal(self, topic: str) -> Dict[str, Any]:
+        """Active goal signal: how does this topic align with SHARD's current goal?
+
+        Uses backend/goal_engine.py — goal persisted across sessions,
+        generated autonomously from self_model + world_model.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from goal_engine import GoalEngine, GoalStorage
+            ge   = GoalEngine(GoalStorage())
+            goal = ge.get_active_goal()
+            if goal is None:
+                return {"topic": topic, "active_goal": None, "alignment": 0.0}
+            alignment = goal.alignment_score(topic)
+            return {
+                "topic":        topic,
+                "active_goal":  goal.title,
+                "goal_type":    goal.goal_type,
+                "alignment":    round(alignment, 3),
+                "goal_progress": round(goal.progress, 3),
+                "goal_keywords": goal.domain_keywords[:4],
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_goal failed: %s", exc)
+            return {"topic": topic, "active_goal": None, "alignment": 0.0, "error": str(exc)}
+
+    # ── Layer R — REAL SELF MODEL (augments Layer 2) ──────────────────────────
+
+    def query_real_identity(self) -> Dict[str, Any]:
+        """Augments query_identity() with data from backend/self_model.py.
+
+        The old cognition/self_model.py depends on graph/strategy/agenda.
+        This uses our data-driven SelfModel built from experiment_history.json.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from self_model import SelfModel
+            sm = SelfModel.load_or_build()
+            return {
+                "momentum":             sm.momentum,
+                "real_cert_rate":       sm.certification_rate,
+                "real_avg_score":       sm.avg_score,
+                "blind_spots":          sm.blind_spots[:4],
+                "quarantine_candidates": sm._data.get("quarantine_candidates", [])[:3],
+                "strengths":            sm.strengths[:5],
+                "prompt_fragment":      sm.as_prompt_fragment(),
+            }
+        except Exception as exc:
+            logger.warning("[COGNITION] query_real_identity failed: %s", exc)
+            return {"momentum": "unknown", "real_cert_rate": 0.0, "error": str(exc)}
 
     # ── Shadow Diagnostic Layer — audit_emergence() ───────────────────────────
 
@@ -669,6 +785,9 @@ def _detect_tensions(
     knowledge: Dict,
     anchor: Dict,
     strategy_rec: Optional[Dict] = None,
+    world: Optional[Dict] = None,
+    goal: Optional[Dict] = None,
+    real_identity: Optional[Dict] = None,
 ) -> List[str]:
     """Detect meaningful conflicts between layers.
 
@@ -718,6 +837,41 @@ def _detect_tensions(
             f"cert_rate={cr:.0%} avg={avg:.1f}/10 storico. "
             f"DIRECTED PIVOT disponibile: {text}"
         )
+
+    # Vettore 4: World says "critical skill" but SHARD cert_rate is low
+    if world and real_identity:
+        rel = world.get("relevance", 0.0)
+        real_cr = real_identity.get("real_cert_rate", 0.0)
+        domain = world.get("domain", "unknown")
+        if rel >= 0.80 and real_cr < 0.30:
+            tensions.append(
+                f"Vettore 4 (Mondo->Identità): rilevanza mondiale {rel:.0%} nel dominio '{domain}' "
+                f"ma cert_rate SHARD {real_cr:.0%} — gap critico, massima priorità"
+            )
+
+    # Vettore 5: Goal alignment signal
+    if goal:
+        alignment = goal.get("alignment", 0.0)
+        goal_title = goal.get("active_goal", "")
+        if goal_title and alignment >= 0.3:
+            tensions.append(
+                f"Vettore 5 (Goal->Topic): topic allineato {alignment:.0%} al goal '{goal_title}' "
+                f"— studiarlo avanza il goal attivo"
+            )
+        elif goal_title and alignment == 0.0:
+            tensions.append(
+                f"Vettore 5 (Goal->Topic): topic NON allineato al goal '{goal_title}' "
+                f"— valuta se questo studio è prioritario rispetto al goal"
+            )
+
+    # Vettore 6: Momentum stagnation
+    if real_identity:
+        momentum = real_identity.get("momentum", "unknown")
+        if momentum == "stagnating":
+            tensions.append(
+                "Vettore 6 (Momentum): SHARD in stagnazione nelle ultime sessioni "
+                "— considera approccio più fondamentale, tier basso, evita topic compositi"
+            )
 
     # Near-miss tension: so close, yet keeps failing
     if near_miss and attempts >= 2:

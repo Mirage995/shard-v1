@@ -406,10 +406,26 @@ class NightRunner:
                     if t.lower() not in _certified and not self._is_quarantined(t)
                 ]
                 if _candidates:
-                    topic = random.choice(_candidates)
+                    # Goal steering: if active goal exists, prefer aligned topics
+                    _goal_aligned = self.goal_engine.best_aligned_topic(_candidates)
+                    if _goal_aligned:
+                        topic = _goal_aligned
+                        self.logger.info(
+                            "[GOAL STEER] Topic steered by active goal: %r (score=%.2f)",
+                            topic,
+                            self.goal_engine.get_active_goal().alignment_score(topic)
+                            if self.goal_engine.get_active_goal() else 0,
+                        )
+                    else:
+                        topic = random.choice(_candidates)
                     if is_valid_topic(topic, self.logger) and not is_trivial_topic(topic, self.logger):
                         self.logger.info("[CURATED] Topic selected from curated list: %r", topic)
-                        return topic, "curated_list", "Selezionato dalla lista curata."
+                        source_label = "curated_goal_steered" if _goal_aligned else "curated_list"
+                        reason_label = (
+                            f"Allineato al goal: {self.goal_engine.goal_summary()}"
+                            if _goal_aligned else "Selezionato dalla lista curata."
+                        )
+                        return topic, source_label, reason_label
             except Exception as _cur_err:
                 self.logger.warning("[CURATED] Could not read curated_topics.txt: %s", _cur_err)
 
@@ -575,6 +591,108 @@ class NightRunner:
         study_agent = StudyAgent(goal_engine=self.goal_engine)
         study_agent._topic_llm_budget = self.topic_budget
 
+        # ── SELF MODEL + WORLD MODEL BOOTSTRAP ───────────────────────────────
+        try:
+            from backend.self_model import SelfModel
+            _self_model = SelfModel.load_or_build()
+            self.logger.info(
+                "[SELF MODEL] cert_rate=%.0f%%  avg_score=%.1f  momentum=%s  blind_spots=%d",
+                _self_model.certification_rate * 100,
+                _self_model.avg_score,
+                _self_model.momentum,
+                len(_self_model.blind_spots),
+            )
+            # Auto-quarantine composite/junk topics with 2+ failures
+            _qc = _self_model._data.get("quarantine_candidates", [])
+            if _qc:
+                _quarantine_path = Path(__file__).resolve().parents[1] / "shard_memory" / "quarantine.json"
+                try:
+                    _existing_q = set()
+                    if _quarantine_path.exists():
+                        _existing_q = set(json.loads(_quarantine_path.read_text(encoding="utf-8")))
+                    _new_q = [t for t in _qc if t not in _existing_q]
+                    if _new_q:
+                        _existing_q.update(_new_q)
+                        _quarantine_path.write_text(json.dumps(list(_existing_q), indent=2), encoding="utf-8")
+                        self.logger.info("[SELF MODEL] Auto-quarantined %d junk topics: %s", len(_new_q), _new_q[:3])
+                except Exception:
+                    pass
+        except Exception as _sm_err:
+            _self_model = None
+            self.logger.warning("[SELF MODEL] non-fatal error: %s", _sm_err)
+
+        try:
+            from backend.world_model import WorldModel
+            _world_model = WorldModel.load_or_default()
+            _wm_cov = _world_model.coverage_summary()
+            self.logger.info(
+                "[WORLD MODEL] coverage=%s%%  known=%d/%d skills",
+                _wm_cov["coverage_pct"], _wm_cov["known_skills"], _wm_cov["total_skills"],
+            )
+            # Self-calibrate relevance scores from SHARD's real cert data
+            _wm_adj = _world_model.self_calibrate(min_experiments=10)
+            if _wm_adj:
+                for sk, delta in _wm_adj.items():
+                    self.logger.info(
+                        "[WORLD MODEL] Recalibrated '%s': %.3f -> %.3f (cert_rate=%.0f%%, n=%d)",
+                        sk, delta["old"], delta["new"], delta["cert_rate"]*100, delta["n"],
+                    )
+            # Surface top-3 world-priority gaps SHARD doesn't know yet
+            _known = set(_self_model.strengths) if _self_model else set()
+            _wm_gaps = _world_model.priority_gaps(_known, top_n=3)
+            if _wm_gaps:
+                self.logger.info(
+                    "[WORLD MODEL] Top priority gaps: %s",
+                    ", ".join(g["skill"] for g in _wm_gaps),
+                )
+        except Exception as _wm_err:
+            _world_model = None
+            self.logger.warning("[WORLD MODEL] non-fatal error: %s", _wm_err)
+
+        # ── AUTONOMOUS GOAL GENERATION ────────────────────────────────────────
+        # SHARD reads its own self_model + world_model and decides what to
+        # pursue this session — no human input required.
+        try:
+            self.goal_engine.capability_graph = capability_graph
+            _auto_goal = self.goal_engine.autonomous_generate()
+            if _auto_goal:
+                self.logger.info(
+                    "[GOAL AUTO] Active goal: '%s' | progress=%.0f%% | type=%s",
+                    _auto_goal.title,
+                    _auto_goal.progress * 100,
+                    _auto_goal.goal_type,
+                )
+                self.logger.info("[GOAL AUTO] Keywords: %s", _auto_goal.domain_keywords)
+                self.logger.info("[GOAL AUTO] Reason: %s", _auto_goal.description.splitlines()[1] if '\n' in _auto_goal.description else "")
+            else:
+                self.logger.info("[GOAL AUTO] No goal generated — no world model gaps found")
+        except Exception as _ag_err:
+            self.logger.warning("[GOAL AUTO] non-fatal error: %s", _ag_err)
+
+        # ── SEMANTIC MEMORY BOOTSTRAP ─────────────────────────────────────────
+        # Index all existing episodes + knowledge base files into ChromaDB.
+        # Skips if already populated (upsert is idempotent, but we avoid the
+        # sentence-transformer load overhead when there's nothing new to add).
+        try:
+            from backend.semantic_memory import get_semantic_memory
+            _sem = get_semantic_memory()
+            _sem_stats = _sem.stats()
+            if _sem_stats["episodes"] == 0 or _sem_stats["knowledge"] == 0:
+                self.logger.info("[SEMANTIC] ChromaDB sparse — running index_all()")
+                _sem.index_all(verbose=False)
+                _new_stats = _sem.stats()
+                self.logger.info(
+                    "[SEMANTIC] Indexed: episodes=%d  knowledge=%d  errors=%d",
+                    _new_stats["episodes"], _new_stats["knowledge"], _new_stats["errors"],
+                )
+            else:
+                self.logger.info(
+                    "[SEMANTIC] ChromaDB ready: episodes=%d  knowledge=%d  errors=%d",
+                    _sem_stats["episodes"], _sem_stats["knowledge"], _sem_stats["errors"],
+                )
+        except Exception as _sem_boot_err:
+            self.logger.warning("[SEMANTIC] Bootstrap non-fatal error: %s", _sem_boot_err)
+
         # ── SSJ3: Proactive self-improvement (ImprovementEngine) ──────────────
         try:
             from backend.self_analyzer import SelfAnalyzer
@@ -593,6 +711,19 @@ class NightRunner:
                 self.logger.info("[SSJ3] %s", _result.summary())
         except Exception as _ssj3_err:
             self.logger.warning("[SSJ3] ImprovementEngine non-fatal error: %s", _ssj3_err)
+
+        # ── GAP DETECTOR: Autonomous failure-driven study topic injection ──────
+        # Reads benchmark_episodes.json, clusters error patterns, enqueues gaps.
+        try:
+            from backend.gap_detector import GapDetector
+            _gap_report = GapDetector().detect(enqueue=True)
+            self.logger.info("[GAP] %s", _gap_report.summary())
+            if _gap_report.topics_queued:
+                # Reload improvement queue — now includes both SSJ3 + gap topics
+                from backend.improvement_engine import ImprovementEngine as _IE2
+                self._improvement_topics = list(_IE2().peek_queue())
+        except Exception as _gap_err:
+            self.logger.warning("[GAP] GapDetector non-fatal error: %s", _gap_err)
 
         for cycle in range(1, self.max_cycles + 1):
             limit_reason = self._check_limits(cycle)
@@ -672,6 +803,60 @@ class NightRunner:
                     certified=cycle_data["certified"],
                     score=cycle_data["score"] or 0.0,
                 )
+
+                # ── SELF/WORLD MODEL UPDATE per-cycle ─────────────────────
+                try:
+                    from backend.self_model import SelfModel
+                    _sm_live = SelfModel.load()
+                    if _sm_live:
+                        if cycle_data["certified"]:
+                            _sm_live.update_from_session(
+                                certified=[topic], failed=[],
+                                scores=[cycle_data["score"] or 0.0],
+                            )
+                        # else: will be batched in end-of-session update
+                except Exception:
+                    pass
+                try:
+                    from backend.world_model import WorldModel
+                    _wm_live = WorldModel.load_or_default()
+                    if cycle_data["certified"]:
+                        _wm_live.mark_known(topic, cycle_data["score"] or 7.5)
+                        _wm_live.save()
+                except Exception:
+                    pass
+
+                # ── LOOP CLOSURE: gap resolved → semantic memory + gap log ────
+                if cycle_data["certified"] and source == "improvement_engine":
+                    try:
+                        from backend.semantic_memory import get_semantic_memory
+                        _sem = get_semantic_memory()
+                        _sem.add_knowledge(
+                            title=topic,
+                            content=(
+                                f"Gap resolved via NightRunner study.\n"
+                                f"Topic: {topic}\n"
+                                f"Score: {cycle_data['score']}/10\n"
+                                f"Certified at: {datetime.now().isoformat()}"
+                            ),
+                            source="gap_resolution",
+                        )
+                    except Exception:
+                        pass
+                    try:
+                        import json as _json
+                        _res_path = Path(__file__).resolve().parents[1] / "shard_memory" / "gap_resolutions.json"
+                        _resolutions = {}
+                        if _res_path.exists():
+                            _resolutions = _json.loads(_res_path.read_text(encoding="utf-8"))
+                        _resolutions[topic] = {
+                            "resolved_at": datetime.now().isoformat(),
+                            "score": cycle_data["score"],
+                        }
+                        _res_path.write_text(_json.dumps(_resolutions, indent=2), encoding="utf-8")
+                        self.logger.info("[GAP] Marked '%s' as resolved (score=%.1f)", topic, cycle_data["score"])
+                    except Exception:
+                        pass
 
                 # Capability-driven refactor: enqueue responsible modules after failure
                 if not cycle_data["certified"]:
@@ -821,6 +1006,26 @@ class NightRunner:
         self._generate_json_dump()
         self._backup_state()
         await self._generate_markdown_recap(study_agent)
+
+        # ── END-OF-SESSION: rebuild self model + update goal progress ─────────
+        try:
+            from backend.self_model import SelfModel
+            _sm_final = SelfModel.build()  # full rebuild with latest data
+            self.logger.info(
+                "[SELF MODEL] Rebuilt — cert_rate=%.0f%%  avg=%.1f  momentum=%s  blind_spots=%s",
+                _sm_final.certification_rate * 100,
+                _sm_final.avg_score,
+                _sm_final.momentum,
+                _sm_final.blind_spots[:3],
+            )
+        except Exception as _e:
+            self.logger.warning("[SELF MODEL] End-of-session rebuild failed: %s", _e)
+
+        try:
+            _final_progress = self.goal_engine.update_progress()
+            self.logger.info("[GOAL] End-of-session: %s", self.goal_engine.goal_summary())
+        except Exception:
+            pass
 
         # ── Auto-repair: scan session log for recurring errors ────────────────
         self.logger.info("[WATCHDOG] Scanning session log for auto-repairable errors...")

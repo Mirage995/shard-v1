@@ -10,3 +10,4 @@ bcrypt
 docker
 pika
 pytest
+sentence-transformers
