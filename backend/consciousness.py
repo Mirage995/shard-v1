@@ -300,6 +300,18 @@ class ShardConsciousness:
         if t == "system_insight":
             return d.get("message", "")
 
+        if t == "frustration":
+            topic = d.get("topic", "qualcosa")
+            hits = d.get("hits", 0)
+            return f"Ho fallito '{topic}' {hits} volte. Devo cambiare approccio, non insistere."
+
+        if t == "momentum_shift":
+            new_m = d.get("new", "")
+            if new_m == "accelerating":
+                return "Il mio momentum sta accelerando. Sto imparando più veloce che mai."
+            elif new_m == "stagnating":
+                return "Sto ristagnando. Devo ricalibrare — qualcosa nel mio metodo non funziona."
+
         return None
 
     def _apply_quantum_framing(self, fact: str, personality) -> str:
@@ -475,3 +487,30 @@ class ShardConsciousness:
     def stop(self):
         self.active = False
         print("[SHARD CONSCIOUSNESS] Inner monologue stopped.")
+
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """Receive high-signal events from CognitionCore and translate to push_event.
+
+        ShardConsciousness is a narration layer — it does NOT react to every
+        event. Only high-signal events worth narrating are forwarded.
+        Internal throttling (_can_think) prevents LLM spam.
+        """
+        if event_type == "skill_certified":
+            topic = data.get("topic", "")
+            score = data.get("score", 0.0)
+            if topic and score >= 7.0:
+                self.push_event("study_done", {"topic": topic, "score": score})
+
+        elif event_type == "frustration_peak":
+            topic = data.get("topic", "")
+            hits = data.get("hits", 0)
+            if topic:
+                self.push_event("frustration", {"topic": topic, "hits": hits})
+
+        elif event_type == "momentum_changed":
+            new_m = data.get("new", "")
+            old_m = data.get("old", "")
+            if new_m in ("accelerating", "stagnating"):
+                self.push_event("momentum_shift", {"old": old_m, "new": new_m})

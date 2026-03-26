@@ -363,14 +363,185 @@ def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
     return topics[:2]  # max 2 topics per failed task
 
 
+def _extract_multi_bug_list(readme: str) -> str:
+    """Detect and extract an explicit bug list from the README.
+
+    Returns a formatted 'BUGS TO FIX' block if the task has a multi-bug table
+    or numbered bug list, otherwise returns an empty string.
+    """
+    if not readme:
+        return ""
+
+    lines = readme.splitlines()
+    bug_lines = []
+
+    # Pattern 1: markdown table with bug index column (| # | ... | Bug | ...)
+    in_table = False
+    for line in lines:
+        if re.search(r"\|\s*#\s*\|", line, re.IGNORECASE):
+            in_table = True
+            continue
+        if in_table:
+            if line.strip().startswith("|") and not re.match(r"\|[-| ]+\|", line):
+                # Data row — extract columns 2 and 3 (function + bug description)
+                cols = [c.strip() for c in line.strip().strip("|").split("|")]
+                if len(cols) >= 3:
+                    bug_lines.append(f"  - [{cols[0]}] {cols[1]}: {cols[2]}")
+            elif not line.strip().startswith("|") and bug_lines:
+                break
+
+    # Pattern 2: numbered list BUT only inside a section whose heading contains "bug"
+    if not bug_lines:
+        in_bug_section = False
+        for line in lines:
+            if re.match(r"#+\s", line):
+                in_bug_section = bool(re.search(r"\bbug", line, re.IGNORECASE))
+            if in_bug_section:
+                if re.match(r"\s*(?:Bug\s*)?\d+[\.\)]\s+\S", line, re.IGNORECASE):
+                    bug_lines.append(f"  - {line.strip()}")
+                elif re.match(r"#+\s*Bug\s+\d+", line, re.IGNORECASE):
+                    bug_lines.append(f"  - {line.strip('#').strip()}")
+
+    if not bug_lines:
+        return ""
+
+    n = len(bug_lines)
+    return (
+        f"\n=== MULTI-BUG TASK: {n} bugs must ALL be fixed in one shot ===\n"
+        f"Do NOT wait for test failures to discover bugs — fix ALL of these simultaneously:\n"
+        + "\n".join(bug_lines)
+        + "\nApproach: identify every root cause first, then write the complete fixed file.\n"
+    )
+
+
+def _measure_performance_delta(task_dir: Path, legacy_file: str,
+                                candidate_file: str, call_expr: str,
+                                n: int = 5) -> str:
+    """Run legacy and candidate side-by-side and return a speedup report.
+
+    Args:
+        task_dir:       Path to the task directory.
+        legacy_file:    Filename of the original slow code (e.g. 'legacy_processor.py').
+        candidate_file: Filename of the candidate fixed code (e.g. 'optimized_processor.py').
+        call_expr:      Python expression to benchmark (e.g. 'process_transactions(data)').
+        n:              Number of timing repetitions.
+
+    Returns a formatted string to inject into the correction prompt.
+    Returns empty string on any error.
+    """
+    try:
+        script = f"""
+import sys, timeit, importlib.util, json
+sys.path.insert(0, {repr(str(task_dir))})
+
+def _load(fname):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_mod", {repr(str(task_dir))} + "/" + fname)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+try:
+    legacy = _load({repr(legacy_file)})
+    cand   = _load({repr(candidate_file)})
+    # Build shared setup
+    setup_legacy = "from __main__ import legacy; " + "import sys; sys.path.insert(0, {repr(str(task_dir))})"
+    setup_cand   = "from __main__ import cand;   " + "import sys; sys.path.insert(0, {repr(str(task_dir))})"
+
+    # Use timeit with a simple callable approach
+    import time
+    def _time(mod, n=5):
+        fn = getattr(mod, {repr(call_expr.split("(")[0])}, None)
+        if fn is None:
+            return None
+        # Warm up
+        try: fn(*([None] if "None" in {repr(call_expr)} else []))
+        except: pass
+        times = []
+        for _ in range(n):
+            t = time.perf_counter()
+            try: fn()
+            except: pass
+            times.append(time.perf_counter() - t)
+        return min(times)
+
+    import time
+
+    # More robust: just import and call process_transactions with real data
+    import importlib
+    legacy_mod = importlib.import_module("legacy_processor") if {repr(legacy_file)} == "legacy_processor.py" else legacy
+    cand_mod   = cand
+
+    fn_name = {repr(call_expr.split("(")[0].strip())}
+    legacy_fn = getattr(legacy_mod, fn_name, None)
+    cand_fn   = getattr(cand_mod,   fn_name, None)
+
+    if legacy_fn is None or cand_fn is None:
+        print(json.dumps({{"error": "function not found"}}))
+        sys.exit(0)
+
+    # Generate test data matching what tests use
+    import random
+    data = []
+    categories = ["food", "electronics", "clothing", "books"]
+    for i in range(10000):
+        data.append({{"id": i, "amount": round(random.uniform(1, 1000), 2),
+                      "category": random.choice(categories), "status": "completed"}})
+
+    legacy_times = []
+    cand_times   = []
+    for _ in range({n}):
+        t = time.perf_counter(); legacy_fn(data); legacy_times.append(time.perf_counter()-t)
+        t = time.perf_counter(); cand_fn(data);   cand_times.append(time.perf_counter()-t)
+
+    legacy_best = min(legacy_times)
+    cand_best   = min(cand_times)
+    speedup = legacy_best / cand_best if cand_best > 0 else 0
+    pct = (speedup - 1) * 100
+    print(json.dumps({{"legacy_ms": round(legacy_best*1000,1), "cand_ms": round(cand_best*1000,1),
+                       "speedup": round(speedup, 2), "faster_pct": round(pct, 1)}}))
+except Exception as e:
+    print(json.dumps({{"error": str(e)}}))
+"""
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            capture_output=True, text=True, timeout=30,
+            cwd=str(task_dir),
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            return ""
+        data = json.loads(result.stdout.strip())
+        if "error" in data:
+            return ""
+        pct = data["faster_pct"]
+        legacy_ms = data["legacy_ms"]
+        cand_ms = data["cand_ms"]
+        speedup = data["speedup"]
+        target_met = pct >= 30
+        status = "✓ TARGET MET" if target_met else "✗ TARGET NOT MET (need ≥30%)"
+        return (
+            f"\n=== PERFORMANCE MEASUREMENT (actual timing) ===\n"
+            f"Legacy:    {legacy_ms}ms\n"
+            f"Your code: {cand_ms}ms\n"
+            f"Speedup:   {speedup}x ({pct:+.1f}%) — {status}\n"
+            + ("" if target_met else
+               "You need to be at least 30% faster than legacy. "
+               "Replace O(n²) loops with dict lookups, use collections.Counter/defaultdict, "
+               "avoid redundant iterations over the same data.\n")
+        )
+    except Exception:
+        return ""
+
+
 def _build_initial_prompt(source: str, readme: str, output_filename: str,
                           experience_summary: str = "", lang: str = "python") -> str:
     memory_block = f"\n{experience_summary}\n" if experience_summary else ""
+    multi_bug_block = _extract_multi_bug_list(readme)
     lang_label = {"python": "Python", "javascript": "JavaScript", "cpp": "C++",
                   "rust": "Rust", "go": "Go", "java": "Java"}.get(lang, lang)
     return f"""Read the task description and source code below.
 Your job: create {output_filename} — an optimized/fixed version of the source code.
-{memory_block}
+{memory_block}{multi_bug_block}
 === TASK DESCRIPTION (read this FIRST — it explains what to do) ===
 {readme}
 
@@ -395,6 +566,7 @@ def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
 def _build_correction_prompt(
     source: str, tests: str, current_code: str, attempts: list, output_filename: str,
     stuck_tests: list = None, lang: str = "python", diagnostic: str = "",
+    task_dir: Path = None,
 ) -> str:
     # Full details for every attempt — the LLM must see the complete history to avoid oscillating
     history_parts = []
@@ -452,10 +624,24 @@ def _build_correction_prompt(
                          "linear", "quadratic", "bench", "latency", "throughput")
         is_perf = any(kw in t.lower() for t in stuck_tests for kw in perf_keywords)
         if is_perf:
+            # Try to get a real performance measurement
+            perf_measurement = ""
+            if task_dir:
+                # Detect legacy file and candidate file names from output_filename
+                _legacy_candidates = ["legacy_processor.py", "legacy.py", "slow.py"]
+                _legacy_file = next(
+                    (f for f in _legacy_candidates if (task_dir / f).exists()), None
+                )
+                if _legacy_file and (task_dir / output_filename).exists():
+                    _fn_name = "process_transactions"  # most common perf task pattern
+                    perf_measurement = _measure_performance_delta(
+                        task_dir, _legacy_file, output_filename, f"{_fn_name}(data)"
+                    )
             perf_hint = (
                 "\n  4. These are PERFORMANCE tests — your algorithm may be too slow. "
                 "Consider: replace nested loops with O(n log n) sorting, use dict lookups "
                 "instead of list scans, avoid recomputing values in loops."
+                + (f"\n{perf_measurement}" if perf_measurement else "")
             )
         else:
             perf_hint = ""
@@ -1054,6 +1240,7 @@ async def run_benchmark_loop(
             prompt = _build_correction_prompt(
                 source, tests, current_code, attempts, output_filename,
                 stuck_tests=stuck_tests, lang=lang, diagnostic=diagnostic,
+                task_dir=task_dir,
             )
             print(f"  [SHARD FEEDBACK] Correction prompt ({len(prompt):,} chars)")
 
@@ -1243,6 +1430,33 @@ async def run_benchmark_loop(
                 tests_failed=failed, error_summary=error_summary,
                 raw_pytest=raw_pytest, syntax_valid=True, elapsed=elapsed,
             ))
+
+            # -- Feed failure into semantic memory (error pattern) ---------
+            # Next attempt's correction prompt will query this and avoid the same mistake.
+            if error_summary:
+                try:
+                    from semantic_memory import get_semantic_memory as _get_sem
+                    _fix_hint = (
+                        f"Task: {task_key} | Attempt {attempt_num} failed.\n"
+                        f"Failing tests: {', '.join(failed[:5])}\n"
+                        f"Error: {error_summary[:400]}"
+                    )
+                    _get_sem().add_error_pattern(
+                        error_text=error_summary[:500],
+                        fix=_fix_hint,
+                        lang=lang,
+                    )
+                    # Also query for similar past fixes and inject into experience_summary
+                    _sem_fix = _get_sem().query_for_prompt(
+                        error_summary[:300], top_k=2, min_score=0.40,
+                    )
+                    if _sem_fix:
+                        experience_summary = (
+                            (experience_summary + "\n\n" if experience_summary else "")
+                            + f"[Semantic memory — similar past errors & fixes]\n{_sem_fix}"
+                        )
+                except Exception:
+                    pass
 
             # -- Early stopping / rollback ---------------------------------
             current_rec = attempts[-1]

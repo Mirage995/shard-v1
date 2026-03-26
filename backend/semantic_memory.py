@@ -297,6 +297,43 @@ class SemanticMemory:
             "errors":    self._errors.count(),
         }
 
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to environment events broadcast by CognitionCore.
+
+        SemanticMemory is the memory layer — it indexes knowledge and errors
+        as they are produced by other modules.
+        """
+        if event_type == "skill_certified":
+            # Another module certified a skill — index it so future queries find it
+            topic = data.get("topic", "")
+            score = data.get("score", 0.0)
+            if topic:
+                try:
+                    self.add_knowledge(
+                        title=topic,
+                        content=f"Skill certified with score {score:.1f}/10. Source: {source}.",
+                        source="cognition_event",
+                    )
+                except Exception:
+                    pass
+
+        elif event_type == "frustration_peak":
+            # A topic is chronically failing — query for similar past solutions
+            # and store as an error pattern hint for future study cycles
+            topic = data.get("topic", "")
+            hits = data.get("hits", 0)
+            if topic:
+                try:
+                    self.add_error_pattern(
+                        error_text=f"Chronic failure on topic: {topic} ({hits} failed attempts)",
+                        fix=f"Topic '{topic}' has failed {hits} times. Consider decomposing or changing approach.",
+                        lang="python",
+                    )
+                except Exception:
+                    pass
+
 
 # -- Module-level singleton ----------------------------------------------------
 

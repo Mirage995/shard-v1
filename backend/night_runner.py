@@ -617,6 +617,11 @@ class NightRunner:
         self._transition(SessionState.INIT, "loading memory + capability graph")
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
+        # Pre-initialize environment variables so bootstrap blocks can reference them safely
+        _self_model = None
+        _world_model = None
+        _desire      = None
+        _core_env    = None
         # create goal engine tied to the same capability graph
         storage = GoalStorage()
         self.goal_engine = GoalEngine(storage, capability_graph)
@@ -776,6 +781,34 @@ class NightRunner:
             if _desire:
                 _core_env.register("desire_engine", _desire,
                                    ["skill_certified", "goal_changed", "momentum_changed"])
+            try:
+                from backend.semantic_memory import get_semantic_memory as _get_sem_env
+                _sem_env = _get_sem_env()
+                _core_env.register("semantic_memory", _sem_env,
+                                   ["skill_certified", "frustration_peak"])
+            except Exception:
+                pass
+            try:
+                _core_env.register("capability_graph", self.capability_graph,
+                                   ["skill_certified"])
+            except Exception:
+                pass
+            try:
+                from backend.improvement_engine import ImprovementEngine as _IE
+                _imp_env = _IE()
+                _core_env.register("improvement_engine", _imp_env,
+                                   ["skill_certified", "frustration_peak"])
+            except Exception:
+                pass
+            try:
+                from backend.consciousness import ShardConsciousness
+                from backend.memory import ShardMemory
+                _mem_c = ShardMemory()
+                _consciousness_env = ShardConsciousness(_mem_c, self.capability_graph, self.goal_engine)
+                _core_env.register("consciousness", _consciousness_env,
+                                   ["skill_certified", "frustration_peak", "momentum_changed"])
+            except Exception:
+                pass
             self.logger.info(
                 "[CORE ENV] %d module(s) registered in shared environment",
                 len(_core_env._registry),
@@ -886,10 +919,14 @@ class NightRunner:
                     if cycle_data["certified"]:
                         # Broadcast: skill certified → all registered modules react
                         if _core_env:
-                            _core_env.broadcast(
+                            _n_rcv = _core_env.broadcast(
                                 "skill_certified",
                                 {"topic": topic, "score": cycle_data["score"] or 7.5},
                                 source="night_runner",
+                            )
+                            self.logger.info(
+                                "[CORE ENV] broadcast 'skill_certified' → %d recipient(s) reacted",
+                                _n_rcv,
                             )
                         # Desire engine: record engagement (not covered by on_event)
                         if _desire:
@@ -909,10 +946,15 @@ class NightRunner:
                             # If frustration peaked, broadcast so GoalEngine can react
                             _hits = _desire.get_frustration(topic)
                             if _hits >= 3 and _core_env:
-                                _core_env.broadcast(
+                                _n_rcv = _core_env.broadcast(
                                     "frustration_peak",
                                     {"topic": topic, "hits": _hits},
                                     source="desire_engine",
+                                )
+                                self.logger.info(
+                                    "[CORE ENV] broadcast 'frustration_peak' (hits=%d) → %d recipient(s) reacted",
+                                    _hits,
+                                    _n_rcv,
                                 )
 
                     if _desire:
@@ -1121,10 +1163,14 @@ class NightRunner:
             )
             # Broadcast momentum change so GoalEngine + DesireEngine + WorldModel react
             if _core_env and _sm_final.momentum != _prev_momentum:
-                _core_env.broadcast(
+                _n_rcv = _core_env.broadcast(
                     "momentum_changed",
                     {"old": _prev_momentum, "new": _sm_final.momentum},
                     source="self_model",
+                )
+                self.logger.info(
+                    "[CORE ENV] broadcast 'momentum_changed' (%s → %s) → %d recipient(s) reacted",
+                    _prev_momentum, _sm_final.momentum, _n_rcv,
                 )
                 self.logger.info(
                     "[CORE ENV] momentum_changed: %s → %s",

@@ -544,3 +544,21 @@ class CapabilityGraph:
             max_depth = max(max_depth, len(deps))
         
         return max_depth
+
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to CognitionCore environment events.
+
+        CapabilityGraph is the skill ledger — it registers new capabilities
+        when skills are certified and marks progress for GoalEngine.
+        """
+        if event_type == "skill_certified":
+            topic = data.get("topic", "")
+            if topic:
+                try:
+                    for atomic in normalize_capability(topic):
+                        self.add_capability(atomic, source_topic=topic)
+                    self.flush()
+                except Exception:
+                    pass

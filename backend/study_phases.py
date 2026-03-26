@@ -1029,3 +1029,35 @@ class PostStudyPhase(BasePhase):
                 print(f"[EPISODIC] Episode stored for topic '{ctx.topic}'")
         except Exception as episode_err:
             print(f"[EPISODIC] Failed to store episode (non-fatal): {episode_err}")
+
+        # Semantic memory: index this study session with rich content
+        try:
+            from semantic_memory import get_semantic_memory as _get_sem_ps
+            _sem_ps = _get_sem_ps()
+            if ctx.certified:
+                # Build a rich knowledge entry: strategy + code snippet + key concepts
+                _content_parts = [
+                    f"Topic certified with score {ctx.score:.1f}/10.",
+                    f"Strategy used: {ctx.strategy_used or 'default'}.",
+                ]
+                if ctx.connections:
+                    _content_parts.append(f"Key connections: {', '.join(ctx.connections[:5])}.")
+                if ctx.codice_generato:
+                    _content_parts.append(
+                        f"Working code snippet:\n```python\n{ctx.codice_generato[:600]}\n```"
+                    )
+                _sem_ps.add_knowledge(
+                    title=ctx.topic,
+                    content="\n".join(_content_parts),
+                    source="study_certified",
+                )
+                print(f"[SEMANTIC] Indexed certified knowledge: '{ctx.topic}'")
+            elif ctx.score > 0 and ctx.classified_error_type:
+                # Failed but has a classifiable error — save as error pattern
+                _sem_ps.add_error_pattern(
+                    error_text=f"{ctx.topic}: {ctx.classified_error_type}",
+                    fix=f"Strategy attempted: {ctx.strategy_used or 'none'}. Score: {ctx.score:.1f}/10.",
+                    lang="python",
+                )
+        except Exception:
+            pass

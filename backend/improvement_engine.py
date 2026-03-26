@@ -315,3 +315,41 @@ class ImprovementEngine:
             os.replace(tmp, _QUEUE_FILE)
         except Exception as exc:
             logger.error("[ENGINE] Could not save queue state: %s", exc)
+
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to CognitionCore environment events.
+
+        ImprovementEngine manages the study queue — it removes resolved topics
+        when skills are certified and re-prioritizes on frustration peaks.
+        """
+        if event_type == "skill_certified":
+            # Topic was certified — remove it from pending queue if present
+            topic = data.get("topic", "")
+            if topic:
+                queue: list = self._state.get("pending_queue", [])
+                before = len(queue)
+                self._state["pending_queue"] = [
+                    t for t in queue
+                    if t.lower() != topic.lower()
+                ]
+                if len(self._state["pending_queue"]) < before:
+                    self._save_state()
+                    logger.info("[ENGINE] Removed certified topic from queue: %r", topic)
+
+        elif event_type == "frustration_peak":
+            # Topic is chronically failing — decompose and re-enqueue subtopics
+            topic = data.get("topic", "")
+            if topic:
+                subtopics = self._decompose(topic)
+                added = 0
+                for sub in subtopics:
+                    if sub != topic and self._enqueue(sub):
+                        added += 1
+                if added:
+                    self._save_state()
+                    logger.info(
+                        "[ENGINE] Frustration peak on '%s' — enqueued %d decomposed subtopics",
+                        topic, added,
+                    )
