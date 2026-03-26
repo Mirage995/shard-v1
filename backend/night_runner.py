@@ -669,6 +669,13 @@ class NightRunner:
                         "[WORLD MODEL] Recalibrated '%s': %.3f -> %.3f (cert_rate=%.0f%%, n=%d)",
                         sk, delta["old"], delta["new"], delta["cert_rate"]*100, delta["n"],
                     )
+                # Broadcast so GoalEngine can re-evaluate its active goal
+                if _core_env:
+                    _core_env.broadcast(
+                        "world_recalibrated",
+                        {"adjustments": list(_wm_adj.keys())[:5]},
+                        source="world_model",
+                    )
             # Surface top-3 world-priority gaps SHARD doesn't know yet
             _known = set(_self_model.strengths) if _self_model else set()
             _wm_gaps = _world_model.priority_gaps(_known, top_n=3)
@@ -752,6 +759,30 @@ class NightRunner:
         except Exception as _de_err:
             _desire = None
             self.logger.warning("[DESIRE] Bootstrap non-fatal error: %s", _de_err)
+
+        # ── COGNITIONCORE ENVIRONMENT — register all modules ──────────────────
+        # Each module becomes a citizen: it can receive and react to broadcasts.
+        try:
+            from backend.cognition.cognition_core import get_cognition_core
+            _core_env = get_cognition_core()
+            if _self_model:
+                _core_env.register("self_model", _self_model, ["*"])
+            if _world_model:
+                _core_env.register("world_model", _world_model,
+                                   ["skill_certified", "momentum_changed"])
+            _core_env.register("goal_engine", self.goal_engine,
+                               ["skill_certified", "momentum_changed",
+                                "frustration_peak", "world_recalibrated"])
+            if _desire:
+                _core_env.register("desire_engine", _desire,
+                                   ["skill_certified", "goal_changed", "momentum_changed"])
+            self.logger.info(
+                "[CORE ENV] %d module(s) registered in shared environment",
+                len(_core_env._registry),
+            )
+        except Exception as _env_err:
+            _core_env = None
+            self.logger.warning("[CORE ENV] Registration non-fatal: %s", _env_err)
 
         # ── GAP DETECTOR: Autonomous failure-driven study topic injection ──────
         # Reads benchmark_episodes.json, clusters error patterns, enqueues gaps.
@@ -845,54 +876,55 @@ class NightRunner:
                     score=cycle_data["score"] or 0.0,
                 )
 
-                # ── DESIRE ENGINE UPDATE per-cycle ────────────────────────
+                # ── ENVIRONMENT BROADCAST — modules react autonomously ─────
+                # One broadcast replaces all the manual per-module calls below.
+                # WorldModel, GoalEngine, DesireEngine all react via on_event().
                 try:
-                    from backend.desire_engine import (
-                        get_desire_engine as _get_de2,
-                        compute_engagement_score as _eng_score,
-                    )
-                    _de2 = _get_de2()
-                    if cycle_data["certified"]:
-                        _de2.clear_frustration(topic)
-                        _de2.update_curiosity(topic)
-                    else:
-                        _de2.update_frustration(topic)
-                    # Compute engagement score from session signals
-                    _engagement = _eng_score(
-                        certified=cycle_data["certified"],
-                    )
-                    _de2.record_engagement(topic, _engagement)
-                    self.logger.info(
-                        "[DESIRE] Updated '%s': frustration=%d curiosity=%.2f engagement=%.2f",
-                        topic,
-                        _de2.get_frustration(topic),
-                        _de2.get_desire_context(topic)["curiosity_pull"],
-                        _engagement,
-                    )
-                except Exception:
-                    pass
+                    from backend.desire_engine import compute_engagement_score as _eng_score
+                    _engagement = _eng_score(certified=cycle_data["certified"])
 
-                # ── SELF/WORLD MODEL UPDATE per-cycle ─────────────────────
-                try:
-                    from backend.self_model import SelfModel
-                    _sm_live = SelfModel.load()
-                    if _sm_live:
-                        if cycle_data["certified"]:
-                            _sm_live.update_from_session(
+                    if cycle_data["certified"]:
+                        # Broadcast: skill certified → all registered modules react
+                        if _core_env:
+                            _core_env.broadcast(
+                                "skill_certified",
+                                {"topic": topic, "score": cycle_data["score"] or 7.5},
+                                source="night_runner",
+                            )
+                        # Desire engine: record engagement (not covered by on_event)
+                        if _desire:
+                            _desire.record_engagement(topic, _engagement)
+                        # SelfModel incremental update
+                        if _self_model:
+                            _self_model.update_from_session(
                                 certified=[topic], failed=[],
                                 scores=[cycle_data["score"] or 0.0],
                             )
-                        # else: will be batched in end-of-session update
-                except Exception:
-                    pass
-                try:
-                    from backend.world_model import WorldModel
-                    _wm_live = WorldModel.load_or_default()
-                    if cycle_data["certified"]:
-                        _wm_live.mark_known(topic, cycle_data["score"] or 7.5)
-                        _wm_live.save()
-                except Exception:
-                    pass
+                    else:
+                        # Failed cycle: update frustration directly (desire engine is not
+                        # registered for a "skill_failed" event — keep it simple)
+                        if _desire:
+                            _desire.update_frustration(topic)
+                            _desire.record_engagement(topic, _engagement)
+                            # If frustration peaked, broadcast so GoalEngine can react
+                            _hits = _desire.get_frustration(topic)
+                            if _hits >= 3 and _core_env:
+                                _core_env.broadcast(
+                                    "frustration_peak",
+                                    {"topic": topic, "hits": _hits},
+                                    source="desire_engine",
+                                )
+
+                    if _desire:
+                        self.logger.info(
+                            "[DESIRE] '%s': frustration=%d curiosity=%.2f engagement=%.2f",
+                            topic,
+                            _desire.get_frustration(topic),
+                            _desire.get_desire_context(topic)["curiosity_pull"],
+                            _engagement,
+                        )
+                except Exception as _bc_err:
+                    self.logger.debug("[CORE ENV] Per-cycle broadcast error (non-fatal): %s", _bc_err)
 
                 # ── LOOP CLOSURE: gap resolved → semantic memory + gap log ────
                 if cycle_data["certified"] and source == "improvement_engine":
@@ -1078,6 +1110,7 @@ class NightRunner:
         # ── END-OF-SESSION: rebuild self model + update goal progress ─────────
         try:
             from backend.self_model import SelfModel
+            _prev_momentum = _self_model.momentum if _self_model else "unknown"
             _sm_final = SelfModel.build()  # full rebuild with latest data
             self.logger.info(
                 "[SELF MODEL] Rebuilt — cert_rate=%.0f%%  avg=%.1f  momentum=%s  blind_spots=%s",
@@ -1086,6 +1119,17 @@ class NightRunner:
                 _sm_final.momentum,
                 _sm_final.blind_spots[:3],
             )
+            # Broadcast momentum change so GoalEngine + DesireEngine + WorldModel react
+            if _core_env and _sm_final.momentum != _prev_momentum:
+                _core_env.broadcast(
+                    "momentum_changed",
+                    {"old": _prev_momentum, "new": _sm_final.momentum},
+                    source="self_model",
+                )
+                self.logger.info(
+                    "[CORE ENV] momentum_changed: %s → %s",
+                    _prev_momentum, _sm_final.momentum,
+                )
         except Exception as _e:
             self.logger.warning("[SELF MODEL] End-of-session rebuild failed: %s", _e)
 

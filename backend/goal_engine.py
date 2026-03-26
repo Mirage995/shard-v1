@@ -393,6 +393,35 @@ class GoalEngine:
         self.set_active_goal(goal.id)
         return goal
 
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to environment events broadcast by CognitionCore."""
+        if event_type == "skill_certified":
+            self.update_progress()
+
+        elif event_type == "momentum_changed":
+            new_momentum = data.get("new", "")
+            if new_momentum == "stagnating":
+                # Stagnating: shorten goal persistence so SHARD can pivot faster
+                goal = self.get_active_goal()
+                if goal and goal.sessions_active > 1:
+                    goal.sessions_active = max(0, goal.sessions_active - 1)
+                    self.storage.save_goal(goal)
+
+        elif event_type == "frustration_peak":
+            # A topic is stuck — if it's aligned with our goal, note it but don't abandon
+            # The CriticAgent will handle diagnosis; goal just acknowledges the signal
+            pass
+
+        elif event_type == "world_recalibrated":
+            # World relevance scores updated — re-evaluate if active goal is still optimal
+            # Force re-generation check next session by resetting sessions_active
+            goal = self.get_active_goal()
+            if goal and goal.goal_type == "autonomous":
+                goal.sessions_active = max(0, goal.sessions_active - 1)
+                self.storage.save_goal(goal)
+
     # ── Capability graph listener (backward compat) ────────────────────────────
 
     def on_capability_added(self, capability_name: str):

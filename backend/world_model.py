@@ -228,6 +228,24 @@ class WorldModel:
             },
         }
 
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to environment events broadcast by CognitionCore."""
+        if event_type == "skill_certified":
+            topic = data.get("topic", "")
+            score = data.get("score", 7.5)
+            if topic:
+                self.mark_known(topic, score)
+                self.save()
+
+        elif event_type == "momentum_changed":
+            new_momentum = data.get("new", "")
+            if new_momentum == "stagnating":
+                # Re-calibrate with lower threshold — stagnation needs more signal, not less
+                self.self_calibrate(min_experiments=5)
+                self.save()
+
     # ── Persistence ────────────────────────────────────────────────────────────
 
     def save(self):

@@ -180,6 +180,67 @@ class CognitionCore:
             "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0, "ignored_v3": 0},
         }
 
+        # ── Shared Environment — module registry + event bus ──────────────────
+        # Modules register here and receive broadcasts from each other.
+        # CognitionCore is the environment: it routes events, never decides.
+        self._registry: Dict[str, Dict] = {}   # name → {module, interests}
+        self._broadcast_log: List[Dict] = []   # last 50 events (Shadow Diagnostic)
+
+    # ── Shared Environment — register / broadcast ─────────────────────────────
+
+    def register(self, name: str, module, interests: List[str]) -> None:
+        """Register a module as a citizen of this environment.
+
+        Args:
+            name:      Unique identifier (e.g. "world_model", "desire_engine")
+            module:    The module instance. Must implement on_event(event, data, source).
+            interests: List of event types to receive. Use ["*"] for all events.
+        """
+        self._registry[name] = {"module": module, "interests": set(interests)}
+        logger.info("[CORE ENV] Registered '%s' — interests: %s", name, interests)
+
+    def broadcast(self, event_type: str, data: Dict, source: str = "system") -> int:
+        """Broadcast an event to all registered modules that declared interest.
+
+        CognitionCore routes the event — it does NOT decide what to do with it.
+        Each module reacts autonomously via its on_event() method.
+
+        Returns the number of modules that received the event.
+        The event is logged in the Shadow Diagnostic broadcast_log.
+        """
+        recipients = 0
+        for name, entry in self._registry.items():
+            if name == source:
+                continue  # never echo back to the source
+            interests = entry["interests"]
+            if event_type in interests or "*" in interests:
+                try:
+                    entry["module"].on_event(event_type, data, source)
+                    recipients += 1
+                except Exception as exc:
+                    logger.warning("[CORE ENV] '%s'.on_event(%s) failed: %s", name, event_type, exc)
+
+        # Log in Shadow Diagnostic
+        self._broadcast_log.append({
+            "event":      event_type,
+            "source":     source,
+            "data_keys":  list(data.keys()),
+            "recipients": recipients,
+            "timestamp":  datetime.now().isoformat(),
+        })
+        if len(self._broadcast_log) > 50:
+            self._broadcast_log = self._broadcast_log[-50:]
+
+        logger.info(
+            "[CORE ENV] broadcast '%s' from '%s' → %d recipient(s)",
+            event_type, source, recipients,
+        )
+        return recipients
+
+    def get_broadcast_log(self, last_n: int = 10) -> List[Dict]:
+        """Return the last N environment events (for telemetry / debugging)."""
+        return self._broadcast_log[-last_n:]
+
     # ── Initialization ────────────────────────────────────────────────────────
 
     async def initialize(self):

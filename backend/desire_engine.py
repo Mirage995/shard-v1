@@ -260,6 +260,40 @@ class DesireEngine:
             "avg_engagement": ds.avg_engagement,
         }
 
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to environment events broadcast by CognitionCore."""
+        if event_type == "skill_certified":
+            topic = data.get("topic", "")
+            if topic:
+                self.clear_frustration(topic)
+                self.update_curiosity(topic)
+
+        elif event_type == "goal_changed":
+            # New goal activated — decay curiosity pull for old goal's topics
+            old_keywords = data.get("old_keywords", [])
+            if old_keywords:
+                changed = False
+                for topic, ds in self._state.items():
+                    if any(kw in topic.lower() for kw in old_keywords):
+                        ds.curiosity_pull = round(ds.curiosity_pull * 0.3, 4)
+                        changed = True
+                if changed:
+                    self._save()
+
+        elif event_type == "momentum_changed":
+            new_momentum = data.get("new", "")
+            if new_momentum == "stagnating":
+                # Boost base_priority for topics with no frustration (fresh candidates)
+                changed = False
+                for ds in self._state.values():
+                    if ds.frustration_hits == 0 and ds.base_priority < 0.9:
+                        ds.base_priority = round(min(1.0, ds.base_priority * 1.1), 4)
+                        changed = True
+                if changed:
+                    self._save()
+
     def summary(self) -> str:
         top = self.top_desire_topics(3)
         if not top:

@@ -154,6 +154,19 @@ class SelfModel:
     def to_dict(self) -> dict:
         return dict(self._data)
 
+    # ── Shared environment interface ───────────────────────────────────────────
+
+    def on_event(self, event_type: str, data: dict, source: str = "") -> None:
+        """React to environment events from CognitionCore.
+
+        SelfModel is primarily a *source* of events (broadcasts momentum_changed
+        after a rebuild) — but it can also react to world context.
+        """
+        # No reactive behavior needed currently.
+        # SelfModel is rebuilt at end-of-session by NightRunner which then
+        # broadcasts momentum_changed. Round-trip would create a cycle.
+        pass
+
     # ── Incremental update ─────────────────────────────────────────────────────
 
     def update_from_session(self, certified: list[str], failed: list[str],
