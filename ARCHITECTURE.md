@@ -416,9 +416,105 @@ shard_v1/
 
 ---
 
-## 5. Data Flows
+## 5. CognitionCore Event Bus — Cross-Module Communication (SSJ14)
 
-### 5.1 Audio Interaction (Gemini Live + Auto-Reconnect)
+### 5.1 Overview
+
+SSJ14 introduced the most significant architectural change in SHARD's history: the CognitionCore bus went from a passive event router (NightRunner broadcasts → modules react) to a fully bidirectional system where modules generate events that other modules react to.
+
+No central orchestrator. No hand-written rules for what happens when mood changes. Each module implements `on_event(event_type, data, source)` and declares its interests. The bus routes. Behavior emerges.
+
+### 5.2 Registered Citizens (14 modules)
+
+| Citizen | Listens to | Broadcasts |
+|---------|-----------|------------|
+| `self_model` | `*` (all events) | — |
+| `world_model` | certified, failed, momentum_changed | — |
+| `goal_engine` | certified, failed, momentum_changed, frustration_peak, world_recalibrated, **mood_shift** | — |
+| `desire_engine` | certified, failed, goal_changed, momentum_changed, frustration_peak, **mood_shift** | — |
+| `semantic_memory` | certified, failed, frustration_peak | — |
+| `capability_graph` | certified, failed | — |
+| `improvement_engine` | certified, failed, frustration_peak | — |
+| `consciousness` | certified, failed, frustration_peak, momentum_changed, **mood_shift**, **identity_updated** | — |
+| `self_model_tracker` | session_complete, **mood_shift**, **identity_updated** | — |
+| `vision` | certified, frustration_peak, momentum_changed | — |
+| `mood_engine` | frustration_peak, momentum_changed, certified, failed | **mood_shift** |
+| `identity_core` | session_complete, certified, failed | **identity_updated**, **low_self_esteem** |
+| `skill_library` | certified | — |
+| `hebbian_updater` | **mood_shift**, certified, failed | — |
+
+### 5.3 New Events (SSJ14)
+
+**`mood_shift`** — broadcast by MoodEngine when affective label changes (confident/focused/neutral/strained/frustrated).
+```
+data: { "from": old_label, "to": new_label, "score": float }
+```
+Reactions:
+- `desire_engine`: frustrated → boost priority of top blocked topic; confident → spread curiosity pull
+- `goal_engine`: confident → +0.01 goal progress; frustrated → +1 patience (don't pivot away yet)
+- `self_model_tracker`: stores `_current_mood`, shifts prediction baseline (-0.5 frustrated, +0.3 confident)
+- `hebbian_updater`: frustrated → 5% decay of ALL synaptic weights toward baseline (clears failure patterns)
+- `consciousness`: narrates if shift involves `confident` or `frustrated`
+
+**`identity_updated`** — broadcast by IdentityCore after each end-of-session rebuild.
+```
+data: { "self_esteem": float, "trajectory": str, "sessions_lived": int, "cert_rate": float }
+```
+Reactions:
+- `self_model_tracker`: adjusts `_identity_baseline = (self_esteem - 0.5) * 1.0` → shifts all predictions
+- `consciousness`: logs biography update to internal narration stream
+
+**`low_self_esteem`** — broadcast by IdentityCore when self_esteem < 0.30.
+```
+data: { "self_esteem": float, "trajectory": str }
+```
+
+### 5.4 Cross-Module Influence Graph
+
+```
+Frustration event ──► MoodEngine recomputes ──► mood = "frustrated"
+                                │
+                                ▼ mood_shift broadcast
+              ┌─────────────────┼──────────────────────────────────┐
+              ▼                 ▼                                   ▼
+      desire_engine       hebbian_updater                  self_model_tracker
+   (boost blocked         (decay all weights               (_current_mood = "frustrated"
+    topic priority)        5% toward baseline)              prediction -= 0.5)
+              │                                                     │
+              ▼                                                     ▼
+   SHARD more likely to                             Next study prediction is lower
+   pick the blocked topic                           → SHARD knows it's hard territory
+   on next cycle
+```
+
+```
+session_complete ──► IdentityCore.rebuild()
+                          │
+                          ├── self_esteem computed from cert_rate + momentum
+                          ├── narrative written by LLM (facts only, no invention)
+                          │
+                          ▼ identity_updated broadcast
+                ┌─────────┴──────────────┐
+                ▼                        ▼
+      self_model_tracker            consciousness
+    (_identity_baseline adj)      (narrates biography)
+```
+
+### 5.5 Emergent Behaviors Observed
+
+These were NOT programmed. They emerged from module interactions:
+
+| Behavior | Modules involved | Mechanism |
+|----------|-----------------|-----------|
+| **Asyncio phobia** | VisionEngine + DesireEngine | After 3+ failures, VISION added asyncio to `avoid_domains` autonomously. SHARD now avoids it without being told. |
+| **Comfort zone** | DesireEngine + CapabilityGraph | union_find selected 3× in a row via curiosity_pull. Certifying it boosted pull on adjacent topics — SHARD stayed in familiar territory. |
+| **Paradoxical curiosity under failure** | DesireEngine | curiosity_pull increased after failed attempts (Zeigarnik effect — incomplete tasks stay top of mind). |
+| **Calibrated predictor** | SelfModelTracker | After asyncio failures, sig_difficulty weight went to -0.696. Prediction for asyncio topics dropped to ~0.0 — SHARD learned to expect failure before starting. |
+| **Mood-driven reset** | MoodEngine + HebbianUpdater | When mood hits "frustrated", synaptic weights decay toward baseline. SHARD effectively "clears its head" — the learned failure patterns reset. Same effect as the prompt hint "Start from zero". |
+
+### 5.6 Data Flows (original)
+
+### 5.6.1 Audio Interaction (Gemini Live + Auto-Reconnect)
 
 ```
 User speaks
