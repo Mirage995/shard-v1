@@ -1,33 +1,37 @@
 {
-  "built_at": "2026-03-26T00:44:20.858490",
-  "updated_at": "2026-03-26T00:44:20.858552",
-  "total_experiments": 94,
-  "total_certified": 18,
-  "certification_rate": 0.191,
-  "avg_score": 4.83,
+  "built_at": "2026-03-27T13:39:42.868886",
+  "updated_at": "2026-03-27T15:22:18.030238",
+  "total_experiments": 78,
+  "total_certified": 17,
+  "certification_rate": 0.218,
+  "avg_score": 4.76,
   "strengths": [
-    "REST API design patterns",
-    "Python decorators and metaclasses",
-    "transitive usage applied to binary search algorithm",
     "catch narrow exceptions applied to python exception handling best practices",
-    "exception-driven control flow applied to logarithmic time complexity o(log n)",
-    "activation functions applied to exception-driven control flow",
-    "fail fast principle applied to dynamic content handling",
-    "Python exception handling best practices",
-    "neural networks and deep learning basics",
+    "transitive usage applied to binary search algorithm",
+    "template parser handling and debugging",
     "logging and monitoring patterns",
-    "web scraping with BeautifulSoup"
+    "activation functions applied to exception-driven control flow",
+    "exception-driven control flow applied to logarithmic time complexity o(log n)",
+    "Python exception handling best practices",
+    "REST API design patterns",
+    "fail fast principle applied to dynamic content handling",
+    "Python decorators and metaclasses",
+    "neural networks and deep learning basics"
   ],
-  "blind_spots": [
-    "api_integration applied to web_scraping",
-    "exception-driven control flow applied to perceptron",
-    "observability applied to dark matter hypothesis",
-    "web scraping with beautifulsoup applied to convolutional neural networks (cnns)"
-  ],
+  "blind_spots": [],
+  "quarantine_candidates": [],
   "language_confidence": {
-    "python": 0.191
+    "python": 0.218
   },
-  "momentum": "stable",
+  "momentum": "stagnating",
   "top_capability_graph_skills": [],
-  "capability_graph_size": 0
+  "capability_graph_size": 0,
+  "last_session": {
+    "date": "2026-03-27T15:22:18.030238",
+    "certified": [
+      "template parser handling and debugging"
+    ],
+    "failed": [],
+    "avg_score": 7.8
+  }
 }

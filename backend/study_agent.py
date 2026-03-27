@@ -126,6 +126,11 @@ class StudyAgent:
         self._topic_llm_calls  = 0
         self._topic_llm_budget = DEFAULT_TOPIC_LLM_BUDGET
 
+        # ── Session-level context injected by NightRunner ─────────────────────
+        # Populated from SessionReflection.get_context_block() before study loop.
+        # Appended to every _think / _think_fast system prompt as background context.
+        self.session_context: str = ""
+
         # ── Extracted sub-components (SSJ3 Phase 1) ──
         self.sandbox_runner = DockerSandboxRunner(
             sandbox_dir=SANDBOX_DIR,
@@ -313,6 +318,8 @@ class StudyAgent:
                 f"Topic burned {self._topic_llm_calls} LLM calls (budget={self._topic_llm_budget})"
             )
         effective_system = system
+        if self.session_context:
+            effective_system += f"\n\n{self.session_context[:600]}"
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
 
@@ -334,6 +341,8 @@ class StudyAgent:
                 f"Topic burned {self._topic_llm_calls} LLM calls (budget={self._topic_llm_budget})"
             )
         effective_system = system
+        if self.session_context:
+            effective_system += f"\n\n{self.session_context[:600]}"
         if json_mode:
             effective_system += "\nOUTPUT ONLY VALID JSON. Do not include markdown formatting, backticks, code fences, or any conversational text."
 
@@ -893,7 +902,21 @@ Respond ONLY with valid JSON:
             validation_qa = result.get("validation_qa", [])
         except Exception as e:
             print(f"[VALIDATE] JSON parse error: {e}")
+            # Recovery: JSON troncato a max_tokens — estrai coppie complete via regex
             validation_qa = []
+            try:
+                import re
+                pattern = r'"domanda"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"risposta"\s*:\s*"((?:[^"\\]|\\.)*)"'
+                matches = re.findall(pattern, raw, re.DOTALL)
+                for domanda, risposta in matches:
+                    validation_qa.append({
+                        "domanda":  domanda.replace("\\n", "\n").replace('\\"', '"'),
+                        "risposta": risposta.replace("\\n", "\n").replace('\\"', '"'),
+                    })
+                if validation_qa:
+                    print(f"[VALIDATE] Regex recovery: {len(validation_qa)} Q&A salvate")
+            except Exception:
+                pass
 
         # Also build backward-compatible answers dict
         answers = {}

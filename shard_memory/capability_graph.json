@@ -1517,5 +1517,769 @@
     ],
     "acquired": "2026-03-25T19:21:48.468780",
     "source_topic": "dynamic programming memoization"
+  },
+  "python object oriented programming": {
+    "requires": [],
+    "acquired": "2026-03-26T12:51:42.568789",
+    "source_topic": "python object oriented programming"
+  },
+  "object-oriented programming": {
+    "requires": [
+      "python object oriented programming"
+    ],
+    "acquired": "2026-03-26T12:51:42.574573",
+    "source_topic": "python object oriented programming"
+  },
+  "sql injection prevention and input sanitization": {
+    "requires": [],
+    "acquired": "2026-03-26T13:11:34.072811",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "sql injection": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.079231",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "input sanitization": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.084695",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "parameterized queries": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.090231",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "prepared statements": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.096433",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "client-side validation": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.101961",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "database_querying": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-26T13:11:34.108912",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "template parser handling and debugging": {
+    "requires": [],
+    "acquired": "2026-03-26T14:17:07.912210",
+    "source_topic": "template parser handling and debugging"
+  },
+  "template parsing": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:17:07.917797",
+    "source_topic": "template parser handling and debugging"
+  },
+  "command-line interface": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:17:07.922850",
+    "source_topic": "template parser handling and debugging"
+  },
+  "error handling": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:17:07.928019",
+    "source_topic": "template parser handling and debugging"
+  },
+  "custom errors": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:17:07.933213",
+    "source_topic": "template parser handling and debugging"
+  },
+  "reverse debugging": {
+    "requires": [
+      "race condition handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:59:59.147094",
+    "source_topic": "race condition handling and debugging"
+  },
+  "scheduler arbitrary": {
+    "requires": [
+      "race condition handling and debugging"
+    ],
+    "acquired": "2026-03-26T14:59:59.153628",
+    "source_topic": "race condition handling and debugging"
+  },
+  "abstract syntax tree (ast)": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T15:14:27.361910",
+    "source_topic": "template parser handling and debugging"
+  },
+  "template parser": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T15:14:27.367559",
+    "source_topic": "template parser handling and debugging"
+  },
+  "command-line interface (cli)": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T15:14:27.372987",
+    "source_topic": "template parser handling and debugging"
+  },
+  "json parsing and serialization python": {
+    "requires": [],
+    "acquired": "2026-03-26T15:42:57.638757",
+    "source_topic": "json parsing and serialization python"
+  },
+  "json parsing": {
+    "requires": [
+      "json parsing and serialization python"
+    ],
+    "acquired": "2026-03-26T15:42:57.644635",
+    "source_topic": "json parsing and serialization python"
+  },
+  "json serialization": {
+    "requires": [
+      "json parsing and serialization python"
+    ],
+    "acquired": "2026-03-26T15:42:57.651371",
+    "source_topic": "json parsing and serialization python"
+  },
+  "data_serialization": {
+    "requires": [
+      "json parsing and serialization python"
+    ],
+    "acquired": "2026-03-26T15:42:57.657498",
+    "source_topic": "json parsing and serialization python"
+  },
+  "python context managers and resource management": {
+    "requires": [],
+    "acquired": "2026-03-26T19:25:41.574830",
+    "source_topic": "python context managers and resource management"
+  },
+  "context manager": {
+    "requires": [
+      "python context managers and resource management"
+    ],
+    "acquired": "2026-03-26T19:25:41.580781",
+    "source_topic": "python context managers and resource management"
+  },
+  "__enter__ method": {
+    "requires": [
+      "python context managers and resource management"
+    ],
+    "acquired": "2026-03-26T19:25:41.586423",
+    "source_topic": "python context managers and resource management"
+  },
+  "__exit__ method": {
+    "requires": [
+      "python context managers and resource management"
+    ],
+    "acquired": "2026-03-26T19:25:41.591961",
+    "source_topic": "python context managers and resource management"
+  },
+  "with statement": {
+    "requires": [
+      "python context managers and resource management"
+    ],
+    "acquired": "2026-03-26T19:25:41.597482",
+    "source_topic": "python context managers and resource management"
+  },
+  "contextlib.contextmanager decorator": {
+    "requires": [
+      "python context managers and resource management"
+    ],
+    "acquired": "2026-03-26T19:25:41.602876",
+    "source_topic": "python context managers and resource management"
+  },
+  "python generators and coroutines": {
+    "requires": [],
+    "acquired": "2026-03-26T19:54:33.539255",
+    "source_topic": "python generators and coroutines"
+  },
+  "debugging tools": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-26T20:31:09.435626",
+    "source_topic": "template parser handling and debugging"
+  },
+  "python dataclasses and slots": {
+    "requires": [],
+    "acquired": "2026-03-26T20:43:23.038114",
+    "source_topic": "python dataclasses and slots"
+  },
+  "__slots__": {
+    "requires": [
+      "python dataclasses and slots"
+    ],
+    "acquired": "2026-03-26T20:43:23.045451",
+    "source_topic": "python dataclasses and slots"
+  },
+  "multiple inheritance": {
+    "requires": [
+      "python dataclasses and slots"
+    ],
+    "acquired": "2026-03-26T20:43:23.052056",
+    "source_topic": "python dataclasses and slots"
+  },
+  "heap data structure and priority queue": {
+    "requires": [],
+    "acquired": "2026-03-26T23:54:51.691017",
+    "source_topic": "heap data structure and priority queue"
+  },
+  "asyncio advanced patterns": {
+    "requires": [],
+    "acquired": "2026-03-27T00:11:30.461308",
+    "source_topic": "asyncio advanced patterns"
+  },
+  "coroutine chaining": {
+    "requires": [
+      "asyncio advanced patterns"
+    ],
+    "acquired": "2026-03-27T00:11:30.471715",
+    "source_topic": "asyncio advanced patterns"
+  },
+  "decision tree implementation": {
+    "requires": [],
+    "acquired": "2026-03-27T00:18:47.790911",
+    "source_topic": "decision tree implementation"
+  },
+  "decision tree": {
+    "requires": [
+      "decision tree implementation"
+    ],
+    "acquired": "2026-03-27T00:18:47.800049",
+    "source_topic": "decision tree implementation"
+  },
+  "information gain": {
+    "requires": [
+      "decision tree implementation"
+    ],
+    "acquired": "2026-03-27T00:18:47.809200",
+    "source_topic": "decision tree implementation"
+  },
+  "gini index": {
+    "requires": [
+      "decision tree implementation"
+    ],
+    "acquired": "2026-03-27T00:18:47.817307",
+    "source_topic": "decision tree implementation"
+  },
+  "two pointer technique": {
+    "requires": [],
+    "acquired": "2026-03-27T00:23:03.640690",
+    "source_topic": "two pointer technique"
+  },
+  "two-pointer technique": {
+    "requires": [
+      "two pointer technique"
+    ],
+    "acquired": "2026-03-27T00:23:03.648992",
+    "source_topic": "two pointer technique"
+  },
+  "floyd's cycle detection algorithm": {
+    "requires": [
+      "two pointer technique"
+    ],
+    "acquired": "2026-03-27T00:23:03.655902",
+    "source_topic": "two pointer technique"
+  },
+  "trie data structure": {
+    "requires": [],
+    "acquired": "2026-03-27T00:57:32.713789",
+    "source_topic": "trie data structure"
+  },
+  "prefix tree": {
+    "requires": [
+      "trie data structure"
+    ],
+    "acquired": "2026-03-27T00:57:32.722589",
+    "source_topic": "trie data structure"
+  },
+  "python asyncio event loop internals": {
+    "requires": [],
+    "acquired": "2026-03-27T01:01:08.393336",
+    "source_topic": "python asyncio event loop internals"
+  },
+  "event loop": {
+    "requires": [
+      "python asyncio event loop internals"
+    ],
+    "acquired": "2026-03-27T01:01:08.401241",
+    "source_topic": "python asyncio event loop internals"
+  },
+  "impossible differentials in cryptography applied to exception handling boundaries": {
+    "requires": [],
+    "acquired": "2026-03-27T01:14:44.209385",
+    "source_topic": "Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis"
+  },
+  "profiling and optimization python": {
+    "requires": [],
+    "acquired": "2026-03-27T01:17:17.106007",
+    "source_topic": "profiling and optimization python"
+  },
+  "code profiling": {
+    "requires": [
+      "profiling and optimization python"
+    ],
+    "acquired": "2026-03-27T01:17:17.114601",
+    "source_topic": "profiling and optimization python"
+  },
+  "performance bottleneck": {
+    "requires": [
+      "profiling and optimization python"
+    ],
+    "acquired": "2026-03-27T01:17:17.122157",
+    "source_topic": "profiling and optimization python"
+  },
+  "optimization techniques": {
+    "requires": [
+      "profiling and optimization python"
+    ],
+    "acquired": "2026-03-27T01:17:17.129025",
+    "source_topic": "profiling and optimization python"
+  },
+  "kernel size": {
+    "requires": [
+      "integration of max pooling (maxpool2d) and exception handling"
+    ],
+    "acquired": "2026-03-27T01:25:03.563090",
+    "source_topic": "Integration of max pooling (maxpool2d) and exception handling"
+  },
+  "data format (channels_first": {
+    "requires": [
+      "integration of max pooling (maxpool2d) and exception handling"
+    ],
+    "acquired": "2026-03-27T01:25:03.571118",
+    "source_topic": "Integration of max pooling (maxpool2d) and exception handling"
+  },
+  "circuit breaker pattern python": {
+    "requires": [],
+    "acquired": "2026-03-27T01:44:54.850679",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "circuit breaker pattern": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-27T01:44:54.859047",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "open state": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-27T01:44:54.866008",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "closed state": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-27T01:44:54.872999",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "union find disjoint set": {
+    "requires": [],
+    "acquired": "2026-03-27T01:49:17.875510",
+    "source_topic": "union find disjoint set"
+  },
+  "redis data structures python": {
+    "requires": [],
+    "acquired": "2026-03-27T01:55:48.831476",
+    "source_topic": "redis data structures python"
+  },
+  "redis-backed data structures": {
+    "requires": [
+      "redis data structures python"
+    ],
+    "acquired": "2026-03-27T01:55:48.839272",
+    "source_topic": "redis data structures python"
+  },
+  "pythonic interface": {
+    "requires": [
+      "redis data structures python"
+    ],
+    "acquired": "2026-03-27T01:55:48.846898",
+    "source_topic": "redis data structures python"
+  },
+  "thread-safe data structures": {
+    "requires": [
+      "redis data structures python"
+    ],
+    "acquired": "2026-03-27T01:55:48.853765",
+    "source_topic": "redis data structures python"
+  },
+  "connection pooling": {
+    "requires": [
+      "redis data structures python"
+    ],
+    "acquired": "2026-03-27T01:55:48.862210",
+    "source_topic": "redis data structures python"
+  },
+  "aes encryption python": {
+    "requires": [],
+    "acquired": "2026-03-27T02:03:16.024120",
+    "source_topic": "aes encryption python"
+  },
+  "aes (advanced encryption standard)": {
+    "requires": [
+      "aes encryption python"
+    ],
+    "acquired": "2026-03-27T02:03:16.032657",
+    "source_topic": "aes encryption python"
+  },
+  "cipher modes (ecb": {
+    "requires": [
+      "aes encryption python"
+    ],
+    "acquired": "2026-03-27T02:03:16.039971",
+    "source_topic": "aes encryption python"
+  },
+  "disjoint set union": {
+    "requires": [
+      "union find disjoint set"
+    ],
+    "acquired": "2026-03-27T02:06:00.199448",
+    "source_topic": "union find disjoint set"
+  },
+  "make_set(v)": {
+    "requires": [
+      "union find disjoint set"
+    ],
+    "acquired": "2026-03-27T02:06:00.212104",
+    "source_topic": "union find disjoint set"
+  },
+  "union_sets(a": {
+    "requires": [
+      "union find disjoint set"
+    ],
+    "acquired": "2026-03-27T02:06:00.221750",
+    "source_topic": "union find disjoint set"
+  },
+  "find_set(v)": {
+    "requires": [
+      "union find disjoint set"
+    ],
+    "acquired": "2026-03-27T02:06:00.229277",
+    "source_topic": "union find disjoint set"
+  },
+  "fail fast principle applied to dynamic content handling": {
+    "requires": [],
+    "acquired": "2026-03-27T02:09:15.383652",
+    "source_topic": "Integration of fail fast principle applied to dynamic content handling and sql injection"
+  },
+  "fail-fast principle": {
+    "requires": [
+      "integration of fail fast principle applied to dynamic content handling and sql injection"
+    ],
+    "acquired": "2026-03-27T02:09:15.391956",
+    "source_topic": "Integration of fail fast principle applied to dynamic content handling and sql injection"
+  },
+  "input validation": {
+    "requires": [
+      "integration of fail fast principle applied to dynamic content handling and sql injection"
+    ],
+    "acquired": "2026-03-27T02:09:15.400636",
+    "source_topic": "Integration of fail fast principle applied to dynamic content handling and sql injection"
+  },
+  "dynamic sql": {
+    "requires": [
+      "integration of fail fast principle applied to dynamic content handling and sql injection"
+    ],
+    "acquired": "2026-03-27T02:09:15.407953",
+    "source_topic": "Integration of fail fast principle applied to dynamic content handling and sql injection"
+  },
+  "caching strategies lru cache": {
+    "requires": [],
+    "acquired": "2026-03-27T02:13:21.621329",
+    "source_topic": "caching strategies lru cache"
+  },
+  "lru cache": {
+    "requires": [
+      "caching strategies lru cache"
+    ],
+    "acquired": "2026-03-27T02:13:21.629128",
+    "source_topic": "caching strategies lru cache"
+  },
+  "cache hit": {
+    "requires": [
+      "caching strategies lru cache"
+    ],
+    "acquired": "2026-03-27T02:13:21.638371",
+    "source_topic": "caching strategies lru cache"
+  },
+  "cache miss": {
+    "requires": [
+      "caching strategies lru cache"
+    ],
+    "acquired": "2026-03-27T02:13:21.645867",
+    "source_topic": "caching strategies lru cache"
+  },
+  "cache eviction policy": {
+    "requires": [
+      "caching strategies lru cache"
+    ],
+    "acquired": "2026-03-27T02:13:21.654071",
+    "source_topic": "caching strategies lru cache"
+  },
+  "exception-driven control flow applied to perceptron": {
+    "requires": [],
+    "acquired": "2026-03-27T11:52:45.164245",
+    "source_topic": "Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions"
+  },
+  "neural network backpropagation python": {
+    "requires": [],
+    "acquired": "2026-03-27T11:57:28.903815",
+    "source_topic": "neural network backpropagation python"
+  },
+  "neural network": {
+    "requires": [
+      "neural network backpropagation python"
+    ],
+    "acquired": "2026-03-27T11:57:28.914197",
+    "source_topic": "neural network backpropagation python"
+  },
+  "forward propagation": {
+    "requires": [
+      "neural network backpropagation python"
+    ],
+    "acquired": "2026-03-27T11:57:28.923665",
+    "source_topic": "neural network backpropagation python"
+  },
+  "redis data structures": {
+    "requires": [
+      "integration of json serialization and redis data structures python"
+    ],
+    "acquired": "2026-03-27T12:05:30.059126",
+    "source_topic": "Integration of json serialization and redis data structures python"
+  },
+  "redis om": {
+    "requires": [
+      "integration of json serialization and redis data structures python"
+    ],
+    "acquired": "2026-03-27T12:05:30.067463",
+    "source_topic": "Integration of json serialization and redis data structures python"
+  },
+  "minimal_prototyping": {
+    "requires": [
+      "integration of json serialization and redis data structures python"
+    ],
+    "acquired": "2026-03-27T12:05:30.077240",
+    "source_topic": "Integration of json serialization and redis data structures python"
+  },
+  "rsa encryption python from scratch": {
+    "requires": [],
+    "acquired": "2026-03-27T12:09:35.631488",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "rsa (rivest–shamir–adleman)": {
+    "requires": [
+      "rsa encryption python from scratch"
+    ],
+    "acquired": "2026-03-27T12:09:35.639697",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "modular exponentiation": {
+    "requires": [
+      "rsa encryption python from scratch"
+    ],
+    "acquired": "2026-03-27T12:09:35.647579",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "side-channel attacks": {
+    "requires": [
+      "rsa encryption python from scratch"
+    ],
+    "acquired": "2026-03-27T12:09:35.655614",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "extended euclidean algorithm": {
+    "requires": [
+      "rsa encryption python from scratch"
+    ],
+    "acquired": "2026-03-27T12:09:35.664562",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "prime number generation": {
+    "requires": [
+      "rsa encryption python from scratch"
+    ],
+    "acquired": "2026-03-27T12:09:35.672601",
+    "source_topic": "rsa encryption python from scratch"
+  },
+  "jwt token validation": {
+    "requires": [],
+    "acquired": "2026-03-27T12:13:22.006791",
+    "source_topic": "jwt token validation"
+  },
+  "message queue rabbitmq python": {
+    "requires": [],
+    "acquired": "2026-03-27T12:18:36.036247",
+    "source_topic": "message queue rabbitmq python"
+  },
+  "message queue": {
+    "requires": [
+      "message queue rabbitmq python"
+    ],
+    "acquired": "2026-03-27T12:18:36.045852",
+    "source_topic": "message queue rabbitmq python"
+  },
+  "amqp (advanced message queuing protocol)": {
+    "requires": [
+      "message queue rabbitmq python"
+    ],
+    "acquired": "2026-03-27T12:18:36.053495",
+    "source_topic": "message queue rabbitmq python"
+  },
+  "test driven development pytest": {
+    "requires": [],
+    "acquired": "2026-03-27T12:21:59.001595",
+    "source_topic": "test driven development pytest"
+  },
+  "red-green-refactor cycle": {
+    "requires": [
+      "test driven development pytest"
+    ],
+    "acquired": "2026-03-27T12:21:59.009806",
+    "source_topic": "test driven development pytest"
+  },
+  "dns resolution python": {
+    "requires": [],
+    "acquired": "2026-03-27T12:25:24.892163",
+    "source_topic": "dns resolution python"
+  },
+  "dns resolution": {
+    "requires": [
+      "dns resolution python"
+    ],
+    "acquired": "2026-03-27T12:25:24.901902",
+    "source_topic": "dns resolution python"
+  },
+  "dns protocol": {
+    "requires": [
+      "dns resolution python"
+    ],
+    "acquired": "2026-03-27T12:25:24.910555",
+    "source_topic": "dns resolution python"
+  },
+  "dns records (a": {
+    "requires": [
+      "dns resolution python"
+    ],
+    "acquired": "2026-03-27T12:25:24.919995",
+    "source_topic": "dns resolution python"
+  },
+  "sha256 implementation": {
+    "requires": [],
+    "acquired": "2026-03-27T12:32:04.954268",
+    "source_topic": "sha256 implementation"
+  },
+  "message scheduling": {
+    "requires": [
+      "sha256 implementation"
+    ],
+    "acquired": "2026-03-27T12:32:04.971096",
+    "source_topic": "sha256 implementation"
+  },
+  "compression function": {
+    "requires": [
+      "sha256 implementation"
+    ],
+    "acquired": "2026-03-27T12:32:04.984876",
+    "source_topic": "sha256 implementation"
+  },
+  "docker container python sdk": {
+    "requires": [],
+    "acquired": "2026-03-27T12:47:23.056237",
+    "source_topic": "docker container python sdk"
+  },
+  "docker sdk for python": {
+    "requires": [
+      "docker container python sdk"
+    ],
+    "acquired": "2026-03-27T12:47:23.064111",
+    "source_topic": "docker container python sdk"
+  },
+  "docker engine api": {
+    "requires": [
+      "docker container python sdk"
+    ],
+    "acquired": "2026-03-27T12:47:23.072725",
+    "source_topic": "docker container python sdk"
+  },
+  "linear regression numpy": {
+    "requires": [],
+    "acquired": "2026-03-27T13:09:33.401413",
+    "source_topic": "linear regression numpy"
+  },
+  "linear regression": {
+    "requires": [
+      "linear regression numpy"
+    ],
+    "acquired": "2026-03-27T13:09:33.409763",
+    "source_topic": "linear regression numpy"
+  },
+  "least squares": {
+    "requires": [
+      "linear regression numpy"
+    ],
+    "acquired": "2026-03-27T13:09:33.417527",
+    "source_topic": "linear regression numpy"
+  },
+  "machine_learning": {
+    "requires": [
+      "linear regression numpy"
+    ],
+    "acquired": "2026-03-27T13:09:33.427205",
+    "source_topic": "linear regression numpy"
+  },
+  "parse-time error handling": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-27T15:21:49.215173",
+    "source_topic": "template parser handling and debugging"
+  },
+  "runtime error handling": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-27T15:21:49.224478",
+    "source_topic": "template parser handling and debugging"
+  },
+  "debugging techniques": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-27T15:21:49.232163",
+    "source_topic": "template parser handling and debugging"
+  },
+  "error message system": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-27T15:21:49.240559",
+    "source_topic": "template parser handling and debugging"
   }
 }

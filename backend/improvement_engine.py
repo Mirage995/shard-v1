@@ -256,6 +256,8 @@ class ImprovementEngine:
         return valid if len(valid) > 1 else [topic]
 
     def _is_garbage(self, topic: str) -> bool:
+        if topic.strip().startswith("#"):
+            return True   # markdown header — mai un topic valido
         t = topic.lower()
         return any(token in t for token in _GARBAGE_TOKENS)
 

@@ -53,22 +53,74 @@ def _row_factory(cursor: sqlite3.Cursor, row: tuple) -> dict:
 
 
 def _init_schema(conn: sqlite3.Connection) -> None:
-    """Apply schema.sql if the database has no tables yet."""
-    # Check if schema is already applied
+    """Apply schema.sql if the database has no tables yet, then run migrations."""
     cursor = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'"
     )
-    if cursor.fetchone():
-        return  # Schema already exists
+    if not cursor.fetchone():
+        if not os.path.exists(SCHEMA_PATH):
+            raise FileNotFoundError(f"Schema file not found: {SCHEMA_PATH}")
+        with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+            schema_sql = f.read()
+        conn.executescript(schema_sql)
+        logger.info("[SHARD_DB] Schema v1 applied to %s", DB_PATH)
 
-    if not os.path.exists(SCHEMA_PATH):
-        raise FileNotFoundError(f"Schema file not found: {SCHEMA_PATH}")
+    _run_migrations(conn)
 
-    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
-        schema_sql = f.read()
 
-    conn.executescript(schema_sql)
-    logger.info("[SHARD_DB] Schema v1 applied to %s", DB_PATH)
+def _run_migrations(conn: sqlite3.Connection) -> None:
+    """Apply incremental migrations for databases already at v1."""
+    cursor = conn.execute("SELECT MAX(version) as v FROM schema_version")
+    row = cursor.fetchone()
+    current = row["v"] if row and row["v"] else 1
+
+    if current < 2:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS activation_log (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id      TEXT    NOT NULL,
+                topic           TEXT    NOT NULL,
+                timestamp       TEXT    NOT NULL,
+                score           REAL,
+                certified       INTEGER DEFAULT 0,
+                predicted_score REAL,
+                source          TEXT,
+                sig_episodic    REAL    DEFAULT 0.0,
+                sig_strategy    REAL    DEFAULT 0.0,
+                sig_near_miss   REAL    DEFAULT 0.0,
+                sig_first_try   REAL    DEFAULT 0.0,
+                sig_graphrag    REAL    DEFAULT 0.0,
+                sig_improvement REAL    DEFAULT 0.0
+            );
+            CREATE INDEX IF NOT EXISTS idx_act_session   ON activation_log(session_id);
+            CREATE INDEX IF NOT EXISTS idx_act_topic     ON activation_log(topic);
+            CREATE INDEX IF NOT EXISTS idx_act_certified ON activation_log(certified);
+            CREATE INDEX IF NOT EXISTS idx_act_timestamp ON activation_log(timestamp);
+
+            CREATE TABLE IF NOT EXISTS synaptic_weights (
+                source_citizen  TEXT    NOT NULL,
+                target_citizen  TEXT    NOT NULL,
+                weight          REAL    DEFAULT 1.0,
+                ltp_count       INTEGER DEFAULT 0,
+                ltd_count       INTEGER DEFAULT 0,
+                last_updated    TEXT,
+                PRIMARY KEY (source_citizen, target_citizen)
+            );
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (2, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v2 applied — activation_log + synaptic_weights")
+
+    if current < 3:
+        conn.executescript("""
+            ALTER TABLE activation_log ADD COLUMN sig_desire     REAL DEFAULT 0.0;
+            ALTER TABLE activation_log ADD COLUMN sig_difficulty REAL DEFAULT 0.5;
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (3, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v3 applied — sig_desire + sig_difficulty")
 
 
 def get_db() -> sqlite3.Connection:

@@ -900,10 +900,23 @@ Please analyze the problem and propose a minimal patch.
         # Track previous strategy for audit_emergence
         prev_strategy = ctx.strategy_used
 
+        # Near-miss alert: when score is close to the certification threshold (7.5),
+        # inject a targeted block so the LLM knows it's close and what to improve.
+        near_miss_block = ""
+        _score_now = ctx.score or 0.0
+        if 5.5 <= _score_now < 7.5:
+            _gap_to_cert = round(7.5 - _score_now, 1)
+            near_miss_block = (
+                f"\n\nNEAR-MISS: current score {_score_now}/10 — only {_gap_to_cert} points "
+                f"from certification (threshold=7.5). Do NOT change the overall approach. "
+                f"Refine and deepen: add precise code examples, cover edge cases explicitly, "
+                f"and ensure the most complex concept is fully explained with working code.\n"
+            )
+
         # 1. Re-synthesize theory with gap focus
         gap_prompt = f"""
 Previous study of "{ctx.topic}" had these gaps: {gaps}
-Focus area: {focus}{critique_block}{core_block}
+Focus area: {focus}{critique_block}{core_block}{near_miss_block}
 Re-synthesize with emphasis on filling these specific gaps.
 If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR APPROACH — do not repeat the same strategy.
 Use the same JSON format as before.

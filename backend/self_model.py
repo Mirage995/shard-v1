@@ -50,6 +50,14 @@ _JUNK_PATTERNS = [
     r"applied to safe_code",
     r"tier \d+$",
     r"shard_debug",
+    # Physics/pseudoscience that bleeds in from hallucination spirals
+    r"dark matter",
+    r"galaxy rotation",
+    r"modified (newtonian|gravity)",
+    r"perceptron",          # ML toy model — not a programming skill
+    r"web.scraping",        # too generic to be a blind spot
+    # "applied to X" patterns where X is off-topic
+    r"applied to (dark|perceptron|hypothesis|galaxy|physics|scraping)",
 ]
 _JUNK_RE = re.compile("|".join(_JUNK_PATTERNS), re.IGNORECASE)
 
@@ -249,7 +257,11 @@ class SelfModel:
                 blind_spots.append((t, len(attempt_scores), sum(attempt_scores) / len(attempt_scores)))
 
         blind_spots.sort(key=lambda x: (-x[1], x[2]))  # most attempted + lowest score first
-        data["blind_spots"] = [t for t, _, _ in blind_spots[:10]]
+        _composite_bs = re.compile(r"\bapplied to\b", re.IGNORECASE)
+        data["blind_spots"] = [
+            t for t, _, _ in blind_spots
+            if not _is_junk(t) and not _composite_bs.search(t)
+        ][:10]
 
         # ── Auto-quarantine candidates ─────────────────────────────────────────
         # Docker test confirmed: 0% of blind spots are real skill gaps.

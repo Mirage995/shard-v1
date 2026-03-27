@@ -1,9 +1,7 @@
 {
   "pending_queue": [
-    "ghost bug handling and debugging",
-    "# Task 02 — The Ghost Bug",
-    "dirty data handling and debugging",
-    "# Task 03 — Optimize the Transaction Processor"
+    "note tag handling and debugging",
+    "# Task 12 — Note Tag Matcher"
   ],
   "processed_ticket_ids": [
     "cf_dns_resolution_python",
@@ -18,6 +16,6 @@
     "cf_exception-driven_control_flow_applied_to",
     "cf_#_task_03_—_optimize_the_transaction_pro"
   ],
-  "total_topics_ever_queued": 52,
+  "total_topics_ever_queued": 97,
   "last_run_at": "2026-03-25T00:28:09.881437"
 }

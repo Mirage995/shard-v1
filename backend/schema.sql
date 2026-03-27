@@ -190,6 +190,51 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_kg_pair
     ON knowledge_graph(source_concept, target_concept, relation_type);
 
 
+-- ─── ACTIVATION LOG (Synaptic Plasticity) ────────────────────────────────────
+-- One row per study cycle. Records which citizens contributed (signal 0-1)
+-- and the outcome. Used to compute Hebbian connection weights between citizens.
+-- sig_* columns = citizen signal strength for that cycle (0.0 = absent, 1.0 = max)
+
+CREATE TABLE IF NOT EXISTS activation_log (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id      TEXT    NOT NULL,               -- UUID per run di NightRunner
+    topic           TEXT    NOT NULL,
+    timestamp       TEXT    NOT NULL,               -- ISO 8601
+    score           REAL,                           -- 0.0–10.0
+    certified       INTEGER DEFAULT 0,              -- 0/1
+    predicted_score REAL,                           -- da SelfModelTracker
+    source          TEXT,                           -- curated, improvement_engine, etc.
+    -- citizen signals
+    sig_episodic    REAL    DEFAULT 0.0,            -- had_episodic_context
+    sig_strategy    REAL    DEFAULT 0.0,            -- strategy_reused
+    sig_near_miss   REAL    DEFAULT 0.0,            -- near_miss_history
+    sig_first_try   REAL    DEFAULT 0.0,            -- first_attempt
+    sig_graphrag    REAL    DEFAULT 0.0,            -- graphrag_hits (0/1 → esteso in futuro)
+    sig_improvement REAL    DEFAULT 0.0             -- source_improvement
+);
+
+CREATE INDEX IF NOT EXISTS idx_act_session   ON activation_log(session_id);
+CREATE INDEX IF NOT EXISTS idx_act_topic     ON activation_log(topic);
+CREATE INDEX IF NOT EXISTS idx_act_certified ON activation_log(certified);
+CREATE INDEX IF NOT EXISTS idx_act_timestamp ON activation_log(timestamp);
+
+
+-- ─── SYNAPTIC WEIGHTS ─────────────────────────────────────────────────────────
+-- Peso adattivo per ogni coppia (cittadino_A, cittadino_B).
+-- Aggiornato con Hebb: co-attivazione + skill_certified → LTP, skill_failed → LTD.
+-- Parte da 1.0, range [0.1, 3.0].
+
+CREATE TABLE IF NOT EXISTS synaptic_weights (
+    source_citizen  TEXT    NOT NULL,
+    target_citizen  TEXT    NOT NULL,
+    weight          REAL    DEFAULT 1.0,
+    ltp_count       INTEGER DEFAULT 0,   -- quante volte si sono co-attivati con successo
+    ltd_count       INTEGER DEFAULT 0,   -- quante volte con fallimento
+    last_updated    TEXT,
+    PRIMARY KEY (source_citizen, target_citizen)
+);
+
+
 -- ─── SCHEMA VERSION ──────────────────────────────────────────────────────────
 -- For future migrations
 

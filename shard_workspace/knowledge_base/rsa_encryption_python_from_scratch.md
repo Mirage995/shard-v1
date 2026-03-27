@@ -5,42 +5,24 @@
 *   **RSA (Rivest–Shamir–Adleman):** A public-key cryptosystem widely used for secure data transmission.
 *   **Prime Numbers:** Essential for generating the public and private keys in RSA.
 *   **Modular Arithmetic:** Performing arithmetic operations within a specific modulus.
-*   **Extended Euclidean Algorithm:** Used to find the modular inverse, crucial for key generation.
-*   **Modular Exponentiation:** Efficiently computes large exponents modulo a number, used in encryption and decryption.
-*   **Timing Attack:** A side-channel attack that exploits the time it takes to perform cryptographic operations.
-*   **Side-Channel Attack:** Attacks based on information gained from the physical implementation of a cryptosystem.
+*   **Public Key:** Used for encryption; can be shared openly.
+*   **Private Key:** Used for decryption; must be kept secret.
+*   **Encryption:** Converting plaintext to ciphertext using the public key.
+*   **Decryption:** Converting ciphertext to plaintext using the private key.
+*   **Key Generation:** The process of creating the public and private key pair.
+*   **Modular Exponentiation:** Efficiently computing large exponents modulo a number.
+*   **Extended Euclidean Algorithm:** Used to find the modular multiplicative inverse.
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
-| Relatively easy to understand and implement the basic algorithm. | Vulnerable to various attacks if not implemented carefully (e.g., timing attacks). |
-| Widely used and supported. | Key generation can be computationally intensive for large key sizes. |
-| Provides both encryption and digital signature capabilities. | Requires large prime numbers for strong security. |
+| Educational: Deep understanding of RSA. | Security: Vulnerable to attacks if not implemented correctly. |
+| Customizable: Full control over the implementation. | Complexity: Requires knowledge of number theory. |
+| No dependencies: Doesn't rely on external libraries. | Performance: Slower than optimized libraries. |
 
 ## Practical Example
 ```python
 import random
-
-def is_prime(n, k=5):
-    if n <= 1: return False
-    if n <= 3: return True
-    s = 0
-    r = n - 1
-    while r % 2 == 0:
-        s += 1
-        r //= 2
-    for _ in range(k):
-        a = random.randrange(2, n - 1)
-        x = pow(a, r, n)
-        if x == 1 or x == n - 1:
-            continue
-        for _ in range(s - 1):
-            x = pow(x, 2, n)
-            if x == n - 1:
-                break
-        else:
-            return False
-    return True
 
 def gcd(a, b):
     while b:
@@ -55,23 +37,39 @@ def extended_gcd(a, b):
     y = x1
     return d, x, y
 
+def modular_inverse(a, m):
+    g, x, y = extended_gcd(a, m)
+    if g != 1:
+        raise Exception('Modular inverse does not exist')
+    else:
+        return x % m
+
 def generate_keypair(p, q):
     if not (is_prime(p) and is_prime(q)):
         raise ValueError('Both numbers must be prime.')
     elif p == q:
         raise ValueError('p and q cannot be equal')
+
     n = p * q
     phi = (p-1) * (q-1)
+
     e = random.randrange(1, phi)
     g = gcd(e, phi)
     while g != 1:
         e = random.randrange(1, phi)
         g = gcd(e, phi)
-    d, x, y = extended_gcd(e, phi)
-    d = x % phi
-    if d < 0:
-        d += phi
+
+    d = modular_inverse(e, phi)
+
     return ((e, n), (d, n))
+
+def is_prime(num):
+    if num < 2:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
 
 def encrypt(pk, plaintext):
     key, n = pk
@@ -89,14 +87,14 @@ if __name__ == '__main__':
     public, private = generate_keypair(p, q)
     print("Public key:", public)
     print("Private key:", private)
+
     message = "Hello RSA!"
     encrypted_msg = encrypt(public, message)
     print("Encrypted message:", encrypted_msg)
+
     decrypted_msg = decrypt(private, encrypted_msg)
     print("Decrypted message:", decrypted_msg)
 ```
 
 ## SHARD's Take
-RSA provides a foundation for understanding public-key cryptography. However, a basic implementation is highly susceptible to attacks. Secure RSA implementations require careful attention to detail, including padding schemes and countermeasures against side-channel attacks.
-
-```
+Implementing RSA from scratch provides a solid understanding of the underlying mathematical principles. However, creating a secure RSA implementation requires careful attention to detail, especially in prime number generation and protection against side-channel attacks. For production systems, using well-vetted cryptographic libraries is strongly recommended.

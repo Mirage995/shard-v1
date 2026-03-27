@@ -1,6 +1,6 @@
 {
   "created_at": "2026-03-26T00:43:55.456004",
-  "updated_at": "2026-03-26T00:43:55.457232",
+  "updated_at": "2026-03-27T15:22:15.525483",
   "skills": {
     "asyncio and async patterns in python": {
       "relevance": 0.95,
@@ -13,8 +13,8 @@
       "relevance": 0.88,
       "domain": "python",
       "xp_leverage": 1.3,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.2
     },
     "python typing system and generics": {
       "relevance": 0.85,
@@ -27,8 +27,8 @@
       "relevance": 0.8,
       "domain": "python",
       "xp_leverage": 1.1,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.3
     },
     "python dictionary operations and error handling": {
       "relevance": 0.82,
@@ -83,15 +83,15 @@
       "relevance": 0.76,
       "domain": "python",
       "xp_leverage": 0.9,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 8.8
     },
     "json parsing and serialization python": {
       "relevance": 0.77,
       "domain": "python",
       "xp_leverage": 0.9,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.3
     },
     "numpy array operations and boolean indexing": {
       "relevance": 0.9,
@@ -132,8 +132,8 @@
       "relevance": 0.92,
       "domain": "security",
       "xp_leverage": 1.3,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 7.5
     },
     "password hashing bcrypt argon2": {
       "relevance": 0.9,
@@ -160,8 +160,8 @@
       "relevance": 0.75,
       "domain": "cs_fundamentals",
       "xp_leverage": 1.1,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 8.5
     },
     "sorting algorithms": {
       "relevance": 0.8,
@@ -195,8 +195,8 @@
       "relevance": 0.86,
       "domain": "devops",
       "xp_leverage": 1.2,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.2
     },
     "websocket protocol implementation": {
       "relevance": 0.82,
@@ -213,7 +213,7 @@
       "known_score": null
     },
     "design patterns factory singleton observer": {
-      "relevance": 0.84,
+      "relevance": 0.5062,
       "domain": "engineering",
       "xp_leverage": 1.3,
       "known": false,
@@ -407,6 +407,147 @@
       "xp_leverage": 1.0,
       "known": true,
       "known_score": 7.75
+    },
+    "asyncio concurrency patterns": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "profiling and optimization python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "race condition handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "template parser handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.8
+    },
+    "note tag handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
+    },
+    "python context managers and resource management": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "python dataclasses and slots": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "heap data structure and priority queue": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "decision tree implementation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "two pointer technique": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "trie data structure": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "integration of max pooling (maxpool2d) and exception handling": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "aes encryption python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "integration of fail fast principle applied to dynamic content handling and sql injection": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "rsa encryption python from scratch": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "jwt token validation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.1
+    },
+    "test driven development pytest": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "linear regression numpy": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
     }
-  }
+  },
+  "last_calibrated": "2026-03-26T14:57:50.720693"
 }
