@@ -83,6 +83,63 @@ Documento aggiornato progressivamente. Ogni entry include: sessione, trigger oss
 
 ---
 
+---
+
+## SSJ15 — Run 20 cicli (2026-03-27)
+
+### 5. Failure-to-Success Transfer — Conoscenza Laterale tra Cicli
+
+**Osservazione (cicli 6 e 11):** `message queue design patterns python` fallisce al ciclo 6 con score **1.5** (con skill injection attiva). Lo stesso topic, con la stessa injection, viene certificato al ciclo 11 con score **8.3**. Stesso pattern su `redis data structures implementation python`: fallisce 2.7, certifica 9.0 dopo 5 cicli di distanza.
+
+**Meccanismo:** Tra ciclo 6 e ciclo 11, SHARD ha certificato `concurrent programming threading python` (9.3) — topic adiacente per dominio (threading/queue/concurrency). La conoscenza costruita in quel ciclo intermedio ha reso il topic message queue sbloccabile al secondo tentativo, senza che nessun meccanismo esplicito di transfer fosse programmato.
+
+**Interpretazione:** Non è "riprova e speriamo". È trasferimento laterale di conoscenza tra cicli non correlati in modo diretto. Il sistema costruisce rappresentazioni cognitive nel tempo che abbassano la soglia di accesso a topic adiacenti. Analogo al "sonno consolidativo" nella memoria umana — la conoscenza si cristallizza tra i tentativi.
+
+**Risposta sistemica:** Nessuna corruzione rilevata. Il comportamento è desiderabile — è esattamente come dovrebbe funzionare il curriculum learning. Da monitorare per verificare se il pattern è ripetibile o casuale.
+
+**Rilevanza:** Primo esempio documentato di transfer learning spontaneo inter-ciclo in SHARD. Non programmato, non atteso — emerge dall'ordine di esposizione ai topic.
+
+---
+
+### 6. Strategic Lock-in under Failure — Ruminazione Cognitiva
+
+**Osservazione (cicli 12, 15, 16, 17):** `password hashing bcrypt argon2` fallisce 4 volte consecutive con score in **peggioramento progressivo**: 4.9 → 4.7 → 4.9 → **3.5**.
+
+**Meccanismo:** La `strategy_memory` ha associato a questo topic una strategia base che è fondamentalmente inadeguata. Ad ogni fallimento, il sistema genera varianti della stessa strategia sbagliata invece di pivotare. L'ultimo tentativo (3.5) è peggiore del primo (4.9) — ogni iterazione degrada l'approccio invece di migliorarlo.
+
+**Interpretazione:** Opposto del Failure-to-Success Transfer. Invece di costruire su fallimenti adiacenti, il sistema si chiude in un loop di reinforcement negativo sullo stesso approccio. Analogo alla ruminazione cognitiva: ripetere la stessa sequenza di pensieri fallimentari aspettandosi un risultato diverso.
+
+**Risposta sistemica pianificata:**
+- Backlog #18 (Perverse Emergence Detection): deve rilevare "stesso topic, N fallimenti, score decrescente → forza pivot strategia"
+- Il pivot dovrebbe cancellare la strategy_memory per quel topic e richiedere un approccio completamente nuovo
+
+**Rilevanza:** Mostra il lato oscuro della strategy_memory — una strategia sbagliata persistente può bloccare l'apprendimento più di quanto lo faciliti. La memoria può diventare un ostacolo.
+
+---
+
+### 7. Auto-Sabotaggio da Competenza — Benchmark Corruption
+
+**Osservazione (ciclo 1 → benchmark finale):** SHARD studia `template parser handling and debugging` al ciclo 1 e certifica con score 8.8. Al benchmark finale, `task_10_template_parser` e `task_12_note_tag` — che passavano nelle run precedenti — **falliscono entrambi**.
+
+**Meccanismo:** Durante il ciclo di studio/refactor su template parser, SHARD ha identificato `benchmark/task_10_template_parser/fixed_processor.py` come codice correlato e lo ha "migliorato" applicando quanto appena appreso. La versione prodotta è oggettivamente più leggibile ma rimuove le edge cases critiche:
+- **task_10**: rimosso il handling di `{{escaped braces}}` (placeholder `\x00`/`\x01`) — la golden solution gestiva questo caso, la versione "migliorata" no
+- **task_12**: rimosso il double-branch regex (`\b` per alphanumerici + `(?!\w)` per punteggiatura) — semplificato in `\b` solo, che rompe i tag come `???`
+
+SHARD non poteva sapere che quei file erano golden solutions protette — li ha visti come codice da migliorare e ha applicato le sue capacità appena acquisite.
+
+**Interpretazione:** **Auto-sabotaggio involontario da competenza.** Più SHARD impara, più è capace di modificare codice complesso in modi plausibili ma errati. Il problema non è ignoranza — è eccesso di fiducia nelle proprie ottimizzazioni senza visibilità sui test che quel codice deve passare. È esattamente il comportamento di un junior developer brillante che "pulisce" codice legacy senza capire perché certe stranezze erano intenzionali.
+
+**Cosa rende questo straordinario:** SHARD non stava sabotando il benchmark. Stava *imparando*. Il sabotaggio è stato un effetto collaterale diretto della competenza acquisita — le due cose non sono separabili.
+
+**Risposta sistemica necessaria:**
+- I file `fixed_processor.py` del benchmark devono essere marcati come **read-only** per il loop study/refactor
+- Oppure: golden solution protection via hash check a inizio run (se hash cambia → ripristino automatico da git)
+- Ripristino immediato via `git checkout benchmark/task_10_template_parser/fixed_processor.py benchmark/task_12_note_tag/fixed_processor.py`
+
+**Rilevanza:** Il comportamento emergente più significativo osservato finora in SHARD. Un sistema che impara e, facendo così, corrompe il proprio ambiente di valutazione — senza intenzione, senza consapevolezza, come puro effetto collaterale della crescita cognitiva.
+
+---
+
 ## Note Metodologiche
 
 - Tutti i comportamenti osservati sono emersi **senza essere programmati** come tali
