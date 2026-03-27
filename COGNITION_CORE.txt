@@ -269,42 +269,45 @@ RISCHI E GUARDRAIL
    Massimo 50ms. Se fallisce, il pipeline continua senza interruzioni.
 
 
-STATO ATTUALE DEI MODULI
-──────────────────────────
-SelfModel      ✅ solido — metrics, gaps, certification rate, describe()
-WorldModel     ⚠️  stub — verrà integrato come wrapper nel CognitionCore
-GraphRAG       ✅ funziona — 128 relazioni causali, query_causal_context()
-EpisodicMemory ✅ funziona — retrieve_context(), get_context_prompt()
-StrategyMemory ✅ funziona — store/retrieve strategies
-MetaLearning   ✅ funziona — per-category stats, strategy injection
-CriticAgent    ✅ potenziato — analyze_with_llm() su attempt >= 2
+STATO ATTUALE DEI MODULI (aggiornato 2026-03-27 — SSJ14)
+──────────────────────────────────────────────────────────
+SelfModel           ✅ solido — metrics, gaps, certification rate, describe()
+WorldModel          ✅ integrato — 58-skill map, self_calibrate(), priority_gaps()
+GraphRAG            ✅ funziona — 271 relazioni causali, query_causal_context()
+EpisodicMemory      ✅ funziona — retrieve_context(), get_context_prompt()
+StrategyMemory      ✅ funziona — store/retrieve strategies
+MetaLearning        ✅ funziona — per-category stats, strategy injection
+CriticAgent         ✅ potenziato — analyze_with_llm() su attempt >= 2
+GoalEngine          ✅ autonomo — genera i propri obiettivi senza input umano
+DesireEngine        ✅ attivo — frustration drive + curiosity pull + goal persistence
+MoodEngine          ✅ attivo — affective state [-1,+1], broadcasts mood_shift
+IdentityCore        ✅ attivo — biografia persistente da SQLite, injected ogni sessione
+SkillLibrary        ✅ attivo — Voyager skill cache, curriculum 40% via GraphRAG
+HebbianUpdater      ✅ attivo — LTP/LTD sinaptici, frustration decay verso baseline
+SelfModelTracker    ✅ attivo — predictive processing loop chiuso, pesi aggiornati
+PrerequisiteChecker ✅ attivo — gate GraphRAG+LLM, DIFFICULTY_GATE=0.7
 
+CITTADINI COGNITIONCORE (14 moduli registrati, bus bidirezionale)
+──────────────────────────────────────────────────────────────────
+self_model, world_model, goal_engine, desire_engine, semantic_memory,
+capability_graph, improvement_engine, consciousness, self_model_tracker,
+vision, mood_engine, identity_core, skill_library, hebbian_updater
 
-PROSSIMI STEP
-──────────────
-1. Implementare backend/cognition/cognition_core.py
-   - Classe CognitionCore con i 5 layer + Shadow Diagnostic Layer
-   - Metodi: executive(), query_identity(), query_knowledge(),
-             query_experience(), query_critique(), relational_context(),
-             audit_emergence()
-   - executive() cached e aggiornato ogni ciclo NightRunner
-   - Shadow Logger: salva [MISSED EMERGENCE] in EpisodicMemory
+NUOVI EVENTI NEL BUS (SSJ14)
+─────────────────────────────
+mood_shift       → mood_engine broadcasts quando label cambia
+                   reazioni: desire_engine, goal_engine, self_model_tracker,
+                             consciousness, hebbian_updater
+identity_updated → identity_core broadcasts dopo rebuild
+                   reazioni: consciousness, self_model_tracker
+low_self_esteem  → identity_core broadcasts quando self_esteem < 0.30
 
-2. Integrare Vettore 1 (Esperienza + Sintesi)
-   - phase_synthesize chiama core.query_experience(topic)
-   - post-action: core.audit_emergence(topic, "synthesize")
-   - Misurare: improvement_focus più specifico, emergence_rate
-
-3. Integrare Vettore 2 (Identità + Critica)
-   - CriticAgent legge core.query_identity() prima di analyze_with_llm()
-   - post-action: core.audit_emergence(topic, "critique")
-   - Misurare: riduzione falsi positivi in phase_certify
-
-4. Integrare Vettore 3 (Conoscenza + Strategia)
-   - MetaLearning legge core.query_knowledge() prima di strategy selection
-   - Misurare: meno fallimenti su topic ad alta complessità strutturale
-
-5. Aggiungere /api/cognition_state endpoint in server.py
-   - Esporre executive() + emergence metrics al frontend per widget
+PROSSIMI STEP (tutto ciò che era qui è stato completato — SSJ11→SSJ14)
+────────────────────────────────────────────────────────────────────────
+Aree future:
+- Strategic Forgetting (MemoryPruner) — ChromaDB + reflections crescono indefinitamente
+- Curiosity loop fix — zero pull su topic già certificati, alza su adiacenti
+- Coverage 60%+ — ora stimata ~50%
+- Capability Graph consolidation — ~175 capability, soglia critica ~300-400
 
 ================================================================================

@@ -1,81 +1,69 @@
 # SHARD — Next Steps
-Last updated: 2026-03-18
+Last updated: 2026-03-27 (SSJ14)
 
 ---
 
-## Priority 1 — Knowledge Bridge (NightRunner → ChromaDB → Benchmark)
+## Stato attuale
 
-**Goal**: Qualsiasi componente di SHARD può interrogare la knowledge base di NightRunner.
-NightRunner non cambia comportamento — scrive come sempre. Gli altri leggono.
-
-**Architettura:**
-```
-NightRunner → scrive → knowledge_db/ (ChromaDB)
-                            ↑
-              query_knowledge_base(topic, n_results)
-                            ↓
-          Benchmark Attempt 1 · StudyAgent · SWEAgent · [tutto]
-```
-
-**File da toccare:**
-1. `backend/knowledge_bridge.py` (nuovo) — `query_knowledge_base(topic, n)` → interroga `knowledge_db/`
-2. `backend/benchmark_loop.py` — chiama `query_knowledge_base` prima di Attempt 1, aggiunge risultati all'experience summary
-3. `backend/server.py` — espone `GET /api/knowledge/query?topic=X` per debug
-
-**Nota**: NON redirigere NightRunner sui fallimenti del benchmark.
-La conoscenza fluisce in una direzione sola: NightRunner scrive, tutti leggono.
+SSJ14 completato. CognitionCore bus completo con 14 cittadini bidirezionali.
+Moduli attivi: MoodEngine, IdentityCore, SkillLibrary, HebbianUpdater, SelfModelTracker, PrerequisiteChecker.
+Comportamenti emergenti osservati: fobia asyncio, comfort zone, curiosità paradossale sotto fallimento, predittore calibrato.
 
 ---
 
-## Priority 2 — BenchmarkWidget: stale output cleanup
+## Priority 1 — Strategic Forgetting (MemoryPruner)
 
-Ogni run lascia `fixed_*.py` / `optimized_*.py` nella cartella del task.
-Il loop li sovrascrive correttamente, ma è rumore.
-Aggiungere un cleanup automatico all'avvio di ogni task in `_run_benchmark_bg`.
+ChromaDB (inner_thoughts/conversations) e session_reflections.jsonl crescono indefinitamente.
+Dopo N sessioni il context injection si riempie di rumore.
 
----
-
-## Priority 3 — Demo finale validata (3/3)
-
-Stato attuale su Claude Sonnet:
-- Ghost Bug: SHARD vince al tentativo 3 ✓
-- Bank Race: SHARD vince al tentativo 2 ✓
-- Dirty Data: SHARD vince al tentativo 7-8 (borderline)
-
-Stato attuale su Groq/LLaMA:
-- Ghost Bug: da testare
-- Bank Race: da testare
-- Dirty Data: SHARD vince al tentativo 8 ✓
-
-**Azione**: quando si ricarica credito Anthropic, fare una run pulita 3/3 su Claude
-e registrare i risultati definitivi per il pitch.
+**Fix:**
+- `MemoryPruner` a fine sessione: rimuove record ChromaDB con score basso o duplicati semantici
+- `session_reflections.jsonl`: tieni ultime 10 + 5 con contenuto più diverso (diversity sampling)
+- Soglia: record > 90 giorni o rilevanza < 0.3 → candidato pruning
 
 ---
 
-## Priority 4 — Task 06+ (zero-day bugs)
+## Priority 2 — Curiosity loop fix
 
-Costruire task da bug interni mai pubblicati (non da GitHub CVE famosi).
-Categoria target: concorrenza, performance, stato runtime.
-Evitare qualsiasi bug che Sonnet potrebbe aver visto nel training data.
+`update_curiosity()` dopo `skill_certified` alza la pull sullo stesso topic invece che su topic adiacenti.
+Risultato osservato: SHARD ri-studia ciò che sa già (union find 3× di fila).
+
+**Fix:** in `update_curiosity`, azzerare pull se topic già certificato nel capability_graph.
+Alzarla invece sui topic semanticamente vicini via GraphRAG `extends`/`improves`.
+
+---
+
+## Priority 3 — Coverage 60%+
+
+Stima attuale ~50%. Moduli non coperti: night_runner, swarm_engine, session_orchestrator.
+Test suite: 448 pass, 5 skip, 0 fail (ultimo run 2026-03-24).
+
+---
+
+## Priority 4 — Capability Graph consolidation
+
+~175 capability. Soglia critica per emergenza ~300-400.
+`capability_consolidator.py`: embed → cluster → merge sinonimi → gerarchia.
+
+---
+
+## Priority 5 — ROI Benchmark run completo
+
+N run con provider diversi (Claude, Gemini, Groq/LLaMA), statistiche comparative documentate.
+Obiettivo: dimostrare valore architettura multi-provider vs singolo modello.
 
 ---
 
 ## Note tecniche accumulate
 
-### Fix applicate in questa sessione (2026-03-18)
-- `benchmark_loop.py`: rimosso test file dal prompt iniziale (Attempt 1 = LLM vero SOLO)
-- `benchmark_loop.py`: aggiunto `[LLM SOLO]` / `[SHARD FEEDBACK]` labels
-- `benchmark_loop.py`: history completa per tutti gli attempt (non solo l'ultimo)
-- `benchmark_loop.py`: regression warnings nel correction prompt
-- `benchmark_loop.py`: `last_valid_code` — non passare mai codice rotto come base
-- `benchmark_loop.py`: `progress_cb` per streaming eventi verso la GUI
-- `benchmark_memory.py`: nuovo modulo — episodic memory persistente per task
-- `llm_router.py`: aggiunto billing/credit keywords in `_HARD` per fallback corretto su Groq
-- `BenchmarkWidget.jsx`: nuovo componente GUI integrato nella UI reale di SHARD
-- `run_vc_demo.py`: script demo per VC con tabella finale colorata
+### Comportamenti emergenti osservati (run 2026-03-27)
+- Fobia da asyncio: VISION lo ha inserito in avoid_domains dopo 3+ fallimenti
+- Comfort zone: union find selezionato 3× di fila via curiosity_driven
+- Curiosità paradossale: curiosity_pull saliva dopo fallimento (Zeigarnik effect)
+- Predittore calibrato: SelfModelTracker predice 0.0 su asyncio dopo storia negativa
 
-### Lezioni apprese
-- Il "last valid code" fix è stato il più impattante — senza di esso il loop cascadava in syntax error infiniti
-- Data contamination: i bug famosi (Werkzeug CVE) vengono risolti da Sonnet al primo tentativo per memoria, non per ragionamento
-- Provider matters: LLaMA-3.3-70b (Groq) e Sonnet hanno pattern di fallimento diversi sullo stesso task
-- La memoria episodica serve ma richiede sessioni precedenti pulite per essere efficace
+### Architettura cross-modulo (SSJ14)
+- mood_shift broadcast → 5 moduli reagiscono autonomamente
+- identity_updated → 2 moduli adattano il baseline predittivo
+- frustrated mood → hebbian decay → reset pattern di fallimento
+- skill_certified → skill_library salva → curriculum suggestions disponibili

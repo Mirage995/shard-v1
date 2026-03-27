@@ -1,0 +1,144 @@
+{
+  "statement": "SHARD seeks to become a reliable autonomous problem-solver — mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (30 skills certified so far)",
+  "focus_domains": [
+    "algorithms",
+    "debugging",
+    "code quality",
+    "performance",
+    "fundamentals review"
+  ],
+  "avoid_domains": [
+    "asyncio advanced patterns",
+    "git internals object model",
+    "async io with python selectors"
+  ],
+  "certified_count": 30,
+  "frustration_topics": [
+    "asyncio advanced patterns",
+    "git internals object model",
+    "async io with python selectors"
+  ],
+  "last_updated": "2026-03-27T14:22:18.026281+00:00",
+  "update_log": [
+    {
+      "ts": "2026-03-26T18:54:58.600214+00:00",
+      "msg": "certified: python generators and coroutines (score=9.2)"
+    },
+    {
+      "ts": "2026-03-26T19:31:34.597965+00:00",
+      "msg": "certified: template parser handling and debugging (score=7.6)"
+    },
+    {
+      "ts": "2026-03-26T19:43:58.240385+00:00",
+      "msg": "certified: python dataclasses and slots (score=9.3)"
+    },
+    {
+      "ts": "2026-03-26T19:57:02.474171+00:00",
+      "msg": "certified: heap data structure and priority queue (score=8.0)"
+    },
+    {
+      "ts": "2026-03-26T22:48:13.970392+00:00",
+      "msg": "certified: template parser handling and debugging (score=8.3)"
+    },
+    {
+      "ts": "2026-03-26T22:54:51.700434+00:00",
+      "msg": "certified: heap data structure and priority queue (score=8.5)"
+    },
+    {
+      "ts": "2026-03-26T23:14:14.324620+00:00",
+      "msg": "frustration: asyncio advanced patterns (5 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-26T23:19:28.884884+00:00",
+      "msg": "certified: decision tree implementation (score=9.0)"
+    },
+    {
+      "ts": "2026-03-26T23:23:26.544772+00:00",
+      "msg": "certified: two pointer technique (score=9.3)"
+    },
+    {
+      "ts": "2026-03-26T23:49:34.696517+00:00",
+      "msg": "certified: template parser handling and debugging (score=8.5)"
+    },
+    {
+      "ts": "2026-03-26T23:57:55.230943+00:00",
+      "msg": "certified: trie data structure (score=8.0)"
+    },
+    {
+      "ts": "2026-03-27T00:14:44.224746+00:00",
+      "msg": "certified: Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis (score=8.3)"
+    },
+    {
+      "ts": "2026-03-27T00:17:36.472144+00:00",
+      "msg": "certified: profiling and optimization python (score=8.3)"
+    },
+    {
+      "ts": "2026-03-27T00:26:38.689162+00:00",
+      "msg": "certified: Integration of max pooling (maxpool2d) and exception handling (score=9.0)"
+    },
+    {
+      "ts": "2026-03-27T00:49:17.891051+00:00",
+      "msg": "certified: union find disjoint set (score=8.3)"
+    },
+    {
+      "ts": "2026-03-27T01:03:19.818974+00:00",
+      "msg": "certified: aes encryption python (score=8.5)"
+    },
+    {
+      "ts": "2026-03-27T01:06:32.066616+00:00",
+      "msg": "certified: union find disjoint set (score=9.3)"
+    },
+    {
+      "ts": "2026-03-27T01:10:55.545525+00:00",
+      "msg": "certified: Integration of fail fast principle applied to dynamic content handling and sql injection (score=9.2)"
+    },
+    {
+      "ts": "2026-03-27T10:49:23.155950+00:00",
+      "msg": "certified: union find disjoint set (score=8.5)"
+    },
+    {
+      "ts": "2026-03-27T10:52:45.177081+00:00",
+      "msg": "certified: Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions (score=8.3)"
+    },
+    {
+      "ts": "2026-03-27T11:10:07.692551+00:00",
+      "msg": "certified: rsa encryption python from scratch (score=9.2)"
+    },
+    {
+      "ts": "2026-03-27T11:13:22.020141+00:00",
+      "msg": "certified: jwt token validation (score=8.1)"
+    },
+    {
+      "ts": "2026-03-27T11:22:34.813307+00:00",
+      "msg": "certified: test driven development pytest (score=9.2)"
+    },
+    {
+      "ts": "2026-03-27T11:44:34.156736+00:00",
+      "msg": "frustration: git internals object model (3 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T11:47:56.409315+00:00",
+      "msg": "certified: docker container python sdk (score=9.2)"
+    },
+    {
+      "ts": "2026-03-27T11:57:30.388234+00:00",
+      "msg": "frustration: async io with python selectors (3 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T12:10:19.296220+00:00",
+      "msg": "certified: linear regression numpy (score=7.9)"
+    },
+    {
+      "ts": "2026-03-27T12:29:57.395746+00:00",
+      "msg": "frustration: async io with python selectors (4 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T12:39:42.891546+00:00",
+      "msg": "momentum: stable → stagnating"
+    },
+    {
+      "ts": "2026-03-27T14:22:18.026281+00:00",
+      "msg": "certified: template parser handling and debugging (score=7.8)"
+    }
+  ]
+}

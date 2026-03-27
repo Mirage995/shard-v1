@@ -270,6 +270,14 @@ class DesireEngine:
                 self.clear_frustration(topic)
                 self.update_curiosity(topic)
 
+        elif event_type == "skill_failed":
+            # NightRunner already calls update_frustration() directly before broadcasting.
+            # Here we only update curiosity so the desire score reflects the failure signal
+            # without double-counting the frustration hit.
+            topic = data.get("topic", "")
+            if topic:
+                self.update_curiosity(topic)
+
         elif event_type == "goal_changed":
             # New goal activated — decay curiosity pull for old goal's topics
             old_keywords = data.get("old_keywords", [])
@@ -281,6 +289,38 @@ class DesireEngine:
                         changed = True
                 if changed:
                     self._save()
+
+        elif event_type == "frustration_peak":
+            # Topic has hit the chronic-failure threshold (3+ hits via direct calls).
+            # frustration_hits are already incremented — don't duplicate.
+            # Boost base_priority so frustration-drive selection (hits>=2, 40% chance)
+            # picks it up sooner and gives SHARD another honest attempt.
+            topic = data.get("topic", "")
+            if topic:
+                ds = self._get_or_create(topic)
+                ds.base_priority = round(min(1.0, ds.base_priority + 0.15), 4)
+                ds.last_updated = _now()
+                self._save()
+
+        elif event_type == "mood_shift":
+            new_label = data.get("to", "")
+            if new_label == "frustrated":
+                # When SHARD is frustrated: push the single most-blocked topic up in priority
+                # so frustration-drive selection resolves the block sooner
+                top = self.top_desire_topics(top_n=5)
+                blocked = [t for t in top if t.get("frustration_hits", 0) >= 2]
+                if blocked:
+                    ds = self._get_or_create(blocked[0]["topic"])
+                    ds.base_priority = round(min(1.0, ds.base_priority + 0.10), 4)
+                    ds.last_updated = _now()
+                    self._save()
+                    logger.debug("[DESIRE] mood_shift(frustrated) → boosted priority for '%s'", blocked[0]["topic"])
+            elif new_label in ("confident", "focused"):
+                # Confident mood: spread a small curiosity boost to uncertified adjacent topics
+                for ds in list(self._state.values())[:10]:
+                    if ds.frustration_hits == 0 and ds.curiosity_pull < 0.5:
+                        ds.curiosity_pull = round(min(1.0, ds.curiosity_pull + 0.05), 4)
+                self._save()
 
         elif event_type == "momentum_changed":
             new_momentum = data.get("new", "")

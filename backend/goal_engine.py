@@ -400,6 +400,15 @@ class GoalEngine:
         if event_type == "skill_certified":
             self.update_progress()
 
+        elif event_type == "skill_failed":
+            # A topic failed: if aligned with active goal, nudge progress down slightly.
+            topic = data.get("topic", "")
+            if topic:
+                goal = self.get_active_goal()
+                if goal and goal.alignment_score(topic) >= 0.3:
+                    goal.progress = max(0.0, round(goal.progress - 0.02, 4))
+                    self.storage.save_goal(goal)
+
         elif event_type == "momentum_changed":
             new_momentum = data.get("new", "")
             if new_momentum == "stagnating":
@@ -410,9 +419,34 @@ class GoalEngine:
                     self.storage.save_goal(goal)
 
         elif event_type == "frustration_peak":
-            # A topic is stuck — if it's aligned with our goal, note it but don't abandon
-            # The CriticAgent will handle diagnosis; goal just acknowledges the signal
-            pass
+            # A topic is chronically failing. If it's aligned with the active goal,
+            # age the goal out faster so SHARD can pivot to a different approach.
+            topic = data.get("topic", "")
+            hits  = data.get("hits", 0)
+            if topic:
+                goal = self.get_active_goal()
+                if goal and goal.alignment_score(topic) >= 0.3:
+                    # Penalise sessions_active: after 2+ frustrations on an aligned topic,
+                    # the goal has earned less patience.
+                    if hits >= 2:
+                        goal.sessions_active = max(0, goal.sessions_active - 1)
+                        self.storage.save_goal(goal)
+
+        elif event_type == "mood_shift":
+            new_label = data.get("to", "")
+            if new_label in ("confident", "focused"):
+                # Good mood → nudge active goal progress (momentum carries over)
+                goal = self.get_active_goal()
+                if goal:
+                    goal.progress = round(min(1.0, goal.progress + 0.01), 4)
+                    self.storage.save_goal(goal)
+                    logger.debug("[GOAL] mood_shift(%s) → progress nudge +0.01 on '%s'", new_label, goal.title)
+            elif new_label == "frustrated":
+                # Frustration → slow goal aging (SHARD needs time to recover, not pivot)
+                goal = self.get_active_goal()
+                if goal and goal.sessions_active > 0:
+                    goal.sessions_active = min(goal.sessions_active + 1, 10)
+                    self.storage.save_goal(goal)
 
         elif event_type == "world_recalibrated":
             # World relevance scores updated — re-evaluate if active goal is still optimal

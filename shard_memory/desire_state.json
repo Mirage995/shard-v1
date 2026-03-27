@@ -1,0 +1,453 @@
+{
+  "asyncio advanced patterns": {
+    "topic": "asyncio advanced patterns",
+    "base_priority": 0.5,
+    "frustration_hits": 5,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T00:14:14.201556"
+  },
+  "asyncio concurrency patterns": {
+    "topic": "asyncio concurrency patterns",
+    "base_priority": 0.3836,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [],
+    "last_updated": "2026-03-26T12:42:44.965201"
+  },
+  "python object oriented programming": {
+    "topic": "python object oriented programming",
+    "base_priority": 0.88,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-26T12:52:10.611654"
+  },
+  "regular expressions in python": {
+    "topic": "regular expressions in python",
+    "base_priority": 0.836,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0,
+      0.04
+    ],
+    "last_updated": "2026-03-26T13:16:07.239844"
+  },
+  "sql injection prevention and input sanitization": {
+    "topic": "sql injection prevention and input sanitization",
+    "base_priority": 0.92,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-26T13:11:45.621811"
+  },
+  "profiling and optimization python": {
+    "topic": "profiling and optimization python",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04,
+      0.0,
+      0.04
+    ],
+    "last_updated": "2026-03-27T01:17:36.488817"
+  },
+  "race condition handling and debugging": {
+    "topic": "race condition handling and debugging",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04,
+      0.04,
+      0.04
+    ],
+    "last_updated": "2026-03-26T18:57:27.692595"
+  },
+  "template parser handling and debugging": {
+    "topic": "template parser handling and debugging",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04,
+      0.04,
+      0.0,
+      0.04,
+      0.04,
+      0.04,
+      0.04
+    ],
+    "last_updated": "2026-03-27T15:22:18.086119"
+  },
+  "note tag handling and debugging": {
+    "topic": "note tag handling and debugging",
+    "base_priority": 0.5,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04,
+      0.0
+    ],
+    "last_updated": "2026-03-26T15:29:49.980422"
+  },
+  "json parsing and serialization python": {
+    "topic": "json parsing and serialization python",
+    "base_priority": 0.847,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-26T15:43:08.922009"
+  },
+  "python context managers and resource management": {
+    "topic": "python context managers and resource management",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-26T19:26:07.278380"
+  },
+  "python generators and coroutines": {
+    "topic": "python generators and coroutines",
+    "base_priority": 0.968,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0,
+      0.04
+    ],
+    "last_updated": "2026-03-26T19:54:58.602839"
+  },
+  "python dataclasses and slots": {
+    "topic": "python dataclasses and slots",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-26T20:43:58.245384"
+  },
+  "heap data structure and priority queue": {
+    "topic": "heap data structure and priority queue",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04,
+      0.04
+    ],
+    "last_updated": "2026-03-26T23:54:51.702573"
+  },
+  "jwt token validation": {
+    "topic": "jwt token validation",
+    "base_priority": 0.0,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0,
+      0.04
+    ],
+    "last_updated": "2026-03-27T12:13:22.022892"
+  },
+  "decision tree implementation": {
+    "topic": "decision tree implementation",
+    "base_priority": 0.0,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T00:19:28.897970"
+  },
+  "two pointer technique": {
+    "topic": "two pointer technique",
+    "base_priority": 0.0,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T00:23:26.547283"
+  },
+  "git internals object model": {
+    "topic": "git internals object model",
+    "base_priority": 0.0,
+    "frustration_hits": 3,
+    "curiosity_pull": 0.6,
+    "engagement_scores": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "last_updated": "2026-03-27T12:44:34.175099"
+  },
+  "trie data structure": {
+    "topic": "trie data structure",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T00:57:55.233920"
+  },
+  "python asyncio event loop internals": {
+    "topic": "python asyncio event loop internals",
+    "base_priority": 0.32,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T01:03:57.395264"
+  },
+  "tcp socket programming python": {
+    "topic": "tcp socket programming python",
+    "base_priority": 0.4,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T01:09:03.012116"
+  },
+  "Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis": {
+    "topic": "Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T01:14:44.240481"
+  },
+  "dns resolution python": {
+    "topic": "dns resolution python",
+    "base_priority": 0.0,
+    "frustration_hits": 2,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0,
+      0.0
+    ],
+    "last_updated": "2026-03-27T12:27:48.915000"
+  },
+  "Integration of max pooling (maxpool2d) and exception handling": {
+    "topic": "Integration of max pooling (maxpool2d) and exception handling",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T01:26:38.703269"
+  },
+  "circuit breaker pattern python": {
+    "topic": "circuit breaker pattern python",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T01:45:31.400756"
+  },
+  "union find disjoint set": {
+    "topic": "union find disjoint set",
+    "base_priority": 0.825,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04,
+      0.04,
+      0.04
+    ],
+    "last_updated": "2026-03-27T11:49:23.170609"
+  },
+  "redis data structures python": {
+    "topic": "redis data structures python",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T01:58:11.244136"
+  },
+  "aes encryption python": {
+    "topic": "aes encryption python",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T02:03:19.834165"
+  },
+  "Integration of fail fast principle applied to dynamic content handling and sql injection": {
+    "topic": "Integration of fail fast principle applied to dynamic content handling and sql injection",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T02:10:55.562923"
+  },
+  "caching strategies lru cache": {
+    "topic": "caching strategies lru cache",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T02:15:55.015904"
+  },
+  "async io with python selectors": {
+    "topic": "async io with python selectors",
+    "base_priority": 0.317,
+    "frustration_hits": 4,
+    "curiosity_pull": 1.0,
+    "engagement_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "last_updated": "2026-03-27T13:29:57.414586"
+  },
+  "Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions": {
+    "topic": "Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T11:52:45.192318"
+  },
+  "neural network backpropagation python": {
+    "topic": "neural network backpropagation python",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T11:59:26.791449"
+  },
+  "Integration of json serialization and redis data structures python": {
+    "topic": "Integration of json serialization and redis data structures python",
+    "base_priority": 0.3762,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T12:06:36.953296"
+  },
+  "rsa encryption python from scratch": {
+    "topic": "rsa encryption python from scratch",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T12:10:07.695684"
+  },
+  "message queue rabbitmq python": {
+    "topic": "message queue rabbitmq python",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T12:19:03.807072"
+  },
+  "test driven development pytest": {
+    "topic": "test driven development pytest",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T12:22:34.816280"
+  },
+  "sha256 implementation": {
+    "topic": "sha256 implementation",
+    "base_priority": 0.0,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T12:32:29.495358"
+  },
+  "docker container python sdk": {
+    "topic": "docker container python sdk",
+    "base_priority": 0.946,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.0,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T12:47:56.412736"
+  },
+  "password hashing bcrypt argon2": {
+    "topic": "password hashing bcrypt argon2",
+    "base_priority": 0.9,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T13:05:21.943569"
+  },
+  "linear regression numpy": {
+    "topic": "linear regression numpy",
+    "base_priority": 0.55,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T13:10:19.310836"
+  },
+  "Integration of template parsing and post-quantum tls": {
+    "topic": "Integration of template parsing and post-quantum tls",
+    "base_priority": 0.2123,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T13:19:41.850584"
+  },
+  "transformer attention mechanism": {
+    "topic": "transformer attention mechanism",
+    "base_priority": 0.89,
+    "frustration_hits": 1,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0
+    ],
+    "last_updated": "2026-03-27T13:24:56.457671"
+  }
+}

@@ -14,7 +14,7 @@ from research_agenda import ResearchAgenda
 try:
     from quantum_soul import QuantumSoul, QuantumPersonalityState
     _QUANTUM_SOUL_AVAILABLE = True
-except ImportError:
+except Exception:
     _QUANTUM_SOUL_AVAILABLE = False
 
 from shard_self_log import SelfLogger, ConsciousThought
@@ -514,3 +514,18 @@ class ShardConsciousness:
             old_m = data.get("old", "")
             if new_m in ("accelerating", "stagnating"):
                 self.push_event("momentum_shift", {"old": old_m, "new": new_m})
+
+        elif event_type == "mood_shift":
+            new_label = data.get("to", "")
+            # Narrate only significant mood transitions
+            if new_label in ("frustrated", "confident") or data.get("from") in ("frustrated", "confident"):
+                self.push_event("mood_shift", {
+                    "from": data.get("from"), "to": new_label, "score": data.get("score", 0.0)
+                })
+
+        elif event_type == "identity_updated":
+            self.push_event("biography_update", {
+                "self_esteem":    data.get("self_esteem", 0.5),
+                "trajectory":     data.get("trajectory", "stable"),
+                "sessions_lived": data.get("sessions_lived", 0),
+            })

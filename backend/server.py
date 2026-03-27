@@ -2225,6 +2225,67 @@ async def knowledge_graph_stats():
     except Exception as exc:
         return {"total_relations": 0, "error": str(exc)}
 
+
+@app.get("/api/mood")
+async def mood_status():
+    """Stato affettivo globale di SHARD."""
+    try:
+        from mood_engine import MoodEngine
+        return MoodEngine().get_status()
+    except Exception as exc:
+        return {"mood_score": 0.0, "label": "neutral", "error": str(exc)}
+
+
+@app.get("/api/synaptic/weights")
+async def synaptic_weights():
+    """Pesi sinaptici Hebbian tra cittadini SHARD."""
+    try:
+        from hebbian_updater import HebbianUpdater
+        u = HebbianUpdater()
+        return u.get_stats()
+    except Exception as exc:
+        return {"total_pairs": 0, "error": str(exc)}
+
+
+@app.get("/api/synaptic/activation_log")
+async def activation_log(limit: int = 50):
+    """Ultimi N cicli dell'activation_log (segnali cittadini + outcome)."""
+    try:
+        from shard_db import query as db_query
+        rows = db_query(
+            "SELECT * FROM activation_log ORDER BY timestamp DESC LIMIT ?",
+            (limit,),
+        )
+        return {"rows": rows, "count": len(rows)}
+    except Exception as exc:
+        return {"rows": [], "error": str(exc)}
+
+@app.get("/api/skill_library")
+async def skill_library_status():
+    """Voyager skill library — tutte le skill certificate di SHARD."""
+    try:
+        from backend.skill_library import SkillLibrary
+        from shard_db import query as db_query
+        sl = SkillLibrary()
+        rows = db_query(
+            "SELECT topic, score, strategies, certified_at FROM skill_library ORDER BY certified_at DESC"
+        )
+        return {"stats": sl.get_stats(), "skills": rows}
+    except Exception as exc:
+        return {"stats": {}, "skills": [], "error": str(exc)}
+
+
+@app.get("/api/identity")
+async def identity_status():
+    """Biografia persistente di SHARD — derivata da dati SQLite reali."""
+    try:
+        from backend.identity_core import IdentityCore
+        ic = IdentityCore()
+        return ic.get_status()
+    except Exception as exc:
+        return {"sessions_lived": 0, "error": str(exc)}
+
+
 @app.get("/api/llm/cache_stats")
 async def llm_cache_stats():
     """LLM cache hit/miss stats."""

@@ -45,7 +45,7 @@ from backend.study_personas import select_persona, record_outcome
 MAX_CYCLES_DEFAULT = 5
 MAX_RUNTIME_MINUTES_DEFAULT = 120
 MAX_API_CALLS_DEFAULT = 50
-PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT = 10
+PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT = 1
 
 # ── TASK 3: Topic Quality Filtering ───────────────────────────────────────────
 BAD_TOKENS = {
@@ -349,6 +349,14 @@ class NightRunner:
         except Exception:
             return False
 
+    def _is_avoided(self, topic: str) -> bool:
+        """True if topic matches an avoid_domain from VisionEngine (chronic failures)."""
+        ve = getattr(self, "_vision_engine", None)
+        if ve is None:
+            return False
+        topic_l = topic.lower().strip()
+        return any(topic_l == a.lower().strip() or a.lower().strip() in topic_l for a in ve.avoid_domains)
+
     async def _select_topic(self, capability_graph, config_context) -> tuple[str, str, str]:
         """Returns (topic, source, reason)"""
 
@@ -367,12 +375,26 @@ class NightRunner:
             if self._is_quarantined(topic):
                 self.logger.warning("[QUARANTINE] Improvement topic is quarantined (3+ hard fails): %r", topic)
                 continue
+            if self._is_avoided(topic):
+                self.logger.info("[VISION] Improvement topic in avoid_domains — skipping: %r", topic)
+                continue
             self.logger.info("[SSJ3] Improvement topic dequeued: %r", topic)
             return topic, "improvement_engine", "Proactive improvement ticket (SSJ3)"
 
-        # Priority 0: Phoenix Protocol (25% chance of Failure Replay)
-        if random.random() < 0.25:
-            self.logger.info("[PHOENIX] Attempting failure replay lookup...")
+        # Priority 0: Phoenix Protocol — replays near-miss topics (score 6.0–7.4).
+        # Base probability 25%, boosted to 50% when the DB has known near-miss topics
+        # (score 7.0–7.4, just under the 7.5 certification threshold).
+        try:
+            from shard_db import get_db as _phx_db
+            _phx_near = _phx_db().execute(
+                "SELECT COUNT(*) FROM experiments WHERE certified=0 AND score >= 7.0 AND score < 7.5"
+            ).fetchone()[0]
+        except Exception:
+            _phx_near = 0
+        _phoenix_prob = 0.50 if _phx_near > 0 else 0.25
+        if random.random() < _phoenix_prob:
+            self.logger.info("[PHOENIX] Attempting failure replay lookup... (prob=%.0f%%, near_miss_topics=%d)",
+                             _phoenix_prob * 100, _phx_near)
             replay_engine = ExperimentReplay()
             if hasattr(replay_engine, "failed_experiments"):
                 failures = replay_engine.failed_experiments()
@@ -386,8 +408,8 @@ class NightRunner:
                 topic_data = random.choice(candidates)
                 topic = topic_data.get("topic")
                 past_score = topic_data.get("score")
-                if self._is_quarantined(topic):
-                    self.logger.info(f"[PHOENIX] Candidate '{topic}' is quarantined — skipping.")
+                if self._is_quarantined(topic) or self._is_avoided(topic):
+                    self.logger.info(f"[PHOENIX] Candidate '{topic}' is quarantined/avoided — skipping.")
                 else:
                     self.logger.info(f"[PHOENIX] Replay candidate found: '{topic}' (previous score: {past_score})")
                     return topic, "failure_replay", f"Phoenix replay: score precedente {past_score}|prev_score={past_score}"
@@ -405,7 +427,7 @@ class NightRunner:
                 _dt = _dc["topic"]
                 if not is_valid_topic(_dt, self.logger) or is_trivial_topic(_dt, self.logger):
                     continue
-                if self._is_quarantined(_dt):
+                if self._is_quarantined(_dt) or self._is_avoided(_dt):
                     continue
                 # Curiosity pull: pick adjacent topic 30% of the time
                 if _dc["curiosity_pull"] > 0.2 and random.random() < 0.30:
@@ -425,6 +447,26 @@ class NightRunner:
         except Exception as _de_sel_err:
             self.logger.debug("[DESIRE] Topic selection non-fatal: %s", _de_sel_err)
 
+        # Priority 0.5: Curriculum suggestion — topics that extend certified skills
+        try:
+            from backend.skill_library import suggest_curriculum_topics as _suggest_curr
+            _cert_set = set(capability_graph.capabilities.keys())
+            _pool_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
+            _pool = [l.strip() for l in _pool_file.read_text(encoding="utf-8").splitlines()
+                     if l.strip() and not l.startswith("#")] if _pool_file.exists() else []
+            _curr_suggestions = _suggest_curr(_cert_set, _pool, top_n=5)
+            _curr_suggestions = [
+                t for t in _curr_suggestions
+                if not self._is_quarantined(t) and not self._is_avoided(t)
+                and is_valid_topic(t, self.logger) and not is_trivial_topic(t, self.logger)
+            ]
+            if _curr_suggestions and random.random() < 0.40:  # 40% chance to follow curriculum
+                _curr_topic = _curr_suggestions[0]
+                self.logger.info("[CURRICULUM] Following skill graph: '%s'", _curr_topic)
+                return _curr_topic, "curriculum", f"Curriculum: extends/improves a certified skill"
+        except Exception as _curr_err:
+            self.logger.debug("[CURRICULUM] non-fatal: %s", _curr_err)
+
         # Priority 1: Curated topics list (primary source — replaces ExperimentInventor)
         _curated_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
         if _curated_file.exists():
@@ -435,7 +477,9 @@ class NightRunner:
                 _certified = set(capability_graph.capabilities.keys())
                 _candidates = [
                     t for t in _curated
-                    if t.lower() not in _certified and not self._is_quarantined(t)
+                    if t.lower() not in _certified
+                    and not self._is_quarantined(t)
+                    and not self._is_avoided(t)
                 ]
                 if _candidates:
                     # Goal steering: if active goal exists, prefer aligned topics
@@ -521,6 +565,10 @@ class NightRunner:
             # Fix C: quarantine hopeless topics (3+ attempts, max score < 6.0)
             if self._is_quarantined(topic):
                 self.logger.info(f"[QUARANTINE] Skipping '{topic}' — 3+ hard failures, max score < 6.0")
+                self.topic_filter_discards += 1
+                continue
+            if self._is_avoided(topic):
+                self.logger.info(f"[VISION] Skipping '{topic}' — in avoid_domains (chronic failure)")
                 self.topic_filter_discards += 1
                 continue
 
@@ -615,13 +663,23 @@ class NightRunner:
         _module_vb = globals()["_vb"]
         _vb = (lambda text, priority="low", event_type="info": None) if self._background_mode else _module_vb  # noqa: F841
         self._transition(SessionState.INIT, "loading memory + capability graph")
+        import uuid as _uuid
+        _session_id = str(_uuid.uuid4())
+        self.logger.info("[SESSION] id=%s", _session_id)
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
         # Pre-initialize environment variables so bootstrap blocks can reference them safely
-        _self_model = None
-        _world_model = None
-        _desire      = None
-        _core_env    = None
+        _self_model        = None
+        _world_model       = None
+        _desire            = None
+        _mood              = None
+        _identity          = None
+        _skill_lib         = None
+        _hebbian_singleton = None
+        _core_env          = None
+        self._vision_engine = None
+        _session_reflection = None
+        _bench_tracker     = None
         # create goal engine tied to the same capability graph
         storage = GoalStorage()
         self.goal_engine = GoalEngine(storage, capability_graph)
@@ -774,41 +832,53 @@ class NightRunner:
                 _core_env.register("self_model", _self_model, ["*"])
             if _world_model:
                 _core_env.register("world_model", _world_model,
-                                   ["skill_certified", "momentum_changed"])
+                                   ["skill_certified", "skill_failed", "momentum_changed"])
             _core_env.register("goal_engine", self.goal_engine,
-                               ["skill_certified", "momentum_changed",
-                                "frustration_peak", "world_recalibrated"])
+                               ["skill_certified", "skill_failed", "momentum_changed",
+                                "frustration_peak", "world_recalibrated", "mood_shift"])
             if _desire:
                 _core_env.register("desire_engine", _desire,
-                                   ["skill_certified", "goal_changed", "momentum_changed"])
+                                   ["skill_certified", "skill_failed", "goal_changed",
+                                    "momentum_changed", "frustration_peak", "mood_shift"])
             try:
                 from backend.semantic_memory import get_semantic_memory as _get_sem_env
                 _sem_env = _get_sem_env()
                 _core_env.register("semantic_memory", _sem_env,
-                                   ["skill_certified", "frustration_peak"])
-            except Exception:
-                pass
+                                   ["skill_certified", "skill_failed", "frustration_peak"])
+            except Exception as _sm_err:
+                self.logger.warning("[CORE ENV] semantic_memory register failed: %s", _sm_err)
             try:
-                _core_env.register("capability_graph", self.capability_graph,
-                                   ["skill_certified"])
-            except Exception:
-                pass
+                _core_env.register("capability_graph", capability_graph,
+                                   ["skill_certified", "skill_failed"])
+            except Exception as _cg_err:
+                self.logger.warning("[CORE ENV] capability_graph register failed: %s", _cg_err)
             try:
                 from backend.improvement_engine import ImprovementEngine as _IE
                 _imp_env = _IE()
                 _core_env.register("improvement_engine", _imp_env,
-                                   ["skill_certified", "frustration_peak"])
-            except Exception:
-                pass
+                                   ["skill_certified", "skill_failed", "frustration_peak"])
+            except Exception as _ie_err:
+                self.logger.warning("[CORE ENV] improvement_engine register failed: %s", _ie_err)
             try:
                 from backend.consciousness import ShardConsciousness as _SC
                 from backend.memory import ShardMemory as _SM_c
                 _mem_c = _SM_c()
-                _consciousness_env = _SC(_mem_c, self.capability_graph, self.goal_engine)
+                _consciousness_env = _SC(_mem_c, capability_graph, self.goal_engine)
                 _core_env.register("consciousness", _consciousness_env,
-                                   ["skill_certified", "frustration_peak", "momentum_changed"])
-            except Exception:
-                pass
+                                   ["skill_certified", "skill_failed", "frustration_peak",
+                                    "momentum_changed", "mood_shift", "identity_updated"])
+            except Exception as _cs_err:
+                self.logger.warning("[CORE ENV] consciousness register failed: %s", _cs_err)
+            try:
+                from backend.self_model_tracker import SelfModelTracker
+                _self_tracker = SelfModelTracker(
+                    think_fn=getattr(study_agent, "_think_fast", None)
+                )
+                _core_env.register("self_model_tracker", _self_tracker,
+                                   ["session_complete", "mood_shift", "identity_updated"])
+            except Exception as _cd_err:
+                self.logger.warning("[CORE ENV] self_model_tracker register failed: %s", _cd_err)
+                _self_tracker = None
             self.logger.info(
                 "[CORE ENV] %d module(s) registered in shared environment",
                 len(_core_env._registry),
@@ -816,6 +886,127 @@ class NightRunner:
         except Exception as _env_err:
             _core_env = None
             self.logger.warning("[CORE ENV] Registration non-fatal: %s", _env_err)
+
+        # ── MOOD ENGINE ───────────────────────────────────────────────────────
+        try:
+            from backend.mood_engine import MoodEngine as _ME
+            _mood = _ME()
+            # Register in CognitionCore BEFORE first compute so broadcast works
+            if _core_env:
+                _core_env.register(
+                    "mood_engine", _mood,
+                    ["frustration_peak", "momentum_changed", "skill_certified", "skill_failed"],
+                )
+                _mood._core_env = _core_env
+            _mood.compute(desire_engine=_desire, momentum="stable")
+            self.logger.info(
+                "[MOOD] Initial state: score=%.3f (%s)",
+                _mood.get_score(), _mood.get_label(),
+            )
+        except Exception as _mood_err:
+            self.logger.warning("[MOOD] Init non-fatal: %s", _mood_err)
+
+        # ── VISION LAYER ──────────────────────────────────────────────────────
+        try:
+            from backend.vision import get_vision as _get_vision
+            self._vision_engine = _get_vision()
+            self.logger.info("[VISION] Mission: %s", self._vision_engine.statement[:120])
+            self.logger.info("[VISION] Focus: %s", ", ".join(self._vision_engine.focus_domains[:6]))
+            if self._vision_engine.avoid_domains:
+                self.logger.info("[VISION] Avoid: %s", ", ".join(self._vision_engine.avoid_domains[:6]))
+            if _core_env:
+                _core_env.register(
+                    "vision", self._vision_engine,
+                    ["skill_certified", "frustration_peak", "momentum_changed"],
+                )
+                self.logger.info("[VISION] Registered in CognitionCore.")
+        except Exception as _ve_err:
+            self.logger.warning("[VISION] non-fatal: %s", _ve_err)
+
+        # ── SESSION REFLECTION — inject past context ───────────────────────────
+        try:
+            from backend.session_reflection import make_session_reflection as _make_sr
+            _session_reflection = _make_sr(llm_call_fn=None)  # LLM attached at end of session
+            _sr_block = _session_reflection.get_context_block()
+            # Also inject open questions from SelfModelTracker (real prediction errors)
+            try:
+                from backend.self_model_tracker import SelfModelTracker as _SMT
+                _hypo_block = _SMT.get_context_block()
+            except Exception:
+                _hypo_block = ""
+            _full_context = "\n\n".join(b for b in [_sr_block, _hypo_block] if b)
+            if _full_context:
+                self.logger.info(
+                    "[REFLECTION] Past context loaded (%d chars) — injecting into study_agent system prompt.",
+                    len(_full_context),
+                )
+                study_agent.session_context = _full_context
+            else:
+                self.logger.info("[REFLECTION] No past context — first session.")
+        except Exception as _sr_err:
+            self.logger.warning("[REFLECTION] non-fatal: %s", _sr_err)
+
+        # ── HEBBIAN UPDATER — register as CognitionCore citizen ─────────────
+        try:
+            from backend.hebbian_updater import HebbianUpdater as _HU_cls
+            _hebbian_singleton = _HU_cls()
+            if _core_env:
+                _core_env.register(
+                    "hebbian_updater", _hebbian_singleton,
+                    ["mood_shift", "skill_certified", "skill_failed"],
+                )
+            self.logger.info("[HEBBIAN] Registered in CognitionCore.")
+        except Exception as _hu_err:
+            self.logger.warning("[HEBBIAN] Init non-fatal: %s", _hu_err)
+
+        # ── SKILL LIBRARY — load Voyager-style skill cache ───────────────────
+        try:
+            from backend.skill_library import SkillLibrary as _SL
+            _skill_lib = _SL()
+            if _core_env:
+                _core_env.register("skill_library", _skill_lib, ["skill_certified"])
+            _sl_stats = _skill_lib.get_stats()
+            self.logger.info(
+                "[SKILL_LIB] Loaded — %d certified skills (avg=%.1f)",
+                _sl_stats["total_skills"], _sl_stats["avg_score"],
+            )
+        except Exception as _sl_err:
+            self.logger.warning("[SKILL_LIB] Init non-fatal: %s", _sl_err)
+
+        # ── IDENTITY CORE — inject persistent biography ───────────────────────
+        try:
+            from backend.identity_core import IdentityCore as _IC
+            _identity = _IC()
+            if _core_env:
+                _core_env.register(
+                    "identity_core", _identity,
+                    ["session_complete", "skill_certified", "skill_failed"],
+                )
+                _identity._core_env = _core_env
+            _id_block = _identity.get_context_block()
+            if _id_block:
+                _base_ctx = study_agent.session_context or ""
+                study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
+                self.logger.info(
+                    "[IDENTITY] Biography injected (%d chars) — sessions=%d self_esteem=%.2f trajectory=%s",
+                    len(_id_block),
+                    _identity.get_status().get("sessions_lived", 0),
+                    _identity.get_status().get("self_esteem", 0.0),
+                    _identity.get_status().get("trajectory", "unknown"),
+                )
+            else:
+                self.logger.info("[IDENTITY] No biography yet — first session.")
+        except Exception as _id_init_err:
+            self.logger.warning("[IDENTITY] Init non-fatal: %s", _id_init_err)
+
+        # ── BENCHMARK TRACKER — log delta from previous session ───────────────
+        try:
+            from backend.benchmark_tracker import get_benchmark_tracker as _get_btrk
+            _bench_tracker = _get_btrk()
+            _prev_delta_str = _bench_tracker.get_delta_summary()
+            self.logger.info("[BENCH TRACKER] Previous session: %s", _prev_delta_str)
+        except Exception as _bt_err:
+            self.logger.warning("[BENCH TRACKER] non-fatal: %s", _bt_err)
 
         # ── GAP DETECTOR: Autonomous failure-driven study topic injection ──────
         # Reads benchmark_episodes.json, clusters error patterns, enqueues gaps.
@@ -839,6 +1030,58 @@ class NightRunner:
             self._transition(SessionState.SELECT, f"cycle {cycle}/{self.max_cycles}")
             topic, source, reason = await self._select_topic(capability_graph, "")
 
+            # ── PREREQUISITE GATE — se il topic è difficile, studia prima i prereq ──
+            try:
+                from backend.prerequisite_checker import get_missing_prerequisites as _get_prereqs
+                from shard_db import query as _prereq_db
+                # Calcola sig_difficulty dal DB (stesso calcolo di prima del ciclo)
+                _prereq_exps = _prereq_db(
+                    "SELECT certified FROM experiments WHERE topic=? ORDER BY created_at DESC LIMIT 10",
+                    (topic,),
+                )
+                if _prereq_exps:
+                    _prereq_cert_r = sum(1 for e in _prereq_exps if e["certified"]) / len(_prereq_exps)
+                    _prereq_difficulty = round(1.0 - _prereq_cert_r, 2)
+                else:
+                    _prereq_difficulty = 0.5
+                _missing_prereqs = get_missing_prerequisites(topic, capability_graph, _prereq_difficulty)
+                if _missing_prereqs:
+                    _original_topic = topic
+                    # Filter out prereqs that are quarantined, avoided, or invalid
+                    _safe_prereqs = [
+                        _p for _p in _missing_prereqs
+                        if (
+                            is_valid_topic(_p, self.logger)
+                            and not is_trivial_topic(_p, self.logger)
+                            and not self._is_quarantined(_p)
+                            and not self._is_avoided(_p)
+                        )
+                    ]
+                    if _safe_prereqs:
+                        _prereq_topic = _safe_prereqs[0]
+                        self.logger.info(
+                            "[PREREQ] '%s' (difficulty=%.2f) needs '%s' first — redirecting",
+                            _original_topic, _prereq_difficulty, _prereq_topic,
+                        )
+                        # Queue remaining prereqs + original topic for future cycles
+                        try:
+                            from backend.improvement_engine import ImprovementEngine as _IE_prereq
+                            _ie_prereq = _IE_prereq()
+                            for _p in reversed(_safe_prereqs[1:] + [_original_topic]):
+                                _ie_prereq.enqueue_topics([_p])
+                        except Exception:
+                            pass
+                        topic  = _prereq_topic
+                        source = "prerequisite"
+                        reason = f"Prerequisite for '{_original_topic}' (difficulty={_prereq_difficulty:.2f})"
+                    else:
+                        self.logger.debug(
+                            "[PREREQ] All prereqs for '%s' are quarantined/invalid — proceeding as-is",
+                            _original_topic,
+                        )
+            except Exception as _prereq_err:
+                self.logger.debug("[PREREQ] non-fatal: %s", _prereq_err)
+
             self.logger.info(f"=== Cycle {cycle}/{self.max_cycles} ===")
             self.logger.info(f"Topic selected: {topic}")
             self.logger.info(f"Source: {source}")
@@ -859,12 +1102,84 @@ class NightRunner:
             strategy_memory = StrategyMemory()
             strategies = strategy_memory.query(topic, k=1)
             if strategies:
-                strat_name = strategies[0]["topic"] 
+                strat_name = strategies[0]["topic"]
                 self.logger.info(f"[STRATEGY] Reusing strategy: {strat_name} for topic: {topic}")
                 cycle_data["strategies_reused"].append(strat_name)
             else:
                 self.logger.info(f"[STRATEGY] No existing strategy found for: {topic}")
-            
+
+            # ── SELF-MODEL: predict score before studying ─────────────────────
+            # Features are observable facts about this cycle — not invented.
+            # sig_* are citizen signals (0.0-1.0) for activation_log / synaptic weights.
+            _sig_desire     = 0.0
+            _sig_difficulty = 0.5
+            _sig_graphrag   = 0.0
+
+            # sig_desire — desire_score composito (frustration + curiosity + engagement)
+            try:
+                from backend.desire_engine import get_desire_engine as _get_de_sig
+                _de_sig = _get_de_sig()
+                _desire_ctx = _de_sig.get_desire_context(topic)
+                _sig_desire = round(float(_desire_ctx.get("desire_score", 0.0)), 4)
+            except Exception:
+                pass
+
+            # sig_difficulty — 1 - cert_rate storica (topic mai visto = 0.5 neutro)
+            try:
+                from shard_db import query as _smq_diff
+                _diff_hist = _smq_diff(
+                    "SELECT certified FROM experiments WHERE topic=? "
+                    "ORDER BY timestamp DESC LIMIT 10", (topic,)
+                )
+                if _diff_hist:
+                    _cert_r = sum(1 for r in _diff_hist if r["certified"]) / len(_diff_hist)
+                    _sig_difficulty = round(1.0 - _cert_r, 2)
+            except Exception:
+                pass
+
+            if _self_tracker:
+                try:
+                    from shard_db import query as _smq
+                    _prior = _smq(
+                        "SELECT score FROM experiments WHERE topic=? AND score IS NOT NULL "
+                        "ORDER BY timestamp DESC LIMIT 5", (topic,)
+                    )
+                    _prior_scores = [r["score"] for r in _prior]
+
+                    # sig_graphrag — conteggio reale relazioni causali nel knowledge graph
+                    try:
+                        from backend.graph_rag import count_causal_hits as _cch
+                        _sig_graphrag = round(min(1.0, _cch(topic) / 10.0), 2)
+                    except Exception:
+                        _sig_graphrag = 1.0 if _prior_scores else 0.0
+
+                    _cycle_features = {
+                        "had_episodic_context": bool(_prior_scores),
+                        "strategy_reused":      bool(strategies),
+                        "near_miss_history":    any(6.0 <= s <= 7.4 for s in _prior_scores),
+                        "first_attempt":        len(_prior_scores) == 0,
+                        "graphrag_hits":        _sig_graphrag,
+                        "source_improvement":   source == "improvement_engine",
+                        # Continuous signals — feed into predictive processing loop
+                        "sig_difficulty":       _sig_difficulty,
+                        "sig_desire":           _sig_desire,
+                        "sig_graphrag":         _sig_graphrag,
+                    }
+                    _predicted_score = _self_tracker.predict_before(topic, _cycle_features)
+                    self.logger.info(
+                        "[SELF_MODEL] Predicted score for '%s': %.1f | "
+                        "desire=%.2f difficulty=%.2f graphrag=%.2f",
+                        topic, _predicted_score,
+                        _sig_desire, _sig_difficulty, _sig_graphrag,
+                    )
+                except Exception as _sm_err:
+                    _cycle_features = {}
+                    _predicted_score = None
+                    self.logger.debug("[SELF_MODEL] predict_before non-fatal: %s", _sm_err)
+            else:
+                _cycle_features = {}
+                _predicted_score = None
+
             async def on_certify(t, s, e_data):
                 cycle_data["certified"] = True
                 cycle_data["score"] = s
@@ -889,12 +1204,55 @@ class NightRunner:
             try:
                 self._transition(SessionState.STUDY, topic)
                 self.api_calls_used += 3
+
+                # ── SKILL LIBRARY INJECTION — past certified solutions ────────
+                _sl_injected = False
+                if _skill_lib is not None:
+                    try:
+                        _sl_block = _skill_lib.get_injection_block(topic, capability_graph)
+                        if _sl_block:
+                            _base_ctx = study_agent.session_context or ""
+                            study_agent.session_context = "\n\n".join(b for b in [_sl_block, _base_ctx] if b)
+                            _sl_injected = True
+                            self.logger.info("[SKILL_LIB] Injected %d chars for topic '%s'", len(_sl_block), topic)
+                    except Exception as _sl_inj_err:
+                        self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
+
+                # ── MOOD INJECTION — stato affettivo → prompt di studio ────────
+                if _mood:
+                    try:
+                        _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
+                        _mood_hint = _mood.get_prompt_hint()
+                        _mood_label = _mood.get_label()
+                        # Prepend mood hint to session_context (non-destructive)
+                        _base_ctx = study_agent.session_context or ""
+                        study_agent.session_context = (
+                            f"[AFFECTIVE STATE: {_mood_label.upper()}] {_mood_hint}\n\n{_base_ctx}"
+                        ).strip()
+                        self.logger.info("[MOOD] Injected into study prompt: %s (%.3f)", _mood_label, _mood.get_score())
+                    except Exception as _mi_err:
+                        self.logger.debug("[MOOD] inject non-fatal: %s", _mi_err)
+
                 best_score = await study_agent.study_topic(
                     topic=topic,
                     tier=persona_cfg.tier,
                     on_certify=on_certify,
                     previous_score=prev_score,
                 )
+
+                # Restore session_context — strip mood and skill lib prefixes
+                _ctx = study_agent.session_context or ""
+                if _mood and "[AFFECTIVE STATE:" in _ctx:
+                    _ctx = "\n\n".join(
+                        p for p in _ctx.split("\n\n")
+                        if not p.startswith("[AFFECTIVE STATE:")
+                    ).strip()
+                if _sl_injected and "=== SHARD SKILL LIBRARY" in _ctx:
+                    _ctx = "\n\n".join(
+                        p for p in _ctx.split("\n\n")
+                        if not p.startswith("=== SHARD SKILL LIBRARY")
+                    ).strip()
+                study_agent.session_context = _ctx
                 if not cycle_data["certified"] and best_score:
                     cycle_data["score"] = best_score
                     _vb(f"Topic fallito: {topic}. Miglior score raggiunto: {round(best_score, 2)} su dieci.", priority="medium", event_type="cycle_failed")
@@ -917,6 +1275,20 @@ class NightRunner:
                     _engagement = _eng_score(certified=cycle_data["certified"])
 
                     if cycle_data["certified"]:
+                        # Save to Voyager skill library (no regression)
+                        if _skill_lib is not None:
+                            try:
+                                _sl_session = datetime.now().strftime("%Y%m%d_%H%M%S")
+                                _sl_strats  = cycle_data.get("strategies_reused", [])
+                                _skill_lib.save_skill(
+                                    topic=topic,
+                                    score=cycle_data["score"] or 7.5,
+                                    session_id=_sl_session,
+                                    strategies=_sl_strats,
+                                )
+                            except Exception as _sl_save_err:
+                                self.logger.debug("[SKILL_LIB] save non-fatal: %s", _sl_save_err)
+
                         # Broadcast: skill certified → all registered modules react
                         if _core_env:
                             _n_rcv = _core_env.broadcast(
@@ -938,8 +1310,17 @@ class NightRunner:
                                 scores=[cycle_data["score"] or 0.0],
                             )
                     else:
-                        # Failed cycle: update frustration directly (desire engine is not
-                        # registered for a "skill_failed" event — keep it simple)
+                        # Failed cycle: broadcast skill_failed so all registered citizens react
+                        if _core_env:
+                            _n_rcv = _core_env.broadcast(
+                                "skill_failed",
+                                {"topic": topic, "score": cycle_data["score"] or 0.0},
+                                source="night_runner",
+                            )
+                            self.logger.info(
+                                "[CORE ENV] broadcast 'skill_failed' → %d recipient(s) reacted",
+                                _n_rcv,
+                            )
                         if _desire:
                             _desire.update_frustration(topic)
                             _desire.record_engagement(topic, _engagement)
@@ -1061,17 +1442,25 @@ class NightRunner:
             # ── Write experiment to SQLite ─────────────────────────────────────
             # Single INSERT replaces the old read-all → append → rewrite-all JSON cycle.
             # Determine failure_reason from available signals
-            _failure_reason = "unknown"
+            _failures_list = cycle_data.get("failures", [])
             if cycle_data["certified"]:
                 _failure_reason = "none"
-            elif any(f.startswith("CRASH") for f in cycle_data.get("failures", [])):
+            elif any(f.startswith("BUDGET_EXCEEDED") for f in _failures_list):
+                # LLM call budget exhausted — not a model quality issue
+                _failure_reason = "budget_exceeded"
+            elif any(f.startswith("CRASH") for f in _failures_list):
                 _failure_reason = "crash"
             elif cycle_data["score"] == 0.0:
+                # Score zero without explicit exception — broken phase or empty LLM response
                 _failure_reason = "phase_error"
             elif cycle_data["score"] < 5.0:
                 _failure_reason = "low_score"
             elif cycle_data["score"] < 7.5:
+                # 5.0–7.4: passed study but didn't reach certification threshold
                 _failure_reason = "near_miss"
+            else:
+                # score >= 7.5 but not certified — synthesis or sandbox gate failed
+                _failure_reason = "gate_fail"
 
             try:
                 from shard_db import get_db as _get_db
@@ -1103,6 +1492,80 @@ class NightRunner:
             except Exception as _db_err:
                 self.logger.warning("[DB] Could not write experiment to SQLite: %s", _db_err)
 
+            # ── SELF-MODEL: record outcome, compute prediction error ───────────
+            if _self_tracker and _cycle_features:
+                try:
+                    # Record this cycle's outcome vs prediction
+                    _hypothesis = _self_tracker.record_outcome(
+                        topic=topic,
+                        actual_score=cycle_data["score"] or 0.0,
+                        certified=cycle_data["certified"],
+                        desire_engine=_desire,
+                        goal_engine=self.goal_engine,
+                    )
+                    if _hypothesis:
+                        self.logger.info(
+                            "[SELF_MODEL] Inconsistency on '%s': feature='%s' gap=%.3f",
+                            topic,
+                            _hypothesis.get("feature", ""),
+                            _hypothesis.get("gap", 0.0),
+                        )
+                except Exception as _smt_err:
+                    self.logger.debug("[SELF_MODEL] record_outcome non-fatal: %s", _smt_err)
+
+            # ── ACTIVATION LOG — sinapsi: salva segnali cittadini + outcome ──────
+            # Sempre loggato — indipendente da _self_tracker e _cycle_features.
+            try:
+                from shard_db import execute as _db_exec
+                _db_exec(
+                    """INSERT INTO activation_log
+                       (session_id, topic, timestamp, score, certified,
+                        predicted_score, source,
+                        sig_episodic, sig_strategy, sig_near_miss,
+                        sig_first_try, sig_graphrag, sig_improvement,
+                        sig_desire, sig_difficulty)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    (
+                        _session_id,
+                        topic,
+                        datetime.now().isoformat(),
+                        cycle_data.get("score") or 0.0,
+                        int(bool(cycle_data.get("certified"))),
+                        _predicted_score or 5.0,
+                        source,
+                        float(_cycle_features.get("had_episodic_context", False)),
+                        float(_cycle_features.get("strategy_reused", False)),
+                        float(_cycle_features.get("near_miss_history", False)),
+                        float(_cycle_features.get("first_attempt", False)),
+                        _sig_graphrag,
+                        float(_cycle_features.get("source_improvement", False)),
+                        _sig_desire,
+                        _sig_difficulty,
+                    ),
+                )
+                self.logger.debug("[ACTIVATION] logged cycle for topic='%s'", topic)
+            except Exception as _act_err:
+                self.logger.debug("[ACTIVATION] non-fatal: %s", _act_err)
+
+            # ── HEBBIAN UPDATE — plasticita sinaptica dopo ogni ciclo ──────────
+            try:
+                from backend.hebbian_updater import HebbianUpdater as _HU
+                _hebbian = _hebbian_singleton if _hebbian_singleton is not None else _HU()
+                _heb_signals = {
+                    "sig_episodic":    float(_cycle_features.get("had_episodic_context", False)),
+                    "sig_strategy":    float(_cycle_features.get("strategy_reused", False)),
+                    "sig_near_miss":   float(_cycle_features.get("near_miss_history", False)),
+                    "sig_first_try":   float(_cycle_features.get("first_attempt", False)),
+                    "sig_graphrag":    _sig_graphrag,
+                    "sig_improvement": float(_cycle_features.get("source_improvement", False)),
+                    "sig_desire":      _sig_desire,
+                    "sig_difficulty":  _sig_difficulty,
+                }
+                _heb_n = _hebbian.update(_heb_signals, certified=bool(cycle_data.get("certified")))
+                self.logger.debug("[HEBBIAN] %d pair(s) updated (cert=%s)", _heb_n, bool(cycle_data.get("certified")))
+            except Exception as _heb_err:
+                self.logger.debug("[HEBBIAN] non-fatal: %s", _heb_err)
+
             if cycle < self.max_cycles and not self._check_limits(cycle + 1):
                 if self._background_mode:
                     # Yield extra time to the audio session between cycles
@@ -1126,6 +1589,23 @@ class NightRunner:
 
         # ── Benchmark Loop: run all benchmark tasks ──────────────────────────
         await self._run_benchmarks()
+
+        # Record benchmark results in tracker and log delta
+        if _bench_tracker and self.benchmark_results:
+            try:
+                _btrk_results = [
+                    {
+                        "task_dir": b.get("task", ""),
+                        "success": b.get("success", False),
+                        "total_attempts": b.get("attempts", 1),
+                        "elapsed_total": b.get("elapsed_seconds", 0.0),
+                    }
+                    for b in self.benchmark_results
+                ]
+                _bench_tracker.record_session(_btrk_results)
+                self.logger.info("[BENCH TRACKER] %s", _bench_tracker.get_delta_summary())
+            except Exception as _btrk_err:
+                self.logger.warning("[BENCH TRACKER] record_session failed: %s", _btrk_err)
 
         total_runtime = round((time.time() - self.start_time)/60, 2)
         total_cert = sum(1 for c in self.session_data if c["certified"])
@@ -1162,6 +1642,7 @@ class NightRunner:
                 _sm_final.blind_spots[:3],
             )
             # Broadcast momentum change so GoalEngine + DesireEngine + WorldModel react
+            self._last_momentum = _sm_final.momentum
             if _core_env and _sm_final.momentum != _prev_momentum:
                 _n_rcv = _core_env.broadcast(
                     "momentum_changed",
@@ -1217,6 +1698,63 @@ class NightRunner:
         except Exception as exc:
             self.logger.warning("[PROACTIVE] Non-fatal error: %s", exc)
 
+        # ── SESSION REFLECTION — LLM-generated end-of-session analysis ──────────
+        if _session_reflection is not None:
+            try:
+                _certified_topics = [c["topic"] for c in self.session_data if c.get("certified")]
+                _failed_topics    = [c["topic"] for c in self.session_data if not c.get("certified")]
+                _bench_delta_str  = (
+                    _bench_tracker.get_delta_summary() if _bench_tracker else "N/A"
+                )
+                _refl_ctx = {
+                    "certified_topics": _certified_topics,
+                    "failed_topics":    _failed_topics,
+                    "benchmark_delta":  _bench_delta_str,
+                    "session_id":       datetime.now().strftime("%Y%m%d_%H%M%S"),
+                }
+                # Attach LLM callable from study_agent
+                _session_reflection._llm = study_agent._think_fast
+                _reflection_text = await _session_reflection.generate_and_save(_refl_ctx)
+                if _reflection_text:
+                    self.logger.info(
+                        "[REFLECTION] Generated (%d chars):\n%s",
+                        len(_reflection_text),
+                        _reflection_text[:500],
+                    )
+            except Exception as _refl_err:
+                self.logger.warning("[REFLECTION] Generation non-fatal: %s", _refl_err)
+
+        # ── IDENTITY CORE — rebuild biography end-of-session ─────────────────
+        try:
+            if _identity is not None:
+                _final_momentum = getattr(self, "_last_momentum", "stable")
+                _identity.rebuild(
+                    think_fn=study_agent._think_fast,
+                    momentum=_final_momentum,
+                )
+                self.logger.info(
+                    "[IDENTITY] Rebuilt — sessions=%d cert_rate=%.0f%% self_esteem=%.2f trajectory=%s",
+                    _identity.get_status().get("sessions_lived", 0),
+                    _identity.get_status().get("cert_rate_overall", 0.0) * 100,
+                    _identity.get_status().get("self_esteem", 0.0),
+                    _identity.get_status().get("trajectory", "unknown"),
+                )
+        except Exception as _id_end_err:
+            self.logger.warning("[IDENTITY] End-of-session rebuild non-fatal: %s", _id_end_err)
+
+        # ── SELF-MODEL: session_complete broadcast ────────────────────────────
+        try:
+            if _core_env:
+                _core_env.broadcast("session_complete", {}, source="night_runner")
+            if _self_tracker:
+                # Log current learned weights so we can see them evolving
+                self.logger.info(
+                    "[SELF_MODEL] Learned feature weights: %s",
+                    {k: v for k, v in _self_tracker._weights.items() if abs(v) > 0.01},
+                )
+        except Exception as _smt_end_err:
+            self.logger.debug("[SELF_MODEL] session_complete non-fatal: %s", _smt_end_err)
+
         self.logger.info("Session complete. Shutting down cleanly.")
 
     async def _run_benchmarks(self):
@@ -1239,10 +1777,14 @@ class NightRunner:
         except ImportError:
             from benchmark_loop import run_benchmark_loop
 
+        _TASK_TIMEOUT_S = 300  # 5 minutes max per benchmark task
         for task_dir in task_dirs:
             self.logger.info("[BENCHMARK] Starting task: %s", task_dir.name)
             try:
-                result = await run_benchmark_loop(task_dir, max_attempts=5)
+                result = await asyncio.wait_for(
+                    run_benchmark_loop(task_dir, max_attempts=5),
+                    timeout=_TASK_TIMEOUT_S,
+                )
                 summary = {
                     "task": task_dir.name,
                     "success": result.success,
@@ -1257,6 +1799,16 @@ class NightRunner:
                     "[BENCHMARK] %s %s — %d attempt(s), %.1fs",
                     status, task_dir.name, result.total_attempts, result.elapsed_total,
                 )
+            except asyncio.TimeoutError:
+                self.logger.warning(
+                    "[BENCHMARK] Task %s TIMED OUT after %ds — skipping.",
+                    task_dir.name, _TASK_TIMEOUT_S,
+                )
+                self.benchmark_results.append({
+                    "task": task_dir.name, "success": False,
+                    "attempts": 0, "elapsed_seconds": _TASK_TIMEOUT_S,
+                    "error": f"TimeoutError after {_TASK_TIMEOUT_S}s",
+                })
             except Exception as exc:
                 self.logger.warning("[BENCHMARK] Task %s crashed: %s", task_dir.name, exc)
                 self.benchmark_results.append({
