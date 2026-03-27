@@ -10,60 +10,18 @@
   "avoid_domains": [
     "asyncio advanced patterns",
     "git internals object model",
-    "async io with python selectors"
+    "async io with python selectors",
+    "password hashing bcrypt argon2"
   ],
-  "certified_count": 30,
+  "certified_count": 34,
   "frustration_topics": [
     "asyncio advanced patterns",
     "git internals object model",
-    "async io with python selectors"
+    "async io with python selectors",
+    "password hashing bcrypt argon2"
   ],
-  "last_updated": "2026-03-27T14:22:18.026281+00:00",
+  "last_updated": "2026-03-27T15:49:21.485569+00:00",
   "update_log": [
-    {
-      "ts": "2026-03-26T18:54:58.600214+00:00",
-      "msg": "certified: python generators and coroutines (score=9.2)"
-    },
-    {
-      "ts": "2026-03-26T19:31:34.597965+00:00",
-      "msg": "certified: template parser handling and debugging (score=7.6)"
-    },
-    {
-      "ts": "2026-03-26T19:43:58.240385+00:00",
-      "msg": "certified: python dataclasses and slots (score=9.3)"
-    },
-    {
-      "ts": "2026-03-26T19:57:02.474171+00:00",
-      "msg": "certified: heap data structure and priority queue (score=8.0)"
-    },
-    {
-      "ts": "2026-03-26T22:48:13.970392+00:00",
-      "msg": "certified: template parser handling and debugging (score=8.3)"
-    },
-    {
-      "ts": "2026-03-26T22:54:51.700434+00:00",
-      "msg": "certified: heap data structure and priority queue (score=8.5)"
-    },
-    {
-      "ts": "2026-03-26T23:14:14.324620+00:00",
-      "msg": "frustration: asyncio advanced patterns (5 hits) → avoid_domains"
-    },
-    {
-      "ts": "2026-03-26T23:19:28.884884+00:00",
-      "msg": "certified: decision tree implementation (score=9.0)"
-    },
-    {
-      "ts": "2026-03-26T23:23:26.544772+00:00",
-      "msg": "certified: two pointer technique (score=9.3)"
-    },
-    {
-      "ts": "2026-03-26T23:49:34.696517+00:00",
-      "msg": "certified: template parser handling and debugging (score=8.5)"
-    },
-    {
-      "ts": "2026-03-26T23:57:55.230943+00:00",
-      "msg": "certified: trie data structure (score=8.0)"
-    },
     {
       "ts": "2026-03-27T00:14:44.224746+00:00",
       "msg": "certified: Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis (score=8.3)"
@@ -139,6 +97,50 @@
     {
       "ts": "2026-03-27T14:22:18.026281+00:00",
       "msg": "certified: template parser handling and debugging (score=7.8)"
+    },
+    {
+      "ts": "2026-03-27T14:27:35.016796+00:00",
+      "msg": "frustration: async io with python selectors (5 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T14:31:01.832418+00:00",
+      "msg": "certified: dependency injection python (score=9.0)"
+    },
+    {
+      "ts": "2026-03-27T14:36:03.062044+00:00",
+      "msg": "certified: transformer attention mechanism (score=7.5)"
+    },
+    {
+      "ts": "2026-03-27T14:56:14.752724+00:00",
+      "msg": "frustration: git internals object model (4 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T15:00:46.607886+00:00",
+      "msg": "certified: Integration of rest api and quantum linear key-recovery attacks (score=8.7)"
+    },
+    {
+      "ts": "2026-03-27T15:16:09.880244+00:00",
+      "msg": "frustration: async io with python selectors (6 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T15:19:06.781294+00:00",
+      "msg": "certified: Integration of solid principles and prime number generation (score=8.3)"
+    },
+    {
+      "ts": "2026-03-27T15:32:38.742056+00:00",
+      "msg": "frustration: password hashing bcrypt argon2 (3 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T15:38:59.746126+00:00",
+      "msg": "frustration: password hashing bcrypt argon2 (4 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T15:44:32.511685+00:00",
+      "msg": "frustration: git internals object model (5 hits) → avoid_domains"
+    },
+    {
+      "ts": "2026-03-27T15:49:21.485569+00:00",
+      "msg": "frustration: password hashing bcrypt argon2 (5 hits) → avoid_domains"
     }
   ]
 }

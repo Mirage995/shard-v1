@@ -1,0 +1,39 @@
+{
+  "sessions_lived": 5,
+  "narrative": "",
+  "total_attempts": 404,
+  "total_certified": 172,
+  "cert_rate_overall": 0.4257,
+  "strong_domains": [
+    "algorithms",
+    "data"
+  ],
+  "weak_domains": [
+    "networking"
+  ],
+  "peak_skills": [
+    "Python decorators and metaclasses",
+    "python descriptor protocol",
+    "python object oriented programming",
+    "race condition handling and debugging",
+    "json parsing and serialization python",
+    "python context managers and resource management",
+    "python dataclasses and slots",
+    "two pointer technique"
+  ],
+  "chronic_blocks": [
+    "convolutional neural networks (cnns) applied to sorting algorithm tier 1",
+    "impossible differentials in cryptography applied to exception handling boundaries",
+    "test_driven_development applied to deep_learning",
+    "impossible differentials in cryptography applied to python decorators and metaclasses",
+    "observability applied to dark matter hypothesis",
+    "api_integration applied to web_scraping",
+    "exception-driven control flow applied to perceptron",
+    "web scraping with beautifulsoup applied to convolutional neural networks (cnns)",
+    "dns resolution python",
+    "password hashing bcrypt argon2"
+  ],
+  "self_esteem": 0.2554,
+  "trajectory": "declining",
+  "updated_at": "2026-03-27T16:59:31.706163"
+}

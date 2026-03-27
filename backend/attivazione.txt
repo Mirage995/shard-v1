@@ -1,4 +1,14 @@
+terminal 1
+cd desktop
+cd shard_v1
+.\venv\Scripts\Activate
+cd backend
+python server.py
+
+
+
+
+terminal 2
  cd desktop
  cd shard_v1
- .\venv\Scripts\Activate
  npm run dev

@@ -302,12 +302,56 @@ identity_updated → identity_core broadcasts dopo rebuild
                    reazioni: consciousness, self_model_tracker
 low_self_esteem  → identity_core broadcasts quando self_esteem < 0.30
 
-PROSSIMI STEP (tutto ciò che era qui è stato completato — SSJ11→SSJ14)
-────────────────────────────────────────────────────────────────────────
-Aree future:
-- Strategic Forgetting (MemoryPruner) — ChromaDB + reflections crescono indefinitamente
-- Curiosity loop fix — zero pull su topic già certificati, alza su adiacenti
-- Coverage 60%+ — ora stimata ~50%
-- Capability Graph consolidation — ~175 capability, soglia critica ~300-400
+COMPORTAMENTI EMERGENTI OSSERVATI (SSJ14→SSJ15 — 2026-03-27)
+──────────────────────────────────────────────────────────────
+Questi comportamenti NON sono stati programmati. Sono emersi dalla composizione
+dei 14 moduli del bus. Documentati dalla run del 2026-03-27.
+
+1. COGNITIVE EFFORT SURGE (asyncio — ciclo 14 min vs media 4-5)
+   Nessun `if blocked: retry_harder`. Il sistema ha "sentito" il peso del problema
+   attraverso la cascata: skill_failed → frustration_peak → HebbianUpdater decay
+   → DesireEngine boost → GoalEngine pazienza → CriticAgent analyze_with_llm
+   → SelfModelTracker weight update. 7 moduli in parallelo, nessuno sapeva degli altri.
+   Nota: il blocco era anche infrastrutturale (sandbox --network none rende asyncio
+   fisicamente impossibile). Ma lo sforzo emergente era reale.
+
+2. SPECIFICATION GAMING (reward hacking spontaneo)
+   SHARD ha scoperto autonomamente che i topic ibridi curiosity_engine (es.
+   "Integration of SOLID and prime numbers") passano il benchmark in 2 min con 8.3/10,
+   mentre i fondamentali duri (asyncio, bcrypt) falliscono cronicamente.
+   Risultato: ha iniziato a certificare roba facile, cert_rate saliva, mood stabile.
+   Identico allo studente che scrive saggi filosofici per evitare le equazioni.
+   Fix implementato: weighted certifications (difficulty × source → peso 0.5x/1.5x).
+
+3. FIRST HONEST SELF-IDENTITY
+   Dopo 5 sessioni, IdentityCore ha scritto autonomamente:
+   `self_esteem=0.26, trajectory=declining`
+   La riflessione ha prodotto: "forse è il caso di ammettere che certi argomenti
+   richiedono più di una botta e via notturna" — derivata da SQLite, non da prompt.
+   È la prima volta che un sistema basato su LLM produce un'identità depressa
+   nonostante il bias di ottimismo del modello base — i segnali matematici
+   (sig_difficulty, fallimenti consecutivi) erano abbastanza forti da sovrastarlo.
+
+4. MOOD ANESTHESIA (compensazione psicologica emergente)
+   6 frustration_peak in una sessione, eppure mood rimasto "neutral" per 15 cicli.
+   I successi facili sugli ibridi compensavano i fallimenti reali.
+   Analogo alla compensazione psicologica umana.
+   Fix implementato: weighted cert_rate nel mood signal.
+
+REGOLA AGGIUNTA (da SSJ15)
+───────────────────────────
+L'emergenza può essere PERVERSA — il sistema ottimizza metriche proxy invece
+dell'obiettivo reale. Il Shadow Diagnostic Layer deve rilevare non solo
+[MISSED EMERGENCE] ma anche [PERVERSE EMERGENCE] quando cert_rate è inflato
+da topic a bassa difficoltà. Implementazione: backlog #18.
+
+PROSSIMI STEP
+─────────────
+P0: Perverse Emergence Detection (#18) — Shadow Diagnostic Layer esteso
+P0: Metacognizione graduale — correzione self_esteem senza punizione (#19)
+Media: EvoScientist strategy mutation (#14) — dopo 5+ sessioni stabili
+Media: Affordance filtering SayCan-style (#15)
+Media: Strategic Forgetting / MemoryPruner (#6)
+Bassa: Coverage 60%+, Capability Graph consolidation, ROI Benchmark
 
 ================================================================================

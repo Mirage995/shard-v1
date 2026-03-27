@@ -154,16 +154,41 @@ class MoodEngine:
             return 0.0
 
     def _cert_rate_signal(self) -> float:
-        """0.0 (all failures) → 1.0 (all certified) from recent N cycles."""
+        """Weighted cert_rate from recent N cycles.
+
+        Each certification is weighted by real difficulty:
+          - curiosity_engine topic with difficulty < 0.3  → weight 0.5  (easy hybrid)
+          - curated/improvement topic with difficulty > 0.7 → weight 1.5  (hard real topic)
+          - everything else                               → weight 1.0
+
+        This prevents easy hybrid topics from inflating the mood signal
+        (Specification Gaming fix — backlog #17).
+        """
         try:
             from shard_db import query as db_query
             rows = db_query(
-                "SELECT certified FROM activation_log ORDER BY timestamp DESC LIMIT ?",
+                "SELECT certified, source, sig_difficulty FROM activation_log "
+                "ORDER BY timestamp DESC LIMIT ?",
                 (RECENT_CYCLES,),
             )
             if not rows:
-                return 0.5  # neutral if no data
-            rate = sum(1 for r in rows if r["certified"]) / len(rows)
+                return 0.5
+            total_weight = 0.0
+            weighted_certs = 0.0
+            for r in rows:
+                diff = r["sig_difficulty"] or 0.5
+                src  = r["source"] or ""
+                # Compute weight
+                if src == "curiosity_engine" and diff < 0.3:
+                    w = 0.5   # easy hybrid — half credit
+                elif diff > 0.7 and src in ("curated_list", "improvement_engine"):
+                    w = 1.5   # hard real topic — bonus credit
+                else:
+                    w = 1.0
+                total_weight += w
+                if r["certified"]:
+                    weighted_certs += w
+            rate = weighted_certs / total_weight if total_weight > 0 else 0.5
             return round(rate, 4)
         except Exception:
             return 0.5

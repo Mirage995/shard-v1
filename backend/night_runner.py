@@ -1183,6 +1183,9 @@ class NightRunner:
             async def on_certify(t, s, e_data):
                 cycle_data["certified"] = True
                 cycle_data["score"] = s
+                # Capture winning code + pass_rate for skill_implementations (#13)
+                cycle_data["pass_rate"] = e_data.get("pass_rate") or 0.0
+                cycle_data["winning_code"] = e_data.get("winning_code") or ""
                 _vb(f"Topic certificato: {t}. Score: {s} su dieci.", priority="low", event_type="cycle_certified")
                 
             # Fix B: extract previous_score from Phoenix replay reason tag
@@ -1210,11 +1213,14 @@ class NightRunner:
                 if _skill_lib is not None:
                     try:
                         _sl_block = _skill_lib.get_injection_block(topic, capability_graph)
-                        if _sl_block:
+                        # Also inject past working implementation if available
+                        _impl_block = _skill_lib.get_implementation_block(topic)
+                        _combined = "\n\n".join(b for b in [_sl_block, _impl_block] if b)
+                        if _combined:
                             _base_ctx = study_agent.session_context or ""
-                            study_agent.session_context = "\n\n".join(b for b in [_sl_block, _base_ctx] if b)
+                            study_agent.session_context = "\n\n".join(b for b in [_combined, _base_ctx] if b)
                             _sl_injected = True
-                            self.logger.info("[SKILL_LIB] Injected %d chars for topic '%s'", len(_sl_block), topic)
+                            self.logger.info("[SKILL_LIB] Injected %d chars for topic '%s'", len(_combined), topic)
                     except Exception as _sl_inj_err:
                         self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
 
@@ -1247,10 +1253,11 @@ class NightRunner:
                         p for p in _ctx.split("\n\n")
                         if not p.startswith("[AFFECTIVE STATE:")
                     ).strip()
-                if _sl_injected and "=== SHARD SKILL LIBRARY" in _ctx:
+                if _sl_injected and ("=== SHARD SKILL LIBRARY" in _ctx or "[PAST WORKING CODE" in _ctx):
                     _ctx = "\n\n".join(
                         p for p in _ctx.split("\n\n")
                         if not p.startswith("=== SHARD SKILL LIBRARY")
+                        and not p.startswith("[PAST WORKING CODE")
                     ).strip()
                 study_agent.session_context = _ctx
                 if not cycle_data["certified"] and best_score:
@@ -1286,6 +1293,16 @@ class NightRunner:
                                     session_id=_sl_session,
                                     strategies=_sl_strats,
                                 )
+                                # Save winning implementation (Voyager #13)
+                                _impl_code = cycle_data.get("winning_code")
+                                _impl_pass_rate = cycle_data.get("pass_rate", 0.0) or 0.0
+                                if _impl_code and _impl_pass_rate >= 0.80:
+                                    _skill_lib.save_implementation(
+                                        topic=topic,
+                                        code=_impl_code,
+                                        score=cycle_data["score"] or 7.5,
+                                        pass_rate=_impl_pass_rate,
+                                    )
                             except Exception as _sl_save_err:
                                 self.logger.debug("[SKILL_LIB] save non-fatal: %s", _sl_save_err)
 

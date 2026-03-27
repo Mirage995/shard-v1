@@ -2281,5 +2281,118 @@
     ],
     "acquired": "2026-03-27T15:21:49.240559",
     "source_topic": "template parser handling and debugging"
+  },
+  "dependency injection python": {
+    "requires": [],
+    "acquired": "2026-03-27T15:30:30.404595",
+    "source_topic": "dependency injection python"
+  },
+  "dependency injection": {
+    "requires": [
+      "dependency injection python"
+    ],
+    "acquired": "2026-03-27T15:30:30.414188",
+    "source_topic": "dependency injection python"
+  },
+  "inversion of control": {
+    "requires": [
+      "dependency injection python"
+    ],
+    "acquired": "2026-03-27T15:30:30.422848",
+    "source_topic": "dependency injection python"
+  },
+  "constructor injection": {
+    "requires": [
+      "dependency injection python"
+    ],
+    "acquired": "2026-03-27T15:30:30.431470",
+    "source_topic": "dependency injection python"
+  },
+  "setter injection": {
+    "requires": [
+      "dependency injection python"
+    ],
+    "acquired": "2026-03-27T15:30:30.439943",
+    "source_topic": "dependency injection python"
+  },
+  "method injection": {
+    "requires": [
+      "dependency injection python"
+    ],
+    "acquired": "2026-03-27T15:30:30.448026",
+    "source_topic": "dependency injection python"
+  },
+  "transformer attention mechanism": {
+    "requires": [],
+    "acquired": "2026-03-27T15:35:50.385468",
+    "source_topic": "transformer attention mechanism"
+  },
+  "attention mechanism": {
+    "requires": [
+      "transformer attention mechanism"
+    ],
+    "acquired": "2026-03-27T15:35:50.393862",
+    "source_topic": "transformer attention mechanism"
+  },
+  "scaled dot-product attention": {
+    "requires": [
+      "transformer attention mechanism"
+    ],
+    "acquired": "2026-03-27T15:35:50.401754",
+    "source_topic": "transformer attention mechanism"
+  },
+  "multi-head attention": {
+    "requires": [
+      "transformer attention mechanism"
+    ],
+    "acquired": "2026-03-27T15:35:50.408916",
+    "source_topic": "transformer attention mechanism"
+  },
+  "transformer architecture": {
+    "requires": [
+      "transformer attention mechanism"
+    ],
+    "acquired": "2026-03-27T15:35:50.417037",
+    "source_topic": "transformer attention mechanism"
+  },
+  "tcp socket programming python": {
+    "requires": [],
+    "acquired": "2026-03-27T16:23:15.850032",
+    "source_topic": "tcp socket programming python"
+  },
+  "socket api": {
+    "requires": [
+      "tcp socket programming python"
+    ],
+    "acquired": "2026-03-27T16:23:15.859560",
+    "source_topic": "tcp socket programming python"
+  },
+  "tcp sockets": {
+    "requires": [
+      "tcp socket programming python"
+    ],
+    "acquired": "2026-03-27T16:23:15.868030",
+    "source_topic": "tcp socket programming python"
+  },
+  "af_inet": {
+    "requires": [
+      "tcp socket programming python"
+    ],
+    "acquired": "2026-03-27T16:23:15.876594",
+    "source_topic": "tcp socket programming python"
+  },
+  "sock_stream": {
+    "requires": [
+      "tcp socket programming python"
+    ],
+    "acquired": "2026-03-27T16:23:15.885183",
+    "source_topic": "tcp socket programming python"
+  },
+  "server socket": {
+    "requires": [
+      "tcp socket programming python"
+    ],
+    "acquired": "2026-03-27T16:23:15.894402",
+    "source_topic": "tcp socket programming python"
   }
 }

@@ -140,11 +140,41 @@ class IdentityCore:
             logger.warning("[IDENTITY] DB unavailable: %s", e)
             return self._data
 
-        # ── Total attempts and cert rate ──────────────────────────────────────
+        # ── Total attempts and cert rate (weighted by difficulty) ─────────────
+        # Join experiments with activation_log to get sig_difficulty + source.
+        # Certifications on easy hybrid topics (curiosity_engine, difficulty<0.3)
+        # count 0.5x. Hard curated topics (difficulty>0.7) count 1.5x.
+        # This prevents specification gaming from inflating self-esteem (backlog #17).
         rows = db_query("SELECT certified, score, topic FROM experiments WHERE score IS NOT NULL")
-        total      = len(rows)
-        certified  = sum(1 for r in rows if r.get("certified"))
-        cert_rate  = round(certified / total, 4) if total else 0.0
+        total = len(rows)
+
+        try:
+            al_rows = db_query(
+                "SELECT topic, source, sig_difficulty, certified FROM activation_log"
+            )
+            al_map = {r["topic"]: r for r in al_rows}
+        except Exception:
+            al_map = {}
+
+        total_weight = 0.0
+        weighted_certified = 0.0
+        for r in rows:
+            t    = r.get("topic", "")
+            al   = al_map.get(t, {})
+            diff = al.get("sig_difficulty") or 0.5
+            src  = al.get("source") or ""
+            if src == "curiosity_engine" and diff < 0.3:
+                w = 0.5
+            elif diff > 0.7 and src in ("curated_list", "improvement_engine"):
+                w = 1.5
+            else:
+                w = 1.0
+            total_weight += w
+            if r.get("certified"):
+                weighted_certified += w
+
+        certified = sum(1 for r in rows if r.get("certified"))
+        cert_rate = round(weighted_certified / total_weight, 4) if total_weight > 0 else 0.0
 
         # ── Domain breakdown ──────────────────────────────────────────────────
         domain_cert  = defaultdict(int)

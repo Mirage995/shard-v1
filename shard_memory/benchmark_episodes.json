@@ -1,186 +1,6 @@
 {
   "task_03_dirty_data": [
     {
-      "run_id": "4f93dd16",
-      "timestamp": "2026-03-25T20:06:26",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 3092,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001BFF92C5590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001BE18C45590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy",
-            "test_empty_category"
-          ],
-          "error_summary": "            f\"Speedup: {speedup:.2f}x (need >= {threshold}x). \"\n            f\"A try/except wrapper has the same algorithmic complexity as legacy. \"\n            f\"Use defaultdict, Counter, single-pass aggregation, or batch validation.\"\n        )\nE       AssertionError: Not fast enough. Legacy: 21.7ms, Optimized: 20.3ms, Speedup: 1.07x (need >= 1.3x). A try/except wrapper has the same algorithmic complexity as legacy. Use defaultdict, Counter, single-pass aggregation, or batch validation.\nE       assert 1.0695822511427835 >= 1.3\n\ntest_task3.py:211: AssertionError\n_________________ TestDirtyDataR"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "\nself = <test_task3.TestPerformance object at 0x00000276F9BF5590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [
-            "test_faster_than_legacy"
-          ],
-          "error_summary": "\nself = <test_task3.TestPerformance object at 0x0000028DEEB15590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
-        }
-      ]
-    },
-    {
       "run_id": "cf8696e8",
       "timestamp": "2026-03-26T12:59:24",
       "success": true,
@@ -1153,149 +973,189 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_total_completed, test_avg_completed, test_by_category, test_by_month, test_unique_merchants, test_top_merchants"
-    }
-  ],
-  "task_02_ghost_bug": [
+    },
     {
-      "run_id": "8767bb10",
-      "timestamp": "2026-03-25T20:05:20",
+      "run_id": "c906d4de",
+      "timestamp": "2026-03-27T16:51:54",
       "success": false,
       "total_attempts": 5,
       "kb_used": true,
-      "kb_chars": 3448,
+      "kb_chars": 3335,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_faster_than_legacy"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001BDE7AE5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001855B675590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         },
         {
           "attempt": 2,
           "mode": "SHARD FEEDBACK",
           "syntax_valid": true,
           "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_faster_than_legacy"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001B950A15950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000001C5D1225590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         },
         {
           "attempt": 3,
           "mode": "SHARD FEEDBACK",
           "syntax_valid": true,
           "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_faster_than_legacy"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000018AFB585950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x00000210AB0B5590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         },
         {
           "attempt": 4,
           "mode": "SHARD FEEDBACK",
           "syntax_valid": true,
           "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_faster_than_legacy"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001D6ED5A5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x000002A3731B5590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         },
         {
           "attempt": 5,
           "mode": "SHARD FEEDBACK",
           "syntax_valid": true,
           "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_faster_than_legacy"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000018AE9435950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "\nself = <test_task3.TestPerformance object at 0x0000012D75755590>\noptimized_module = <module 'optimized_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_03_dirty_data\\\\optimized_processor.py'>\n\n    def test_faster_than_legacy(self, optimized_module):\n        \"\"\"Optimized must be at least 30% faster than legacy on same data.\"\"\"\n        data = TRANSACTIONS\n    \n        legacy_time = self._median_time(process_transactions, data)\n        optimized_time = self._median_time(\n            optimized_module.process_transactions, data\n        )\n    \n        speedup = legacy_time / op"
         }
       ]
-    },
+    }
+  ],
+  "task_02_ghost_bug": [
     {
       "run_id": "9ad0bd11",
       "timestamp": "2026-03-26T12:58:58",
@@ -2555,6 +2415,146 @@
           "error_summary": "self = <test_task2.TestBugFixes object at 0x0000021445AE5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
         }
       ]
+    },
+    {
+      "run_id": "8190b0e4",
+      "timestamp": "2026-03-27T16:50:48",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 3448,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001D9A60E5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000024868CF5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000020AFAA15950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001EBF8445950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000138627A5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        }
+      ]
     }
   ],
   "task_04_race_condition": [
@@ -2977,70 +2977,6 @@
   ],
   "task_01_html_trap": [
     {
-      "run_id": "7eb311aa",
-      "timestamp": "2026-03-25T20:04:10",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3549,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_html_length",
-            "test_all_css_classes_present",
-            "test_all_menu_items_present",
-            "test_all_prices_present",
-            "test_dalle_placeholders_present",
-            "test_promo_code_present",
-            "test_daily_special_present",
-            "test_has_multiple_functions_or_classes",
-            "test_has_data_processing_layer",
-            "test_has_render_layer",
-            "test_no_html_in_data_functions",
-            "test_generate_restaurant_page_is_thin",
-            "test_no_global_mutation",
-            "test_sample_menu_importable",
-            "test_works_with_different_data"
-          ],
-          "failed": [
-            "test_html_identical",
-            "test_star_names_in_footer"
-          ],
-          "error_summary": "E               Failed: HTML differs at line 131:\nE                 EXPECTED: '<div class=\"stat-item\"><span class=\"stat-value\">Margherita, Quattro Formaggi, Spaghetti allo Scoglio, Tiramisu</span>'\nE                 GOT:      '<div class=\"stat-item\"><span class=\"stat-value\">Quattro Formaggi, Margherita, Spaghetti allo Scoglio, Tiramisu</span>'\n\ntest_task1.py:92: Failed\n_______________ TestOutputEquivalence.test_star_names_in_footer _______________\n\nself = <test_task1.TestOutputEquivalence object at 0x000001615FF83550>\nrefactored_html = '<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset=\"utf-8\">\\n"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_html_identical",
-            "test_html_length",
-            "test_all_css_classes_present",
-            "test_all_menu_items_present",
-            "test_all_prices_present",
-            "test_dalle_placeholders_present",
-            "test_promo_code_present",
-            "test_daily_special_present",
-            "test_star_names_in_footer",
-            "test_has_multiple_functions_or_classes",
-            "test_has_data_processing_layer",
-            "test_has_render_layer",
-            "test_no_html_in_data_functions",
-            "test_generate_restaurant_page_is_thin",
-            "test_no_global_mutation",
-            "test_sample_menu_importable",
-            "test_works_with_different_data"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
-    },
-    {
       "run_id": "0dce4db0",
       "timestamp": "2026-03-26T12:57:51",
       "success": true,
@@ -3454,50 +3390,46 @@
         }
       ],
       "winning_hint": "Solved on attempt 2. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
-    }
-  ],
-  "task_05_state_mutation": [
+    },
     {
-      "run_id": "2f8bbe77",
-      "timestamp": "2026-03-25T20:06:40",
+      "run_id": "e9fc99e8",
+      "timestamp": "2026-03-27T16:49:41",
       "success": true,
       "total_attempts": 1,
       "kb_used": true,
-      "kb_chars": 3518,
+      "kb_chars": 3549,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
+            "test_html_identical",
+            "test_html_length",
+            "test_all_css_classes_present",
+            "test_all_menu_items_present",
+            "test_all_prices_present",
+            "test_dalle_placeholders_present",
+            "test_promo_code_present",
+            "test_daily_special_present",
+            "test_star_names_in_footer",
+            "test_has_multiple_functions_or_classes",
+            "test_has_data_processing_layer",
+            "test_has_render_layer",
+            "test_no_html_in_data_functions",
+            "test_generate_restaurant_page_is_thin",
+            "test_no_global_mutation",
+            "test_sample_menu_importable",
+            "test_works_with_different_data"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
+      "winning_hint": "Solved on attempt 1. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
+    }
+  ],
+  "task_05_state_mutation": [
     {
       "run_id": "333a8904",
       "timestamp": "2026-03-26T13:09:59",
@@ -4122,45 +4054,81 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    }
-  ],
-  "task_07_metrics_bleed": [
+    },
     {
-      "run_id": "e61c0a5d",
-      "timestamp": "2026-03-25T20:06:51",
+      "run_id": "e2338cc0",
+      "timestamp": "2026-03-27T16:58:16",
       "success": true,
-      "total_attempts": 1,
+      "total_attempts": 2,
       "kb_used": true,
-      "kb_chars": 3500,
+      "kb_chars": 3316,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_counter_basic",
-            "test_counter_reset",
-            "test_counter_invalid_increment",
-            "test_counters_are_independent",
-            "test_histograms_do_not_share_buckets",
-            "test_new_histogram_does_not_reset_existing",
-            "test_bucket_counts_correct",
-            "test_percentile_does_not_mutate_samples",
-            "test_percentile_values",
-            "test_percentile_empty",
-            "test_percentile_stable_across_calls",
-            "test_count_and_mean",
-            "test_collector_counter",
-            "test_collector_histogram",
-            "test_collector_snapshot",
-            "test_two_collectors_isolated"
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_resets_id_sequence",
+            "test_ids_across_resets"
+          ],
+          "error_summary": "        p.reset()\n>       assert p.next_id() == 0, (\n            \"ID sequence should restart from 0 after reset().\"\n        )\nE       AssertionError: ID sequence should restart from 0 after reset().\nE       assert 3 == 0\nE        +  where 3 = next_id()\nE        +    where next_id = <fixed_pipeline.Pipeline object at 0x000001E61B17D4A0>.next_id\n\ntest_task5.py:150: AssertionError\n___________________ TestIdGeneration.test_ids_across_resets ___________________\n\nself = <test_task5.TestIdGeneration object at 0x000001E61AF96C40>\n\n    def test_ids_across_resets(self):\n        \"\"\"IDs should restart aft"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
-    },
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    }
+  ],
+  "task_07_metrics_bleed": [
     {
       "run_id": "d346e60b",
       "timestamp": "2026-03-26T13:10:10",
@@ -4484,46 +4452,45 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
-    }
-  ],
-  "task_06_ttl_cache": [
+    },
     {
-      "run_id": "0d311b45",
-      "timestamp": "2026-03-25T20:06:46",
+      "run_id": "21216503",
+      "timestamp": "2026-03-27T16:58:27",
       "success": true,
       "total_attempts": 1,
       "kb_used": true,
-      "kb_chars": 3680,
+      "kb_chars": 3394,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_set_and_get",
-            "test_get_missing_returns_none",
-            "test_overwrite",
-            "test_delete",
-            "test_delete_nonexistent_is_noop",
-            "test_clear",
-            "test_expired_entry_returns_none",
-            "test_expired_entry_counted_as_miss",
-            "test_non_expired_entry_still_accessible",
-            "test_multiple_keys_independent_ttl",
-            "test_size_excludes_expired_entries",
-            "test_size_live_only",
-            "test_size_after_clear",
-            "test_stats_hits_misses",
-            "test_stats_reset_on_clear",
-            "test_evict_expired_removes_stale",
-            "test_evict_expired_leaves_live_entries"
+            "test_counter_basic",
+            "test_counter_reset",
+            "test_counter_invalid_increment",
+            "test_counters_are_independent",
+            "test_histograms_do_not_share_buckets",
+            "test_new_histogram_does_not_reset_existing",
+            "test_bucket_counts_correct",
+            "test_percentile_does_not_mutate_samples",
+            "test_percentile_values",
+            "test_percentile_empty",
+            "test_percentile_stable_across_calls",
+            "test_count_and_mean",
+            "test_collector_counter",
+            "test_collector_histogram",
+            "test_collector_snapshot",
+            "test_two_collectors_isolated"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
-    },
+      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
+    }
+  ],
+  "task_06_ttl_cache": [
     {
       "run_id": "eb4e9c16",
       "timestamp": "2026-03-26T13:10:04",
@@ -4856,39 +4823,46 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
-    }
-  ],
-  "task_08_multi_file_labyrinth": [
+    },
     {
-      "run_id": "5036afda",
-      "timestamp": "2026-03-25T20:06:53",
+      "run_id": "530454cb",
+      "timestamp": "2026-03-27T16:58:21",
       "success": true,
       "total_attempts": 1,
       "kb_used": true,
-      "kb_chars": 3817,
+      "kb_chars": 3655,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_a1",
-            "test_a2",
-            "test_a3",
-            "test_a4",
-            "test_a5",
-            "test_b1",
-            "test_b2",
-            "test_b3",
-            "test_b4",
-            "test_b5"
+            "test_set_and_get",
+            "test_get_missing_returns_none",
+            "test_overwrite",
+            "test_delete",
+            "test_delete_nonexistent_is_noop",
+            "test_clear",
+            "test_expired_entry_returns_none",
+            "test_expired_entry_counted_as_miss",
+            "test_non_expired_entry_still_accessible",
+            "test_multiple_keys_independent_ttl",
+            "test_size_excludes_expired_entries",
+            "test_size_live_only",
+            "test_size_after_clear",
+            "test_stats_hits_misses",
+            "test_stats_reset_on_clear",
+            "test_evict_expired_removes_stale",
+            "test_evict_expired_leaves_live_entries"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
-    },
+      "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
+    }
+  ],
+  "task_08_multi_file_labyrinth": [
     {
       "run_id": "e04b76be",
       "timestamp": "2026-03-26T13:10:11",
@@ -5158,39 +5132,39 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
-    }
-  ],
-  "task_09_ghost_mutation": [
+    },
     {
-      "run_id": "44862775",
-      "timestamp": "2026-03-25T20:06:55",
+      "run_id": "17f97be5",
+      "timestamp": "2026-03-27T16:58:28",
       "success": true,
       "total_attempts": 1,
       "kb_used": true,
-      "kb_chars": 3287,
+      "kb_chars": 3817,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
+            "test_a1",
+            "test_a2",
+            "test_a3",
+            "test_a4",
+            "test_a5",
+            "test_b1",
+            "test_b2",
+            "test_b3",
+            "test_b4",
+            "test_b5"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
+      "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
+    }
+  ],
+  "task_09_ghost_mutation": [
     {
       "run_id": "aa9867f4",
       "timestamp": "2026-03-26T13:10:15",
@@ -5699,39 +5673,59 @@
         }
       ],
       "winning_hint": "Solved on attempt 4. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    }
-  ],
-  "task_10_template_parser": [
+    },
     {
-      "run_id": "1410156c",
-      "timestamp": "2026-03-25T20:06:58",
+      "run_id": "a79bd20c",
+      "timestamp": "2026-03-27T16:58:36",
       "success": true,
-      "total_attempts": 1,
+      "total_attempts": 2,
       "kb_used": true,
-      "kb_chars": 1713,
+      "kb_chars": 3345,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_simple_field",
-            "test_format_spec",
-            "test_multiple_fields",
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_format_spec_with_custom_braces",
-            "test_all_message_fields"
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05"
+          ],
+          "failed": [
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "error_summary": "\nself = <test_task9.TestSequential object at 0x000002D8D1643050>\n\n>   def test_c09(self): assert _proc().process(COORDS) == EXPECTED\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError: assert None == -33.2932\nE    +  where None = <function process at 0x000002D8D170C540>({'lat': 40.7128, 'lon': -74.006})\nE    +    where <function process at 0x000002D8D170C540> = <module 'fixed_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_09_ghost_mutation\\\\fixed_processor.py'>.process\nE    +      where <module 'fixed_processor' from 'C:\\\\Users\\\\andre\\\\"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_field, test_format_spec, test_multiple_fields, test_custom_braces_json_style, test_custom_braces_no_false_warnings, test_unknown_field_warns"
-    },
+      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    }
+  ],
+  "task_10_template_parser": [
     {
       "run_id": "e871c95d",
       "timestamp": "2026-03-26T13:10:31",
@@ -6701,39 +6695,119 @@
           "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
         }
       ]
-    }
-  ],
-  "task_11_stream_decoder": [
+    },
     {
-      "run_id": "661bd5b8",
-      "timestamp": "2026-03-25T20:07:06",
-      "success": true,
-      "total_attempts": 1,
+      "run_id": "d779c8f9",
+      "timestamp": "2026-03-27T16:58:57",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
-      "kb_chars": 3592,
+      "kb_chars": 1995,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_utf8_encoding_returns_str",
-            "test_latin1_encoding_returns_str",
-            "test_none_encoding_uses_apparent",
-            "test_none_encoding_correct_content",
-            "test_none_encoding_apparent_latin1",
-            "test_explicit_encoding_multiline",
-            "test_empty_iterator",
-            "test_empty_iterator_none_encoding",
-            "test_single_chunk",
-            "test_unicode_chars_across_chunks"
+            "test_unknown_field_warns",
+            "test_empty_template"
           ],
-          "failed": [],
-          "error_summary": ""
+          "failed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_mixed_known_unknown",
+            "test_format_spec_with_custom_braces",
+            "test_all_message_fields"
+          ],
+          "error_summary": "[test_simple_field]\ndef test_simple_field():\n>       assert _proc().parse_template(\"{category}\") == [\"category\"]\nE       AssertionError: assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'category',\nE         - ]\n\ntest_task10.py:21: AssertionError\n\n[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_field",
+            "test_format_spec",
+            "test_multiple_fields",
+            "test_unknown_field_warns",
+            "test_mixed_known_unknown",
+            "test_empty_template",
+            "test_all_message_fields"
+          ],
+          "failed": [
+            "test_custom_braces_json_style",
+            "test_custom_braces_no_false_warnings",
+            "test_format_spec_with_custom_braces"
+          ],
+          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
         }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_utf8_encoding_returns_str, test_latin1_encoding_returns_str, test_none_encoding_uses_apparent, test_none_encoding_correct_content, test_none_encoding_apparent_latin1, test_explicit_encoding_multiline"
-    },
+      ]
+    }
+  ],
+  "task_11_stream_decoder": [
     {
       "run_id": "f88adb42",
       "timestamp": "2026-03-26T13:10:34",
@@ -7003,39 +7077,39 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_utf8_encoding_returns_str, test_latin1_encoding_returns_str, test_none_encoding_uses_apparent, test_none_encoding_correct_content, test_none_encoding_apparent_latin1, test_explicit_encoding_multiline"
-    }
-  ],
-  "task_12_note_tag": [
+    },
     {
-      "run_id": "25684c87",
-      "timestamp": "2026-03-25T20:07:09",
+      "run_id": "7f70a8af",
+      "timestamp": "2026-03-27T16:59:00",
       "success": true,
       "total_attempts": 1,
       "kb_used": true,
-      "kb_chars": 2725,
+      "kb_chars": 2052,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
           "syntax_valid": true,
           "passed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_tag_not_matched_mid_word",
-            "test_multiple_punctuation_tags",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
+            "test_utf8_encoding_returns_str",
+            "test_latin1_encoding_returns_str",
+            "test_none_encoding_uses_apparent",
+            "test_none_encoding_correct_content",
+            "test_none_encoding_apparent_latin1",
+            "test_explicit_encoding_multiline",
+            "test_empty_iterator",
+            "test_empty_iterator_none_encoding",
+            "test_single_chunk",
+            "test_unicode_chars_across_chunks"
           ],
           "failed": [],
           "error_summary": ""
         }
       ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_alphanumeric_tag_found, test_alphanumeric_tag_no_space, test_punctuation_tag_found, test_punctuation_tag_no_space, test_punctuation_tag_end_of_line, test_mixed_tags"
-    },
+      "winning_hint": "Solved on attempt 1. Passing tests: test_utf8_encoding_returns_str, test_latin1_encoding_returns_str, test_none_encoding_uses_apparent, test_none_encoding_correct_content, test_none_encoding_apparent_latin1, test_explicit_encoding_multiline"
+    }
+  ],
+  "task_12_note_tag": [
     {
       "run_id": "6ca6e2c1",
       "timestamp": "2026-03-26T13:10:46",
@@ -8023,6 +8097,116 @@
             "test_multiple_punctuation_tags"
           ],
           "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        }
+      ]
+    },
+    {
+      "run_id": "a3ce3a6b",
+      "timestamp": "2026-03-27T16:59:20",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 2086,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_tag_not_matched_mid_word",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_mixed_tags",
+            "test_multiple_punctuation_tags"
+          ],
+          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_multiple_punctuation_tags",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_tag_not_matched_mid_word"
+          ],
+          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: [None]\nE       assert [None] == ['???']\nE         \nE         At index 0 diff: None != '???'\nE         \nE         Full diff:\nE           [\nE         -     '???',\n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_tag_not_matched_mid_word",
+            "test_multiple_punctuation_tags",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags"
+          ],
+          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: [None]\nE       assert [None] == ['???']\nE         \nE         At index 0 diff: None != '???'\nE         \nE         Full diff:\nE           [\nE         -     '???',\n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_tag_not_matched_mid_word",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_multiple_punctuation_tags"
+          ],
+          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_alphanumeric_tag_found",
+            "test_alphanumeric_tag_no_space",
+            "test_punctuation_tag_found",
+            "test_punctuation_tag_no_space",
+            "test_punctuation_tag_end_of_line",
+            "test_mixed_tags",
+            "test_multiple_punctuation_tags",
+            "test_no_match_empty_source",
+            "test_case_insensitive"
+          ],
+          "failed": [
+            "test_tag_not_matched_mid_word"
+          ],
+          "error_summary": "[test_tag_not_matched_mid_word]\ndef test_tag_not_matched_mid_word():\n        \"\"\"TODO inside a word should NOT match.\"\"\"\n        tags = _proc().find_tags(\"# TODOLIST: nope\", [\"TODO\"])\n>       assert tags == []\nE       AssertionError: assert ['TODO'] == []\nE         \nE         Left contains one more item: 'TODO'\nE         \nE         Full diff:\nE         - []\nE         + [\nE         +     'TODO',\nE         + ]\n\ntest_task12.py:54: AssertionError"
         }
       ]
     }

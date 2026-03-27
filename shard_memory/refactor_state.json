@@ -1,5 +1,5 @@
 {
-  "current_index": 4,
+  "current_index": 0,
   "history": [
     {
       "id": "d75bd75d-4551-4a2f-bba2-a383f38909ba",
@@ -74,7 +74,26 @@
       "status": "applied",
       "applied_at": "2026-03-24T17:59:58.985241",
       "backup": "C:\\Users\\andre\\Desktop\\shard_v1\\backend\\sandbox_runner.bak_20260324_175958"
+    },
+    {
+      "id": "6d6f537a-0f1c-4d87-a078-259561b6a4ef",
+      "timestamp": "2026-03-26T20:04:40.824057",
+      "type": "refactor",
+      "file": "backend/meta_learning.py",
+      "description": "Avoid repeated database queries for global and category stats in the `update` method by reusing the initial query results.",
+      "category": "performance",
+      "rationale": "The `update` method queries the database for global and category stats twice. The second set of queries can be avoided by reusing the results from the first set, improving performance by reducing database load and query execution time. This is especially important as the number of study cycles increases. The repeated queries have O(2) complexity, which can be reduced to O(1).",
+      "changes": [
+        {
+          "old": "        # ── 2. Refresh in-memory stats from DB views ─────────────────────────\n        try:\n            conn = _get_db()\n            gs_row = conn.execute(\"SELECT * FROM global_stats\").fetchone()\n            if gs_row:\n                gs = self._data.setdefault(\"global_stats\", {})\n                gs[\"total_sessions\"] = gs_row[\"total_sessions\"]\n                gs[\"certified\"] = gs_row[\"certified_count\"]\n                gs[\"avg_score\"] = gs_row[\"avg_score\"] or 0.0\n                gs[\"cert_rate\"] = gs_row[\"cert_rate\"] or 0.0\n\n                # Trend from last N scores\n                score_rows = conn.execute(\n                    \"SELECT score FROM experiments WHERE score IS NOT NULL \"\n                    \"ORDER BY timestamp DESC LIMIT ?\", (HISTORY_WINDOW,)\n                ).fetchall()\n                scores = [r[\"score\"] for r in reversed(score_rows)]\n                gs[\"score_trend\"] = _linear_trend(scores)\n\n                # Best/worst category\n                cat_rows = conn.execute(\"SELECT * FROM category_stats\").fetchall()\n                cats = {}\n                for r in cat_rows:\n                    cats[r[\"category\"]] = {\n                        \"total\": r[\"total\"],\n                        \"certified\": r[\"certified_count\"],\n                        \"avg_score\": r[\"avg_score\"],\n                        \"cert_rate\": r[\"cert_rate\"],\n                    }\n                self._data[\"topic_categories\"] = cats\n                significant = {k: v for k, v in cats.items() if v[\"total\"] >= 3}\n                if significant:\n                    gs[\"best_category\"] = max(significant, key=lambda k: significant[k][\"avg_score\"])\n                    gs[\"worst_category\"] = min(significant, key=lambda k: significant[k][\"avg_score\"])\n        except Exception as exc:\n            logger.warning(\"[DB] MetaLearning stats refresh failed: %s\", exc)",
+          "new": "        # ── 2. Refresh in-memory stats from DB views ─────────────────────────\n        try:\n            conn = _get_db()\n            gs_row = conn.execute(\"SELECT * FROM global_stats\").fetchone()\n            cat_rows = conn.execute(\"SELECT * FROM category_stats\").fetchall()\n\n            if gs_row:\n                gs = self._data.setdefault(\"global_stats\", {})\n                gs[\"total_sessions\"] = gs_row[\"total_sessions\"]\n                gs[\"certified\"] = gs_row[\"certified_count\"]\n                gs[\"avg_score\"] = gs_row[\"avg_score\"] or 0.0\n                gs[\"cert_rate\"] = gs_row[\"cert_rate\"] or 0.0\n\n                # Trend from last N scores\n                score_rows = conn.execute(\n                    \"SELECT score FROM experiments WHERE score IS NOT NULL \"\n                    \"ORDER BY timestamp DESC LIMIT ?\", (HISTORY_WINDOW,)\n                ).fetchall()\n                scores = [r[\"score\"] for r in reversed(score_rows)]\n                gs[\"score_trend\"] = _linear_trend(scores)\n\n                # Best/worst category\n                cats = {}\n                for r in cat_rows:\n                    cats[r[\"category\"]] = {\n                        \"total\": r[\"total\"],\n                        \"certified\": r[\"certified_count\"],\n                        \"avg_score\": r[\"avg_score\"],\n                        \"cert_rate\": r[\"cert_rate\"],\n                    }\n                self._data[\"topic_categories\"] = cats\n                significant = {k: v for k, v in cats.items() if v[\"total\"] >= 3}\n                if significant:\n                    gs[\"best_category\"] = max(significant, key=lambda k: significant[k][\"avg_score\"])\n                    gs[\"worst_category\"] = min(significant, key=lambda k: significant[k][\"avg_score\"])\n        except Exception as exc:\n            logger.warning(\"[DB] MetaLearning stats refresh failed: %s\", exc)"
+        }
+      ],
+      "status": "rejected",
+      "rejected_at": "2026-03-26T20:48:17.621908"
     }
   ],
-  "capability_queue": []
+  "capability_queue": [],
+  "session_count": 5,
+  "consciousness_index": 1
 }

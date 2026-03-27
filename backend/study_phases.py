@@ -660,6 +660,7 @@ class CertifyRetryGroup(BasePhase):
                         "shard_opinion": ctx.structured.get("shard_opinion", ""),
                         "connections": ctx.connections,
                         "validation_qa": ctx.validation_data.get("validation_qa", []),
+                        "winning_code": ctx.codice_generato or "",
                     })
 
                 # Self-generated benchmarks post-certification

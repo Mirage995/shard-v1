@@ -1,22 +1,21 @@
 {
-  "built_at": "2026-03-27T13:39:42.868886",
-  "updated_at": "2026-03-27T15:22:18.030238",
+  "built_at": "2026-03-27T16:59:26.235073",
+  "updated_at": "2026-03-27T16:59:26.235080",
   "total_experiments": 78,
   "total_certified": 17,
   "certification_rate": 0.218,
   "avg_score": 4.76,
   "strengths": [
-    "catch narrow exceptions applied to python exception handling best practices",
-    "transitive usage applied to binary search algorithm",
-    "template parser handling and debugging",
-    "logging and monitoring patterns",
-    "activation functions applied to exception-driven control flow",
-    "exception-driven control flow applied to logarithmic time complexity o(log n)",
-    "Python exception handling best practices",
     "REST API design patterns",
-    "fail fast principle applied to dynamic content handling",
     "Python decorators and metaclasses",
-    "neural networks and deep learning basics"
+    "transitive usage applied to binary search algorithm",
+    "catch narrow exceptions applied to python exception handling best practices",
+    "exception-driven control flow applied to logarithmic time complexity o(log n)",
+    "activation functions applied to exception-driven control flow",
+    "fail fast principle applied to dynamic content handling",
+    "Python exception handling best practices",
+    "neural networks and deep learning basics",
+    "logging and monitoring patterns"
   ],
   "blind_spots": [],
   "quarantine_candidates": [],
@@ -25,13 +24,5 @@
   },
   "momentum": "stagnating",
   "top_capability_graph_skills": [],
-  "capability_graph_size": 0,
-  "last_session": {
-    "date": "2026-03-27T15:22:18.030238",
-    "certified": [
-      "template parser handling and debugging"
-    ],
-    "failed": [],
-    "avg_score": 7.8
-  }
+  "capability_graph_size": 0
 }

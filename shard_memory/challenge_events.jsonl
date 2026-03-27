@@ -1,0 +1,13 @@
+{"type": "benchmark", "data": {"task": "shard_challenge_6dm2xuo0", "attempt": 1, "passed": 17, "failed": 6, "mode": "LLM SOLO"}, "ts": "2026-03-25T23:40:55.942913"}
+{"type": "benchmark", "data": {"task": "shard_challenge_6dm2xuo0", "attempt": 2, "passed": 21, "failed": 2, "mode": "SWARM"}, "ts": "2026-03-25T23:41:13.797726"}
+{"type": "benchmark", "data": {"task": "shard_challenge_6dm2xuo0", "attempt": 3, "passed": 20, "failed": 3, "mode": "SWARM"}, "ts": "2026-03-25T23:41:31.645996"}
+{"type": "benchmark", "data": {"task": "shard_challenge_6dm2xuo0", "attempt": 4, "passed": 18, "failed": 5, "mode": "SWARM"}, "ts": "2026-03-25T23:41:42.119564"}
+{"type": "benchmark", "data": {"task": "shard_challenge_6dm2xuo0", "attempt": 5, "passed": 19, "failed": 4, "mode": "SWARM"}, "ts": "2026-03-25T23:41:51.972543"}
+{"type": "benchmark", "data": {"task": "shard_challenge_sdlw_0xq", "attempt": 1, "passed": 19, "failed": 4, "mode": "LLM SOLO"}, "ts": "2026-03-25T23:42:09.260393"}
+{"type": "benchmark", "data": {"task": "shard_challenge_sdlw_0xq", "attempt": 2, "passed": 23, "failed": 0, "mode": "SWARM"}, "ts": "2026-03-25T23:42:24.851885"}
+{"type": "capability_probe", "data": {"lang": "python", "available": ["python", "pytest", "node"], "missing": ["npm", "jest", "g++", "cargo", "go", "java"], "ready": true}, "ts": "2026-03-25T23:49:05.047059"}
+{"type": "self_assessment", "data": {"profile_lines": 4, "lang": "python", "summary": "=== SHARD SELF-PROFILE ===\n  Runtime (python): READY (pytest 9.0.2)\n  Knowledge graph: 229 acquired concepts, 20 related to python\n  Episode history: no prior sessions for 'shard_challenge_uhen3vcb' \u2014 first attempt\n"}, "ts": "2026-03-25T23:49:05.047507"}
+{"type": "benchmark", "data": {"task": "shard_challenge_uhen3vcb", "attempt": 1, "passed": 16, "failed": 7, "mode": "LLM SOLO"}, "ts": "2026-03-25T23:49:11.482541"}
+{"type": "benchmark", "data": {"task": "shard_challenge_uhen3vcb", "attempt": 2, "passed": 22, "failed": 1, "mode": "SWARM"}, "ts": "2026-03-25T23:49:27.132030"}
+{"type": "benchmark", "data": {"task": "shard_challenge_uhen3vcb", "attempt": 3, "passed": 23, "failed": 0, "mode": "SWARM"}, "ts": "2026-03-25T23:49:47.048708"}
+{"type": "mastery_achieved", "data": {"task": "shard_challenge_uhen3vcb", "lang": "python", "attempts": 3, "tests": 23, "first_try": false}, "ts": "2026-03-25T23:49:47.055692"}

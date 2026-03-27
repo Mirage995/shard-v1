@@ -13,7 +13,7 @@
     "topic": "asyncio concurrency patterns",
     "base_priority": 0.3836,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [],
     "last_updated": "2026-03-26T12:42:44.965201"
   },
@@ -21,7 +21,7 @@
     "topic": "python object oriented programming",
     "base_priority": 0.88,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [
       0.04
     ],
@@ -31,7 +31,7 @@
     "topic": "regular expressions in python",
     "base_priority": 0.836,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [
       0.0,
       0.04
@@ -42,7 +42,7 @@
     "topic": "sql injection prevention and input sanitization",
     "base_priority": 0.92,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [
       0.04
     ],
@@ -52,7 +52,7 @@
     "topic": "profiling and optimization python",
     "base_priority": 0.55,
     "frustration_hits": 0,
-    "curiosity_pull": 0.3,
+    "curiosity_pull": 0.5,
     "engagement_scores": [
       0.04,
       0.0,
@@ -64,7 +64,7 @@
     "topic": "race condition handling and debugging",
     "base_priority": 0.55,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [
       0.04,
       0.04,
@@ -76,7 +76,7 @@
     "topic": "template parser handling and debugging",
     "base_priority": 0.55,
     "frustration_hits": 0,
-    "curiosity_pull": 0.3,
+    "curiosity_pull": 0.5,
     "engagement_scores": [
       0.04,
       0.04,
@@ -103,7 +103,7 @@
     "topic": "json parsing and serialization python",
     "base_priority": 0.847,
     "frustration_hits": 0,
-    "curiosity_pull": 0.0,
+    "curiosity_pull": 0.3,
     "engagement_scores": [
       0.04
     ],
@@ -185,14 +185,16 @@
   "git internals object model": {
     "topic": "git internals object model",
     "base_priority": 0.0,
-    "frustration_hits": 3,
-    "curiosity_pull": 0.6,
+    "frustration_hits": 5,
+    "curiosity_pull": 1.0,
     "engagement_scores": [
+      0.0,
+      0.0,
       0.0,
       0.0,
       0.0
     ],
-    "last_updated": "2026-03-27T12:44:34.175099"
+    "last_updated": "2026-03-27T16:44:32.526865"
   },
   "trie data structure": {
     "topic": "trie data structure",
@@ -217,12 +219,13 @@
   "tcp socket programming python": {
     "topic": "tcp socket programming python",
     "base_priority": 0.4,
-    "frustration_hits": 1,
-    "curiosity_pull": 0.3,
+    "frustration_hits": 2,
+    "curiosity_pull": 0.6,
     "engagement_scores": [
+      0.0,
       0.0
     ],
-    "last_updated": "2026-03-27T01:09:03.012116"
+    "last_updated": "2026-03-27T16:24:34.669260"
   },
   "Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis": {
     "topic": "Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis",
@@ -320,15 +323,17 @@
   "async io with python selectors": {
     "topic": "async io with python selectors",
     "base_priority": 0.317,
-    "frustration_hits": 4,
+    "frustration_hits": 6,
     "curiosity_pull": 1.0,
     "engagement_scores": [
       0.0,
       0.0,
       0.0,
+      0.0,
+      0.0,
       0.0
     ],
-    "last_updated": "2026-03-27T13:29:57.414586"
+    "last_updated": "2026-03-27T16:16:09.899638"
   },
   "Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions": {
     "topic": "Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions",
@@ -413,12 +418,16 @@
   "password hashing bcrypt argon2": {
     "topic": "password hashing bcrypt argon2",
     "base_priority": 0.9,
-    "frustration_hits": 1,
-    "curiosity_pull": 0.3,
+    "frustration_hits": 5,
+    "curiosity_pull": 1.0,
     "engagement_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
       0.0
     ],
-    "last_updated": "2026-03-27T13:05:21.943569"
+    "last_updated": "2026-03-27T16:49:21.500993"
   },
   "linear regression numpy": {
     "topic": "linear regression numpy",
@@ -443,11 +452,52 @@
   "transformer attention mechanism": {
     "topic": "transformer attention mechanism",
     "base_priority": 0.89,
-    "frustration_hits": 1,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.0,
+      0.04
+    ],
+    "last_updated": "2026-03-27T15:36:03.078956"
+  },
+  "dependency injection python": {
+    "topic": "dependency injection python",
+    "base_priority": 0.5,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T15:31:01.848991"
+  },
+  "Integration of compression function and activation functions": {
+    "topic": "Integration of compression function and activation functions",
+    "base_priority": 0.188,
+    "frustration_hits": 0,
     "curiosity_pull": 0.3,
     "engagement_scores": [
       0.0
     ],
-    "last_updated": "2026-03-27T13:24:56.457671"
+    "last_updated": "2026-03-27T15:50:16.067791"
+  },
+  "Integration of rest api and quantum linear key-recovery attacks": {
+    "topic": "Integration of rest api and quantum linear key-recovery attacks",
+    "base_priority": 0.5,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T16:00:46.627202"
+  },
+  "Integration of solid principles and prime number generation": {
+    "topic": "Integration of solid principles and prime number generation",
+    "base_priority": 0.5,
+    "frustration_hits": 0,
+    "curiosity_pull": 0.3,
+    "engagement_scores": [
+      0.04
+    ],
+    "last_updated": "2026-03-27T16:19:06.800598"
   }
 }

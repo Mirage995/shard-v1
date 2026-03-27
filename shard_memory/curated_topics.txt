@@ -23,11 +23,18 @@ sliding window technique
 two pointer technique
 
 # Systems & Networking
-http client implementation python
-websocket protocol implementation
-tcp socket programming python
-async io with python selectors
-dns resolution python
+# DISABLED — sandbox runs with --network none, socket/network code fails physically
+# http client implementation python
+# websocket protocol implementation
+# tcp socket programming python
+# async io with python selectors
+# dns resolution python
+# Re-enable only if sandbox gets loopback networking support
+
+# Systems & Networking (sandbox-safe alternatives)
+http request parsing python
+socket concepts and protocols theory
+network protocol design patterns
 
 # Machine Learning (concrete, codeable)
 gradient descent implementation from scratch
@@ -60,5 +67,12 @@ password hashing bcrypt argon2
 docker container python sdk
 git internals object model
 sqlite query optimization
-redis data structures python
-message queue rabbitmq python
+concurrent programming threading python
+multiprocessing and process pools python
+event driven architecture patterns python
+# DISABLED — requires external server (Redis/RabbitMQ not available in sandbox)
+# redis data structures python
+# message queue rabbitmq python
+# Re-enable only with docker-compose multi-container setup
+redis data structures implementation python
+message queue design patterns python

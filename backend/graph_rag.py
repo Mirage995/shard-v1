@@ -240,6 +240,94 @@ def query_causal_context(topic_or_concept: str, max_hops: int = 2) -> str:
         return ""
 
 
+def get_related_topics(topic: str, relation_types: list[str] | None = None, limit: int = 5) -> list[str]:
+    """Return target concepts related to `topic` via the given relation types.
+
+    Used by desire_engine to find adjacent unexplored topics for curiosity propagation.
+    Defaults to 'extends' and 'improves' — the forward-learning relations.
+    """
+    if relation_types is None:
+        relation_types = ["extends", "improves"]
+    try:
+        from shard_db import query as db_query
+        keyword = topic.lower().strip()
+        words = keyword.split()[:5]
+        placeholders = ",".join("?" * len(relation_types))
+        rows = db_query(
+            f"""
+            SELECT target_concept
+            FROM knowledge_graph
+            WHERE relation_type IN ({placeholders})
+              AND confidence >= 0.6
+            ORDER BY confidence DESC
+            LIMIT 100
+            """,
+            tuple(relation_types),
+        )
+        results = []
+        for r in rows:
+            src_matches = any(
+                w in topic.lower()
+                for w in r["target_concept"].lower().split()[:5]
+            )
+            # Match rows where source_concept mentions our topic keywords
+            if src_matches:
+                results.append(r["target_concept"])
+                if len(results) >= limit:
+                    break
+
+        # Fallback: also include rows where source_concept contains topic keywords
+        if not results:
+            rows2 = db_query(
+                f"""
+                SELECT source_concept, target_concept
+                FROM knowledge_graph
+                WHERE relation_type IN ({placeholders})
+                  AND confidence >= 0.6
+                ORDER BY confidence DESC
+                LIMIT 100
+                """,
+                tuple(relation_types),
+            )
+            for r in rows2:
+                combined = f"{r['source_concept']}".lower()
+                if any(w in combined for w in words):
+                    results.append(r["target_concept"])
+                    if len(results) >= limit:
+                        break
+
+        return list(dict.fromkeys(results))  # deduplicate, preserve order
+    except Exception:
+        return []
+
+
+def count_causal_hits(topic_or_concept: str) -> int:
+    """Return the number of causal relations relevant to a topic.
+
+    Same matching logic as query_causal_context but returns a count (int).
+    Used by NightRunner to populate sig_graphrag in activation_log.
+    """
+    try:
+        from shard_db import query as db_query
+        keyword = topic_or_concept.lower().strip()
+        words = keyword.split()[:5]
+        rows = db_query("""
+            SELECT source_concept, target_concept, context
+            FROM knowledge_graph
+            WHERE confidence >= 0.6
+            LIMIT 50
+        """)
+        return sum(
+            1 for r in rows
+            if any(
+                w in f"{r['source_concept']} {r['target_concept']} {r.get('context') or ''}".lower()
+                for w in words
+            )
+        )
+    except Exception:
+        return 0
+
+
 def get_graph_stats() -> dict:
     """Stats for /health endpoint."""
     try:

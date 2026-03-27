@@ -29,8 +29,21 @@ class StrategyMemory:
         self._lock = asyncio.Lock()
         print(f"[STRATEGY] Memory initialized ({self.collection.count()} strategies stored)")
 
+    @staticmethod
+    def _is_junk_topic(topic: str) -> bool:
+        """Reject recursive/garbage topic strings before storing."""
+        t = topic.lower()
+        return (
+            t.count("integration of") >= 2
+            or t.count("applied to") >= 2
+            or len(topic) > 120
+        )
+
     def store_strategy(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
         """Save a strategy with its topic, description, and outcome."""
+        if self._is_junk_topic(topic):
+            print(f"[STRATEGY] Rejected junk topic (not storing): '{topic[:80]}'")
+            return
         timestamp = datetime.now().isoformat()
         doc_id = f"strat_{timestamp}_{topic[:30].replace(' ', '_')}"
 

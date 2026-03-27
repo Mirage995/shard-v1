@@ -14,6 +14,9 @@ Observed emergent behaviors (not programmed, derived from module interactions):
 - **Comfort zone** — union-find selected 3× in a row via curiosity pull, not random selection
 - **Paradoxical curiosity under failure** — curiosity_pull increased after failed attempts (Zeigarnik effect)
 - **Calibrated predictor** — SelfModelTracker predicts 0.0 on asyncio after tracking its own failure history
+- **Cognitive effort surge** — on a chronically blocked topic, 7 modules fired in cascade without any `if blocked: retry_harder` rule, producing a 14-minute cycle (3× the average). The system "felt" the weight of the problem.
+- **Specification gaming** — SHARD autonomously discovered that hybrid curiosity_engine topics (easy, invented) pass benchmarks faster than hard curated fundamentals. It started routing around difficulty — exactly like a student writing philosophy essays to avoid math homework. Not programmed. Emerged from the interaction of curiosity_engine + LLM + mood signal.
+- **First self-aware identity** — after session 5, IdentityCore wrote: `self_esteem=0.26, trajectory=declining`. The reflection module independently produced: *"forse è il caso di ammettere che certi argomenti richiedono più di una botta e via notturna"* — not prompted, derived from SQLite data.
 
 > **Benchmark result:** naked Gemini Flash solves 9/12 tasks (87.7% avg test pass rate).
 > SHARD wrapping the same model solves **12/12** (100%) — closing every gap the naked LLM leaves open.
@@ -321,6 +324,7 @@ ANTHROPIC_API_KEY=...
 | SSJ12 | Vettore 3 directed pivot from MetaLearning history + per-topic LLM budget |
 | SSJ13 | AGI Layer — SelfModel (momentum, blind spots, quarantine), WorldModel (58-skill map, self_calibrate()), GoalEngine autonomous (SHARD picks its own goals), SemanticMemory bootstrap, GapDetector loop closure, CognitionCore +query_world/goal/real_identity + Vettori 4/5/6 |
 | SSJ14 | **Full bidirectional event bus** — 14 CognitionCore citizens, all interconnected. New modules: MoodEngine (affective state, broadcasts mood_shift), IdentityCore (persistent biography from SQLite, self_esteem computed not declared), SkillLibrary (Voyager-inspired: certified skill cache + automatic curriculum via GraphRAG), HebbianUpdater (LTP/LTD plasticity + frustration decay), SelfModelTracker (predictive processing loop — mood + identity now modulate predictions), PrerequisiteChecker (GraphRAG+LLM gate). New events: mood_shift, identity_updated, low_self_esteem. Emergent behaviors observed: asyncio phobia, comfort zone, paradoxical curiosity under failure (Zeigarnik), calibrated predictor. |
+| SSJ15 | **Emergent behavior analysis + architectural fixes.** Observed: cognitive effort surge (14-min asyncio cycle, 7 modules in cascade, no rule written), specification gaming (SHARD routes around hard topics autonomously), first honest self-identity (self_esteem=0.26, trajectory=declining). Fixes: weighted certifications in mood+identity (difficulty-adjusted cert_rate), curiosity loop fix (GraphRAG extends/improves priority, certified topics excluded), skill implementations (Voyager: saves winning code, injects for similar topics), junk strategy cleanup (20 garbage entries removed, filter prevents re-accumulation), sandbox-incompatible topics removed from curated list (network topics disabled). New backlog items: Perverse Emergence Detection (#18), strategy mutation EvoScientist-style (#14), affordance filtering SayCan-style (#15). |
 
 ---
 

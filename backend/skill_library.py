@@ -34,6 +34,16 @@ CREATE TABLE IF NOT EXISTS skill_library (
 )
 """
 
+_CREATE_IMPL_SQL = """
+CREATE TABLE IF NOT EXISTS skill_implementations (
+    topic        TEXT PRIMARY KEY,
+    code         TEXT,    -- exact code that passed the benchmark
+    score        REAL,
+    pass_rate    REAL,    -- 0.0-1.0 benchmark pass rate at certification
+    saved_at     TEXT
+)
+"""
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _db_query(sql: str, params: tuple = ()):
@@ -47,6 +57,7 @@ def _db_execute(sql: str, params: tuple = ()):
 def _ensure_table():
     try:
         _db_execute(_CREATE_SQL)
+        _db_execute(_CREATE_IMPL_SQL)
     except Exception as exc:
         logger.warning("[SKILL_LIB] table init failed: %s", exc)
 
@@ -106,6 +117,94 @@ class SkillLibrary:
             return [r["topic"] for r in rows]
         except Exception:
             return []
+
+    # ── Skill implementations (Voyager #13) ───────────────────────────────────
+
+    def save_implementation(
+        self,
+        topic: str,
+        code: str,
+        score: float,
+        pass_rate: float,
+    ) -> None:
+        """Save the exact code that passed the benchmark for a certified topic.
+
+        Only saves if pass_rate >= 0.80 — partial passes may have hidden bugs.
+        Upserts: keeps the implementation with the highest score.
+        """
+        if not code or not code.strip():
+            return
+        if pass_rate < 0.80:
+            logger.debug("[SKILL_LIB] impl not saved for '%s': pass_rate=%.0f%% < 80%%", topic, pass_rate * 100)
+            return
+        _ensure_table()
+        try:
+            existing = _db_query(
+                "SELECT score FROM skill_implementations WHERE topic = ?", (topic,)
+            )
+            if existing and existing[0]["score"] >= score:
+                return  # keep the better implementation
+            _db_execute(
+                """
+                INSERT INTO skill_implementations (topic, code, score, pass_rate, saved_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(topic) DO UPDATE SET
+                    code=excluded.code, score=excluded.score,
+                    pass_rate=excluded.pass_rate, saved_at=excluded.saved_at
+                """,
+                (topic, code.strip(), score, pass_rate, datetime.now().isoformat()),
+            )
+            logger.info("[SKILL_LIB] Implementation saved for '%s' (score=%.1f, pass_rate=%.0f%%)",
+                        topic, score, pass_rate * 100)
+        except Exception as exc:
+            logger.warning("[SKILL_LIB] save_implementation failed: %s", exc)
+
+    def get_implementation_block(self, topic: str, similarity_threshold: float = 0.5) -> str:
+        """Return a compact injection block with past working code for similar topics.
+
+        Only injects if topic is similar but not identical (0.50 <= similarity <= 0.85)
+        to avoid verbatim copy on re-study and irrelevant code on distant topics.
+        Returns "" if nothing useful found.
+        """
+        _ensure_table()
+        try:
+            rows = _db_query(
+                "SELECT topic, code, score, pass_rate FROM skill_implementations ORDER BY score DESC LIMIT 20"
+            )
+            if not rows:
+                return ""
+
+            # Find the most similar past implementation (not the exact same topic)
+            try:
+                from sentence_transformers import SentenceTransformer, util
+                model = SentenceTransformer("all-MiniLM-L6-v2")
+                topic_emb = model.encode(topic, convert_to_tensor=True)
+                best_row = None
+                best_sim = 0.0
+                for r in rows:
+                    if r["topic"].lower() == topic.lower():
+                        continue
+                    emb = model.encode(r["topic"], convert_to_tensor=True)
+                    sim = float(util.cos_sim(topic_emb, emb))
+                    if similarity_threshold <= sim <= 0.85 and sim > best_sim:
+                        best_sim = sim
+                        best_row = r
+            except Exception:
+                best_row = None
+
+            if not best_row:
+                return ""
+
+            code_preview = best_row["code"][:600] + ("..." if len(best_row["code"]) > 600 else "")
+            return (
+                f"[PAST WORKING CODE — adapt, don't copy]\n"
+                f"Topic: {best_row['topic']} | score={best_row['score']:.1f} | "
+                f"pass_rate={best_row['pass_rate']:.0%}\n"
+                f"```python\n{code_preview}\n```"
+            )
+        except Exception as exc:
+            logger.debug("[SKILL_LIB] get_implementation_block failed: %s", exc)
+            return ""
 
     def get_injection_block(self, topic: str, capability_graph=None) -> str:
         """

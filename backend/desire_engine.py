@@ -162,8 +162,8 @@ class DesireEngine:
     def update_curiosity(self, certified_topic: str, n_adjacent: int = 3):
         """After certifying a topic, find adjacent unexplored topics and boost their pull.
 
-        Uses SemanticMemory similarity search. Requires sentence-transformers to be
-        available — gracefully skips on import error.
+        Uses GraphRAG extends/improves relations first, falls back to SemanticMemory.
+        Certified topics (both capability names and skill_library entries) are excluded.
         """
         try:
             from semantic_memory import get_semantic_memory
@@ -171,6 +171,14 @@ class DesireEngine:
             sem = get_semantic_memory()
             cap = CapabilityGraph()
             certified_skills = set(k.lower() for k in cap.capabilities.keys())
+
+            # Also exclude topics already certified in skill_library
+            try:
+                from skill_library import SkillLibrary
+                sl = SkillLibrary()
+                certified_skills |= set(t.lower() for t in sl.get_all_certified())
+            except Exception:
+                pass
 
             # WorldModel relevance floor — only boost topics with real learning ROI
             wm = None
@@ -180,19 +188,42 @@ class DesireEngine:
             except Exception:
                 pass
 
-            results = sem.query(certified_topic, collection="knowledge", n_results=n_adjacent + 5)
             adjacent = []
-            for r in results:
-                t = r.get("metadata", {}).get("title") or r.get("document", "")[:60]
-                t = t.strip()
-                if not t or t.lower() in certified_skills or t == certified_topic:
-                    continue
-                # Filter: only admit topics with WorldModel relevance > 0.3
-                if wm is not None and wm.relevance(t) < 0.3:
-                    continue
-                adjacent.append(t)
-                if len(adjacent) >= n_adjacent:
-                    break
+
+            # Priority 1: GraphRAG extends/improves — these are the best next steps
+            try:
+                from graph_rag import GraphRAG
+                rag = GraphRAG()
+                rag_relations = rag.get_related_topics(
+                    certified_topic, relation_types=["extends", "improves"], limit=n_adjacent + 3
+                )
+                for t in rag_relations:
+                    t = t.strip()
+                    if not t or t.lower() in certified_skills or t.lower() == certified_topic.lower():
+                        continue
+                    if wm is not None and wm.relevance(t) < 0.3:
+                        continue
+                    adjacent.append(t)
+                    if len(adjacent) >= n_adjacent:
+                        break
+            except Exception:
+                pass
+
+            # Priority 2: SemanticMemory similarity — fill remaining slots
+            if len(adjacent) < n_adjacent:
+                results = sem.query(certified_topic, collection="knowledge", n_results=n_adjacent + 5)
+                for r in results:
+                    t = r.get("metadata", {}).get("title") or r.get("document", "")[:60]
+                    t = t.strip()
+                    if not t or t.lower() in certified_skills or t.lower() == certified_topic.lower():
+                        continue
+                    if t in adjacent:
+                        continue
+                    if wm is not None and wm.relevance(t) < 0.3:
+                        continue
+                    adjacent.append(t)
+                    if len(adjacent) >= n_adjacent:
+                        break
 
             for adj_topic in adjacent:
                 ds = self._get_or_create(adj_topic)
