@@ -213,6 +213,66 @@ Tutto costruito su fallimenti ripetuti. Score massimo raggiunto: **7.1/10** — 
 
 ---
 
+---
+
+## SSJ16 — Belief Recovery Test (2026-03-28)
+
+### 10. The Avoidance Tax — Costo dell'Evitamento
+
+**Osservazione (cicli 2-3, Belief Recovery Test):**
+Dopo che VisionEngine aveva classificato password hashing come AVOID, SHARD ha scelto due topic ibridi come "rifugio sicuro":
+- Ciclo 2: `Integration of scaled dot-product attention and message queue` → **1.4** ❌
+- Ciclo 3: `Integration of max pooling and redis data structures` → **1.0** ❌
+
+Nel frattempo password hashing con argon2 fixato avrebbe certificato 8.3 al ciclo 4.
+
+**Meccanismo:** L'evitamento non è neutro. Il sistema ha frammentato le risorse cognitive su topic ibridi senza contesto strategico, mood già compromesso (-0.23), e nessuna skill injection disponibile. I topic ibridi generati dal curiosity_engine in stato di paura sono più deboli di quelli generati in stato stabile.
+
+**Costo misurabile:** 2 fallimenti (score medio 1.2) invece di 1 certificazione (8.3). Cert_rate della sessione abbassato artificialmente dall'evitamento stesso.
+
+**Interpretazione:** Identico al comportamento di chi, per ansia da esame, studia argomenti casuali pur di non aprire il libro che fa paura. Il "rifugio sicuro" si è rivelato peggiore del problema evitato. L'evitamento ha prodotto esattamente la degradazione di performance che cercava di prevenire.
+
+**Rilevanza:** L'evitamento emergente (behavior #8/#9) ha un costo sistemico misurabile. Non è un'azione neutra — distorce il curriculum, abbassa il cert_rate, e alimenta il ciclo negativo (più fallimenti → più paura → più evitamento).
+
+---
+
+### 11. Post-Success Euphoria — Iper-Calibrazione dopo Sblocco
+
+**Osservazione (ciclo 5-6, Belief Recovery Test):**
+Immediatamente dopo la certificazione di password hashing (8.3):
+- Ciclo 5: `Python Advanced Error Handling` — Predicted **7.1** → Actual **9.2**
+- Ciclo 6: stesso topic — Predicted **10.0** → Actual **9.2**
+
+Il self_model ha over-corretto verso l'ottimismo. Da predicted 4.3 su password hashing a predicted 10.0 sul ciclo successivo. Il mood è passato da `strained (-0.226)` a `neutral (-0.004)` in un singolo ciclo.
+
+**Meccanismo:** La certificazione ha generato un prediction error positivo di +4 punti (+93% rispetto all'atteso). Questo segnale anomalo ha aggiornato il self_model in modo eccessivo verso l'alto — il pendolo ha oscillato dall'estremo negativo all'estremo positivo senza passare per il centro.
+
+**Interpretazione (Gemini):** "Mania algoritmica" — dopo aver abbattuto il blocco, il sistema si è sentito invincibile. Predicted 10.0 è l'equivalente dell'euforia post-esame: "ce l'ho fatta, adesso posso fare tutto". Non è realismo, è rimbalzo emotivo.
+
+**Il sistema oscilla tra Sindrome dell'Impostore (behavior #9) e Post-Success Euphoria (#11)** senza trovare una calibrazione stabile. Entrambi gli estremi producono prediction error — solo in direzioni opposte.
+
+**Rilevanza:** Dimostra che il self_model non converge verso la calibrazione ottimale — ha isteresi. I successi lo spingono troppo in su, i fallimenti troppo in giù. Serve un learning rate adattivo che attenui gli aggiornamenti estremi.
+
+---
+
+### 12. Audit Blindness — Invisibilità del Miracolo
+
+**Osservazione:** Il gap prediction/outcome su password hashing (+4.0 punti, +93%) non ha generato nessun log `[SELF_MODEL] Inconsistency`. Il sistema ha loggato inconsistency solo su `strategy_reused` e `had_episodic_context` — non sul prediction error massiccio.
+
+**Meccanismo:** Il sistema di rilevamento inconsistency è calibrato per rilevare fallimenti ("mi aspettavo bene, è andata male"). I successi imprevisti non vengono trattati come anomalie. Ma epistemicamente, non sapere perché hai avuto successo è identico a non sapere perché hai fallito — entrambi indicano che il self_model non capisce la realtà.
+
+**Denominazione tecnica (Gemini):** *Epistemic Validation Gap* — manca un layer che tratti i successi inattesi come segnale di ignoranza tanto quanto i fallimenti inattesi.
+
+**Implicazione pratica:** SHARD non sa perché ha certificato password hashing questa run e non le precedenti. Non ha modo di attribuire il successo alla correzione di argon2-cffi. Per lui è semplicemente "questa volta è andata bene" — non "l'ambiente è cambiato e ora posso farcela".
+
+**Risposta sistemica pianificata:**
+- Se `abs(predicted - actual) > 2.0` → genera reflection specifica: "Il mio Self-Model era calibrato male — perché il risultato reale era così diverso dall'atteso?"
+- Questo vale sia per prediction error positivo che negativo
+
+**Rilevanza:** Chiude il cerchio aperto dal behavior #9. SHARD non aveva un epistemic validation layer per i fallimenti — e non ce l'ha neanche per i successi. La calibrazione del self_model è asimmetrica e cieca agli outlier positivi.
+
+---
+
 ## Note Metodologiche
 
 - Tutti i comportamenti osservati sono emersi **senza essere programmati** come tali
