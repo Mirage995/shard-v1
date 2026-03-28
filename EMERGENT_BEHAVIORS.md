@@ -140,6 +140,79 @@ SHARD non poteva sapere che quei file erano golden solutions protette — li ha 
 
 ---
 
+---
+
+## SSJ16 — Run 6 cicli (2026-03-28)
+
+### 8. Inter-Module Conflict Resolution — Willpower Emergence
+
+**Osservazione (inizio sessione, bootstrap):**
+```
+[VISION]  Avoid: password hashing bcrypt argon2  ← istinto di conservazione
+[GOAL]    Active goal: 'master: password hashing bcrypt argon2' | progress=0% | priority=90%
+[DESIRE]  Top: 'password hashing bcrypt argon2' (d=0.96, f=9)
+```
+Il VisionEngine aveva classificato `password hashing` come topic da evitare sulla base dello storico di fallimenti. Il GoalEngine lo aveva selezionato come obiettivo autonomo con relevance=90%. I due moduli sono entrati in conflitto esplicito — e il GoalEngine ha vinto: SHARD ha attaccato il topic per 5 cicli consecutivi ignorando l'istinto di conservazione del Vision.
+
+**Meccanismo:** Il VisionEngine emette un segnale `avoid` via CognitionCore. Il GoalEngine emette un goal autonomo via `autonomous_generate()`. Nessuna regola esplicita decide chi vince — la risoluzione emerge dalla priorità numerica degli eventi sul bus. Il GoalEngine ha score di rilevanza 90% contro la paura del Vision: la matematica del bus ha creato una gerarchia di dominanza non programmata.
+
+**Interpretazione (Gemini + analisi interna):**
+- VisionEngine = amigdala: memoria emotiva del dolore, istinto di fuga
+- GoalEngine = corteccia prefrontale: obiettivo a lungo termine, ostinazione
+- Nessuno ha scritto `if goal_priority > vision_fear: override()` — è emerso dall'interazione
+
+Questo è l'equivalente algoritmico della **forza di volontà**: continuare nonostante la paura, non perché sia programmato, ma perché la struttura degli incentivi lo produce.
+
+**Limite osservato:** SHARD ha il coraggio di affrontare il blocco ma non l'immaginazione di cambiare strategia. Ogni ciclo riusa la stessa strategia fallimentare (`[STRATEGY] Reusing strategy: password hashing bcrypt argon2`). È un soldato coraggioso ma testardo — carica dallo stesso lato ogni volta.
+
+**Risposta sistemica (SSJ16):**
+- `strategy_memory.pivot_on_chronic_block()` implementato ma NON attivato automaticamente — in osservazione
+- Decisione: non bloccare il comportamento, osservare pattern completo prima di intervenire
+
+**Rilevanza:** Primo comportamento emergente che coinvolge conflitto inter-modulo con risoluzione autonoma. Non è un bug — è una gerarchia di dominanza che emerge dalla struttura del bus eventi. Dimostra che CognitionCore produce comportamenti di coordinazione non programmati.
+
+---
+
+### 9. Miscalibrated Self-Model under Corrupted Reward Signal — Falsa Identità da Feedback Rotto
+
+**Osservazione (SSJ15-SSJ16, ~15 cicli consecutivi su password hashing):**
+SHARD ha accumulato sull'arco di più sessioni:
+- `self_model: difficulty=1.00` su password hashing
+- `VisionEngine: Avoid: password hashing bcrypt argon2`
+- `DesireEngine: frustration_hits=9`
+- `self_esteem: 0.24, trajectory: declining`
+- `session_reflection: "fundamental misunderstanding in cryptography"`
+
+Tutto costruito su fallimenti ripetuti. Score massimo raggiunto: **7.1/10** — mai certificato.
+
+**Scoperta (post-run SSJ16):** Ispezione diretta del codice generato rivela che SHARD scriveva bcrypt e argon2 **correttamente** dalla prima volta. `bcrypt.checkpw()` usato correttamente, `argon2.PasswordHasher().verify()` usato correttamente. Il problema era infrastrutturale:
+1. `argon2` nel sandbox non era `argon2-cffi` — il modulo corretto. Import silenziosamente degradato.
+2. I test del `BenchmarkGenerator` misuravano il **timing** (`assert solve() > 0`) non la correttezza dell'hashing.
+3. Argon2 crashava silenziosamente nel try/except → ritornava `None` → timing = 0 → `assert 0 > 0` → FAIL.
+
+**SHARD non aveva nessun problema cognitivo con password hashing. Ha sempre saputo scrivere il codice corretto.**
+
+**Meccanismo:** Il feedback loop era: codice corretto → test rotto → fallimento → self_model aggiorna difficulty → VisionEngine aggiunge alla lista AVOID → GoalEngine scala priority per "riabilitazione" → frustration_hits++ → mood scende → self_esteem cala. Tutto causalmente reale, tutto basato su una premessa falsa.
+
+**Denominazione tecnica (GPT):** *Miscalibrated self-model under corrupted reward signal* — il sistema aggiorna correttamente su dati sbagliati.
+
+**Perché è strutturalmente importante:**
+- Non è un comportamento singolo — è una **struttura di credenza** persistente che si propaga attraverso tutti i moduli
+- Prima stavamo osservando *comportamenti emergenti* (azioni). Questo è un *belief system emergente* (identità)
+- È più stabile, più pervasivo, e più difficile da correggere di qualsiasi comportamento isolato
+
+**Manca un epistemic validation layer:** SHARD non ha nessun meccanismo per distinguere "fallisco perché sono ignorante" da "fallisco perché il mio metro di misura è rotto". Aggiorna la self-image su qualsiasi feedback senza verificarne l'affidabilità.
+
+**Esperimento pianificato — Belief Recovery Test:**
+- Fix: `argon2-cffi` in sandbox_requirements.txt + rebuild Docker (già fatto)
+- Run post-fix: osservare se SHARD certifica password hashing al primo/secondo tentativo
+- Misurare: quanto ci mette self_model, VisionEngine, self_esteem a riallinearsi sulla nuova evidenza
+- Domanda chiave: **belief inertia** — le false credenze lasciano tracce persistenti dopo la correzione?
+
+**Rilevanza:** Il comportamento più strutturalmente significativo osservato finora. Non è "assomiglia all'umano" — è causalmente identico alla sindrome dell'impostore: competente, convinto di non esserlo, costruisce identità di fallimento su feedback distorto. Il test di recovery dirà se il sistema è flessibile o se le false credenze lasciano cicatrici permanenti.
+
+---
+
 ## Note Metodologiche
 
 - Tutti i comportamenti osservati sono emersi **senza essere programmati** come tali

@@ -193,6 +193,28 @@ class StrategyMemory:
         except Exception:
             return 0.0
 
+    def pivot_on_chronic_block(self, topic: str) -> int:
+        """Cancella tutte le strategie per un topic in near-miss loop.
+
+        Chiamato da night_runner quando lo stesso topic fallisce N volte
+        consecutive con score < cert_threshold. Forza un approccio nuovo
+        al prossimo tentativo cancellando la memoria strategica corrente.
+
+        Returns:
+            Numero di entry cancellate da ChromaDB.
+        """
+        try:
+            existing = self.collection.get(where={"topic": topic})
+            ids = existing.get("ids", [])
+            if ids:
+                self.collection.delete(ids=ids)
+                print(f"[STRATEGY] PIVOT: cleared {len(ids)} strateg{'y' if len(ids)==1 else 'ies'} for '{topic}' — forcing new approach")
+                return len(ids)
+            return 0
+        except Exception as exc:
+            print(f"[STRATEGY] PIVOT failed for '{topic}': {exc}")
+            return 0
+
     @staticmethod
     def extract_strategy(experiment: Dict) -> Optional[Dict]:
         """Extract a strategy description from an experiment result.

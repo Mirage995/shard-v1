@@ -11,3 +11,8 @@ docker
 pika
 pytest
 sentence-transformers
+PyJWT
+redis
+pycryptodome
+argon2-cffi
+OpenSSL
