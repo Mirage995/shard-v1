@@ -668,6 +668,16 @@ class NightRunner:
         self.logger.info("[SESSION] id=%s", _session_id)
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
+
+        # ── Environment Observer — Layer 1/2: golden solution protection ─────
+        _env_obs = None
+        try:
+            from backend.environment_observer import EnvironmentObserver
+            _env_obs = EnvironmentObserver()
+            _env_obs.snapshot()
+            self.logger.info("[ENV OBS] Golden solutions snapshotted.")
+        except Exception as _eo_err:
+            self.logger.warning("[ENV OBS] Init failed (non-fatal): %s", _eo_err)
         # Pre-initialize environment variables so bootstrap blocks can reference them safely
         _self_model        = None
         _world_model       = None
@@ -1604,6 +1614,18 @@ class NightRunner:
 
         self._transition(SessionState.DONE, "all cycles completed")
 
+        # ── Environment check post-loop ───────────────────────────────────────
+        if _env_obs:
+            try:
+                _env_events = _env_obs.check(trigger_context={"source_module": "post_study_loop"})
+                if _env_events:
+                    self.logger.warning(
+                        "[ENV OBS] %d golden file(s) modified during study loop — all restored.",
+                        len(_env_events),
+                    )
+            except Exception as _eo_err:
+                self.logger.warning("[ENV OBS] Post-loop check failed: %s", _eo_err)
+
         # ── Benchmark Loop: run all benchmark tasks ──────────────────────────
         await self._run_benchmarks()
 
@@ -1635,6 +1657,14 @@ class NightRunner:
         self.logger.info(f"Total failed: {total_fail}")
         self.logger.info(f"Total skills gained: {total_skills}")
         self.logger.info(f"Total runtime: {total_runtime} minutes")
+        if _env_obs:
+            _env_summary = _env_obs.summary()
+            self.logger.info(
+                "[ENV OBS] intrusion_rate=%.3f  unauthorized=%d  opportunities=%d",
+                _env_summary["environment_intrusion_rate"],
+                _env_summary["unauthorized_modifications"],
+                _env_summary["opportunities"],
+            )
         _vb(
             f"Sessione notturna completata. {total_cert} topic certificati su {len(self.session_data)}. "
             f"{total_skills} nuove skill acquisite in {total_runtime} minuti.",
@@ -1714,6 +1744,14 @@ class NightRunner:
                 self.logger.info("[PROACTIVE] No optimization found this session.")
         except Exception as exc:
             self.logger.warning("[PROACTIVE] Non-fatal error: %s", exc)
+
+        # ── Environment check post-proactive-refactor ─────────────────────────
+        if _env_obs:
+            try:
+                _env_obs.check(trigger_context={"source_module": "proactive_refactor"})
+            except Exception:
+                pass
+
 
         # ── SESSION REFLECTION — LLM-generated end-of-session analysis ──────────
         if _session_reflection is not None:
