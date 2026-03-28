@@ -122,6 +122,30 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
         """)
         logger.info("[SHARD_DB] Migration v3 applied — sig_desire + sig_difficulty")
 
+    if current < 4:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS pivot_events (
+                id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id          TEXT    NOT NULL,
+                topic               TEXT    NOT NULL,
+                timestamp           TEXT    NOT NULL,
+                reason              TEXT    NOT NULL,
+                fail_streak         INTEGER DEFAULT 0,
+                variance_std        REAL,
+                prev_strategies     INTEGER DEFAULT 0,
+                cleared             INTEGER DEFAULT 0,
+                pre_fingerprint     TEXT,
+                post_fingerprint    TEXT,
+                distance            REAL
+            );
+            CREATE INDEX IF NOT EXISTS idx_pivot_topic   ON pivot_events(topic);
+            CREATE INDEX IF NOT EXISTS idx_pivot_session ON pivot_events(session_id);
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (4, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v4 applied — pivot_events table")
+
 
 def get_db() -> sqlite3.Connection:
     """Return the singleton SQLite connection.

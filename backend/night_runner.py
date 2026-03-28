@@ -690,10 +690,37 @@ class NightRunner:
         # No prompt injection — blank slate only. (SSJ17 experiment design)
         _consecutive_fails: dict = {}   # topic → int
         _recent_scores:     dict = {}   # topic → List[float] (last N scores this session)
+        _pivot_tracking:    dict = {}   # topic → {event_id, pre_fingerprint} for post-pivot distance
         _PIVOT_THRESHOLD    = 3
         _VARIANCE_THRESHOLD = 0.5       # std < this = near-miss loop
         _VARIANCE_WINDOW    = 3         # min attempts to compute variance
         _CERT_THRESHOLD     = 7.5       # mirrors constants.SUCCESS_SCORE_THRESHOLD
+
+        def _strategy_fingerprint(strats: list) -> str:
+            """SHA256[:12] of strategy text — short stable identifier for comparison."""
+            import hashlib
+            text = " ".join(
+                s.get("topic", "") + " " + s.get("strategy", "") + " " + s.get("outcome", "")
+                for s in strats
+            ).strip()
+            return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12] if text else "EMPTY"
+
+        def _strategy_distance(fp_a: str, fp_b: str, strats_a: list, strats_b: list) -> float:
+            """Jaccard distance on word tokens between strategy texts (0.0=identical, 1.0=different)."""
+            if fp_a == fp_b:
+                return 0.0
+            def tokens(strats):
+                text = " ".join(
+                    s.get("topic", "") + " " + s.get("strategy", "") + " " + s.get("outcome", "")
+                    for s in strats
+                ).lower()
+                return set(text.split())
+            a, b = tokens(strats_a), tokens(strats_b)
+            if not a and not b:
+                return 0.0
+            intersection = len(a & b)
+            union = len(a | b)
+            return round(1.0 - intersection / union, 4) if union else 0.0
 
         # Pre-initialize environment variables so bootstrap blocks can reference them safely
         _self_model        = None
@@ -1135,6 +1162,33 @@ class NightRunner:
             else:
                 self.logger.info(f"[STRATEGY] No existing strategy found for: {topic}")
 
+            # ── POST-PIVOT: fingerprint + distance measurement ────────────────
+            # If this topic had a pivot, compare new strategy with pre-pivot one.
+            _post_fp = _strategy_fingerprint(strategies)
+            self.logger.info("[STRATEGY] fingerprint=%s  strategies=%d", _post_fp, len(strategies))
+            if topic in _pivot_tracking:
+                _pt = _pivot_tracking[topic]
+                _dist = _strategy_distance(_pt["pre_fingerprint"], _post_fp,
+                                           _pt["pre_strategies"], strategies)
+                _direction = (
+                    "DIFFERENT (agency?)" if _dist > 0.5
+                    else "SIMILAR (bias?)" if _dist > 0.1
+                    else "IDENTICAL (deterministic bias)"
+                )
+                self.logger.warning(
+                    "[POST-PIVOT] '%s': pre=%s → post=%s  distance=%.3f  → %s",
+                    topic, _pt["pre_fingerprint"], _post_fp, _dist, _direction,
+                )
+                try:
+                    from shard_db import execute as _pe_exec
+                    _pe_exec(
+                        "UPDATE pivot_events SET post_fingerprint=?, distance=? WHERE id=?",
+                        (_post_fp, _dist, _pt["event_id"]),
+                    )
+                except Exception as _pe_err:
+                    self.logger.debug("[POST-PIVOT] DB update failed: %s", _pe_err)
+                del _pivot_tracking[topic]  # clear after first post-pivot cycle
+
             # ── SELF-MODEL: predict score before studying ─────────────────────
             # Features are observable facts about this cycle — not invented.
             # sig_* are citizen signals (0.0-1.0) for activation_log / synaptic weights.
@@ -1324,17 +1378,51 @@ class NightRunner:
 
                 if _trigger_a or _trigger_b:
                     _trigger_reason = (
-                        f"fail_streak={_consecutive_fails.get(topic, 0)}" if _trigger_a
-                        else f"near_miss_loop std={round(_std, 2)}"
+                        f"A:fail_streak={_consecutive_fails.get(topic, 0)}" if _trigger_a
+                        else f"B:near_miss_loop std={round(_std, 2)}"
                     )
+                    _fail_streak_val = _consecutive_fails.get(topic, 0)
+                    _std_val         = _std if _trigger_b else None
+
+                    # Capture pre-pivot state for distance measurement
+                    _pre_strategies  = list(strategies)   # snapshot current strategies
+                    _pre_fp          = _strategy_fingerprint(_pre_strategies)
+                    _prev_count      = len(_pre_strategies)
                     try:
                         _cleared = strategy_memory.pivot_on_chronic_block(topic)
                         self.logger.warning(
-                            "[STRATEGY PIVOT] '%s' — %s — "
-                            "cleared %d stale strateg%s. Blank slate next cycle.",
-                            topic, _trigger_reason,
-                            _cleared, "y" if _cleared == 1 else "ies",
+                            "[STRATEGY PIVOT] topic='%s'  reason=%s  "
+                            "prev_strategies=%d  cleared=%s",
+                            topic, _trigger_reason, _prev_count,
+                            "true" if _cleared > 0 else "false",
                         )
+                        # Write structured record to SQLite
+                        try:
+                            from shard_db import execute as _pe_exec, get_db as _pe_db
+                            _pe_exec(
+                                """INSERT INTO pivot_events
+                                   (session_id, topic, timestamp, reason,
+                                    fail_streak, variance_std,
+                                    prev_strategies, cleared, pre_fingerprint)
+                                   VALUES (?, ?, datetime('now'), ?, ?, ?, ?, ?, ?)""",
+                                (
+                                    self.session_id, topic, _trigger_reason,
+                                    _fail_streak_val, _std_val,
+                                    _prev_count, int(_cleared > 0), _pre_fp,
+                                ),
+                            )
+                            _event_id = _pe_db().execute(
+                                "SELECT last_insert_rowid() AS id"
+                            ).fetchone()["id"]
+                            # Store for post-pivot distance measurement
+                            _pivot_tracking[topic] = {
+                                "event_id":        _event_id,
+                                "pre_fingerprint": _pre_fp,
+                                "pre_strategies":  _pre_strategies,
+                            }
+                        except Exception as _pe_err:
+                            self.logger.debug("[STRATEGY PIVOT] DB insert failed: %s", _pe_err)
+
                         _consecutive_fails[topic] = 0
                         _recent_scores[topic] = []   # reset window after pivot
                     except Exception as _piv_err:
