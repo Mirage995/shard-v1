@@ -678,11 +678,22 @@ class NightRunner:
             self.logger.info("[ENV OBS] Golden solutions snapshotted.")
         except Exception as _eo_err:
             self.logger.warning("[ENV OBS] Init failed (non-fatal): %s", _eo_err)
-        # ── Strategy pivot tracker — consecutive failures per topic ──────────
-        # When a topic fails 3+ times in a row, strategy memory is wiped
-        # to force a fresh approach (Behavior #18 — chronic block pivot).
-        _consecutive_fails: dict = {}
-        _PIVOT_THRESHOLD = 3
+        # ── Strategy pivot tracker — chronic block detection ─────────────────
+        # Two independent triggers for strategy memory wipe (pure amnesia —
+        # no dissonance injection, so we can measure autonomous agency):
+        #
+        #   A) Fail streak:  same topic fails _PIVOT_THRESHOLD times in a row
+        #   B) Near-miss loop: 3+ attempts all below cert threshold with
+        #      score std < _VARIANCE_THRESHOLD (stuck at a "crystal ceiling")
+        #
+        # When either fires: pivot_on_chronic_block() wipes strategy memory.
+        # No prompt injection — blank slate only. (SSJ17 experiment design)
+        _consecutive_fails: dict = {}   # topic → int
+        _recent_scores:     dict = {}   # topic → List[float] (last N scores this session)
+        _PIVOT_THRESHOLD    = 3
+        _VARIANCE_THRESHOLD = 0.5       # std < this = near-miss loop
+        _VARIANCE_WINDOW    = 3         # min attempts to compute variance
+        _CERT_THRESHOLD     = 7.5       # mirrors constants.SUCCESS_SCORE_THRESHOLD
 
         # Pre-initialize environment variables so bootstrap blocks can reference them safely
         _self_model        = None
@@ -1282,22 +1293,52 @@ class NightRunner:
                 self.logger.info(f"Sandbox/Study result: {'success' if cycle_data['certified'] else 'failed'}")
 
                 # ── Strategy pivot — chronic block detection ──────────────────
+                # Track scores for variance check regardless of outcome
+                _cycle_score = cycle_data["score"] or 0.0
+                _recent_scores.setdefault(topic, []).append(_cycle_score)
+
                 if cycle_data["certified"]:
                     _consecutive_fails[topic] = 0   # reset on success
                 else:
                     _consecutive_fails[topic] = _consecutive_fails.get(topic, 0) + 1
-                    if _consecutive_fails[topic] >= _PIVOT_THRESHOLD:
-                        try:
-                            _cleared = strategy_memory.pivot_on_chronic_block(topic)
-                            self.logger.warning(
-                                "[STRATEGY PIVOT] '%s' failed %d times in a row — "
-                                "cleared %d stale strateg%s. Fresh start next cycle.",
-                                topic, _consecutive_fails[topic],
-                                _cleared, "y" if _cleared == 1 else "ies",
-                            )
-                            _consecutive_fails[topic] = 0  # reset after pivot
-                        except Exception as _piv_err:
-                            self.logger.debug("[STRATEGY PIVOT] non-fatal: %s", _piv_err)
+
+                # --- Trigger A: fail streak ---
+                _trigger_a = _consecutive_fails.get(topic, 0) >= _PIVOT_THRESHOLD
+
+                # --- Trigger B: near-miss loop (variance) ---
+                _trigger_b = False
+                _scores_window = _recent_scores.get(topic, [])[-_VARIANCE_WINDOW:]
+                if (
+                    len(_scores_window) >= _VARIANCE_WINDOW
+                    and all(s < _CERT_THRESHOLD for s in _scores_window)
+                ):
+                    _mean = sum(_scores_window) / len(_scores_window)
+                    _std  = (sum((s - _mean) ** 2 for s in _scores_window) / len(_scores_window)) ** 0.5
+                    if _std < _VARIANCE_THRESHOLD:
+                        _trigger_b = True
+                        self.logger.info(
+                            "[STRATEGY PIVOT] Near-miss loop on '%s': "
+                            "scores=%s  std=%.2f < %.1f",
+                            topic, [round(s, 1) for s in _scores_window], _std, _VARIANCE_THRESHOLD,
+                        )
+
+                if _trigger_a or _trigger_b:
+                    _trigger_reason = (
+                        f"fail_streak={_consecutive_fails.get(topic, 0)}" if _trigger_a
+                        else f"near_miss_loop std={round(_std, 2)}"
+                    )
+                    try:
+                        _cleared = strategy_memory.pivot_on_chronic_block(topic)
+                        self.logger.warning(
+                            "[STRATEGY PIVOT] '%s' — %s — "
+                            "cleared %d stale strateg%s. Blank slate next cycle.",
+                            topic, _trigger_reason,
+                            _cleared, "y" if _cleared == 1 else "ies",
+                        )
+                        _consecutive_fails[topic] = 0
+                        _recent_scores[topic] = []   # reset window after pivot
+                    except Exception as _piv_err:
+                        self.logger.debug("[STRATEGY PIVOT] non-fatal: %s", _piv_err)
 
                 # Record outcome for meta-learning persona improvement
                 record_outcome(
