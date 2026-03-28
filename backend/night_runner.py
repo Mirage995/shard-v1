@@ -1537,6 +1537,20 @@ class NightRunner:
                             _hypothesis.get("feature", ""),
                             _hypothesis.get("gap", 0.0),
                         )
+                    # ── Behavior #12 fix: Audit Blindness ─────────────────────
+                    # Large prediction error (≥2.0) must be visible in logs.
+                    # The audit reflection is already saved internally by tracker;
+                    # this WARNING ensures it surfaces in night_session.log.
+                    if _predicted_score is not None:
+                        _actual_score = cycle_data["score"] or 0.0
+                        _pred_gap = _actual_score - _predicted_score
+                        if abs(_pred_gap) >= 2.0:
+                            _direction = "UNDERCONFIDENT" if _pred_gap > 0 else "OVERCONFIDENT"
+                            self.logger.warning(
+                                "[AUDIT BLINDNESS] %s on '%s': "
+                                "predicted=%.1f  actual=%.1f  gap=%+.1f",
+                                _direction, topic, _predicted_score, _actual_score, _pred_gap,
+                            )
                 except Exception as _smt_err:
                     self.logger.debug("[SELF_MODEL] record_outcome non-fatal: %s", _smt_err)
 

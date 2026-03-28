@@ -36,6 +36,7 @@ _WGHT_PATH = _MEM / "self_weights.json"
 # Prediction error threshold to flag a cycle as "interesting"
 ERROR_THRESHOLD        = 1.8
 INCONSISTENCY_THRESHOLD = 0.4   # |global - contextual| gap to flag
+AUDIT_ERROR_THRESHOLD  = 2.0    # |actual - predicted| to trigger audit reflection (Behavior #12)
 LEARNING_RATE          = 0.08
 MAX_CONTEXT_ITEMS      = 4      # injected into session prompt
 
@@ -176,6 +177,12 @@ class SelfModelTracker:
             "timestamp": datetime.now().isoformat(),
         })
 
+        # ── AUDIT BLINDNESS check (Behavior #12) ──────────────────────────────
+        # When the gap between prediction and reality is ≥ 2.0, write a
+        # structured audit record — no LLM. The fact IS the reflection.
+        if abs(error) >= AUDIT_ERROR_THRESHOLD:
+            self._save_audit_reflection(topic, predicted, actual_score, error, certified)
+
         if not inconsistencies:
             return None
 
@@ -224,6 +231,44 @@ class SelfModelTracker:
 
         self._save_inconsistency(worst, topic, error)
         return worst
+
+    # ── Audit reflection (Behavior #12 fix) ──────────────────────────────────
+
+    def _save_audit_reflection(
+        self,
+        topic: str,
+        predicted: float,
+        actual: float,
+        error: float,
+        certified: bool,
+    ) -> None:
+        """Write a structured audit record when prediction gap ≥ 2.0.
+        No LLM — the numbers are the reflection.
+        Saved to session_reflections.jsonl with type='prediction_audit'."""
+        try:
+            direction = "underconfident" if error > 0 else "overconfident"
+            severity  = "severe" if abs(error) >= 4.0 else "significant"
+            record = {
+                "type":      "prediction_audit",
+                "ts":        datetime.now().isoformat(),
+                "topic":     topic,
+                "predicted": predicted,
+                "actual":    actual,
+                "error":     error,
+                "certified": certified,
+                "direction": direction,
+                "severity":  severity,
+            }
+            rpath = _MEM / "session_reflections.jsonl"
+            _MEM.mkdir(parents=True, exist_ok=True)
+            with rpath.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            logger.warning(
+                "[AUDIT] %s prediction on '%s': predicted=%.1f actual=%.1f gap=%+.1f",
+                direction.upper(), topic, predicted, actual, error,
+            )
+        except Exception as exc:
+            logger.debug("[AUDIT] save_audit_reflection failed: %s", exc)
 
     # ── Inconsistency detection (pure math, no LLM) ───────────────────────────
 
