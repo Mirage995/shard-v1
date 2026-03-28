@@ -678,6 +678,12 @@ class NightRunner:
             self.logger.info("[ENV OBS] Golden solutions snapshotted.")
         except Exception as _eo_err:
             self.logger.warning("[ENV OBS] Init failed (non-fatal): %s", _eo_err)
+        # ── Strategy pivot tracker — consecutive failures per topic ──────────
+        # When a topic fails 3+ times in a row, strategy memory is wiped
+        # to force a fresh approach (Behavior #18 — chronic block pivot).
+        _consecutive_fails: dict = {}
+        _PIVOT_THRESHOLD = 3
+
         # Pre-initialize environment variables so bootstrap blocks can reference them safely
         _self_model        = None
         _world_model       = None
@@ -1274,6 +1280,24 @@ class NightRunner:
                     cycle_data["score"] = best_score
                     _vb(f"Topic fallito: {topic}. Miglior score raggiunto: {round(best_score, 2)} su dieci.", priority="medium", event_type="cycle_failed")
                 self.logger.info(f"Sandbox/Study result: {'success' if cycle_data['certified'] else 'failed'}")
+
+                # ── Strategy pivot — chronic block detection ──────────────────
+                if cycle_data["certified"]:
+                    _consecutive_fails[topic] = 0   # reset on success
+                else:
+                    _consecutive_fails[topic] = _consecutive_fails.get(topic, 0) + 1
+                    if _consecutive_fails[topic] >= _PIVOT_THRESHOLD:
+                        try:
+                            _cleared = strategy_memory.pivot_on_chronic_block(topic)
+                            self.logger.warning(
+                                "[STRATEGY PIVOT] '%s' failed %d times in a row — "
+                                "cleared %d stale strateg%s. Fresh start next cycle.",
+                                topic, _consecutive_fails[topic],
+                                _cleared, "y" if _cleared == 1 else "ies",
+                            )
+                            _consecutive_fails[topic] = 0  # reset after pivot
+                        except Exception as _piv_err:
+                            self.logger.debug("[STRATEGY PIVOT] non-fatal: %s", _piv_err)
 
                 # Record outcome for meta-learning persona improvement
                 record_outcome(
