@@ -1169,7 +1169,10 @@ async def run_benchmark_loop(
     kb_used = False
     kb_chars = 0
     try:
-        query_text = readme[:300].replace('\n', ' ').strip() if readme else task_key
+        # task_key (e.g. "task_02_ghost_bug") contains the best English keyword
+        # signal for KB lookup. Prepend it so the scorer always sees it,
+        # regardless of whether the README is in Italian or another language.
+        query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
         kb_data = query_knowledge_base(query_text)
         if kb_data:
             kb_used = True

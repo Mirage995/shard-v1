@@ -52,5 +52,34 @@ if __name__ == "__main__":
     print("Final counter value:", counter) # Expected: 0
 ```
 
+## Critical: Lock vs RLock — Nested Locking
+
+Use `threading.RLock()` (reentrant) when a method calls another method that also
+acquires the same lock. `threading.Lock()` is NOT reentrant — re-acquiring it in
+the same thread deadlocks immediately.
+
+```python
+# DEADLOCK: Lock is not reentrant
+class Bank:
+    def __init__(self): self._lock = threading.Lock()
+    def _audit(self):
+        with self._lock: ...          # second acquire by same thread → DEADLOCK
+    def deposit(self):
+        with self._lock:              # first acquire
+            self._audit()            # internally tries to re-acquire → hangs
+
+# CORRECT: RLock allows same thread to re-acquire
+class Bank:
+    def __init__(self): self._lock = threading.RLock()  # reentrant
+    def _audit(self):
+        with self._lock: ...          # safe
+    def deposit(self):
+        with self._lock:
+            self._audit()            # no deadlock
+```
+
+**Symptom of Lock deadlock:** tests hang forever with 0 results, no output.
+**Fix:** replace `threading.Lock()` with `threading.RLock()` in `__init__`.
+
 ## SHARD's Take
 Race conditions are insidious bugs that can be difficult to detect and resolve. Proper synchronization mechanisms, such as locks and semaphores, are crucial for preventing race conditions and ensuring the integrity of shared data in concurrent programs. Careful code design and thorough testing are essential to minimize the risk of introducing these issues.
