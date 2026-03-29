@@ -31,10 +31,10 @@ try:
     from qiskit.circuit import Parameter
     from qiskit.quantum_info import Statevector
     QISKIT_AVAILABLE = True
-    print("🔬 Qiskit disponibile - quantum computing REALE attivo")
+    print("[quantum_soul] Qiskit disponibile - quantum computing REALE attivo")
 except ImportError:
     QISKIT_AVAILABLE = False
-    print("⚠️ Qiskit non disponibile - fallback su simulazione quantica")
+    print("[quantum_soul] Qiskit non disponibile - fallback su simulazione quantica")
     
 # Setup logging
 logging.basicConfig(level=logging.INFO)

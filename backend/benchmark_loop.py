@@ -1123,10 +1123,6 @@ async def run_benchmark_loop(
     else:
         source = source_path.read_text(encoding="utf-8")
 
-    # Clean up stale output from a previous run so the loop starts fresh
-    if output_path.exists():
-        output_path.unlink()
-
     # -- Environment probe + self-profile -------------------------------------
     env_probe    = _probe_environment()
     self_profile = _build_self_profile(task_dir.name, lang)
@@ -1200,6 +1196,7 @@ async def run_benchmark_loop(
     # -- 2. Golden solution protection ------------------------------------
     # If a passing solution already exists, save it before the LLM overwrites it.
     # If all attempts fail, restore it — never regress a working solution.
+    # NOTE: must run before the pivot check and before unlink, so we see the real file.
     _golden_code: str = ""
     _golden_passed: list = []
     if output_path.exists():
@@ -1219,6 +1216,9 @@ async def run_benchmark_loop(
     # encodes a failing approach. Restore to original source (blank slate on code)
     # and measure whether SHARD produces a structurally different solution.
     # temperature=0.05 means differences cannot be attributed to sampling noise.
+    # NOTE: runs before unlink so execute_pivot can read the pre-pivot code for
+    # agency_score comparison. If pivot fires, the file is overwritten with original
+    # source and no unlink is needed. If pivot does not fire, unlink below.
     _pivot_state: dict = {}
     try:
         from benchmark_pivot import should_pivot, execute_pivot
@@ -1230,7 +1230,6 @@ async def run_benchmark_loop(
             # Capture pre-pivot failing tests from most recent episode
             _pre_fails: list = []
             try:
-                from benchmark_memory import load_episodes
                 _eps = load_episodes(_task_id)
                 if _eps:
                     _last = _eps[-1]
@@ -1249,13 +1248,20 @@ async def run_benchmark_loop(
                 pre_fails=_pre_fails,
             ) or {}
             if _pivot_state:
-                # Reload source as the output was just restored to original
+                # Pivot overwrote output_path with original source — reload
                 try:
                     source = (task_dir / source_path.name).read_text(encoding="utf-8")
                 except Exception:
                     pass
     except Exception as _piv_err:
         print(f"  [pivot] non-fatal: {_piv_err}")
+
+    # -- Clean up stale output (only if no pivot was performed) ---------------
+    # If pivot fired, execute_pivot already wrote the original source to output_path.
+    # If no pivot, unlink so the loop starts fresh from a blank output file.
+    if not _pivot_state:
+        if output_path.exists():
+            output_path.unlink()
 
     # -- 3. Loop -----------------------------------------------------------
     attempts = []

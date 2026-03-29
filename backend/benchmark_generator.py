@@ -213,18 +213,17 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
     except SyntaxError as e:
         return {"ok": False, "reason": f"SyntaxError: {e}"}
 
-    # Runtime type check — reject input_data that is a scalar or mapping type.
-    # Scalar primitives (None/bool/int/float) cause 'not iterable' errors.
-    # Dicts cause AttributeError when solve() treats input_data as a string/sequence.
-    # Valid inputs: str, list, tuple, set — sequences the scaffold can iterate over.
+    # Runtime type check — reject only None and bare bool (almost always a generation mistake).
+    # int, float, dict, str, list, tuple, set are all valid input_data types depending on
+    # the function under test (e.g. profiling takes int size, json parsing takes dict).
     # Also: auto-rewrite assert_expr for float/list-of-float expected values so that
     # numpy outputs don't cause "ValueError: truth value of array is ambiguous".
     try:
         ns: dict = {}
         exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
         val = ns.get("input_data")
-        if val is None or isinstance(val, (bool, int, float, dict)):
-            return {"ok": False, "reason": f"input_data is {type(val).__name__} — scalar/mapping, likely wrong type"}
+        if val is None or isinstance(val, bool):
+            return {"ok": False, "reason": f"input_data is {type(val).__name__} — likely a generation mistake"}
 
         # Auto-rewrite assert for float/list-of-float expected values.
         # This guards against "ValueError: truth value of array ambiguous" when
