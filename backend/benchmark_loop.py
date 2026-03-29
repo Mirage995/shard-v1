@@ -1154,51 +1154,102 @@ async def run_benchmark_loop(
     print(f"  Concurrency sim: {'ON' if _run_conc_sim else 'OFF'}")
     print("=" * 68)
 
-    # -- Load episodic memory (always load, inject only if flag is set) ----
+    # -- Signal Gate: collect, rank, filter — only top-K enter the prompt ----
+    # Each source produces a Signal with a confidence score.
+    # gate() ranks by score = confidence × type_weight, keeps top-K.
+    # This shifts control: SHARD decides what matters, not the LLM.
     task_key = task_dir.name
     past_episodes = load_episodes(task_key)
-    experience_summary = build_experience_summary(past_episodes) if (use_episodic_memory and past_episodes) else ""
-    if experience_summary:
-        print(f"  [memory] Injecting {len(past_episodes)} past session(s) into Attempt 1 prompt")
 
-    # Inject self-profile into experience_summary so Attempt 1 sees it
-    if self_profile:
-        experience_summary = self_profile + ("\n" + experience_summary if experience_summary else "")
-        print(f"  [self] Self-profile injected ({len(self_profile)} chars)")
-
-    # -- Query Knowledge Base ----------------------------------------------------
-    kb_used = False
-    kb_chars = 0
-    if use_knowledge_base:
-        try:
-            # task_key (e.g. "task_02_ghost_bug") contains the best English keyword
-            # signal for KB lookup. Prepend it so the scorer always sees it,
-            # regardless of whether the README is in Italian or another language.
-            query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
-            kb_data = query_knowledge_base(query_text)
-            if kb_data:
-                kb_used = True
-                kb_chars = len(kb_data)
-                if experience_summary:
-                    experience_summary += "\n\n" + kb_data
-                else:
-                    experience_summary = kb_data
-                print(f"  [kb] Injected {kb_chars} chars of knowledge base context into prompt")
-        except Exception as e:
-            print(f"  [kb] Knowledge Base injection failed: {e}")
-    else:
-        print(f"  [kb] Knowledge Base disabled (use_knowledge_base=False)")
-
-    # -- Semantic memory query -----------------------------------------------
     try:
-        from semantic_memory import query_semantic_memory
-        _sem_query = f"{task_key} {source[:300]} {tests[:200]}"
-        sem_context = query_semantic_memory(_sem_query, top_k=3, min_score=0.35)
-        if sem_context:
-            experience_summary = (experience_summary + "\n\n" if experience_summary else "") + sem_context
-            print(f"  [semantic] Injected {len(sem_context)} chars of semantic memory into prompt")
-    except Exception as e:
-        print(f"  [semantic] Semantic memory query failed: {e}")
+        from signal_gate import Signal as _Signal, gate as _gate, build_context as _build_ctx, log_gate_result as _log_gate
+        _signals: list = []
+
+        # 1. Self-profile — identity context, always grounding
+        if self_profile:
+            _signals.append(_Signal(
+                content=self_profile, confidence=0.85,
+                type="self_profile", source="self_profile",
+            ))
+
+        # 2. Episodic memory — past session summaries for this task
+        if use_episodic_memory and past_episodes:
+            _ep = build_experience_summary(past_episodes)
+            if _ep:
+                _signals.append(_Signal(
+                    content=_ep,
+                    confidence=min(0.5 + 0.05 * len(past_episodes), 0.80),
+                    type="episodic", source=f"{len(past_episodes)} past sessions",
+                ))
+
+        # 3. Knowledge Base — cheat sheet for this task type
+        kb_used = False
+        kb_chars = 0
+        if use_knowledge_base:
+            try:
+                query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
+                kb_data = query_knowledge_base(query_text)
+                if kb_data:
+                    kb_used = True
+                    kb_chars = len(kb_data)
+                    _signals.append(_Signal(
+                        content=kb_data, confidence=0.80,
+                        type="kb", source="knowledge_base",
+                    ))
+            except Exception as _kb_e:
+                print(f"  [kb] Knowledge Base query failed: {_kb_e}")
+        else:
+            print(f"  [kb] Knowledge Base disabled (use_knowledge_base=False)")
+
+        # 4. Semantic memory — past error/fix patterns
+        try:
+            from semantic_memory import query_semantic_memory
+            _sem_query = f"{task_key} {source[:300]} {tests[:200]}"
+            sem_context = query_semantic_memory(_sem_query, top_k=3, min_score=0.35)
+            if sem_context:
+                _signals.append(_Signal(
+                    content=sem_context, confidence=0.65,
+                    type="semantic_memory", source="semantic_memory",
+                ))
+        except Exception as _sem_e:
+            print(f"  [semantic] Semantic memory query failed: {_sem_e}")
+
+        # 5. Strategy memory — aggregated past successful strategies
+        try:
+            from strategy_memory import StrategyMemory as _SM
+            from signal_gate import build_strategy_signal as _build_strat
+            _strat_results = _SM().query(f"{task_key} {readme[:150]}", k=3)
+            _strat_signal = _build_strat(_strat_results)
+            if _strat_signal:
+                _signals.append(_strat_signal)
+        except Exception as _strat_e:
+            logger.debug("[strategy] query failed: %s", _strat_e)
+
+        # Gate: rank and select top-3
+        _selected = _gate(_signals, top_k=3)
+        experience_summary = _build_ctx(_selected)
+        _log_gate(_selected, _signals)
+
+    except Exception as _gate_err:
+        # Fallback: legacy concat if signal_gate fails
+        logger.warning("[signal_gate] Gate failed, using legacy concat: %s", _gate_err)
+        experience_summary = build_experience_summary(past_episodes) if (use_episodic_memory and past_episodes) else ""
+        if experience_summary:
+            print(f"  [memory] Injecting {len(past_episodes)} past session(s) into Attempt 1 prompt")
+        if self_profile:
+            experience_summary = self_profile + ("\n" + experience_summary if experience_summary else "")
+        kb_used = False
+        kb_chars = 0
+        if use_knowledge_base:
+            try:
+                query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
+                kb_data = query_knowledge_base(query_text)
+                if kb_data:
+                    kb_used = True
+                    kb_chars = len(kb_data)
+                    experience_summary = (experience_summary + "\n\n" if experience_summary else "") + kb_data
+            except Exception:
+                pass
 
     # -- 2. Golden solution protection ------------------------------------
     # If a passing solution already exists, save it before the LLM overwrites it.
@@ -1280,6 +1331,7 @@ async def run_benchmark_loop(
     _best_state = None       # AttemptRecord with highest tests_passed count seen so far
     _swarm_rollback = False  # True when last attempt regressed — triggers surgical mode next call
     _post_pivot_recorded = False  # Track if we've recorded post-pivot measurement
+    _fired_diagnostics: list = []  # Track named diagnostics that fired this run (for weight update)
 
     for attempt_num in range(1, max_attempts + 1):
         t_attempt = time.time()
@@ -1316,6 +1368,22 @@ async def run_benchmark_loop(
                 diagnostic = _run_diagnostic(task_dir, output_path, tests, stuck_tests, lang=lang)
                 if diagnostic:
                     print(f"  [diag] Execution diagnostics injected for {len(stuck_tests)} stuck test(s)")
+            # Named failure-mode classification (idempotency, oscillation, ...)
+            try:
+                from diagnostic_layer import classify_failure as _classify_failure
+                named_diag = _classify_failure(stuck_tests or [], attempts, current_code)
+                if named_diag:
+                    diagnostic = named_diag + ("\n\n" + diagnostic if diagnostic else "")
+                    # Extract diagnostic type name (first token after "!! " prefix)
+                    _diag_name = named_diag.splitlines()[0].replace("!!", "").strip().split()[0]
+                    _fired_diagnostics.append({"type": _diag_name, "confidence": 0.9})
+                    try:
+                        first_line = named_diag.splitlines()[0]
+                        print(f"  [diag] Named diagnostic: {first_line}")
+                    except Exception:
+                        print("  [diag] Named diagnostic injected")
+            except Exception as _e:
+                logger.debug("[diagnostic_layer] classify_failure failed: %s", _e)
             prompt = _build_correction_prompt(
                 source, tests, current_code, attempts, output_filename,
                 stuck_tests=stuck_tests, lang=lang, diagnostic=diagnostic,
@@ -1491,7 +1559,12 @@ async def run_benchmark_loop(
                                        "passed": len(passed), "failed": 0, "failed_tests": []})
                 except Exception:
                     pass
-            # Victory
+            # Victory — update diagnostic weights (learning)
+            try:
+                from diagnostic_learning import update_weights as _update_weights
+                _update_weights(_fired_diagnostics, success=True)
+            except Exception as _lw_e:
+                logger.debug("[diagnostic_learning] update failed: %s", _lw_e)
             total_elapsed = time.time() - t_start
             print(f"\n{'=' * 68}")
             print(f"  VICTORY on attempt {attempt_num}/{max_attempts}")
@@ -1604,6 +1677,13 @@ async def run_benchmark_loop(
         # Tie — keep golden (it's verified, LLM solution is untested at full depth)
         _write_file(output_path, _golden_code)
         print(f"  [golden] Tied at {best_score} tests — kept verified solution")
+
+    # Failed — update diagnostic weights (learning)
+    try:
+        from diagnostic_learning import update_weights as _update_weights
+        _update_weights(_fired_diagnostics, success=False)
+    except Exception as _lw_e:
+        logger.debug("[diagnostic_learning] update failed: %s", _lw_e)
 
     print(f"\n{'=' * 68}")
     print(f"  FAILED after {max_attempts} attempts")

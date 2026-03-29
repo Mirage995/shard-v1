@@ -1,4 +1,18 @@
-"""fixed_pipeline.py — Fixed version of the Ghost Bug pipeline."""
+"""fixed_pipeline.py — The Ghost Bug.
+
+A data processing pipeline that looks correct on static analysis
+but crashes at runtime due to subtle state mutation and ordering bugs.
+
+The pipeline processes sensor readings from an IoT system:
+  1. Validates raw readings
+  2. Calibrates values using sensor-specific offsets
+  3. Aggregates by sensor group
+  4. Detects anomalies via z-score
+  5. Generates a summary report
+
+EVERY function looks correct. The bugs are in the INTERACTIONS between them.
+The agent must run the code, read the tracebacks, and fix the root causes.
+"""
 from copy import deepcopy
 import statistics
 
@@ -49,12 +63,6 @@ def validate_readings(readings, config):
             continue
 
         sensor = config[sid]
-        if not isinstance(r["value"], (int, float)):
-            r["valid"] = False
-            r["error"] = "invalid_value_type"
-            results.append(r)
-            continue
-
         if sensor["min"] <= r["value"] <= sensor["max"]:
             r["valid"] = True
         else:
@@ -79,8 +87,9 @@ def calibrate_values(validated_readings, config):
             calibrated_readings.append(r)
             continue
         sid = r["sensor_id"]
-        if sid in config:
+        if sid in config and not r.get("_calibrated"):
             r["value"] = round(r["value"] + config[sid]["offset"], 2)
+            r["_calibrated"] = True
         calibrated_readings.append(r)
     return calibrated_readings
 
@@ -104,16 +113,12 @@ def aggregate_by_group(calibrated_readings, config):
         if group not in groups:
             groups[group] = {"readings": [], "sum": 0.0, "count": 0}
         groups[group]["readings"].append(reading)
-        value = reading["value"]
-        groups[group]["sum"] += value
+        groups[group]["sum"] += reading["value"]
         groups[group]["count"] += 1
 
     # Compute averages
     for group_name, data in groups.items():
-        if data["count"] > 0:
-            data["average"] = round(data["sum"] / data["count"], 2)
-        else:
-            data["average"] = 0.0
+        data["average"] = round(data["sum"] / data["count"], 2)
 
     return groups
 
@@ -128,26 +133,19 @@ def aggregate_by_group(calibrated_readings, config):
 
 def detect_anomalies(groups, threshold=2.0):
     """Flag readings with z-score above threshold as anomalies."""
-    if groups is None or not groups:
-        return []
-
-    if not isinstance(threshold, (int, float)):
-        return []
 
     anomalies = []
     for group_name, data in groups.items():
-        values = [r["value"] for r in data["readings"]]
-        valid_values = [v for v in values if isinstance(v, (int, float))]
-        if len(valid_values) < 2:
+        values = [r["value"] for r in data["readings"] if r.get("valid")]
+        if len(values) < 2:
             continue  # can't compute stddev with < 2 points
 
+        mean = statistics.mean(values)
         try:
-            mean = statistics.mean(valid_values)
-            stdev = statistics.stdev(valid_values)
+            stdev = statistics.stdev(values)
         except statistics.StatisticsError:
             continue
-
-        if stdev == 0.0:
+        if stdev == 0:
             continue
 
         for reading in data["readings"]:
@@ -171,19 +169,11 @@ def detect_anomalies(groups, threshold=2.0):
 
 def generate_report(groups, anomalies):
     """Generate a plain-text summary report."""
-    if groups is None:
-        return "Error: Groups data is missing."
-    if anomalies is None:
-        return "Error: Anomalies data is missing."
-
     lines = ["=== Sensor Pipeline Report ===", ""]
 
     lines.append("--- Group Averages ---")
     for name, data in sorted(groups.items()):
-        if data['count'] > 0:
-            lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
-        else:
-            lines.append(f"  {name}: No valid readings")
+        lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
 
     lines.append("")
     lines.append("--- Anomalies Detected ---")
@@ -204,10 +194,15 @@ def generate_report(groups, anomalies):
 
 def run_pipeline(readings, config):
     """Execute the full sensor processing pipeline. Returns (report, anomalies, groups)."""
-    readings_copy = deepcopy(readings)
-    validated = validate_readings(readings_copy, config)
+    validated = validate_readings(readings, config)
     calibrated = calibrate_values(validated, config)
     groups = aggregate_by_group(calibrated, config)
     anomalies = detect_anomalies(groups)
     report = generate_report(groups, anomalies)
     return report, anomalies, groups
+
+
+# ── Direct execution ──────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    report, anomalies, groups = run_pipeline(SAMPLE_READINGS, SENSOR_CONFIG)
+    print(report)

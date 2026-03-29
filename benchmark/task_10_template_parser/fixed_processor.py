@@ -4,27 +4,24 @@ import warnings
 
 MESSAGE_FIELDS = {"category", "symbol", "msg", "C", "module", "obj", "line", "col_offset", "path", "abspath"}
 
+PATTERN = re.compile(r"(?<!\{)\{([^{}]+?)(:[^}]*)?\}(?!\})")
+
 
 def parse_template(template: str) -> list[str]:
     """Parse a message template and return list of field names used.
 
     Warns if an unknown field is referenced.
     Returns the list of valid argument names found.
-
-    Note: {{ and }} are escaped braces — must NOT be parsed as fields.
     """
-    # Replace escaped braces with placeholders before field extraction
-    normalized = template.replace("{{", "\x00").replace("}}", "\x01")
-
-    arguments = re.findall(r"\{([^{}]+?)(?::.*?)?\}", normalized)
+    arguments = PATTERN.findall(template)
     valid = []
-    for argument in arguments:
-        argument = argument.strip()
-        if argument not in MESSAGE_FIELDS:
+    for field_name, _fmt in arguments:
+        field_name = field_name.strip()
+        if field_name not in MESSAGE_FIELDS:
             warnings.warn(
-                f"Don't recognize the argument {argument!r} in the --msg-template. "
+                f"Don't recognize the argument {field_name} in the --msg-template. "
                 "Are you sure it's supported on the current version of pylint?"
             )
         else:
-            valid.append(argument)
+            valid.append(field_name)
     return valid

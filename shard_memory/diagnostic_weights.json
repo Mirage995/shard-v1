@@ -1,0 +1,17 @@
+{
+  "DEADLOCK": {
+    "weight": 1.0,
+    "success": 0,
+    "fail": 0
+  },
+  "IDEMPOTENCY": {
+    "weight": 1.05,
+    "success": 1,
+    "fail": 0
+  },
+  "OSCILLATION": {
+    "weight": 1.0,
+    "success": 0,
+    "fail": 0
+  }
+}
