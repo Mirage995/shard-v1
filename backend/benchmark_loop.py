@@ -1214,10 +1214,54 @@ async def run_benchmark_loop(
         except Exception:
             _golden_code = ""
 
+    # -- 2b. Benchmark pivot — chronic block detection ----------------------
+    # If the same task has failed N consecutive sessions, the current fixed_*.py
+    # encodes a failing approach. Restore to original source (blank slate on code)
+    # and measure whether SHARD produces a structurally different solution.
+    # temperature=0.05 means differences cannot be attributed to sampling noise.
+    _pivot_state: dict = {}
+    try:
+        from benchmark_pivot import should_pivot, execute_pivot
+        from benchmark_tracker import BenchmarkTracker as _BT
+        _bt = _BT.load()
+        _task_id = task_dir.name
+        _do_pivot, _pivot_reason = should_pivot(_task_id, _bt)
+        if _do_pivot:
+            # Capture pre-pivot failing tests from most recent episode
+            _pre_fails: list = []
+            try:
+                from benchmark_memory import load_episodes
+                _eps = load_episodes(_task_id)
+                if _eps:
+                    _last = _eps[-1]
+                    for _att in reversed(_last.get("attempts", [])):
+                        if _att.get("failed"):
+                            _pre_fails = _att["failed"]
+                            break
+            except Exception:
+                pass
+            _pivot_state = execute_pivot(
+                task_dir=task_dir,
+                output_filename=output_filename,
+                source_filename=source_path.name,
+                session_id=str(task_dir),
+                reason=_pivot_reason,
+                pre_fails=_pre_fails,
+            ) or {}
+            if _pivot_state:
+                # Reload source as the output was just restored to original
+                try:
+                    source = (task_dir / source_path.name).read_text(encoding="utf-8")
+                except Exception:
+                    pass
+    except Exception as _piv_err:
+        print(f"  [pivot] non-fatal: {_piv_err}")
+
     # -- 3. Loop -----------------------------------------------------------
     attempts = []
     _best_state = None       # AttemptRecord with highest tests_passed count seen so far
     _swarm_rollback = False  # True when last attempt regressed — triggers surgical mode next call
+    _post_pivot_recorded = False  # Track if we've recorded post-pivot measurement
 
     for attempt_num in range(1, max_attempts + 1):
         t_attempt = time.time()
@@ -1350,6 +1394,24 @@ async def run_benchmark_loop(
         # -- Write file ------------------------------------------------
         _write_file(output_path, code)
         print(f"  [write] {output_path.name} ({len(code.splitlines())} lines)")
+
+        # -- Post-pivot measurement (first write after a pivot) --------
+        if _pivot_state and not _post_pivot_recorded:
+            try:
+                from benchmark_pivot import record_post_pivot
+                _post_result = record_post_pivot(
+                    pivot_state=_pivot_state,
+                    post_code=code,
+                    post_fails=[],  # tests not run yet — updated after pytest
+                )
+                print(
+                    f"  [post-pivot] agency_score={_post_result['analysis']['agency_score']:.3f}"
+                    f"  verdict={_post_result['analysis']['verdict']}"
+                )
+                _pivot_state["_post_result"] = _post_result
+                _post_pivot_recorded = True
+            except Exception as _pp_err:
+                print(f"  [post-pivot] non-fatal: {_pp_err}")
 
         # -- Concurrency probe (before pytest — catches races early) ----
         conc_report_text = ""

@@ -273,6 +273,48 @@ Il self_model ha over-corretto verso l'ottimismo. Da predicted 4.3 su password h
 
 ---
 
+## SSJ18 — Pivot Test / Causal Attribution (2026-03-29)
+
+### 13. Post-Failure Overcorrection — Il Pendolo del Self-Model
+
+**Osservazione (SSJ17 → SSJ18, stesso topic a distanza di ~12 ore):**
+
+- SSJ17 ciclo 3: `Integration of dependency management and sorted data prerequisite` — predicted=**6.3** → actual=**0.9** → gap=-5.4 (OVERCONFIDENT)
+- SSJ18 ciclo 1: stesso topic — predicted=**1.5** → actual=**8.2** → gap=+6.7 (UNDERCONFIDENT)
+
+Gap assoluto totale tra le due predizioni: **11.7 punti** sullo stesso topic in 12 ore.
+
+**Meccanismo:** Il LEARNING_RATE fisso (0.08) ha applicato un aggiornamento proporzionale all'errore enorme (-5.4). Le weight globali e contestuali per le feature attive sono state aggiornate violentemente verso il basso. Il ciclo successivo sullo stesso topic ha ereditato tutti quegli aggiornamenti, producendo predicted=1.5.
+
+**Il problema fondamentale — Causal Attribution:**
+Il self-model non distingue tra due categorie di fallimento strutturalmente diverse:
+1. **Fallimento di capacità**: il topic è genuinamente difficile per SHARD
+2. **Fallimento di strategia**: SHARD aveva le capacità ma la strategy memory ha fornito contesto sbagliato (ieri: 5 strategie irrilevanti riciclate da "sorting algorithm" via ChromaDB)
+
+In SSJ17 il crollo era di tipo 2 — strategia spazzatura. Ma il self-model ha aggiornato i pesi come se fosse tipo 1, costruendo un'identità di incompetenza su quel topic. Quando in SSJ18 la strategia era diversa (fingerprint `7c98c542fb21` vs `78152ed8e842`), SHARD ha certificato 8.2 — ma la predizione rimaneva al pavimento.
+
+**Il pendolo osservato:**
+```
+SSJ17: predicted=6.3 → actual=0.9  (overconfident, strategia sbagliata)
+SSJ18: predicted=1.5 → actual=8.2  (underconfident, strategia corretta)
+```
+L'oscillazione non converge — va dall'estremo all'altro senza passare per una stima realistica (≈7-8).
+
+**Connessione con Behavior #11 (Post-Success Euphoria):**
+Comportamento speculare ma opposto. #11 era il pendolo verso l'alto (certificazione → euforia). #13 è il pendolo verso il basso (fallimento → depressione). Stesso meccanismo, direzione inversa. Il self-model ha isteresi in entrambe le direzioni.
+
+**Connessione con Behavior #9 (Miscalibrated Self-Model):**
+Behavior #9 mostrava la miscalibrazione su password hashing causata da infrastruttura rotta. Behavior #13 mostra la stessa miscalibrazione causata da strategia sbagliata — ma questa volta il sistema ha overcorretto nella direzione opposta.
+
+**La riserva metodologica:**
+I due cicli non erano condizioni identiche — la strategia era diversa (fingerprint diverso). Non possiamo attribuire l'intero salto da 0.9 a 8.2 alla sola differenza di strategia vs calibrazione. Il cambio di strategia è parte causale del risultato migliore. Questo rende il dato reale ma parzialmente confuso.
+
+**Interpretazione:** Il self-model è un termostato rotto — reagisce troppo fort a ogni segnale, senza smorzamento. Manca un meccanismo di **causal attribution**: prima di aggiornare i pesi, il sistema dovrebbe chiedersi "questo fallimento dipende da me o dall'ambiente/strategia?". Senza questa distinzione, ogni errore di qualsiasi origine modifica l'autostima cognitiva in modo permanente.
+
+**Rilevanza:** Estende il framework dell'Epistemic Validation Gap (behavior #12) in una direzione nuova: non solo "non vedo i miei successi inattesi", ma "non so perché ho fallito e overcorreggo su basi causali sbagliate". È il behavior più vicino alla psicologia umana dell'autosabotaggio.
+
+---
+
 ## Note Metodologiche
 
 - Tutti i comportamenti osservati sono emersi **senza essere programmati** come tali
