@@ -315,6 +315,33 @@ I due cicli non erano condizioni identiche — la strategia era diversa (fingerp
 
 ---
 
+## SSJ18 — KB ON/OFF Experiment + Deadlock Attractor (2026-03-29)
+
+### 14. Lock Attractor — Guidance-Resistant Deterministic Pattern
+
+**Osservazione (task_04_race_condition, 16+ sessioni):** SHARD genera sempre `threading.Lock()` in soluzioni bancarie con locking annidato. Il pattern causa deadlock immediato (Lock non è rientrante; `_audit()` viene chiamato dall'interno di metodi già lockati). Risultato: 0 test passati, 0 falliti — pytest timed out senza output.
+
+**Esperimento (SSJ18):** tre run con pivot attivo (pre_fp valido):
+
+| Condizione | agency_score | Attempt 1 | Attempt 2 |
+|---|---|---|---|
+| KB ON (RLock guidance injected) | 0.000 IDENTICAL | 0/0 deadlock | 0/0 deadlock |
+| KB OFF (no guidance) | 0.000 IDENTICAL | 0/0 deadlock | 0/0 deadlock |
+| KB ON + deadlock diagnostic hint | 0.000 IDENTICAL | 0/0 deadlock | **16/16 VICTORY** |
+
+**Meccanismo:** Il segnale "0 passed, 0 failed" non conteneva informazioni causali. L'LLM interpretava "0 failed" come "nessun problema visibile" e manteneva la soluzione. Con il messaggio esplicito "DEADLOCK SUSPECTED: usa RLock" nel correction prompt, la soluzione corretta è emersa al secondo tentativo.
+
+**Interpretazione:** L'attractor non è resistente alla conoscenza (il modello sa RLock) — è resistente all'assenza di segnale diagnostico. Il knowledge base passivo non basta; serve il **feedback loop attivo** con diagnosi specifica. Questo distingue "sapere la risposta" da "riconoscere quando quella risposta è necessaria."
+
+**Pattern rilevante:** `agency_score=0.000` con KB ON e KB OFF identici — il modello è un attrattore assoluto su questo task. Il pivot ha valore non per cambiare la soluzione, ma per misurare quanto è forte l'attractor.
+
+**Risposta sistemica:**
+- Aggiunto deadlock detection automatica in `benchmark_loop.py`: se pytest timeout + 0/0, inietta "DEADLOCK SUSPECTED + usa RLock" nell'error_summary
+- Aggiornato `race_condition_handling_and_debugging.md` con sezione Lock vs RLock
+- Fix KB retrieval: `knowledge_bridge.py` ora legge direttamente i `.md` con scoring task_key-weighted
+
+---
+
 ## Note Metodologiche
 
 - Tutti i comportamenti osservati sono emersi **senza essere programmati** come tali
