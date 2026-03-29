@@ -1032,6 +1032,7 @@ async def run_benchmark_loop(
     use_episodic_memory: bool = True,
     use_swarm: bool = False,
     use_concurrency_sim: bool = True,  # auto-detects if task needs it
+    use_knowledge_base: bool = True,   # inject KB cheat sheets into prompt
 ) -> BenchmarkResult:
     """Run the closed feedback loop on a benchmark task.
 
@@ -1165,25 +1166,28 @@ async def run_benchmark_loop(
         experience_summary = self_profile + ("\n" + experience_summary if experience_summary else "")
         print(f"  [self] Self-profile injected ({len(self_profile)} chars)")
 
-    # -- Query Knowledge Base (always run independent of flag) --------------
+    # -- Query Knowledge Base ----------------------------------------------------
     kb_used = False
     kb_chars = 0
-    try:
-        # task_key (e.g. "task_02_ghost_bug") contains the best English keyword
-        # signal for KB lookup. Prepend it so the scorer always sees it,
-        # regardless of whether the README is in Italian or another language.
-        query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
-        kb_data = query_knowledge_base(query_text)
-        if kb_data:
-            kb_used = True
-            kb_chars = len(kb_data)
-            if experience_summary:
-                experience_summary += "\n\n" + kb_data
-            else:
-                experience_summary = kb_data
-            print(f"  [kb] Injected {kb_chars} chars of knowledge base context into prompt")
-    except Exception as e:
-        print(f"  [kb] Knowledge Base injection failed: {e}")
+    if use_knowledge_base:
+        try:
+            # task_key (e.g. "task_02_ghost_bug") contains the best English keyword
+            # signal for KB lookup. Prepend it so the scorer always sees it,
+            # regardless of whether the README is in Italian or another language.
+            query_text = f"{task_key} {readme[:200]}".replace('\n', ' ').strip()
+            kb_data = query_knowledge_base(query_text)
+            if kb_data:
+                kb_used = True
+                kb_chars = len(kb_data)
+                if experience_summary:
+                    experience_summary += "\n\n" + kb_data
+                else:
+                    experience_summary = kb_data
+                print(f"  [kb] Injected {kb_chars} chars of knowledge base context into prompt")
+        except Exception as e:
+            print(f"  [kb] Knowledge Base injection failed: {e}")
+    else:
+        print(f"  [kb] Knowledge Base disabled (use_knowledge_base=False)")
 
     # -- Semantic memory query -----------------------------------------------
     try:
@@ -1458,6 +1462,19 @@ async def run_benchmark_loop(
 
         passed, failed, error_summary = _parse_test_output(raw_pytest, lang=lang)
         elapsed = time.time() - t_attempt
+
+        # -- Deadlock detection: if pytest timed out AND 0 passed, 0 failed ----
+        # The LLM would see "0 failed" and make no change. Inject an explicit
+        # deadlock warning into error_summary so the correction prompt addresses it.
+        if raw_pytest.startswith("TIMEOUT") and not passed and not failed:
+            error_summary = (
+                "DEADLOCK SUSPECTED: The test runner timed out — no tests ran. "
+                "This strongly indicates a threading deadlock in your code. "
+                "Common cause: threading.Lock() used in a method that calls another "
+                "method which also acquires the same lock (non-reentrant). "
+                "FIX: Replace threading.Lock() with threading.RLock() in __init__. "
+                "RLock is reentrant — the same thread can acquire it multiple times."
+            )
 
         if all_passed:
             print(f"ALL PASSED ({len(passed)} tests)")
