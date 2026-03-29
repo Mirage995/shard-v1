@@ -1226,6 +1226,11 @@ async def run_benchmark_loop(
         _bt = _BT.load()
         _task_id = task_dir.name
         _do_pivot, _pivot_reason = should_pivot(_task_id, _bt)
+        if _do_pivot and _golden_passed:
+            # Golden solution already passes all tests — no pivot needed.
+            # Streak is stale; this run will register a success and reset it.
+            print(f"  [pivot] Skipped — golden solution already passes {len(_golden_passed)} test(s).")
+            _do_pivot = False
         if _do_pivot:
             # Capture pre-pivot failing tests from most recent episode
             _pre_fails: list = []
