@@ -283,6 +283,17 @@ python backend/night_runner.py --cycles 1 --no-core  # lobotomy test (baseline w
 **Benchmark (single task):**
 ```bash
 python backend/benchmark_loop.py benchmark/task_04_race_condition --use-swarm
+python backend/benchmark_loop.py benchmark/task_04_race_condition --strategy-mode baseline  # no strategy signal
+```
+
+**A/B causal test:**
+```bash
+python backend/ab_test_runner.py task_02_ghost_bug task_04_race_condition
+```
+
+**External bug (your own code):**
+```bash
+python shard_challenge.py buggy.py test_buggy.py
 ```
 
 **CognitionCore stress test:**
@@ -325,6 +336,8 @@ ANTHROPIC_API_KEY=...
 | SSJ13 | AGI Layer — SelfModel (momentum, blind spots, quarantine), WorldModel (58-skill map, self_calibrate()), GoalEngine autonomous (SHARD picks its own goals), SemanticMemory bootstrap, GapDetector loop closure, CognitionCore +query_world/goal/real_identity + Vettori 4/5/6 |
 | SSJ14 | **Full bidirectional event bus** — 14 CognitionCore citizens, all interconnected. New modules: MoodEngine (affective state, broadcasts mood_shift), IdentityCore (persistent biography from SQLite, self_esteem computed not declared), SkillLibrary (Voyager-inspired: certified skill cache + automatic curriculum via GraphRAG), HebbianUpdater (LTP/LTD plasticity + frustration decay), SelfModelTracker (predictive processing loop — mood + identity now modulate predictions), PrerequisiteChecker (GraphRAG+LLM gate). New events: mood_shift, identity_updated, low_self_esteem. Emergent behaviors observed: asyncio phobia, comfort zone, paradoxical curiosity under failure (Zeigarnik), calibrated predictor. |
 | SSJ15 | **Emergent behavior analysis + architectural fixes.** Observed: cognitive effort surge (14-min asyncio cycle, 7 modules in cascade, no rule written), specification gaming (SHARD routes around hard topics autonomously), first honest self-identity (self_esteem=0.26, trajectory=declining). Fixes: weighted certifications in mood+identity (difficulty-adjusted cert_rate), curiosity loop fix (GraphRAG extends/improves priority, certified topics excluded), skill implementations (Voyager: saves winning code, injects for similar topics), junk strategy cleanup (20 garbage entries removed, filter prevents re-accumulation), sandbox-incompatible topics removed from curated list (network topics disabled). New backlog items: Perverse Emergence Detection (#18), strategy mutation EvoScientist-style (#14), affordance filtering SayCan-style (#15). |
+| SSJ18 | **Diagnostic Layer + Signal Gate + Diagnostic Learning — pre-agency architecture.** Three new modules: `diagnostic_layer.py` (named failure classifier: DEADLOCK/IDEMPOTENCY/OSCILLATION — transforms silent runtime failure into a named, actionable signal); `signal_gate.py` (attention-based top-K filter — each source competes by confidence score, only top-3 enter the prompt, SHARD decides what matters not the LLM); `diagnostic_learning.py` (sole writer of `diagnostic_weights.json`: success +0.05, fail -0.03, clamped [0.5,2.0], atomic write, dedup). Architecture shift: `everything→prompt→LLM_decides` → `signals→ranking→top-K→guided_prompt→LLM_acts`. Key findings: (1) activation gap vs knowledge gap — 6000 chars of RLock documentation ignored, one sentence "DEADLOCK SUSPECTED" → solve; (2) signal competition — strategy (0.81) beats semantic_memory (0.78), episodic dropped; (3) IDEMPOTENCY weight: 1.000 → 1.050 after first victory. Benchmark: 12/12 with gate active. |
+| SSJ19 | **Causal proof + Strategy Compiler + Memory quality fix + OOD generalization.** `strategy_compiler.py`: transforms raw strategy text into grounded operational instructions with confidence gating (>=0.75 MANDATORY, 0.60-0.74 SUGGESTED) and heuristic function-name anchoring. A/B/C causal proof: task_02 A=3att vs B=1att — IDEMPOTENCY diagnostic never fired in B, strategy signal alone solved it. B=C confirmed: gate selects correctly without forcing. Memory quality crisis fixed: 442 junk entries -> 0 via `clean_strategy_db.py`; `extract_from_diff()` extracts real patterns from benchmark victory diffs (12 patterns); `store_from_benchmark()` called at every win. Strategy multiplier: confidence boosted by track record (avg_score + success_rate, range 0.8-1.5). OOD generalization: task_13 (parsing bugs) + task_14 (boundary bugs) — both unseen domains, seed=2att, reuse=1att. Loop closed on new domains. Bulk Unicode fix: 90 backend files (cp1252 silent exceptions were swallowing DB writes). DB: 11 real strategies. |
 
 ---
 
