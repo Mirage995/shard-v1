@@ -9,7 +9,7 @@ import pathlib
 from typing import List, Dict, Any, Optional, Callable
 from importlib.util import spec_from_file_location, module_from_spec
 from datetime import datetime
-# LLM calls go through llm_router — no direct groq/anthropic clients needed here
+# LLM calls go through llm_router -- no direct groq/anthropic clients needed here
 from chromadb.utils import embedding_functions
 from db_manager import get_collection, DB_PATH_KNOWLEDGE_DB
 from filesystem_tools import write_file
@@ -106,11 +106,11 @@ os.makedirs(SANDBOX_DIR, exist_ok=True)
 
 class StudyAgent:
     def __init__(self, goal_engine: GoalEngine = None):
-        # LLM calls go through llm_router (Gemini → Groq → Claude fallback chain)
+        # LLM calls go through llm_router (Gemini -> Groq -> Claude fallback chain)
         # No direct client initialization needed here
         self.emb_fn      = embedding_functions.DefaultEmbeddingFunction()
         self.embed       = self.emb_fn  # Semantic validation use
-        # Usa il singleton db_manager — terzo client ChromaDB unificato
+        # Usa il singleton db_manager -- terzo client ChromaDB unificato
         self.kb          = get_collection(
             CHROMA_DB_PATH,
             name="shard_knowledge_base",
@@ -187,7 +187,7 @@ class StudyAgent:
             self.world_model
         )
 
-        # ── CognitionCore (Senso Interno) — 5-layer Global Workspace ─────────────
+        # ── CognitionCore (Senso Interno) -- 5-layer Global Workspace ─────────────
         try:
             from cognition.cognition_core import get_cognition_core
             from episodic_memory import EpisodicMemory
@@ -261,7 +261,7 @@ class StudyAgent:
         try:
             return json.loads(cleaned)
         except json.JSONDecodeError:
-            print("[SYNTHESIZE] JSON invalid — attempting recovery")
+            print("[SYNTHESIZE] JSON invalid -- attempting recovery")
 
         # Step 2: attempt brute force extraction of { ... }
         start = raw_text.find("{")
@@ -274,7 +274,7 @@ class StudyAgent:
             except Exception:
                 pass
 
-        print("[SYNTHESIZE] Recovery failed — returning empty structure")
+        print("[SYNTHESIZE] Recovery failed -- returning empty structure")
         return {"concepts": [], "summary": "", "insights": []}
 
     async def retrieve_strategy(self, topic: str):
@@ -422,7 +422,7 @@ Example: ["query 1", "query 2", "query 3"]"""
                                 "tier": 1
                             })
                     except Exception as e:
-                        print(f"[MAP] Query failed: {query} — {e}")
+                        print(f"[MAP] Query failed: {query} -- {e}")
 
                 if tier >= 2:
                     wiki_queries = [
@@ -472,7 +472,7 @@ Example: ["query 1", "query 2", "query 3"]"""
 
         print(f"[MAP] Found {len(sources)} unique sources (sorted by relevance)")
         for s in sources[:8]:
-            print(f"  [{s['relevance']}] {s['title'][:60]} — {s['url'][:50]}")
+            print(f"  [{s['relevance']}] {s['title'][:60]} -- {s['url'][:50]}")
 
         self.progress.complete_phase("MAP")
         return sources
@@ -482,7 +482,7 @@ Example: ["query 1", "query 2", "query 3"]"""
     async def phase_aggregate(self, sources: List[Dict]) -> str:
         """Scrape and clean text from web pages with visible Playwright.
 
-        Delegates to StudyBrowserScraper — browser is always closed via finally.
+        Delegates to StudyBrowserScraper -- browser is always closed via finally.
         """
         max_sources = min(len(sources), 6)
         self.progress.set_phase("AGGREGATE", 0.0)
@@ -511,16 +511,16 @@ Example: ["query 1", "query 2", "query 3"]"""
         )
         score_line = (
             f"\nPrevious attempt score: {previous_score}/10. Focus on depth and correctness "
-            f"— the previous synthesis was incomplete. Be more precise and cover more concepts.\n"
+            f"-- the previous synthesis was incomplete. Be more precise and cover more concepts.\n"
             if previous_score is not None else ""
         )
         episodic_line = (
             f"\n{episode_context}\n"
             if episode_context else ""
         )
-        # Vettore 1 — CognitionCore Structural Pivot Directive
+        # Vettore 1 -- CognitionCore Structural Pivot Directive
         pivot_line = (
-            f"\n[COGNITION CORE — STRUCTURAL PIVOT]\n{pivot_directive}\n"
+            f"\n[COGNITION CORE -- STRUCTURAL PIVOT]\n{pivot_directive}\n"
             if pivot_directive else ""
         )
 
@@ -530,7 +530,7 @@ Example: ["query 1", "query 2", "query 3"]"""
             from graph_rag import query_causal_context
             causal = query_causal_context(topic)
             if causal:
-                causal_line = f"\n{causal}\nUse these known relations to enrich your extraction — confirm, contradict, or extend them.\n"
+                causal_line = f"\n{causal}\nUse these known relations to enrich your extraction -- confirm, contradict, or extend them.\n"
                 print(f"[SYNTHESIZE] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings")
         except Exception:
             pass
@@ -546,7 +546,7 @@ Do not include text before or after the JSON.
 Required format:
 
 {{
-"shard_opinion": "1-2 sentence evaluation: why this topic matters, what makes it hard, or where people typically go wrong — not a summary",
+"shard_opinion": "1-2 sentence evaluation: why this topic matters, what makes it hard, or where people typically go wrong -- not a summary",
 "concepts": [
 {{
 "name": "concept_name",
@@ -703,7 +703,7 @@ RAW CONTENT:
                     old_knowledge += f"\n--- [{old_topic}] ---\n{doc}\n"
                 print(f"[CROSS-POLLINATE] Found {len(results['documents'][0])} related documents in memory")
             else:
-                print("[CROSS-POLLINATE] No existing knowledge found — this is SHARD's first topic")
+                print("[CROSS-POLLINATE] No existing knowledge found -- this is SHARD's first topic")
         except Exception as e:
             print(f"[CROSS-POLLINATE] ChromaDB query error: {e}")
 
@@ -744,7 +744,7 @@ Genera il Rapporto di Integrazione (max 150 parole)."""
             report_id = f"integration_{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
             self.kb.upsert(
                 ids=[report_id],
-                documents=[f"Integration Report — {topic}:\n{report}"],
+                documents=[f"Integration Report -- {topic}:\n{report}"],
                 metadatas=[{
                     "topic": topic,
                     "type": "deep_knowledge",
@@ -773,11 +773,11 @@ Genera il Rapporto di Integrazione (max 150 parole)."""
         code_snippet = structured.get("code_snippet", "")
 
         meta_line = (
-            f"\nMeta-learning hint — apply this approach in the Practical Example: {strategy_hint}\n"
+            f"\nMeta-learning hint -- apply this approach in the Practical Example: {strategy_hint}\n"
             if strategy_hint else ""
         )
         score_line = (
-            f"\nPrevious attempt scored {previous_score}/10. The Practical Example was weak — "
+            f"\nPrevious attempt scored {previous_score}/10. The Practical Example was weak -- "
             f"make the code snippet complete, runnable, and well-commented this time.\n"
             if previous_score is not None else ""
         )
@@ -795,7 +795,7 @@ SHARD's opinion: {structured.get('shard_opinion', 'N/A')}
 
 The Cheat Sheet MUST follow this exact structure:
 
-# {topic} — SHARD Cheat Sheet
+# {topic} -- SHARD Cheat Sheet
 
 ## Key Concepts
 (bullet list of the most important concepts with one-line explanations)
@@ -902,7 +902,7 @@ Respond ONLY with valid JSON:
             validation_qa = result.get("validation_qa", [])
         except Exception as e:
             print(f"[VALIDATE] JSON parse error: {e}")
-            # Recovery: JSON troncato a max_tokens — estrai coppie complete via regex
+            # Recovery: JSON troncato a max_tokens -- estrai coppie complete via regex
             validation_qa = []
             try:
                 import re
@@ -924,7 +924,7 @@ Respond ONLY with valid JSON:
             q = qa.get("domanda", "?")
             a = qa.get("risposta", "")
             answers[q] = a
-            print(f"[VALIDATE] Q: {q[:60]}... → answered")
+            print(f"[VALIDATE] Q: {q[:60]}... -> answered")
 
         self.progress.complete_phase("VALIDATE")
         return {"answers": answers, "validation_qa": validation_qa}
@@ -974,7 +974,7 @@ Respond ONLY with valid JSON:
                     uses_mismatch = any(kw in code_lower for kw in code_kws)
                     uses_topic_kw = any(kw in code_lower for kw in topic_kws)
                     if uses_mismatch and not uses_topic_kw:
-                        print(f"[EVALUATE] ⚠️ Domain mismatch: {reason}")
+                        print(f"[EVALUATE] [WARN]️ Domain mismatch: {reason}")
                         sandbox_score = max(0.0, sandbox_score - 5.0)
 
         # Extract answers and validation_qa
@@ -1042,7 +1042,7 @@ AUTO-EXAM (Questions and Answers):
 {json.dumps(validation_qa if validation_qa else answers, indent=2, ensure_ascii=False)}
 """
 
-        print("[EVALUATE] Scoring via Groq (Groq → Gemini → Claude fallback)...")
+        print("[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...")
         raw = await self._think_fast(prompt, json_mode=True)
         
         try:
@@ -1145,16 +1145,16 @@ AUTO-EXAM (Questions and Answers):
         if benchmark_available and pass_rate is not None and pass_rate < BENCHMARK_PASS_THRESHOLD:
             reasons.append(
                 f"pass_rate {pass_rate:.0%} < {BENCHMARK_PASS_THRESHOLD:.0%} "
-                f"(benchmark gate — fin delle auto-congratulazioni)"
+                f"(benchmark gate -- fin delle auto-congratulazioni)"
             )
 
         if not reasons:
             bench_tag = f" | pass_rate={pass_rate:.0%}" if benchmark_available else " | LLM-only"
-            print(f"[CERTIFY] ✅ '{topic}' CERTIFIED — Score: {score}/10{bench_tag}")
+            print(f"[CERTIFY] ✅ '{topic}' CERTIFIED -- Score: {score}/10{bench_tag}")
             self.progress.complete_phase("CERTIFY")
             return True
         else:
-            print(f"[CERTIFY] ❌ '{topic}' FAILED — {', '.join(reasons)}")
+            print(f"[CERTIFY] ❌ '{topic}' FAILED -- {', '.join(reasons)}")
             return False
 
     # ── PHASE 7b: BENCHMARK ───────────────────────────────────────────────────
@@ -1171,15 +1171,15 @@ AUTO-EXAM (Questions and Answers):
         falls back to the LLM-only score transparently (soft degradation).
 
         Returns a dict with keys to be merged into eval_data:
-            score              — blended final score (or original LLM score on fallback)
-            pass_rate          — 0.0-1.0 (None on fallback)
-            benchmark_available — True when real benchmark ran
-            benchmark_detail   — raw BenchmarkRunner output
+            score              -- blended final score (or original LLM score on fallback)
+            pass_rate          -- 0.0-1.0 (None on fallback)
+            benchmark_available -- True when real benchmark ran
+            benchmark_detail   -- raw BenchmarkRunner output
         """
         llm_score = eval_data.get("score", 0.0)
 
         if not BENCHMARK_ENABLED:
-            print("[BENCHMARK] Disabled via BENCHMARK_ENABLED=False — using LLM score")
+            print("[BENCHMARK] Disabled via BENCHMARK_ENABLED=False -- using LLM score")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
         self.progress.set_phase("BENCHMARK", 0.0)
@@ -1191,19 +1191,19 @@ AUTO-EXAM (Questions and Answers):
                 synthesized_code=synthesized_code or "",
             )
         except Exception as e:
-            print(f"[BENCHMARK] ❌ Generator exception — falling back to LLM score: {e}")
+            print(f"[BENCHMARK] ❌ Generator exception -- falling back to LLM score: {e}")
             self.progress.complete_phase("BENCHMARK")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
         if not benchmark.get("available"):
             reason = benchmark.get("reason", "no tests generated")
-            print(f"[BENCHMARK] Unavailable ({reason}) — falling back to LLM score")
+            print(f"[BENCHMARK] Unavailable ({reason}) -- falling back to LLM score")
             self.progress.complete_phase("BENCHMARK")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
         self.progress.set_phase("BENCHMARK", 0.4)
         print(
-            f"[BENCHMARK] {benchmark['n_valid']} tests generated — "
+            f"[BENCHMARK] {benchmark['n_valid']} tests generated -- "
             f"requesting implementation attempt from LLM..."
         )
 
@@ -1230,7 +1230,7 @@ AUTO-EXAM (Questions and Answers):
             # Strip markdown fences if present
             impl_code = re.sub(r"```(?:python)?|```", "", impl_code or "").strip()
         except Exception as e:
-            print(f"[BENCHMARK] ❌ Implementation LLM call failed — falling back: {e}")
+            print(f"[BENCHMARK] ❌ Implementation LLM call failed -- falling back: {e}")
             self.progress.complete_phase("BENCHMARK")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
@@ -1244,12 +1244,12 @@ AUTO-EXAM (Questions and Answers):
                 topic=topic,
             )
         except Exception as e:
-            print(f"[BENCHMARK] ❌ Runner exception — falling back to LLM score: {e}")
+            print(f"[BENCHMARK] ❌ Runner exception -- falling back to LLM score: {e}")
             self.progress.complete_phase("BENCHMARK")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
         if not bench_result.get("available") or bench_result.get("total", 0) == 0:
-            print("[BENCHMARK] No tests ran — falling back to LLM score")
+            print("[BENCHMARK] No tests ran -- falling back to LLM score")
             self.progress.complete_phase("BENCHMARK")
             return {"score": llm_score, "pass_rate": None, "benchmark_available": False}
 
@@ -1355,7 +1355,7 @@ AUTO-EXAM (Questions and Answers):
         on_error: Optional[Callable] = None,
         previous_score: float = None,
     ):
-        """Complete study loop — delegates to StudyPipeline.
+        """Complete study loop -- delegates to StudyPipeline.
 
         Phases are declared as a configurable list. Each phase reads from
         and writes to a shared StudyContext. Fatal phases abort on error;
@@ -1395,7 +1395,7 @@ AUTO-EXAM (Questions and Answers):
             CrossPollinatePhase(),  # integration report        (non-fatal)
             MaterializePhase(),     # cheat sheet to filesystem (non-fatal)
             SandboxPhase(),         # code gen + Docker exec    (non-fatal)
-            CertifyRetryGroup(),    # VALIDATE→EVALUATE→BENCHMARK→CERTIFY × N
+            CertifyRetryGroup(),    # VALIDATE->EVALUATE->BENCHMARK->CERTIFY × N
             PostStudyPhase(),       # meta-learning + episodic  (non-fatal)
         ])
 

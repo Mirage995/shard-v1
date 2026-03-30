@@ -12,10 +12,10 @@ def stream_decode_unicode(iterator, encoding, apparent_encoding="utf-8"):
     """
     if encoding is None:
         for item in iterator:
-            try:
-                yield item.decode(apparent_encoding)
-            except UnicodeDecodeError:
+            if isinstance(item, bytes):
                 yield item.decode(apparent_encoding, errors="replace")
+            else:
+                yield item
         return
 
     decoder = codecs.getincrementaldecoder(encoding)(errors="replace")

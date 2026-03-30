@@ -1,7 +1,7 @@
-"""study_context.py — Mutable state bag for the SHARD study pipeline.
+"""study_context.py -- Mutable state bag for the SHARD study pipeline.
 
 StudyContext flows through every phase of the pipeline.
-Each phase reads what it needs and writes its outputs — no phase
+Each phase reads what it needs and writes its outputs -- no phase
 needs to know about any other phase, only about the context fields.
 """
 import sys
@@ -14,7 +14,7 @@ class StudyContext:
     """Accumulated state for a single study_topic() run.
 
     Phases read inputs and write outputs on this object.
-    The pipeline orchestrator never inspects phase-specific fields —
+    The pipeline orchestrator never inspects phase-specific fields --
     it only calls phase.run(ctx) and checks ctx.certified / ctx.score.
     """
 
@@ -31,7 +31,7 @@ class StudyContext:
     on_error: Optional[Callable] = None
     on_web_data: Optional[Callable] = None
 
-    # ── Phase outputs — accumulated as the pipeline runs ─────────────────────
+    # ── Phase outputs -- accumulated as the pipeline runs ─────────────────────
     sources: List[Dict] = field(default_factory=list)
     raw_text: str = ""
     structured: Dict = field(default_factory=dict)
@@ -57,10 +57,10 @@ class StudyContext:
     files_modified: List[str] = field(default_factory=list)
     attempt: int = 0
 
-    # ── Critical thinking — LLM meta-critique on stuck topics ────────────────
+    # ── Critical thinking -- LLM meta-critique on stuck topics ────────────────
     critic_meta_critique: Optional[str] = None  # set by CritAgent.analyze_with_llm on attempt>=2
 
-    # ── CognitionCore — Senso Interno ─────────────────────────────────────────
+    # ── CognitionCore -- Senso Interno ─────────────────────────────────────────
     core_experience: Dict = field(default_factory=dict)   # Layer 4 snapshot for this topic
     pivot_directive: Optional[str] = None                 # structural pivot from Vettore 1
     core_relational_ctx: Optional[str] = None             # relational_context() injected at attempt>=2
@@ -70,7 +70,7 @@ class StudyContext:
     # ── Helper ────────────────────────────────────────────────────────────────
 
     async def emit(self, phase: str, score: float, msg: str):
-        """Unified progress emission — replaces the nested closure in study_topic."""
+        """Unified progress emission -- replaces the nested closure in study_topic."""
         pct = self.progress.percentage if self.progress else 0
         print(f"[SHARD.STUDY] [{pct:3d}%] {phase} | {score}/10 | {msg}")
         sys.stdout.flush()

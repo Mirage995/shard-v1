@@ -1,4 +1,4 @@
-"""bootstrap_memory.py — One-shot indexer for SHARD's semantic memory.
+"""bootstrap_memory.py -- One-shot indexer for SHARD's semantic memory.
 
 Indexes all existing benchmark episodes and knowledge base files into
 ChromaDB so semantic queries return useful results from the first run.

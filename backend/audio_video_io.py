@@ -25,7 +25,7 @@ class AudioVideoIO:
         self.out_queue = None
         self.session = None
         self.paused = False
-        # Deaf Mode: True while SHARD is playing audio — mic chunks are read but
+        # Deaf Mode: True while SHARD is playing audio -- mic chunks are read but
         # not forwarded to Gemini, preventing acoustic feedback loops.
         self._ai_speaking: bool = False
 
@@ -40,7 +40,7 @@ class AudioVideoIO:
         """Called by _play_audio to activate/deactivate Deaf Mode."""
         if self._ai_speaking != speaking:
             self._ai_speaking = speaking
-            print(f"[AudioVideoIO] Deaf Mode: {'ON — mic muted' if speaking else 'OFF — mic active'}")
+            print(f"[AudioVideoIO] Deaf Mode: {'ON -- mic muted' if speaking else 'OFF -- mic active'}")
 
     def set_session(self, session):
         self.session = session

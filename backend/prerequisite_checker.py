@@ -1,12 +1,12 @@
-"""prerequisite_checker.py — Prerequisite gating for SHARD topic selection.
+"""prerequisite_checker.py -- Prerequisite gating for SHARD topic selection.
 
 Before studying a hard topic (sig_difficulty >= threshold), SHARD checks
 whether the required foundational skills are already certified.
 
 Two-layer strategy:
-  1. GraphRAG — query knowledge_graph for `depends_on` / `requires` relations
+  1. GraphRAG -- query knowledge_graph for `depends_on` / `requires` relations
      already extracted during past SYNTHESIZE phases. Zero LLM cost.
-  2. LLM fallback — if GraphRAG returns nothing, ask Gemini/Groq for 1-2
+  2. LLM fallback -- if GraphRAG returns nothing, ask Gemini/Groq for 1-2
      prerequisite topics. Results are cached in SQLite to avoid repeat calls.
 
 Integration point: called from NightRunner._select_topic() after a topic is
@@ -56,7 +56,7 @@ def get_missing_prerequisites(
     """Return a list of prerequisite topics that SHARD has not yet certified.
 
     Returns [] if:
-    - sig_difficulty < DIFFICULTY_GATE (easy topic — no gating needed)
+    - sig_difficulty < DIFFICULTY_GATE (easy topic -- no gating needed)
     - all prerequisites are already certified
     - no prerequisites found
 
@@ -108,7 +108,7 @@ def _from_graphrag(topic: str) -> list[str]:
             tgt = row["target_concept"]
             combined = f"{src} {tgt}".lower()
             if any(w in combined for w in words):
-                # The topic appears as the dependent side → tgt is the prereq
+                # The topic appears as the dependent side -> tgt is the prereq
                 if any(w in src for w in words):
                     prereqs.append(tgt)
                 else:
@@ -147,7 +147,7 @@ def _from_llm_cached(topic: str) -> list[str]:
     except Exception:
         pass
 
-    # Cache miss — call LLM
+    # Cache miss -- call LLM
     prereqs = _ask_llm(topic)
     if prereqs:
         try:
@@ -202,14 +202,14 @@ def _ask_llm(topic: str) -> list[str]:
             return []
 
     # Always run in a fresh thread to avoid event-loop conflicts.
-    # Timeout is short (10s) — if LLM is slow, skip prereq detection rather than block.
+    # Timeout is short (10s) -- if LLM is slow, skip prereq detection rather than block.
     import concurrent.futures
     try:
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(asyncio.run, _call())
             return future.result(timeout=10)
     except concurrent.futures.TimeoutError:
-        logger.debug("[PREREQ] LLM timeout — skipping prereq detection for this topic")
+        logger.debug("[PREREQ] LLM timeout -- skipping prereq detection for this topic")
         return []
     except Exception as e:
         logger.debug("[PREREQ] async bridge failed: %s", e)

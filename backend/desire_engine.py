@@ -1,11 +1,11 @@
-"""desire_engine.py — SHARD's want layer.
+"""desire_engine.py -- SHARD's want layer.
 
 Four mechanisms that approximate "wanting" rather than pure optimization:
 
-1. Goal persistence   — active goals resist replacement until mature (sessions_active threshold)
-2. Frustration drive  — non-junk failures increase desire_score, not just quarantine
-3. Lateral curiosity  — certification triggers semantic search for adjacent unexplored topics
-4. Process reward     — engagement_score tracks session richness independent of certification
+1. Goal persistence   -- active goals resist replacement until mature (sessions_active threshold)
+2. Frustration drive  -- non-junk failures increase desire_score, not just quarantine
+3. Lateral curiosity  -- certification triggers semantic search for adjacent unexplored topics
+4. Process reward     -- engagement_score tracks session richness independent of certification
 
 State persisted in shard_memory/desire_state.json.
 """
@@ -23,7 +23,7 @@ _W_BASE        = 0.40   # world-model relevance / priority
 _W_FRUSTRATION = 0.35   # normalized frustration hits
 _W_CURIOSITY   = 0.25   # semantic adjacency pull from recent certs
 
-# Junk regex — same logic as self_model, prevents frustration boost on nonsense
+# Junk regex -- same logic as self_model, prevents frustration boost on nonsense
 _JUNK_RE = re.compile(
     r"integration of .+ and .+|"
     r"\b(potrei|vorrei|penso|chiedo|facendo|dovrei|riflessione|energia|lealt[àa])\b|"
@@ -147,7 +147,7 @@ class DesireEngine:
         return ds.frustration_hits
 
     def clear_frustration(self, topic: str):
-        """Called on certification — topic is no longer blocked."""
+        """Called on certification -- topic is no longer blocked."""
         if topic in self._state:
             self._state[topic].frustration_hits = 0
             self._state[topic].curiosity_pull = 0.0
@@ -180,7 +180,7 @@ class DesireEngine:
             except Exception:
                 pass
 
-            # WorldModel relevance floor — only boost topics with real learning ROI
+            # WorldModel relevance floor -- only boost topics with real learning ROI
             wm = None
             try:
                 from world_model import WorldModel
@@ -190,7 +190,7 @@ class DesireEngine:
 
             adjacent = []
 
-            # Priority 1: GraphRAG extends/improves — these are the best next steps
+            # Priority 1: GraphRAG extends/improves -- these are the best next steps
             try:
                 from graph_rag import GraphRAG
                 rag = GraphRAG()
@@ -209,7 +209,7 @@ class DesireEngine:
             except Exception:
                 pass
 
-            # Priority 2: SemanticMemory similarity — fill remaining slots
+            # Priority 2: SemanticMemory similarity -- fill remaining slots
             if len(adjacent) < n_adjacent:
                 results = sem.query(certified_topic, collection="knowledge", n_results=n_adjacent + 5)
                 for r in results:
@@ -265,7 +265,7 @@ class DesireEngine:
         return self._state[topic].desire_score()
 
     def top_desire_topics(self, top_n: int = 5) -> List[dict]:
-        """Return topics sorted by desire_score — for NightRunner priority stack."""
+        """Return topics sorted by desire_score -- for NightRunner priority stack."""
         scored = [
             {
                 "topic": t,
@@ -310,7 +310,7 @@ class DesireEngine:
                 self.update_curiosity(topic)
 
         elif event_type == "goal_changed":
-            # New goal activated — decay curiosity pull for old goal's topics
+            # New goal activated -- decay curiosity pull for old goal's topics
             old_keywords = data.get("old_keywords", [])
             if old_keywords:
                 changed = False
@@ -323,7 +323,7 @@ class DesireEngine:
 
         elif event_type == "frustration_peak":
             # Topic has hit the chronic-failure threshold (3+ hits via direct calls).
-            # frustration_hits are already incremented — don't duplicate.
+            # frustration_hits are already incremented -- don't duplicate.
             # Boost base_priority so frustration-drive selection (hits>=2, 40% chance)
             # picks it up sooner and gives SHARD another honest attempt.
             topic = data.get("topic", "")
@@ -345,7 +345,7 @@ class DesireEngine:
                     ds.base_priority = round(min(1.0, ds.base_priority + 0.10), 4)
                     ds.last_updated = _now()
                     self._save()
-                    logger.debug("[DESIRE] mood_shift(frustrated) → boosted priority for '%s'", blocked[0]["topic"])
+                    logger.debug("[DESIRE] mood_shift(frustrated) -> boosted priority for '%s'", blocked[0]["topic"])
             elif new_label in ("confident", "focused"):
                 # Confident mood: spread a small curiosity boost to uncertified adjacent topics
                 for ds in list(self._state.values())[:10]:

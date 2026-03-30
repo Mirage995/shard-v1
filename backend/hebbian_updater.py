@@ -1,4 +1,4 @@
-"""hebbian_updater.py — Synaptic plasticity for SHARD.
+"""hebbian_updater.py -- Synaptic plasticity for SHARD.
 
 Implements Hebbian learning over the synaptic_weights table:
   - LTP (Long-Term Potentiation): neurons that fire TOGETHER on a certified cycle
@@ -75,7 +75,7 @@ class HebbianUpdater:
         """Bootstrap synaptic_weights from all existing activation_log rows.
 
         Called once to initialise weights from collected data.
-        Safe to call multiple times — uses ltp_count/ltd_count to avoid
+        Safe to call multiple times -- uses ltp_count/ltd_count to avoid
         double-counting rows that were already processed.
 
         Returns number of pairs seeded/updated.
@@ -150,11 +150,11 @@ class HebbianUpdater:
         """React to events from other modules."""
         if event_type == "mood_shift":
             if data.get("to") == "frustrated":
-                # Frustration → decay all synaptic weights 5% toward baseline (WEIGHT_INIT).
-                # Simulates "clearing the pattern" — same effect as the prompt hint
+                # Frustration -> decay all synaptic weights 5% toward baseline (WEIGHT_INIT).
+                # Simulates "clearing the pattern" -- same effect as the prompt hint
                 # "Start from zero". Pairs > 1.0 drop slightly; pairs < 1.0 rise slightly.
                 n = self._frustration_decay()
-                logger.info("[HEBBIAN] mood_shift(frustrated) → decayed %d pair(s) toward baseline", n)
+                logger.info("[HEBBIAN] mood_shift(frustrated) -> decayed %d pair(s) toward baseline", n)
 
     def _frustration_decay(self, decay_rate: float = 0.05) -> int:
         """Decay all synaptic weights 5% toward WEIGHT_INIT on frustration."""
@@ -195,7 +195,7 @@ class HebbianUpdater:
             )
 
             if row is None:
-                # First time this pair co-activates — initialise
+                # First time this pair co-activates -- initialise
                 weight = WEIGHT_INIT + LTP_DELTA if certified else WEIGHT_INIT - LTD_DELTA
                 weight = max(WEIGHT_MIN, min(WEIGHT_MAX, weight))
                 ltp = 1 if certified else 0
@@ -222,9 +222,9 @@ class HebbianUpdater:
             logger.debug("[HEBBIAN] _apply_plasticity error: %s", e)
 
     def _ensure_schema(self) -> None:
-        """synaptic_weights table is created by shard_db migrations — just verify."""
+        """synaptic_weights table is created by shard_db migrations -- just verify."""
         try:
             from shard_db import query_one
             query_one("SELECT COUNT(*) FROM synaptic_weights")
         except Exception as e:
-            logger.warning("[HEBBIAN] synaptic_weights not accessible: %s — run shard_db.get_db() first", e)
+            logger.warning("[HEBBIAN] synaptic_weights not accessible: %s -- run shard_db.get_db() first", e)

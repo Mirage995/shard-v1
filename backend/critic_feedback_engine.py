@@ -23,11 +23,11 @@ class CriticFeedbackEngine:
         capability = feedback.get("capability", "unknown")
 
         if not remediation_topic:
-            print(f"[CRITIC FEEDBACK] No remediation topic for '{capability}' — skipping injection")
+            print(f"[CRITIC FEEDBACK] No remediation topic for '{capability}' -- skipping injection")
             return None
 
         if confidence < self.CONFIDENCE_THRESHOLD:
-            print(f"[CRITIC FEEDBACK] Low confidence ({confidence:.2f}) for '{capability}' — skipping injection")
+            print(f"[CRITIC FEEDBACK] Low confidence ({confidence:.2f}) for '{capability}' -- skipping injection")
             return None
 
         if self.research_agenda and hasattr(self.research_agenda, "add_priority_topic"):
@@ -37,7 +37,7 @@ class CriticFeedbackEngine:
                 f"(from failure on '{capability}', confidence={confidence:.2f})"
             )
         else:
-            print("[CRITIC FEEDBACK] No research agenda available — topic not injected")
+            print("[CRITIC FEEDBACK] No research agenda available -- topic not injected")
 
         return {
             "injected_topic": remediation_topic,

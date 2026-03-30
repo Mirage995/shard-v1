@@ -1,4 +1,4 @@
-"""generate_architecture_map.py — Auto-update architecture_map.json from real imports.
+"""generate_architecture_map.py -- Auto-update architecture_map.json from real imports.
 
 Usage:
     python backend/generate_architecture_map.py
@@ -31,7 +31,7 @@ _SKIP = {
     "conftest", "setup", "migrate_to_sqlite",
 }
 
-# Stem prefixes that indicate generated/temp files — excluded from the map
+# Stem prefixes that indicate generated/temp files -- excluded from the map
 _SKIP_PREFIXES = ("study_", "temp_", "test_", "verify_", "simulate_")
 
 # Directories inside backend/ that contain sub-modules
@@ -123,7 +123,7 @@ def main() -> None:
         deps = _extract_imports(py_file, known)
 
         if module_id not in modules_map:
-            # New module — add with placeholders
+            # New module -- add with placeholders
             modules_map[module_id] = {
                 "responsibility": f"TODO: describe {module_id}",
                 "layer": "unknown",
@@ -131,11 +131,11 @@ def main() -> None:
                 "reads": [],
                 "writes": [],
                 "capability_tags": [],
-                "notes": "Auto-added by generate_architecture_map.py — fill manually.",
+                "notes": "Auto-added by generate_architecture_map.py -- fill manually.",
             }
             added.append(module_id)
         else:
-            # Existing module — update depends_on only
+            # Existing module -- update depends_on only
             old_deps = modules_map[module_id].get("depends_on", [])
             if sorted(old_deps) != sorted(deps):
                 updated_deps.append(
@@ -158,7 +158,7 @@ def main() -> None:
         print(f"  Cleaned up {len(removed)} auto-added generated/temp entries.")
 
     if added:
-        print(f"\n  NEW modules added ({len(added)}) — fill manually:")
+        print(f"\n  NEW modules added ({len(added)}) -- fill manually:")
         for m in added:
             print(f"    + {m}")
     else:

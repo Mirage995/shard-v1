@@ -1,4 +1,4 @@
-"""benchmark_runner.py — Executes benchmark test cases in the Docker sandbox.
+"""benchmark_runner.py -- Executes benchmark test cases in the Docker sandbox.
 
 Replaces the legacy stub with real isolated test execution.
 
@@ -6,7 +6,7 @@ Key design:
   - Each test is validated independently (ast.parse) BEFORE execution.
   - "Test is malformed" and "agent's implementation failed" are two distinct outcomes.
     Only the latter counts as a failure. Malformed tests are discarded silently.
-  - pass_rate = passed / (passed + failed)  — discarded tests are excluded from the denominator.
+  - pass_rate = passed / (passed + failed)  -- discarded tests are excluded from the denominator.
 """
 import ast
 import re
@@ -92,7 +92,7 @@ class BenchmarkRunner:
             f"[BENCHMARK_RUN] '{topic}': "
             f"{passed}/{total} passed "
             f"(+{discarded} discarded) "
-            f"→ pass_rate={pass_rate:.0%}"
+            f"-> pass_rate={pass_rate:.0%}"
         )
 
         return {
@@ -127,7 +127,7 @@ class BenchmarkRunner:
             ast.parse(f"{setup}\n{assert_expr}")
         except SyntaxError as e:
             print(
-                f"[BENCHMARK_RUN] ⚠️  Test {test_idx} discarded "
+                f"[BENCHMARK_RUN] [WARN]️  Test {test_idx} discarded "
                 f"(SyntaxError in test itself): {e}"
             )
             return {
@@ -178,11 +178,11 @@ class BenchmarkRunner:
         # ── Step 4: classify the failure ───────────────────────────────────────
 
         # Infrastructure error (Docker not running, image build failed, etc.)
-        # → discard the test entirely, do not penalise the agent.
+        # -> discard the test entirely, do not penalise the agent.
         if _is_infrastructure_error(stderr):
             print(
-                f"[BENCHMARK_RUN] ⚠️  Test {test_idx} discarded "
-                f"(infrastructure error — Docker unavailable)"
+                f"[BENCHMARK_RUN] [WARN]️  Test {test_idx} discarded "
+                f"(infrastructure error -- Docker unavailable)"
             )
             return {
                 "test_idx":    test_idx,
@@ -192,10 +192,10 @@ class BenchmarkRunner:
             }
 
         # Test is syntactically broken (SyntaxError in test block lines)
-        # → discard, not the agent's fault.
+        # -> discard, not the agent's fault.
         if _is_test_fault(stderr, impl_line_count):
             print(
-                f"[BENCHMARK_RUN] ⚠️  Test {test_idx} discarded "
+                f"[BENCHMARK_RUN] [WARN]️  Test {test_idx} discarded "
                 f"(runtime fault in test block, not in implementation)"
             )
             return {
@@ -205,7 +205,7 @@ class BenchmarkRunner:
                 "reason":      f"test runtime error: {stderr[:200]}",
             }
 
-        # Legitimate failure — implementation did not satisfy the assert
+        # Legitimate failure -- implementation did not satisfy the assert
         return {
             "test_idx":    test_idx,
             "description": description,
@@ -217,7 +217,7 @@ class BenchmarkRunner:
     # ── Legacy stub API (keeps existing study_agent.py call sites working) ─────
 
     def run(self, benchmark: Dict[str, Any]) -> Dict[str, Any]:
-        """Legacy sync stub — kept for backward compatibility with existing call sites.
+        """Legacy sync stub -- kept for backward compatibility with existing call sites.
         Real execution is done via the async ``run_benchmark()`` method.
         """
         return {"success": True, "benchmark": benchmark}

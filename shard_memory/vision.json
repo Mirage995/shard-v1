@@ -1,5 +1,5 @@
 {
-  "statement": "SHARD seeks to become a reliable autonomous problem-solver — mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (30 skills certified so far)",
+  "statement": "SHARD seeks to become a reliable autonomous problem-solver — mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (80 skills certified so far)",
   "focus_domains": [
     "algorithms",
     "debugging",
@@ -10,137 +10,136 @@
   "avoid_domains": [
     "asyncio advanced patterns",
     "git internals object model",
-    "async io with python selectors",
-    "password hashing bcrypt argon2"
+    "async io with python selectors"
   ],
-  "certified_count": 34,
+  "certified_count": 82,
   "frustration_topics": [
     "asyncio advanced patterns",
     "git internals object model",
     "async io with python selectors",
     "password hashing bcrypt argon2"
   ],
-  "last_updated": "2026-03-27T15:49:21.485569+00:00",
+  "last_updated": "2026-03-29T16:42:32.699666+00:00",
   "update_log": [
     {
-      "ts": "2026-03-27T00:14:44.224746+00:00",
-      "msg": "certified: Integration of impossible differentials in cryptography applied to exception handling boundaries and arx cipher cryptanalysis (score=8.3)"
+      "ts": "2026-03-28T17:21:00.846490+00:00",
+      "msg": "certified: template parser handling and debugging (score=8.9)"
     },
     {
-      "ts": "2026-03-27T00:17:36.472144+00:00",
-      "msg": "certified: profiling and optimization python (score=8.3)"
+      "ts": "2026-03-28T17:24:47.604192+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.2)"
     },
     {
-      "ts": "2026-03-27T00:26:38.689162+00:00",
-      "msg": "certified: Integration of max pooling (maxpool2d) and exception handling (score=9.0)"
+      "ts": "2026-03-28T17:28:52.669080+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.1)"
     },
     {
-      "ts": "2026-03-27T00:49:17.891051+00:00",
-      "msg": "certified: union find disjoint set (score=8.3)"
+      "ts": "2026-03-28T17:33:16.488138+00:00",
+      "msg": "certified: sql injection prevention and input sanitization (score=9.1)"
     },
     {
-      "ts": "2026-03-27T01:03:19.818974+00:00",
-      "msg": "certified: aes encryption python (score=8.5)"
+      "ts": "2026-03-28T17:36:23.254655+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.3)"
     },
     {
-      "ts": "2026-03-27T01:06:32.066616+00:00",
-      "msg": "certified: union find disjoint set (score=9.3)"
+      "ts": "2026-03-28T17:39:48.749564+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.8)"
     },
     {
-      "ts": "2026-03-27T01:10:55.545525+00:00",
-      "msg": "certified: Integration of fail fast principle applied to dynamic content handling and sql injection (score=9.2)"
+      "ts": "2026-03-28T17:43:44.834187+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.7)"
     },
     {
-      "ts": "2026-03-27T10:49:23.155950+00:00",
-      "msg": "certified: union find disjoint set (score=8.5)"
+      "ts": "2026-03-28T17:46:48.893875+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.2)"
     },
     {
-      "ts": "2026-03-27T10:52:45.177081+00:00",
-      "msg": "certified: Integration of exception-driven control flow applied to perceptron and domain-specific custom exceptions (score=8.3)"
+      "ts": "2026-03-28T18:06:47.937714+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.0)"
     },
     {
-      "ts": "2026-03-27T11:10:07.692551+00:00",
-      "msg": "certified: rsa encryption python from scratch (score=9.2)"
+      "ts": "2026-03-28T18:09:58.549442+00:00",
+      "msg": "certified: Integration of dynamic content handling and dynamic programming memoization (score=9.2)"
     },
     {
-      "ts": "2026-03-27T11:13:22.020141+00:00",
-      "msg": "certified: jwt token validation (score=8.1)"
+      "ts": "2026-03-28T18:14:36.240383+00:00",
+      "msg": "certified: Integration of eafp (easier to ask forgiveness than permission) and constructor injection (score=8.4)"
     },
     {
-      "ts": "2026-03-27T11:22:34.813307+00:00",
-      "msg": "certified: test driven development pytest (score=9.2)"
+      "ts": "2026-03-28T18:23:46.142846+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.7)"
     },
     {
-      "ts": "2026-03-27T11:44:34.156736+00:00",
-      "msg": "frustration: git internals object model (3 hits) → avoid_domains"
+      "ts": "2026-03-28T18:29:27.256060+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.0)"
     },
     {
-      "ts": "2026-03-27T11:47:56.409315+00:00",
-      "msg": "certified: docker container python sdk (score=9.2)"
+      "ts": "2026-03-28T18:41:27.145039+00:00",
+      "msg": "certified: password hashing bcrypt argon2 (score=8.3)"
     },
     {
-      "ts": "2026-03-27T11:57:30.388234+00:00",
-      "msg": "frustration: async io with python selectors (3 hits) → avoid_domains"
+      "ts": "2026-03-28T18:45:23.890389+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.5)"
     },
     {
-      "ts": "2026-03-27T12:10:19.296220+00:00",
-      "msg": "certified: linear regression numpy (score=7.9)"
+      "ts": "2026-03-28T18:49:31.397102+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.3)"
     },
     {
-      "ts": "2026-03-27T12:29:57.395746+00:00",
-      "msg": "frustration: async io with python selectors (4 hits) → avoid_domains"
+      "ts": "2026-03-28T18:53:02.632209+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.2)"
     },
     {
-      "ts": "2026-03-27T12:39:42.891546+00:00",
-      "msg": "momentum: stable → stagnating"
+      "ts": "2026-03-28T18:56:56.286147+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.3)"
     },
     {
-      "ts": "2026-03-27T14:22:18.026281+00:00",
-      "msg": "certified: template parser handling and debugging (score=7.8)"
+      "ts": "2026-03-28T18:59:54.439613+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.5)"
     },
     {
-      "ts": "2026-03-27T14:27:35.016796+00:00",
-      "msg": "frustration: async io with python selectors (5 hits) → avoid_domains"
+      "ts": "2026-03-28T21:43:17.469582+00:00",
+      "msg": "certified: template parser handling and debugging (score=8.2)"
     },
     {
-      "ts": "2026-03-27T14:31:01.832418+00:00",
-      "msg": "certified: dependency injection python (score=9.0)"
+      "ts": "2026-03-28T21:48:30.627620+00:00",
+      "msg": "certified: circuit breaker pattern python (score=9.0)"
     },
     {
-      "ts": "2026-03-27T14:36:03.062044+00:00",
-      "msg": "certified: transformer attention mechanism (score=7.5)"
+      "ts": "2026-03-28T21:57:48.316309+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.2)"
     },
     {
-      "ts": "2026-03-27T14:56:14.752724+00:00",
-      "msg": "frustration: git internals object model (4 hits) → avoid_domains"
+      "ts": "2026-03-28T22:01:32.074042+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.2)"
     },
     {
-      "ts": "2026-03-27T15:00:46.607886+00:00",
-      "msg": "certified: Integration of rest api and quantum linear key-recovery attacks (score=8.7)"
+      "ts": "2026-03-28T22:05:43.142057+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.3)"
     },
     {
-      "ts": "2026-03-27T15:16:09.880244+00:00",
-      "msg": "frustration: async io with python selectors (6 hits) → avoid_domains"
+      "ts": "2026-03-29T16:08:11.595028+00:00",
+      "msg": "certified: Integration of dependency management and sorted data prerequisite (score=8.2)"
     },
     {
-      "ts": "2026-03-27T15:19:06.781294+00:00",
-      "msg": "certified: Integration of solid principles and prime number generation (score=8.3)"
+      "ts": "2026-03-29T16:12:05.336592+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.7)"
     },
     {
-      "ts": "2026-03-27T15:32:38.742056+00:00",
-      "msg": "frustration: password hashing bcrypt argon2 (3 hits) → avoid_domains"
+      "ts": "2026-03-29T16:23:52.583902+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=7.9)"
     },
     {
-      "ts": "2026-03-27T15:38:59.746126+00:00",
-      "msg": "frustration: password hashing bcrypt argon2 (4 hits) → avoid_domains"
+      "ts": "2026-03-29T16:33:53.052012+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=8.6)"
     },
     {
-      "ts": "2026-03-27T15:44:32.511685+00:00",
-      "msg": "frustration: git internals object model (5 hits) → avoid_domains"
+      "ts": "2026-03-29T16:38:21.622959+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.2)"
     },
     {
-      "ts": "2026-03-27T15:49:21.485569+00:00",
-      "msg": "frustration: password hashing bcrypt argon2 (5 hits) → avoid_domains"
+      "ts": "2026-03-29T16:42:32.699666+00:00",
+      "msg": "certified: Python Advanced Error Handling (score=9.3)"
     }
   ]
 }

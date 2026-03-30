@@ -1,4 +1,4 @@
-"""mood_engine.py — Global affective state for SHARD.
+"""mood_engine.py -- Global affective state for SHARD.
 
 Aggregates per-topic frustration, recent cert_rate, and momentum into a
 single mood_score in [-1.0, +1.0].
@@ -7,9 +7,9 @@ single mood_score in [-1.0, +1.0].
    0.0 = neutral
   +1.0 = confident, flowing
 
-mood_score is NOT a decoration — it injects directly into the study prompt,
-changing how SHARD approaches the topic. High frustration → "approach from
-scratch, ignore prior strategies". High confidence → "build on what you know".
+mood_score is NOT a decoration -- it injects directly into the study prompt,
+changing how SHARD approaches the topic. High frustration -> "approach from
+scratch, ignore prior strategies". High confidence -> "build on what you know".
 
 Every value is derived from real SQLite data. Nothing is invented.
 """
@@ -90,7 +90,7 @@ class MoodEngine:
         }
         self._save()
 
-        # Broadcast mood_shift if label changed — other modules react
+        # Broadcast mood_shift if label changed -- other modules react
         new_label = self._state["label"]
         if self._core_env is not None and new_label != self._last_label:
             self._core_env.broadcast(
@@ -98,7 +98,7 @@ class MoodEngine:
                 {"from": self._last_label, "to": new_label, "score": score},
                 source="mood_engine",
             )
-            logger.info("[MOOD] mood_shift: %s → %s", self._last_label, new_label)
+            logger.info("[MOOD] mood_shift: %s -> %s", self._last_label, new_label)
         self._last_label = new_label
 
         logger.info(
@@ -129,18 +129,18 @@ class MoodEngine:
         """React to events from other modules."""
         if event_type == "frustration_peak":
             # Immediate mood recompute when a topic hits chronic failure
-            logger.debug("[MOOD] frustration_peak received — recomputing mood")
+            logger.debug("[MOOD] frustration_peak received -- recomputing mood")
             self.compute(momentum=self._state.get("components", {}).get("momentum", 0.0))
 
         elif event_type == "momentum_changed":
             new_momentum = data.get("new", "stable")
-            logger.debug("[MOOD] momentum_changed → %s — recomputing mood", new_momentum)
+            logger.debug("[MOOD] momentum_changed -> %s -- recomputing mood", new_momentum)
             self.compute(momentum=new_momentum)
 
     # ── Signal computation ────────────────────────────────────────────────────
 
     def _frustration_signal(self, desire_engine) -> float:
-        """0.0 (no frustration) → 1.0 (max frustration)."""
+        """0.0 (no frustration) -> 1.0 (max frustration)."""
         if desire_engine is None:
             return 0.0
         try:
@@ -157,12 +157,12 @@ class MoodEngine:
         """Weighted cert_rate from recent N cycles.
 
         Each certification is weighted by real difficulty:
-          - curiosity_engine topic with difficulty < 0.3  → weight 0.5  (easy hybrid)
-          - curated/improvement topic with difficulty > 0.7 → weight 1.5  (hard real topic)
-          - everything else                               → weight 1.0
+          - curiosity_engine topic with difficulty < 0.3  -> weight 0.5  (easy hybrid)
+          - curated/improvement topic with difficulty > 0.7 -> weight 1.5  (hard real topic)
+          - everything else                               -> weight 1.0
 
         This prevents easy hybrid topics from inflating the mood signal
-        (Specification Gaming fix — backlog #17).
+        (Specification Gaming fix -- backlog #17).
         """
         try:
             from shard_db import query as db_query
@@ -180,9 +180,9 @@ class MoodEngine:
                 src  = r["source"] or ""
                 # Compute weight
                 if src == "curiosity_engine" and diff < 0.3:
-                    w = 0.5   # easy hybrid — half credit
+                    w = 0.5   # easy hybrid -- half credit
                 elif diff > 0.7 and src in ("curated_list", "improvement_engine"):
-                    w = 1.5   # hard real topic — bonus credit
+                    w = 1.5   # hard real topic -- bonus credit
                 else:
                     w = 1.0
                 total_weight += w

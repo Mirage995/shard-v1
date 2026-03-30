@@ -1,15 +1,15 @@
-"""architecture_map.py — SHARD self-model of codebase.
+"""architecture_map.py -- SHARD self-model of codebase.
 
 Loads shard_memory/architecture_map.json and exposes query methods so that
 any module (SelfModel, ProactiveRefactor, future CapabilityMapper) can reason
 about system structure without hardcoding module relationships.
 
 Key methods:
-    get_module(name)                  — full module descriptor
-    get_modules_by_tag(tag)           — modules that have a capability_tag
-    get_dependents(name)              — modules that depend on a given module
-    modules_for_capability(cap_tag)   — alias for get_modules_by_tag (semantic name)
-    summary()                         — human-readable overview
+    get_module(name)                  -- full module descriptor
+    get_modules_by_tag(tag)           -- modules that have a capability_tag
+    get_dependents(name)              -- modules that depend on a given module
+    modules_for_capability(cap_tag)   -- alias for get_modules_by_tag (semantic name)
+    summary()                         -- human-readable overview
 """
 import json
 import logging
@@ -58,7 +58,7 @@ class ArchitectureMap:
         ]
 
     def modules_for_capability(self, capability_tag: str) -> List[str]:
-        """Semantic alias — 'which modules handle this capability?'"""
+        """Semantic alias -- 'which modules handle this capability?'"""
         return self.get_modules_by_tag(capability_tag)
 
     def get_dependents(self, module_name: str) -> List[str]:
@@ -96,7 +96,7 @@ class ArchitectureMap:
             layer = info.get("layer", "unknown")
             layers.setdefault(layer, []).append(name)
 
-        lines = [f"Architecture Map — {len(self.modules)} modules\n"]
+        lines = [f"Architecture Map -- {len(self.modules)} modules\n"]
         for layer, names in sorted(layers.items()):
             lines.append(f"  [{layer}]  {', '.join(sorted(names))}")
         return "\n".join(lines)

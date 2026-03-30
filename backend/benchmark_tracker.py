@@ -1,5 +1,5 @@
 """
-benchmark_tracker.py — SHARD benchmark performance tracker across sessions.
+benchmark_tracker.py -- SHARD benchmark performance tracker across sessions.
 
 Tracks per-task success/failure across sessions, computes deltas, streaks,
 and provides prompt-injectable summaries for CognitionCore integration.
@@ -98,7 +98,7 @@ class BenchmarkTracker:
         Save a session built from *results* and return a delta vs the previous session.
 
         Each element in *results* must contain:
-            task_dir        (str)   — task identifier
+            task_dir        (str)   -- task identifier
             success         (bool)
             total_attempts  (int)
             elapsed_total   (float)
@@ -250,9 +250,9 @@ class BenchmarkTracker:
         """
         Return the streak length for *task_id*.
 
-        Positive  → number of consecutive sessions the task has been passing.
-        Negative  → number of consecutive sessions the task has been failing.
-        0         → task not found in any session.
+        Positive  -> number of consecutive sessions the task has been passing.
+        Negative  -> number of consecutive sessions the task has been failing.
+        0         -> task not found in any session.
         """
         try:
             sessions = self._data.get("sessions", [])
@@ -290,7 +290,7 @@ class BenchmarkTracker:
         Event handler stub for CognitionCore registration.
 
         Recognised event_type values (for future use):
-            "benchmark_complete"  — data should be a list of result dicts,
+            "benchmark_complete"  -- data should be a list of result dicts,
                                     same format as record_session expects.
         """
         pass

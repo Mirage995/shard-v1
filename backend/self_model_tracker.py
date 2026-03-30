@@ -1,4 +1,4 @@
-"""self_model_tracker.py — SHARD Self-Model via Prediction Error (no-LLM core).
+"""self_model_tracker.py -- SHARD Self-Model via Prediction Error (no-LLM core).
 
 Architecture:
   1. BEFORE study: predict expected score using global + contextual feature weights
@@ -7,8 +7,8 @@ Architecture:
                    update contextual_weight[(feature, context)]  (context-specific)
   3. INCONSISTENCY DETECTION (no LLM):
                    gap = |global_weight[f] - contextual_weight[(f, ctx)]|
-                   if gap > threshold → genuine inconsistency in self-model
-                   the gap IS the question — no verbalization needed
+                   if gap > threshold -> genuine inconsistency in self-model
+                   the gap IS the question -- no verbalization needed
   4. Inconsistencies are injected into session context as data, not prose.
      The LLM reads real numbers, not manufactured reflection.
 
@@ -48,13 +48,13 @@ FEATURE_KEYS = [
     "graphrag_hits",
     "source_improvement",
     # Continuous signals from DesireEngine / difficulty history (0.0–1.0)
-    # These scale the adjustment proportionally — higher value = stronger effect.
+    # These scale the adjustment proportionally -- higher value = stronger effect.
     "sig_difficulty",   # 1 - cert_rate: strongest negative predictor (r=-0.664)
     "sig_desire",       # composite desire score: frustration + curiosity + engagement
     "sig_graphrag",     # causal knowledge coverage for this topic
 ]
 
-# Features that carry continuous float values (0.0–1.0) — adjustment scales with value.
+# Features that carry continuous float values (0.0–1.0) -- adjustment scales with value.
 # Boolean features use binary on/off (value treated as 1.0 when active).
 _CONTINUOUS_FEATURES = {"sig_difficulty", "sig_desire", "sig_graphrag"}
 
@@ -79,9 +79,9 @@ def _infer_domain(topic: str) -> str:
 
 class SelfModelTracker:
     """Tracks prediction errors and detects weight inconsistencies.
-    No LLM calls for question generation — inconsistencies are measured, not invented.
+    No LLM calls for question generation -- inconsistencies are measured, not invented.
 
-    CognitionCore citizen — interests: session_complete
+    CognitionCore citizen -- interests: session_complete
     """
 
     def __init__(self, think_fn=None):
@@ -101,7 +101,7 @@ class SelfModelTracker:
             # Shift prediction baseline by self_esteem: esteem 0.5=neutral, 1.0=+0.5, 0.0=-0.5
             esteem = data.get("self_esteem", 0.5)
             self._identity_baseline = round((esteem - 0.5) * 1.0, 3)
-            logger.debug("[SELF_MODEL_TRACKER] identity_updated → baseline_adj=%.3f", self._identity_baseline)
+            logger.debug("[SELF_MODEL_TRACKER] identity_updated -> baseline_adj=%.3f", self._identity_baseline)
 
     # ── Core API ──────────────────────────────────────────────────────────────
 
@@ -128,7 +128,7 @@ class SelfModelTracker:
             else:
                 adjustment += self._weights["global"].get(key, 0.0) * scale
 
-        # Mood modifier: frustrated → -0.5, confident/focused → +0.3, else 0
+        # Mood modifier: frustrated -> -0.5, confident/focused -> +0.3, else 0
         _mood_mod = {"frustrated": -0.5, "strained": -0.2, "confident": 0.3, "focused": 0.1}.get(self._current_mood, 0.0)
         predicted = round(max(0.0, min(10.0, base + adjustment + self._identity_baseline + _mood_mod)), 2)
 
@@ -137,7 +137,7 @@ class SelfModelTracker:
             "predicted": predicted, "context": context,
         })
         logger.debug(
-            "[SELF_MODEL] predict '%s' ctx=%s: base=%.1f adj=%.2f → %.2f",
+            "[SELF_MODEL] predict '%s' ctx=%s: base=%.1f adj=%.2f -> %.2f",
             topic, context, base, adjustment, predicted,
         )
         return predicted
@@ -179,7 +179,7 @@ class SelfModelTracker:
 
         # ── AUDIT BLINDNESS check (Behavior #12) ──────────────────────────────
         # When the gap between prediction and reality is ≥ 2.0, write a
-        # structured audit record — no LLM. The fact IS the reflection.
+        # structured audit record -- no LLM. The fact IS the reflection.
         if abs(error) >= AUDIT_ERROR_THRESHOLD:
             self._save_audit_reflection(topic, predicted, actual_score, error, certified)
 
@@ -190,7 +190,7 @@ class SelfModelTracker:
         worst = max(inconsistencies, key=lambda x: x["gap"])
 
         logger.info(
-            "[SELF_MODEL] Inconsistency detected — feature '%s': "
+            "[SELF_MODEL] Inconsistency detected -- feature '%s': "
             "global=%.2f  contextual[%s]=%.2f  gap=%.2f",
             worst["feature"], worst["global_w"],
             worst["context"], worst["contextual_w"], worst["gap"],
@@ -206,7 +206,7 @@ class SelfModelTracker:
             except Exception as exc:
                 logger.debug("[SELF_MODEL] desire boost failed: %s", exc)
 
-        # Act on goal_engine: create investigation goal (no LLM — pure data)
+        # Act on goal_engine: create investigation goal (no LLM -- pure data)
         if goal_engine:
             try:
                 goal_engine.create_goal(
@@ -243,7 +243,7 @@ class SelfModelTracker:
         certified: bool,
     ) -> None:
         """Write a structured audit record when prediction gap ≥ 2.0.
-        No LLM — the numbers are the reflection.
+        No LLM -- the numbers are the reflection.
         Saved to session_reflections.jsonl with type='prediction_audit'."""
         try:
             direction = "underconfident" if error > 0 else "overconfident"
@@ -289,7 +289,7 @@ class SelfModelTracker:
             contextual_w = self._weights["contextual"].get(ctx_key)
 
             if contextual_w is None:
-                continue   # no contextual data yet — no inconsistency to detect
+                continue   # no contextual data yet -- no inconsistency to detect
 
             gap = abs(global_w - contextual_w)
             if gap >= INCONSISTENCY_THRESHOLD:
@@ -334,7 +334,7 @@ class SelfModelTracker:
 
     @staticmethod
     def get_context_block(n: int = MAX_CONTEXT_ITEMS) -> str:
-        """Inject known weight inconsistencies as plain data — no LLM-generated text.
+        """Inject known weight inconsistencies as plain data -- no LLM-generated text.
         The LLM reads real numbers, not manufactured reflection."""
         ipath = _MEM / "self_inconsistencies.jsonl"
         if not ipath.exists():
@@ -363,7 +363,7 @@ class SelfModelTracker:
                     f"[{ts}] '{f}': global={gw:+.3f}  in '{ctx}'={cw:+.3f}  gap={gap:.3f}"
                 )
             parts.append(
-                "These are real weight gaps — the model behaves differently "
+                "These are real weight gaps -- the model behaves differently "
                 "in specific contexts than it does globally."
             )
             return "\n".join(parts)

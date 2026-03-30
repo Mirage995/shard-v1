@@ -1,4 +1,4 @@
-"""patch_simulator.py — "What if" simulator for code patches.
+"""patch_simulator.py -- "What if" simulator for code patches.
 
 Before applying a patch, SHARD simulates its impact:
   1. Finds which modules depend on the file being patched (via architecture_map)
@@ -7,14 +7,14 @@ Before applying a patch, SHARD simulates its impact:
   4. Returns SimulationReport: risk_level, affected_modules, recommendation
 
 Integration point: server.py calls simulate_patch() in approve_patch() before
-writing the file — adds a risk assessment to the approval gate.
+writing the file -- adds a risk assessment to the approval gate.
 
 Example report:
     PatchSimulator: llm_router.py
     Dependents: study_agent, benchmark_loop, swarm_engine, night_runner (+4 more)
     Changes detected: function signature changed (llm_complete: providers param moved)
-    Risk: HIGH — 8 dependent modules, breaking signature change
-    Recommendation: apply_with_caution — run benchmarks after applying
+    Risk: HIGH -- 8 dependent modules, breaking signature change
+    Recommendation: apply_with_caution -- run benchmarks after applying
 """
 import ast
 import asyncio
@@ -114,7 +114,7 @@ def _analyze_diff(old_code: str, new_code: str, filename: str) -> list[str]:
     for fn in removed_funcs:
         findings.append(f"BREAKING: function '{fn}()' removed")
 
-    # Signature changes — distinguish required param additions (breaking) from safe changes
+    # Signature changes -- distinguish required param additions (breaking) from safe changes
     for fn in set(old_api["functions"]) & set(new_api["functions"]):
         old_args = old_api["functions"][fn]
         new_args = new_api["functions"][fn]
@@ -169,7 +169,7 @@ def _find_dependents(file_path: str) -> tuple[list[str], list[str]]:
 
     try:
         arch = ArchitectureMap()
-        # Derive module name from file path (e.g. backend/llm_router.py → llm_router)
+        # Derive module name from file path (e.g. backend/llm_router.py -> llm_router)
         module_name = Path(file_path).stem
 
         direct = arch.get_dependents(module_name)
@@ -279,7 +279,7 @@ def _build_summary(
         worst = [(m, r) for m, r in module_risks.items()
                  if "LOW RISK" not in r and "low risk" not in r.lower()]
         if worst:
-            lines.append(f"Flagged: {worst[0][0]} — {worst[0][1][:80]}")
+            lines.append(f"Flagged: {worst[0][0]} -- {worst[0][1][:80]}")
     return "\n".join(lines)
 
 
@@ -353,7 +353,7 @@ def simulate_patch_sync(
     old_code: str,
     new_code: str,
 ) -> SimulationReport:
-    """Synchronous version — runs static analysis only (no LLM calls).
+    """Synchronous version -- runs static analysis only (no LLM calls).
 
     Use when you need a quick risk estimate without awaiting.
     """

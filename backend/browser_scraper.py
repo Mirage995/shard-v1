@@ -1,4 +1,4 @@
-"""browser_scraper.py — Playwright-based web scraper for SHARD study pipeline.
+"""browser_scraper.py -- Playwright-based web scraper for SHARD study pipeline.
 
 Extracted from study_agent.py as part of SSJ3 Phase 1: Core Hardening.
 """
@@ -34,7 +34,7 @@ class StudyBrowserScraper:
         self.bctx = None
 
     async def _init(self, headless: bool = False):
-        """Launch browser — headless=False so Boss can see it working."""
+        """Launch browser -- headless=False so Boss can see it working."""
         if not self.browser:
             self.playwright = await async_playwright().start()
             self.browser = await self.playwright.chromium.launch(
@@ -128,8 +128,8 @@ class StudyBrowserScraper:
             try:
                 el = page.locator(selector).first
                 if await el.is_visible(timeout=500):
-                    print(f"[CAPTCHA] ⚠️ Captcha detected! Waiting for manual resolution...")
-                    await self._take_screenshot(page, "⚠️ CAPTCHA DETECTED - Solve manually!")
+                    print(f"[CAPTCHA] [WARN]️ Captcha detected! Waiting for manual resolution...")
+                    await self._take_screenshot(page, "[WARN]️ CAPTCHA DETECTED - Solve manually!")
 
                     # Wait up to 60 seconds for captcha to disappear
                     for _ in range(60):
@@ -167,7 +167,7 @@ class StudyBrowserScraper:
             return True
 
         except Exception as e:
-            print(f"[BROWSER] Navigation failed: {url} — {e}")
+            print(f"[BROWSER] Navigation failed: {url} -- {e}")
             return False
 
     async def scrape_sources(
@@ -179,7 +179,7 @@ class StudyBrowserScraper:
     ) -> str:
         """Scrape and aggregate text from a list of sources.
 
-        Browser is always closed via finally — no leak on crash.
+        Browser is always closed via finally -- no leak on crash.
         Returns concatenated text from all successfully scraped sources.
         """
         print(f"[AGGREGATE] Scraping {max_sources} sources...")

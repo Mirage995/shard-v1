@@ -1,14 +1,14 @@
-"""social_agent_analyzer.py — Local codebase analysis via SHARD StudyPipeline.
+"""social_agent_analyzer.py -- Local codebase analysis via SHARD StudyPipeline.
 
 Entry-point script that builds a custom pipeline to analyze a local codebase
 (default: ~/Desktop/social_agent) without internet access.
 
 Pipeline:
-  1. InitPhase           — meta-learning hint + episodic context
-  2. LocalDirMapPhase    — read local files → ctx.sources + ctx.raw_text
-  3. SynthesizePhase     — LLM extracts architecture + concepts from code
-  4. CodeReviewSandboxPhase — LLM proposes refactoring improvements
-  5. CertifyRetryGroup   — validates proposed fixes (VALIDATE→EVALUATE→CERTIFY)
+  1. InitPhase           -- meta-learning hint + episodic context
+  2. LocalDirMapPhase    -- read local files -> ctx.sources + ctx.raw_text
+  3. SynthesizePhase     -- LLM extracts architecture + concepts from code
+  4. CodeReviewSandboxPhase -- LLM proposes refactoring improvements
+  5. CertifyRetryGroup   -- validates proposed fixes (VALIDATE->EVALUATE->CERTIFY)
 
 Usage:
     python social_agent_analyzer.py                          # default path
@@ -81,7 +81,7 @@ async def analyze_codebase(codebase_path: Path):
 
     # ── Progress callback (prints to terminal) ────────────────────────────
     async def on_progress(phase, topic_name, score, msg, pct):
-        pass  # ctx.emit already prints — no double output
+        pass  # ctx.emit already prints -- no double output
 
     async def on_error(topic_name, phase, error_msg):
         print(f"\n[ANALYZER ERROR] {phase}: {error_msg}\n")
@@ -99,18 +99,18 @@ async def analyze_codebase(codebase_path: Path):
 
     # ── Build custom pipeline ─────────────────────────────────────────────
     #
-    # InitPhase           — reuse: meta-learning + episodic context (non-critical if empty)
-    # LocalDirMapPhase    — NEW: reads local files instead of web scraping
-    # SynthesizePhase     — reuse: LLM extracts structured concepts from raw_text
-    # CodeReviewSandboxPhase — NEW: LLM proposes refactoring instead of demo code
-    # CertifyRetryGroup   — reuse: validates the analysis quality
+    # InitPhase           -- reuse: meta-learning + episodic context (non-critical if empty)
+    # LocalDirMapPhase    -- NEW: reads local files instead of web scraping
+    # SynthesizePhase     -- reuse: LLM extracts structured concepts from raw_text
+    # CodeReviewSandboxPhase -- NEW: LLM proposes refactoring instead of demo code
+    # CertifyRetryGroup   -- reuse: validates the analysis quality
     #
     # Skipped (not needed for local analysis):
-    #   MapPhase, AggregatePhase  — replaced by LocalDirMapPhase
-    #   StorePhase                — not persisting to ChromaDB
-    #   CrossPollinatePhase       — no cross-pollination needed
-    #   MaterializePhase          — no cheat sheet needed
-    #   PostStudyPhase            — no meta-learning update needed
+    #   MapPhase, AggregatePhase  -- replaced by LocalDirMapPhase
+    #   StorePhase                -- not persisting to ChromaDB
+    #   CrossPollinatePhase       -- no cross-pollination needed
+    #   MaterializePhase          -- no cheat sheet needed
+    #   PostStudyPhase            -- no meta-learning update needed
 
     pipeline = StudyPipeline([
         InitPhase(),                                         # meta hints
@@ -120,7 +120,7 @@ async def analyze_codebase(codebase_path: Path):
         CodeReviewCertifyPhase(),                            # validate quality (no benchmark)
     ])
 
-    print(f"[PIPELINE] Phases: {' → '.join(repr(p) for p in pipeline.phases)}")
+    print(f"[PIPELINE] Phases: {' -> '.join(repr(p) for p in pipeline.phases)}")
     print()
 
     # ── Execute ───────────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ async def analyze_codebase(codebase_path: Path):
                 print(f"  [{sev}] {file} ({cat})")
                 print(f"         {problem}")
                 if issue.get("fix_before") and issue.get("fix_after"):
-                    print(f"         FIX: {issue['fix_before'][:80]}  →  {issue['fix_after'][:80]}")
+                    print(f"         FIX: {issue['fix_before'][:80]}  ->  {issue['fix_after'][:80]}")
                 print()
 
         # Show refactored file if generated
@@ -181,7 +181,7 @@ async def analyze_codebase(codebase_path: Path):
             print(f"{'─'*70}")
             print(f"REFACTORED FILE: {refactored_file}")
             print(f"{'─'*70}")
-            print(f"  (Refactored code stored in ctx.codice_generato — {len(ctx.codice_generato)} chars)")
+            print(f"  (Refactored code stored in ctx.codice_generato -- {len(ctx.codice_generato)} chars)")
             print(f"  To apply: review the diff and copy to {codebase_path / refactored_file}")
 
     print(f"\n  Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

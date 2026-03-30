@@ -1,4 +1,4 @@
-"""Error Watchdog — scans NightRunner logs and triggers SWEAgent auto-repair.
+"""Error Watchdog -- scans NightRunner logs and triggers SWEAgent auto-repair.
 
 Reads the current session log, extracts recurring Python tracebacks,
 maps them to backend source files, and calls SWEAgent.repair_backend_file()
@@ -133,7 +133,7 @@ def scan_log(log_path: Path) -> List[DetectedError]:
 
     logger.info("[WATCHDOG] %d traceback block(s) found in %s.", len(blocks), log_path.name)
 
-    # Group blocks by (filepath, exc_type, message[:80]) — deduplication key
+    # Group blocks by (filepath, exc_type, message[:80]) -- deduplication key
     by_sig: dict = defaultdict(list)
     for block in blocks:
         parsed = _parse_error_block(block)
@@ -164,7 +164,7 @@ def scan_log(log_path: Path) -> List[DetectedError]:
             occurrences=count,
         ))
         logger.info(
-            "[WATCHDOG] Actionable: %s in %s (%dx) — %s",
+            "[WATCHDOG] Actionable: %s in %s (%dx) -- %s",
             exc_type, Path(filepath).name, count, message[:60],
         )
 
@@ -187,7 +187,7 @@ async def repair_detected_errors(log_path: Path) -> List[dict]:
     errors = scan_log(log_path)
 
     if not errors:
-        logger.info("[WATCHDOG] No actionable errors detected — codebase looks clean.")
+        logger.info("[WATCHDOG] No actionable errors detected -- codebase looks clean.")
         return []
 
     logger.info("[WATCHDOG] %d error(s) to repair.", len(errors))
@@ -228,12 +228,12 @@ async def repair_detected_errors(log_path: Path) -> List[dict]:
 
         if result.success:
             logger.info(
-                "[WATCHDOG] ✓ Auto-patched %s in %d attempt(s) — commit %s",
+                "[WATCHDOG] OK Auto-patched %s in %d attempt(s) -- commit %s",
                 Path(err.filepath).name, result.attempts, result.commit_hash,
             )
         else:
             logger.warning(
-                "[WATCHDOG] ✗ Could not repair %s after %d attempt(s): %s",
+                "[WATCHDOG] FAIL Could not repair %s after %d attempt(s): %s",
                 Path(err.filepath).name, result.attempts, (result.error or "?")[:120],
             )
             logger.warning(

@@ -1,4 +1,4 @@
-"""knowledge_bridge.py — Bridge between NightRunner's ChromaDB and Benchmarks.
+"""knowledge_bridge.py -- Bridge between NightRunner's ChromaDB and Benchmarks.
 
 Provides safely-wrapped access to the knowledge base for injecting context
 into benchmark prompts or external analysis.
@@ -44,13 +44,13 @@ def _score_md_file(content: str, filename: str, task_key_words: set, full_words:
     """
     fname_words = set(re.split(r'[\W_]+', filename.lower()))
 
-    # Task key overlap against filename — very high weight
+    # Task key overlap against filename -- very high weight
     task_fname_overlap = len(task_key_words & fname_words)
 
-    # Full query overlap against filename — medium weight
+    # Full query overlap against filename -- medium weight
     full_fname_overlap = len(full_words & fname_words)
 
-    # Content word overlap — lower weight, only English content words
+    # Content word overlap -- lower weight, only English content words
     content_words = set(w for w in re.split(r'\W+', content[:600].lower()) if _is_english_word(w))
     content_overlap = len(task_key_words & content_words)
 
@@ -60,7 +60,7 @@ def _score_md_file(content: str, filename: str, task_key_words: set, full_words:
 def _extract_task_key_words(query: str) -> set:
     """Extract high-signal English words from the task_key part of the query.
 
-    Handles: "task_04_race_condition ..." → {"race", "condition"}
+    Handles: "task_04_race_condition ..." -> {"race", "condition"}
     """
     # First token is likely the task_key ("task_02_ghost_bug")
     first_token = query.split()[0] if query.split() else ""
@@ -84,7 +84,7 @@ def _query_md_files(query: str, n_results: int = 2) -> list[tuple[str, str]]:
 
     scored = []
     for md_file in _KB_DIR.glob("*.md"):
-        # Skip task-named files (generated from benchmark README titles — always garbage)
+        # Skip task-named files (generated from benchmark README titles -- always garbage)
         if md_file.stem.startswith("task_"):
             continue
         try:
@@ -118,7 +118,7 @@ def query_knowledge_base(topic: str, n_results: int = 3) -> str:
     try:
         md_results = _query_md_files(topic, n_results=2)
         if md_results:
-            parts.append("╔═══ KNOWLEDGE BASE — Cheat Sheets ═══╗")
+            parts.append("╔═══ KNOWLEDGE BASE -- Cheat Sheets ═══╗")
             parts.append("")
             for name, content in md_results:
                 parts.append(f"--- {name.replace('_', ' ')} ---")
@@ -148,7 +148,7 @@ def query_knowledge_base(topic: str, n_results: int = 3) -> str:
 
                 if results and results.get('documents') and results['documents'][0]:
                     documents = results['documents'][0]
-                    parts.append("╔═══ KNOWLEDGE BASE — NightRunner Concepts ═══╗")
+                    parts.append("╔═══ KNOWLEDGE BASE -- NightRunner Concepts ═══╗")
                     parts.append("")
                     for i, doc in enumerate(documents, 1):
                         parts.append(f"--- Concept {i} ---")

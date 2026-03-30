@@ -1,6 +1,6 @@
-"""SWE Agent — LLM-driven autonomous code repair with mandatory security validation.
+"""SWE Agent -- LLM-driven autonomous code repair with mandatory security validation.
 
-Provider chain for repairs: Claude → Groq LLaMA-70B → Ollama (local).
+Provider chain for repairs: Claude -> Groq LLaMA-70B -> Ollama (local).
 Every patch MUST pass the AST security gate before touching disk.
 Git integration: commits on success, rolls back on failure.
 """
@@ -51,17 +51,17 @@ FORBIDDEN_IMPORTS: frozenset[str] = frozenset({
 FORBIDDEN_CALLS: frozenset[str] = frozenset({
     "eval",        # arbitrary expression execution
     "exec",        # arbitrary statement execution
-    "compile",     # produces code objects → eval/exec bypass
+    "compile",     # produces code objects -> eval/exec bypass
     "__import__",  # dynamic import without 'import' statement
     "globals",     # full namespace exposure
     "locals",      # full namespace exposure
     "vars",        # full namespace exposure
-    "breakpoint",  # drops into debugger → interactive shell
+    "breakpoint",  # drops into debugger -> interactive shell
     "memoryview",  # raw memory access
 })
 
-# ── Security: light gate (backend repair patches — our own code) ───────────────
-# Only blocks newly introduced eval/exec/compile — doesn't restrict imports
+# ── Security: light gate (backend repair patches -- our own code) ───────────────
+# Only blocks newly introduced eval/exec/compile -- doesn't restrict imports
 # because backend code legitimately uses os, subprocess, etc.
 PATCH_FORBIDDEN_CALLS: frozenset[str] = frozenset({
     "eval", "exec", "compile", "__import__",
@@ -71,7 +71,7 @@ PATCH_FORBIDDEN_CALLS: frozenset[str] = frozenset({
 # ── AST visitors ───────────────────────────────────────────────────────────────
 
 class _SecurityVisitor(ast.NodeVisitor):
-    """Heavy AST gate — for untrusted/sandbox code."""
+    """Heavy AST gate -- for untrusted/sandbox code."""
 
     def __init__(self):
         self.violations: list[str] = []
@@ -127,7 +127,7 @@ class _SecurityVisitor(ast.NodeVisitor):
 
 
 class _PatchSecurityVisitor(ast.NodeVisitor):
-    """Light AST gate — for backend repair patches (our own code)."""
+    """Light AST gate -- for backend repair patches (our own code)."""
 
     def __init__(self):
         self.violations: list[str] = []
@@ -143,7 +143,7 @@ class _PatchSecurityVisitor(ast.NodeVisitor):
 # ── Public security functions ──────────────────────────────────────────────────
 
 def validate_code_safety(code: str) -> tuple[bool, list[str]]:
-    """Heavy AST gate — use for sandbox/untrusted code (student programs, experiments)."""
+    """Heavy AST gate -- use for sandbox/untrusted code (student programs, experiments)."""
     try:
         tree = ast.parse(code)
     except SyntaxError as e:
@@ -154,7 +154,7 @@ def validate_code_safety(code: str) -> tuple[bool, list[str]]:
 
 
 def validate_patch_safety(code: str) -> tuple[bool, list[str]]:
-    """Light AST gate — use for backend repair patches (our own code)."""
+    """Light AST gate -- use for backend repair patches (our own code)."""
     try:
         tree = ast.parse(code)
     except SyntaxError as e:
@@ -187,13 +187,13 @@ class SWEAgent:
     Repair flow (up to MAX_REPAIR_ATTEMPTS times):
       1. Read the file
       2. Build a repair prompt (file content + issue + error context + prev failure)
-      3. Call LLM via llm_router (Claude → Groq → Ollama)
+      3. Call LLM via llm_router (Claude -> Groq -> Ollama)
       4. Extract clean Python code from LLM response
-      5. Validate patch safety (light AST gate — blocks eval/exec only)
+      5. Validate patch safety (light AST gate -- blocks eval/exec only)
       6. Write patch atomically (tempfile + os.replace)
       7. Discover and run tests
-      8. On pass  → git commit, return RepairResult(success=True)
-         On fail  → git reset file, feed failure back into prompt, retry
+      8. On pass  -> git commit, return RepairResult(success=True)
+         On fail  -> git reset file, feed failure back into prompt, retry
     """
 
     def __init__(self, workspace_dir: str = "shard_workspace"):
@@ -275,7 +275,7 @@ class SWEAgent:
             # 3. Extract clean code from LLM response
             patch_code = self._extract_code(raw_response, original_code)
 
-            # 4. Light security gate — block eval/exec insertion
+            # 4. Light security gate -- block eval/exec insertion
             ok, violations = validate_patch_safety(patch_code)
             if not ok:
                 previous_failure = "SECURITY: " + "; ".join(violations)
@@ -294,13 +294,13 @@ class SWEAgent:
             if test_paths and require_tests:
                 test_output, tests_passed = await self._run_tests(test_paths)
             else:
-                test_output, tests_passed = "(no tests found — patch written without test gate)", True
+                test_output, tests_passed = "(no tests found -- patch written without test gate)", True
 
             if tests_passed:
                 # 7. Commit
-                commit_msg = f"fix({path.name}): autonomous repair — {issue_text[:60]}"
+                commit_msg = f"fix({path.name}): autonomous repair -- {issue_text[:60]}"
                 commit_ok, commit_hash = await self._git_commit(path, commit_msg)
-                logger.info("[SWE] ✓ Repair committed: %s (%s)", path.name, commit_hash)
+                logger.info("[SWE] OK Repair committed: %s (%s)", path.name, commit_hash)
                 return RepairResult(
                     success=True,
                     filepath=str(path),
@@ -313,7 +313,7 @@ class SWEAgent:
                 # 8. Roll back and carry failure context into the next attempt
                 await self._git_reset_file(path)
                 previous_failure = f"Tests failed on attempt {attempt}:\n{test_output[-1500:]}"
-                logger.warning("[SWE] Attempt %d: tests failed — rolling back and retrying.", attempt)
+                logger.warning("[SWE] Attempt %d: tests failed -- rolling back and retrying.", attempt)
 
         # All attempts exhausted
         await self._git_reset_file(path)
@@ -336,8 +336,8 @@ class SWEAgent:
         """Backward-compatible entrypoint. Wraps repair_backend_file().
 
         repo_name is used to locate the file:
-          "rate_limiter"  → shard_workspace/rate_limiter.py
-          "study_agent"   → backend/study_agent.py
+          "rate_limiter"  -> shard_workspace/rate_limiter.py
+          "study_agent"   -> backend/study_agent.py
         """
         # Prefer workspace dir, then backend dir
         candidate = self.workspace_dir / f"{repo_name.replace('-', '_')}.py"
@@ -394,7 +394,7 @@ class SWEAgent:
             "1. Fix the issue described above.",
             "2. Do NOT remove existing imports unless they are causing the bug.",
             "3. Preserve all existing functionality.",
-            "4. Return the COMPLETE corrected file — not just the changed lines.",
+            "4. Return the COMPLETE corrected file -- not just the changed lines.",
             "5. Output raw Python only. No markdown. No code fences. No explanation.",
         ]
         return "\n".join(parts)
@@ -436,7 +436,7 @@ class SWEAgent:
             pass
 
         # Last resort: return raw and let the safety gate catch any issues
-        logger.warning("[SWE] Could not extract clean code — returning raw LLM output.")
+        logger.warning("[SWE] Could not extract clean code -- returning raw LLM output.")
         return raw
 
     # ── Test discovery ─────────────────────────────────────────────────────────
@@ -478,11 +478,11 @@ class SWEAgent:
             except asyncio.TimeoutError:
                 proc.kill()
                 await proc.wait()
-                msg = f"[SWE] TIMEOUT: pytest exceeded {PYTEST_TIMEOUT_SECONDS}s — process killed."
+                msg = f"[SWE] TIMEOUT: pytest exceeded {PYTEST_TIMEOUT_SECONDS}s -- process killed."
                 logger.error(msg)
                 return msg, False
         except FileNotFoundError:
-            msg = "[SWE] pytest not found in PATH — cannot run tests."
+            msg = "[SWE] pytest not found in PATH -- cannot run tests."
             logger.error(msg)
             return msg, False
 

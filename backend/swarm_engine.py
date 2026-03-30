@@ -1,11 +1,11 @@
-"""swarm_engine.py — Multi-agent pipeline: Architect → Coder → Multi-Reviewer.
+"""swarm_engine.py -- Multi-agent pipeline: Architect -> Coder -> Multi-Reviewer.
 
 Pipeline:
-  1. Architect   — analyzes failure history, produces strategy document
-  2. Coder       — implements the strategy
-  3. Reviewers   — parallel specialized critics (Security, Concurrency, Edge Cases,
-                   Performance, Maintainability) — only relevant ones are activated
-  4. Coder patch — if reviewers find critical issues, Coder applies fixes
+  1. Architect   -- analyzes failure history, produces strategy document
+  2. Coder       -- implements the strategy
+  3. Reviewers   -- parallel specialized critics (Security, Concurrency, Edge Cases,
+                   Performance, Maintainability) -- only relevant ones are activated
+  4. Coder patch -- if reviewers find critical issues, Coder applies fixes
 
 Reviewer selection is automatic based on task content keywords.
 All reviewers use Gemini Flash (fast + free) to keep API costs low.
@@ -31,7 +31,7 @@ logger = logging.getLogger("shard.swarm_engine")
 
 SYSTEM_PROMPT_ARCHITECT = (
     "You are a software architect analyzing failed code repair attempts. "
-    "Your job is to produce a STRATEGY DOCUMENT — plain text, no code. "
+    "Your job is to produce a STRATEGY DOCUMENT -- plain text, no code. "
     "The document must answer these questions: "
     "1. Root cause: why did every attempt fail? Be specific about which tests failed and why. "
     "2. Pattern: did the fixes break previously passing tests? If yes, explain the regression pattern. "
@@ -45,7 +45,7 @@ SYSTEM_PROMPT_CODER = (
     "You receive a strategy document from an Architect and must implement it exactly. "
     "Output ONLY valid Python source code. "
     "No markdown fences, no explanations, no commentary. "
-    "Every function must be fully implemented — no ellipsis, no pass, no TODO. "
+    "Every function must be fully implemented -- no ellipsis, no pass, no TODO. "
     "Follow the Architect's constraints explicitly: if the strategy says 'do not change X', do not change X."
 )
 
@@ -67,7 +67,7 @@ SYSTEM_PROMPT_CRITIC = (
     "incorrect logic, missing edge case handling. "
     "If the code looks correct, respond with exactly: APPROVED "
     "If there are problems, respond with: ISSUES FOUND "
-    "followed by a numbered list of specific, actionable problems. Be precise — line numbers if possible. "
+    "followed by a numbered list of specific, actionable problems. Be precise -- line numbers if possible. "
     "Do NOT rewrite the code. Only report."
 )
 
@@ -199,7 +199,7 @@ def _build_patch_prompt(
 Fix ALL reported issues. Output the COMPLETE corrected {output_filename}. Raw Python only."""
 
 
-# ── Code extraction (idempotent — safe to call on already-clean code) ───────────
+# ── Code extraction (idempotent -- safe to call on already-clean code) ───────────
 
 def _extract_code(response: str) -> str:
     """Extract Python code from LLM response, stripping markdown fences."""
@@ -268,11 +268,11 @@ def _build_architect_prompt(
                     f"Use copy.deepcopy() before modifying readings."
                 )
         hint_str = "\n".join(hints) if hints else (
-            "  Previous approaches have NOT fixed these — rethink from scratch. "
+            "  Previous approaches have NOT fixed these -- rethink from scratch. "
             "Read the test assertions literally and trace your code step by step."
         )
         stuck_block = f"""
-=== STUCK TESTS — CRITICAL (failed in EVERY attempt — address these FIRST) ===
+=== STUCK TESTS -- CRITICAL (failed in EVERY attempt -- address these FIRST) ===
 {stuck_list}
 Specific root causes you MUST fix:
 {hint_str}
@@ -295,11 +295,11 @@ Specific root causes you MUST fix:
     rollback_block = ""
     if rollback_hint:
         rollback_block = (
-            "=== REGRESSIONE RILEVATA — CRITICO ===\n"
+            "=== REGRESSIONE RILEVATA -- CRITICO ===\n"
             "Il tentativo precedente ha REGRESSIONATO il codice: test che passavano ora falliscono.\n"
             "Il BEST STATE e' stato ripristinato su disco. Parti OBBLIGATORIAMENTE da quel codice.\n"
             "Regole TASSATIVE per la tua strategia:\n"
-            "  1. Correggi SOLO il singolo test ancora fallito — nient'altro.\n"
+            "  1. Correggi SOLO il singolo test ancora fallito -- nient'altro.\n"
             "  2. VIETATO suggerire: rinominare variabili, aggiungere validazione, aggiungere\n"
             "     html.escape, ristrutturare classi, aggiungere commenti, o qualsiasi cambio\n"
             "     non direttamente richiesto dal test fallito.\n"
@@ -308,7 +308,7 @@ Specific root causes you MUST fix:
 
     return f"""Analyze the following failed benchmark task and produce a strategy document.
 
-{rollback_block}=== SOURCE CODE (reference — do NOT optimize unless explicitly needed) ===
+{rollback_block}=== SOURCE CODE (reference -- do NOT optimize unless explicitly needed) ===
 {source}
 
 === TEST FILE (all tests must pass) ===
@@ -328,7 +328,7 @@ def _build_coder_prompt(
     if best and best.tests_passed:
         guard_list = "\n".join(f"  - {t}" for t in sorted(best.tests_passed))
         guard_block = f"""
-=== PASSING TESTS TO PRESERVE (from best attempt — do NOT regress these) ===
+=== PASSING TESTS TO PRESERVE (from best attempt -- do NOT regress these) ===
 {guard_list}
 """
 
@@ -371,7 +371,7 @@ async def swarm_complete(
     rollback_hint: bool = False,
     rollback_code: str = None,
 ) -> str:
-    """Multi-agent pipeline: Architect → Coder → Multi-Reviewer → (Coder patch if needed).
+    """Multi-agent pipeline: Architect -> Coder -> Multi-Reviewer -> (Coder patch if needed).
 
     Returns raw Python code string ready for syntax validation by benchmark_loop.
     Raises on LLM failure so benchmark_loop can record it as a normal failed attempt.
@@ -379,7 +379,7 @@ async def swarm_complete(
     Args:
         source:          Original source code (reference, never modified).
         tests:           Full test file content.
-        attempts:        list[AttemptRecord] from benchmark_loop — full history.
+        attempts:        list[AttemptRecord] from benchmark_loop -- full history.
         output_filename: e.g. "fixed_pipeline.py"
         max_tokens:      Forwarded to Coder calls only.
         temperature:     Forwarded to Coder calls only.
@@ -438,10 +438,10 @@ async def swarm_complete(
     focus_mode = stuck_rounds >= 2
     if focus_mode:
         logger.warning(
-            "[SWARM] FOCUS MODE activated (stuck %d rounds) — reviewers muted, "
+            "[SWARM] FOCUS MODE activated (stuck %d rounds) -- reviewers muted, "
             "trusting Architect strategy directly.", stuck_rounds
         )
-        print(f"  [SWARM] FOCUS MODE — reviewers muted ({stuck_rounds} stuck rounds)")
+        print(f"  [SWARM] FOCUS MODE -- reviewers muted ({stuck_rounds} stuck rounds)")
 
     active_reviewers = [] if focus_mode else _select_reviewers(source, tests)
     if not focus_mode:
@@ -455,7 +455,7 @@ async def swarm_complete(
         async def _run_reviewer(spec: ReviewerSpec) -> tuple[str, str]:
             prompt = _build_reviewer_prompt(code, tests, spec)
             try:
-                # Use cache for reviewers — same code structure often gets same review
+                # Use cache for reviewers -- same code structure often gets same review
                 try:
                     from llm_cache import cached_llm_complete
                     result = await cached_llm_complete(
@@ -492,7 +492,7 @@ async def swarm_complete(
 
     # ── Step 5: Coder patch (only if reviewers found critical issues) ─────────
     if critical_findings:
-        logger.info("[SWARM] %d reviewer(s) flagged issues — running Coder patch", len(critical_findings))
+        logger.info("[SWARM] %d reviewer(s) flagged issues -- running Coder patch", len(critical_findings))
         patch_prompt = _build_patch_prompt(code, source, critical_findings, output_filename)
         try:
             patched_raw = await llm_complete(
@@ -506,10 +506,10 @@ async def swarm_complete(
                 code = patched_code
                 logger.info("[SWARM] Coder patch applied (%d chars)", len(code))
             else:
-                logger.warning("[SWARM] Coder patch returned empty/short code — keeping original")
+                logger.warning("[SWARM] Coder patch returned empty/short code -- keeping original")
         except Exception as exc:
-            logger.warning("[SWARM] Coder patch failed: %s — keeping Coder output", exc)
+            logger.warning("[SWARM] Coder patch failed: %s -- keeping Coder output", exc)
     else:
-        logger.info("[SWARM] All reviewers approved — no patch needed")
+        logger.info("[SWARM] All reviewers approved -- no patch needed")
 
     return code

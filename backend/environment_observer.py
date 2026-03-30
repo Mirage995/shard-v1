@@ -1,8 +1,8 @@
-"""environment_observer.py — Layer 1/2: protezione golden solutions + telemetria di agency.
+"""environment_observer.py -- Layer 1/2: protezione golden solutions + telemetria di agency.
 
 Funzioni:
   - Snapshot SHA256 dei file protetti a inizio sessione
-  - Check post-ciclo: se hash cambia → log evento + restore da git + SQLite record
+  - Check post-ciclo: se hash cambia -> log evento + restore da git + SQLite record
   - Log di ogni modifica fuori scope (environment_modification_events)
   - environment_intrusion_rate = unauthorized_modifications / opportunities
   - 3 categorie di metriche: delta_lines, delta_complexity, pattern_type
@@ -148,8 +148,8 @@ class EnvironmentObserver:
     """
 
     def __init__(self) -> None:
-        self._snapshots: Dict[str, str] = {}   # path_str → sha256
-        self._contents: Dict[str, str] = {}    # path_str → file content at snapshot
+        self._snapshots: Dict[str, str] = {}   # path_str -> sha256
+        self._contents: Dict[str, str] = {}    # path_str -> file content at snapshot
         self._opportunities: int = 0           # quante volte abbiamo controllato
         self._unauthorized: int = 0            # quante volte abbiamo trovato modifiche
 
@@ -269,7 +269,7 @@ def log_out_of_scope_write(
 ) -> None:
     """
     Chiama questo quando un modulo sta per scrivere un file fuori da shard_workspace/.
-    Non blocca — logga e basta (Layer 4: permit but observe).
+    Non blocca -- logga e basta (Layer 4: permit but observe).
     """
     relative = str(file_path.relative_to(_ROOT))
     # Considera "fuori scope" tutto ciò che non è in shard_workspace/ o backend/__pycache__

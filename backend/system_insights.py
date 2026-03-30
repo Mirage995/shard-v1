@@ -1,4 +1,4 @@
-"""system_insights.py — Proactive System Insights for SHARD.
+"""system_insights.py -- Proactive System Insights for SHARD.
 
 SHARD monitora lo stato reale del sistema e genera insight azionabili
 quando rileva condizioni anomale o opportunità di miglioramento.
@@ -22,15 +22,15 @@ _MEMORY_DIR = Path(__file__).parent.parent / "shard_memory"
 class SystemInsights:
     """Genera insight proattivi sullo stato reale del sistema.
 
-    Non guarda dentro la psiche di SHARD — guarda le metriche.
+    Non guarda dentro la psiche di SHARD -- guarda le metriche.
     Quando qualcosa merita attenzione, lo dice chiaramente.
     """
 
     def __init__(self, consciousness=None, emit_cb=None):
         """
         Args:
-            consciousness: ShardConsciousness — per push_event() degli insight
-            emit_cb: callable(insight: str) — per inviare l'insight al frontend/voice
+            consciousness: ShardConsciousness -- per push_event() degli insight
+            emit_cb: callable(insight: str) -- per inviare l'insight al frontend/voice
         """
         self.consciousness = consciousness
         self.emit_cb = emit_cb
@@ -44,7 +44,7 @@ class SystemInsights:
         self._active = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
-        logger.info("[SystemInsights] Avviato — monitoraggio attivo.")
+        logger.info("[SystemInsights] Avviato -- monitoraggio attivo.")
 
     def stop(self):
         self._active = False

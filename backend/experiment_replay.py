@@ -40,7 +40,7 @@ class ExperimentReplay:
                         "[REPLAY] Loaded %d topics from disk.", len(self.history)
                     )
         except Exception as e:
-            logger.warning("[REPLAY] Could not load replay history: %s — starting fresh.", e)
+            logger.warning("[REPLAY] Could not load replay history: %s -- starting fresh.", e)
             self.history = []
 
     def _save(self):
@@ -73,7 +73,7 @@ class ExperimentReplay:
             logger.debug("[REPLAY] Skipping invalid replay topic: %s", topic)
             return
         if topic in self.history:
-            return  # already queued — avoid duplicates
+            return  # already queued -- avoid duplicates
         self.history.append(topic)
         self._save()
         logger.debug("[REPLAY] Added replay topic: %s (backlog: %d)", topic, len(self.history))

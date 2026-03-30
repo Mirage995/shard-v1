@@ -1,8 +1,8 @@
 """
-VoiceBroadcaster — file-based queue for proactive SHARD voice events.
+VoiceBroadcaster -- file-based queue for proactive SHARD voice events.
 
 NightRunner (standalone process) writes to the queue.
-server.py polls and emits via Socket.IO → frontend Web Speech API or Gemini Live.
+server.py polls and emits via Socket.IO -> frontend Web Speech API or Gemini Live.
 
 Queue file: shard_memory/voice_queue.json
 """

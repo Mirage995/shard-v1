@@ -1,4 +1,4 @@
-"""benchmark_pivot.py — Pivot detection and agency measurement for benchmark tasks.
+"""benchmark_pivot.py -- Pivot detection and agency measurement for benchmark tasks.
 
 EXPERIMENT DESIGN (SSJ18+):
   When the same benchmark task fails N consecutive sessions, SHARD's approach
@@ -7,7 +7,7 @@ EXPERIMENT DESIGN (SSJ18+):
   a structurally different solution.
 
   With LLM_TEMPERATURE=0.05 (near-deterministic), structural differences
-  post-pivot cannot be attributed to sampling noise — they reflect genuine
+  post-pivot cannot be attributed to sampling noise -- they reflect genuine
   changes in the solution space when the memory constraint is removed.
 
   agency_score = structural_distance * 0.4
@@ -15,9 +15,9 @@ EXPERIMENT DESIGN (SSJ18+):
                + failure_distance    * 0.2
 
   Interpretations:
-    agency_score < 0.1  → IDENTICAL  (strong deterministic attractor)
-    agency_score < 0.5  → SIMILAR    (partial variation, bias dominant)
-    agency_score >= 0.5 → DIFFERENT  (memory was an active constraint)
+    agency_score < 0.1  -> IDENTICAL  (strong deterministic attractor)
+    agency_score < 0.5  -> SIMILAR    (partial variation, bias dominant)
+    agency_score >= 0.5 -> DIFFERENT  (memory was an active constraint)
 
 Scientific note (GPT validation, 2026-03-29):
   This is NOT a test of "free will". It measures:
@@ -107,7 +107,7 @@ def _ast_profile(code: str) -> List[str]:
 
 
 def code_fingerprint(code: str) -> str:
-    """SHA256[:12] of the structural AST profile — stable across whitespace/rename."""
+    """SHA256[:12] of the structural AST profile -- stable across whitespace/rename."""
     profile = _ast_profile(code)
     text = "\n".join(sorted(profile))
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
@@ -210,7 +210,7 @@ def execute_pivot(
     reason: str,
     pre_fails: List[str],
 ) -> Optional[Dict]:
-    """Restore fixed_*.py to original source — blank slate on code.
+    """Restore fixed_*.py to original source -- blank slate on code.
 
     Returns dict with pre_pivot info for post-pivot distance measurement,
     or None if pivot could not be executed.
@@ -298,7 +298,7 @@ def record_post_pivot(
     analysis  = compute_agency_score(pre_code, post_code, pre_fails, post_fails)
 
     logger.warning(
-        "[POST-BENCH-PIVOT] task='%s'  pre=%s → post=%s  "
+        "[POST-BENCH-PIVOT] task='%s'  pre=%s -> post=%s  "
         "agency_score=%.3f  verdict=%s",
         Path(pivot_state.get("task_dir", "")).name,
         pivot_state.get("pre_fp", "?"),

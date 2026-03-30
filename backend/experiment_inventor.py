@@ -20,18 +20,18 @@ class ExperimentInventor:
         caps = self._capabilities()
 
         # Depth guard: never nest composite topics further.
-        # "Integration of X and Y" is depth-1 — stop there.
+        # "Integration of X and Y" is depth-1 -- stop there.
         if target_skill.lower().startswith("integration of "):
             return []
 
-        # Only use atomic capabilities as partners — never composite ones.
+        # Only use atomic capabilities as partners -- never composite ones.
         # This prevents "Integration of (Integration of X) and Y" chains.
         other_caps = [
             c for c in caps
             if c != target_skill and not c.lower().startswith("integration of ")
         ]
         
-        # Fallback: no other capabilities available — generate an advanced pattern
+        # Fallback: no other capabilities available -- generate an advanced pattern
         if not other_caps:
             return [f"Advanced {target_skill} implementation patterns"]
 

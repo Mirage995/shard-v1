@@ -1,16 +1,16 @@
-"""study_personas.py — Dynamic Study Personas for SHARD.
+"""study_personas.py -- Dynamic Study Personas for SHARD.
 
 Instead of running 3 parallel clones (API expensive), SHARD:
 1. Selects ONE persona based on topic category + meta_learning history
 2. Adjusts study parameters accordingly (tier, sandbox_retries, focus)
-3. After certification: records which persona succeeded → future selections improve
+3. After certification: records which persona succeeded -> future selections improve
 
 Personas:
-  THEORETICAL — tier=2, deep docs, theory first. Best for CS theory, algorithms, crypto.
-  HACKER      — tier=1, code examples first, sandbox retries. Best for APIs, libraries, frameworks.
-  VISUAL      — tier=2, diagram generation hint, conceptual. Best for architectures, ML concepts.
+  THEORETICAL -- tier=2, deep docs, theory first. Best for CS theory, algorithms, crypto.
+  HACKER      -- tier=1, code examples first, sandbox retries. Best for APIs, libraries, frameworks.
+  VISUAL      -- tier=2, diagram generation hint, conceptual. Best for architectures, ML concepts.
 
-Integration: night_runner calls select_persona() → passes config to study_topic().
+Integration: night_runner calls select_persona() -> passes config to study_topic().
 """
 import json
 import logging
@@ -39,7 +39,7 @@ class PersonaConfig:
     focus_note: str = ""       # appended to system prompt context
 
 
-# ── Category → default persona mapping ────────────────────────────────────────
+# ── Category -> default persona mapping ────────────────────────────────────────
 
 _CATEGORY_DEFAULTS: dict[str, PersonaType] = {
     "algorithms":      PersonaType.THEORETICAL,

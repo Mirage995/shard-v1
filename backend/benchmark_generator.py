@@ -1,8 +1,8 @@
-"""benchmark_generator.py — Generates objective benchmark test cases for StudyAgent certification.
+"""benchmark_generator.py -- Generates objective benchmark test cases for StudyAgent certification.
 
 Replaces the legacy stub with a real LLM-powered test case generator.
 Each generated test is validated with ast.parse before being returned.
-Malformed tests are silently discarded — they never penalise the agent.
+Malformed tests are silently discarded -- they never penalise the agent.
 """
 import ast
 import json
@@ -23,7 +23,7 @@ Generate exactly {n_tests} Python benchmark test cases for this topic:
 
 TOPIC: {topic}
 
-The agent wrote this implementation (for reference — do NOT copy it verbatim):
+The agent wrote this implementation (for reference -- do NOT copy it verbatim):
 {code_snippet}
 
 Return a JSON object with EXACTLY this structure:
@@ -42,7 +42,7 @@ Rules:
 - The function signature must ALWAYS be: def solve(input_data)
 - Each test must use ONLY Python builtins (no imports in setup or assert_expr)
 - 'setup' must define exactly the variables 'input_data' and 'expected'
-- 'expected' must ALWAYS be a plain Python literal (int, float, str, bool, list, tuple) — NEVER a numpy array or other non-builtin object
+- 'expected' must ALWAYS be a plain Python literal (int, float, str, bool, list, tuple) -- NEVER a numpy array or other non-builtin object
 - Choose 'assert_expr' based on the output type:
     * exact match (int, bool, str, list of int/str, tuple): assert solve(input_data) == expected
     * single float (approximate): assert abs(solve(input_data) - expected) < 1e-6
@@ -110,7 +110,7 @@ class BenchmarkGenerator:
         raw_tests = data.get("tests", [])
 
         if not isinstance(raw_tests, list):
-            print("[BENCHMARK_GEN] ⚠️ 'tests' is not a list — discarding")
+            print("[BENCHMARK_GEN] [WARN]️ 'tests' is not a list -- discarding")
             return _unavailable(topic, "malformed 'tests' field")
 
         valid_tests: List[Dict[str, Any]] = []
@@ -123,7 +123,7 @@ class BenchmarkGenerator:
                     "assert_expr": t["assert_expr"].strip(),
                 })
             else:
-                print(f"[BENCHMARK_GEN] ⚠️ Test {i} discarded: {verdict['reason']}")
+                print(f"[BENCHMARK_GEN] [WARN]️ Test {i} discarded: {verdict['reason']}")
 
         print(
             f"[BENCHMARK_GEN] ✅ {len(valid_tests)}/{len(raw_tests)} tests "
@@ -140,7 +140,7 @@ class BenchmarkGenerator:
     # ── Legacy stub API (keeps existing study_agent.py call sites working) ─────
 
     def generate_for_capability(self, capability_name: str, difficulty: int = 1):
-        """Legacy sync stub — kept for backward compatibility with existing call sites.
+        """Legacy sync stub -- kept for backward compatibility with existing call sites.
         Real generation is done via the async ``generate()`` method.
         """
         return {
@@ -207,13 +207,13 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
         if bad in setup or bad in assert_expr:
             return {"ok": False, "reason": f"dangerous pattern: {bad}"}
 
-    # AST validation — catches any remaining syntax issues
+    # AST validation -- catches any remaining syntax issues
     try:
         ast.parse(f"{setup}\n{assert_expr}")
     except SyntaxError as e:
         return {"ok": False, "reason": f"SyntaxError: {e}"}
 
-    # Runtime type check — reject only None and bare bool (almost always a generation mistake).
+    # Runtime type check -- reject only None and bare bool (almost always a generation mistake).
     # int, float, dict, str, list, tuple, set are all valid input_data types depending on
     # the function under test (e.g. profiling takes int size, json parsing takes dict).
     # Also: auto-rewrite assert_expr for float/list-of-float expected values so that
@@ -223,7 +223,7 @@ def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
         exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
         val = ns.get("input_data")
         if val is None or isinstance(val, bool):
-            return {"ok": False, "reason": f"input_data is {type(val).__name__} — likely a generation mistake"}
+            return {"ok": False, "reason": f"input_data is {type(val).__name__} -- likely a generation mistake"}
 
         # Auto-rewrite assert for float/list-of-float expected values.
         # This guards against "ValueError: truth value of array ambiguous" when

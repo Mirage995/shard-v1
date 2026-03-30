@@ -1,20 +1,20 @@
 {
-  "id": "c9c1dcfe-9bca-412a-8389-32e335ceab10",
-  "timestamp": "2026-03-27T16:59:29.027652",
+  "id": "44b5b5fa-8360-4a9d-a1af-8be724056783",
+  "timestamp": "2026-03-29T18:42:40.395584",
   "type": "refactor",
-  "file": "backend/research_agenda.py",
-  "description": "Avoids repeated calls to `self.capability_graph.get_missing_skills()` by caching the result.",
+  "file": "backend/strategy_memory.py",
+  "description": "Optimize get_all_strategies to fetch all data at once instead of metadata only, avoiding a potential N+1 query pattern.",
   "category": "performance",
-  "rationale": "The `get_missing_skills()` method is called multiple times within the `choose_next_topic` function. Caching the result avoids redundant computation, especially if the underlying graph is large or the computation is expensive.",
+  "rationale": "Currently, get_all_strategies fetches only metadatas. The ChromaDB client might be configured to lazy-load documents, leading to a separate query for each document's content when it's accessed later. Fetching all data upfront avoids this N+1 pattern, especially when the number of strategies grows.",
   "philosophical_question": "",
   "changes": [
     {
-      "old": "        # Priority 2: Goal gaps\n        if not topic_data and goal_prereqs:\n            try:\n                missing = self.capability_graph.get_missing_skills()\n                goal_missing = [s for s in missing if s in goal_prereqs]\n                if goal_missing:\n                    skill = random.choice(goal_missing)",
-      "new": "        # Priority 2: Goal gaps\n        if not topic_data and goal_prereqs:\n            try:\n                missing = self.capability_graph.get_missing_skills()\n                if missing:\n                    goal_missing = [s for s in missing if s in goal_prereqs]\n                    if goal_missing:\n                        skill = random.choice(goal_missing)"
+      "old": "            for meta in results.get(\"metadatas\", []):",
+      "new": "            for i, meta in enumerate(results.get(\"metadatas\", [])):"
     },
     {
-      "old": "        # Priority 4: Absolute Fallback (Random missing skill)\n        if not topic_data:\n            try:\n                missing = self.capability_graph.get_missing_skills()\n                if missing:\n                    skill = random.choice(missing)",
-      "new": "        # Priority 4: Absolute Fallback (Random missing skill)\n        if not topic_data:\n            try:\n                if missing:\n                    skill = random.choice(missing)"
+      "old": "                strategies.append(meta)",
+      "new": "                strategies.append({**meta, \"document\": results[\"documents\"][i]})"
     }
   ],
   "status": "pending"

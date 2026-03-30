@@ -1,8 +1,8 @@
-"""Capability Graph — Runtime representation of SHARD's operational capabilities.
+"""Capability Graph -- Runtime representation of SHARD's operational capabilities.
 
 Tracks what SHARD has learned to DO (not just know). Each capability has a name
 and optional prerequisites. Updated automatically when strategies succeed.
-Storage is in-memory (dict), not persistent — capabilities are re-derived from
+Storage is in-memory (dict), not persistent -- capabilities are re-derived from
 strategy memory on restart if needed.
 """
 import asyncio
@@ -28,8 +28,8 @@ def _get_db():
 
 # ── Capability Normalization ──────────────────────────────────────────────────
 # Composite topic templates that should be split into atomic skill names.
-# "Integration of asyncio and Playwright" → ["asyncio", "playwright"]
-# "X applied to Y" → ["X", "Y"]
+# "Integration of asyncio and Playwright" -> ["asyncio", "playwright"]
+# "X applied to Y" -> ["X", "Y"]
 _NORMALIZE_PATTERNS = [
     (r'^integration of (.+?) and (.+)$',  2),
     (r'^(.+?) applied to (.+)$',          2),
@@ -57,7 +57,7 @@ def normalize_capability(topic: str) -> List[str]:
             # Keep only parts with enough substance
             valid = [p for p in parts if len(p) >= 4]
             if valid:
-                logger.debug("[CAPABILITY] Normalized '%s' → %s", topic, valid)
+                logger.debug("[CAPABILITY] Normalized '%s' -> %s", topic, valid)
                 return valid
     return [t]
 
@@ -169,7 +169,7 @@ class CapabilityGraph:
                     (name, meta.get("source_topic", ""), meta.get("acquired", datetime.now().isoformat())),
                 )
                 if cursor.rowcount > 0:
-                    # New capability — insert deps too
+                    # New capability -- insert deps too
                     cap_id = cursor.lastrowid
                     for req in meta.get("requires", []):
                         conn.execute(
@@ -240,7 +240,7 @@ class CapabilityGraph:
         # Flush to disk immediately after each add so crashes lose at most one entry
         self._save()
 
-        # Notify listeners — iterate over snapshot to avoid mutation during iteration
+        # Notify listeners -- iterate over snapshot to avoid mutation during iteration
         event = {
             "name": key,
             "source_topic": source_topic,
@@ -340,7 +340,7 @@ class CapabilityGraph:
             except (IndexError, ValueError):
                 pass
 
-        print(f"[CAPABILITY] Updated from strategy on '{topic}' — total: {len(self.capabilities)}")
+        print(f"[CAPABILITY] Updated from strategy on '{topic}' -- total: {len(self.capabilities)}")
 
     async def update_from_strategy_async(self, topic: str, strategy: str):
         """Async-safe version of update_from_strategy.
@@ -360,7 +360,7 @@ class CapabilityGraph:
             except (IndexError, ValueError):
                 pass
 
-        logger.info("[CAPABILITY] Updated from strategy on '%s' — total: %d", topic, len(self.capabilities))
+        logger.info("[CAPABILITY] Updated from strategy on '%s' -- total: %d", topic, len(self.capabilities))
 
     def resolve_dependencies(self, capability_name: str) -> List[str]:
         """Return all recursive dependencies for a capability, avoiding cycles."""
@@ -550,7 +550,7 @@ class CapabilityGraph:
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:
         """React to CognitionCore environment events.
 
-        CapabilityGraph is the skill ledger — it registers new capabilities
+        CapabilityGraph is the skill ledger -- it registers new capabilities
         when skills are certified and marks progress for GoalEngine.
         """
         if event_type == "skill_certified":

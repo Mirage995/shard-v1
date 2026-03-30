@@ -1,4 +1,4 @@
-"""Strategy Memory — Persistent storage of successful learning strategies.
+"""Strategy Memory -- Persistent storage of successful learning strategies.
 
 Stores strategies that worked during sandbox experiments so SHARD can
 reuse successful methods in future studies. Uses ChromaDB for persistence
@@ -19,13 +19,13 @@ logger = logging.getLogger("shard.strategy_memory")
 
 class StrategyMemory:
     def __init__(self):
-        # Usa il singleton db_manager — elimina il secondo client ChromaDB indipendente
+        # Usa il singleton db_manager -- elimina il secondo client ChromaDB indipendente
         self.collection = get_collection(
             DB_PATH_STRATEGY_DB,
             name="strategy_memory",
             metadata={"description": "Successful learning strategies from experiments"}
         )
-        # One writer at a time — prevents concurrent NightRunner/SessionOrchestrator races
+        # One writer at a time -- prevents concurrent NightRunner/SessionOrchestrator races
         self._lock = asyncio.Lock()
         print(f"[STRATEGY] Memory initialized ({self.collection.count()} strategies stored)")
 
@@ -65,7 +65,7 @@ class StrategyMemory:
         except Exception:
             pass  # keep initial values on any collection error
 
-        print(f"[STRATEGY] Updated stats → runs={runs} avg={avg_score} success={success_rate}")
+        print(f"[STRATEGY] Updated stats -> runs={runs} avg={avg_score} success={success_rate}")
 
         self.collection.add(
             documents=[strategy],
@@ -108,6 +108,94 @@ class StrategyMemory:
         )
         print(f"[STRATEGY] Stored Strategy object '{strategy.name}' (id={strategy.id})")
 
+    @staticmethod
+    def extract_from_diff(diff: str) -> str | None:
+        """Extract an actionable strategy string from a code diff.
+
+        Heuristic pattern matching -- covers the most common benchmark fix patterns.
+        Returns a short actionable string or None if no pattern matched.
+        """
+        d = diff.lower()
+
+        if "rlock" in d and ("lock(" in d or "threading" in d):
+            return "Replace Lock with RLock for re-entrant locking"
+        if (
+            "_calibrated" in d
+            or '"calibrated"' in d
+            or "not in r" in d
+            or ("idempot" in d and "return" in d)
+            or ("already" in d and ("processed" in d or "calibrat" in d or "applied" in d))
+        ):
+            return "Add idempotency guard: check flag before applying transformation, skip if already done"
+        if "deepcopy" in d or ("copy(" in d and ("import copy" in d or "from copy" in d)):
+            return "Avoid mutation by deepcopying input before applying transformations"
+        if "sorted(" in d and ("lock" in d or "acquire" in d):
+            return "Acquire locks in sorted order by ID to prevent circular waits and deadlock"
+        if "\\b" in d and ("regex" in d or "re." in d or "pattern" in d):
+            return "Use conditional word boundaries in regex: \\b for alphanumeric tokens only, not punctuation tags"
+        if "(?<!" in d or "(?!" in d:
+            return "Use negative lookaround in regex to exclude escaped sequences like {{ }}"
+        if "ttl" in d and ("expired" in d or "evict" in d or "expir" in d):
+            return "Check TTL expiry on cache read not only on write -- evict stale entries before returning"
+        if "thread" in d and ("lock" in d or "join" in d or "semaphore" in d):
+            return "Use threading.Lock to protect shared state accessed from multiple threads"
+        if "range(len(" in d and ("- 1)" in d or "-1)" in d):
+            return "Add boundary guard: iterate range(len(data)-1) when accessing consecutive elements to avoid IndexError"
+        if "range(1," in d and "len(" in d:
+            return "Exclude first and last elements from range when checking neighbors to avoid out-of-bounds access"
+        if "split(" in d and (", 1)" in d or "maxsplit" in d):
+            return "Use split with maxsplit=1 to handle values containing the delimiter character"
+        if ".strip()" in d and ("key" in d or "value" in d or "parse" in d or "token" in d):
+            return "Strip whitespace from parsed tokens before use to avoid key mismatch on padded input"
+        if ".get(" in d and ("default" in d or "none" in d or "config" in d or "key" in d):
+            return "Use dict.get() with a default instead of direct key access to avoid KeyError on missing keys"
+        if "startswith(" in d and ("#" in d or "comment" in d):
+            return "Skip empty and comment lines when parsing line-by-line input"
+        if "isinstance(" in d and ("dict" in d or "list" in d or "str" in d or "int" in d):
+            return "Add type guard with isinstance() before accessing type-specific attributes or keys"
+        if "sorted(" in d and "id" in d:
+            return "Sort items by ID before processing to ensure consistent ordering"
+
+        return None
+
+    def store_from_benchmark(
+        self,
+        task_key: str,
+        prev_code: str,
+        winning_code: str,
+        attempts_used: int,
+    ) -> None:
+        """Extract and store a strategy from a benchmark victory diff.
+
+        Called at VICTORY time in benchmark_loop. Diffs last failed attempt vs
+        winning code to find what actually changed. Only stores on pattern match.
+        """
+        import difflib
+        diff = "\n".join(
+            difflib.unified_diff(
+                prev_code.splitlines(),
+                winning_code.splitlines(),
+                lineterm="",
+                n=0,
+            )
+        )
+        strategy_text = self.extract_from_diff(diff)
+        if not strategy_text:
+            # Log first 200 chars of diff to diagnose missing patterns
+            diff_preview = diff[:200].replace('\n', ' ')
+            print(f"  [strategy] No pattern matched for '{task_key}' | diff: {diff_preview}")
+            return
+
+        # Score heuristic: faster victories = higher confidence
+        score = max(5.0, round(10.0 - (attempts_used - 1) * 1.5, 1))
+        self.store_strategy(
+            topic=f"benchmark:{task_key}",
+            strategy=strategy_text,
+            outcome="success",
+            score=score,
+        )
+        print(f"  [strategy] Stored from diff: '{strategy_text}' (score={score})")
+
     def query(self, topic: str, k: int = 3) -> List[Dict]:
         """Retrieve the most relevant strategies for a topic (sync)."""
         if self.collection.count() == 0:
@@ -131,11 +219,11 @@ class StrategyMemory:
         return strategies
 
     async def query_async(self, topic: str, k: int = 3) -> List[Dict]:
-        """Async wrapper — non blocca l'event loop durante la query ChromaDB."""
+        """Async wrapper -- non blocca l'event loop durante la query ChromaDB."""
         return await asyncio.to_thread(self.query, topic, k)
 
     async def store_strategy_async(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
-        """Async-safe write — serialises concurrent NightRunner/SessionOrchestrator calls."""
+        """Async-safe write -- serialises concurrent NightRunner/SessionOrchestrator calls."""
         async with self._lock:
             await asyncio.to_thread(self.store_strategy, topic, strategy, outcome, score)
 
@@ -208,12 +296,38 @@ class StrategyMemory:
             ids = existing.get("ids", [])
             if ids:
                 self.collection.delete(ids=ids)
-                print(f"[STRATEGY] PIVOT: cleared {len(ids)} strateg{'y' if len(ids)==1 else 'ies'} for '{topic}' — forcing new approach")
+                print(f"[STRATEGY] PIVOT: cleared {len(ids)} strateg{'y' if len(ids)==1 else 'ies'} for '{topic}' -- forcing new approach")
                 return len(ids)
             return 0
         except Exception as exc:
             print(f"[STRATEGY] PIVOT failed for '{topic}': {exc}")
             return 0
+
+    # ── Strategy quality filters ──────────────────────────────────────────────
+
+    @staticmethod
+    def _is_noise(text: str) -> bool:
+        """True if text is a session log / KB artifact -- not an actionable strategy."""
+        t = text.lower()
+        noise_markers = [
+            "sandbox:", "success --", "traceback", "concepts:",
+            "gaps identified:", "focus on:", "stdout", "output:",
+            "code executed", "failed to", "docker",
+        ]
+        return any(m in t for m in noise_markers)
+
+    @staticmethod
+    def _looks_actionable(text: str) -> bool:
+        """True if text contains action verbs and is short enough to be a directive."""
+        if len(text) < 20 or len(text) > 300:
+            return False
+        action_verbs = [
+            "use ", "replace ", "add ", "ensure ", "avoid ",
+            "check ", "return ", "wrap ", "initialize ", "apply ",
+            "acquire ", "sort ", "copy ", "deepcopy", "guard",
+        ]
+        t = text.lower()
+        return any(v in t for v in action_verbs)
 
     @staticmethod
     def extract_strategy(experiment: Dict) -> Optional[Dict]:
@@ -263,12 +377,12 @@ class StrategyMemory:
         if sandbox:
             code = sandbox.get("code", "")
             if sandbox.get("success"):
-                parts.append(f"Sandbox: SUCCESS — code executed without errors")
+                parts.append(f"Sandbox: SUCCESS -- code executed without errors")
                 if sandbox.get("stdout"):
                     parts.append(f"Output: {sandbox['stdout'][:200]}")
             else:
                 stderr = sandbox.get("stderr", "")
-                parts.append(f"Sandbox: FAILED — {stderr[:150]}")
+                parts.append(f"Sandbox: FAILED -- {stderr[:150]}")
 
         # Evaluation insights
         stance = eval_data.get("shard_stance", "")
@@ -284,6 +398,11 @@ class StrategyMemory:
 
         strategy = f"[{topic}] " + " | ".join(parts)
         outcome = "success" if verdict == "PASS" else "failure"
+
+        # Quality gate: reject log artefacts and non-actionable blobs
+        if StrategyMemory._is_noise(strategy) or not StrategyMemory._looks_actionable(strategy):
+            print(f"[STRATEGY] Rejected low-quality strategy (noise/not actionable): '{strategy[:80]}'")
+            return None
 
         return {
             "strategy": strategy[:1200],  # Cap to 1200 chars (same as memory gate)

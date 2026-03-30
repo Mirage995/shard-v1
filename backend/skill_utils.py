@@ -63,7 +63,7 @@ def is_valid_topic(topic: str) -> bool:
         return False
 
     # Reject markdown headers and task-description strings
-    # e.g. "# Task 04 — Fix the Banking Module", "## Fix the X"
+    # e.g. "# Task 04 -- Fix the Banking Module", "## Fix the X"
     if t.startswith("#"):
         return False
 

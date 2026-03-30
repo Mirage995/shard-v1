@@ -1,14 +1,14 @@
-"""diagnostic_learning.py — Sole writer of diagnostic weights for SHARD.
+"""diagnostic_learning.py -- Sole writer of diagnostic weights for SHARD.
 
 Separation of concerns:
-  diagnostic_layer.py    → classifies failure type
-  diagnostic_learning.py → learns which classifiers are effective  ← HERE
-  signal_gate.py         → reads weights + filters signals
-  benchmark_loop.py      → orchestrates, delegates
+  diagnostic_layer.py    -> classifies failure type
+  diagnostic_learning.py -> learns which classifiers are effective  <- HERE
+  signal_gate.py         -> reads weights + filters signals
+  benchmark_loop.py      -> orchestrates, delegates
 
 Update rule (fixed LR, no confidence scaling for now):
-  success → weight += 0.05
-  failure → weight -= 0.03   (softer penalty)
+  success -> weight += 0.05
+  failure -> weight -= 0.03   (softer penalty)
   clamp:    weight in [0.5, 2.0]
 
 One update per run at end-of-run. Duplicates are deduplicated before update.
@@ -64,13 +64,13 @@ def update_weights(diagnostics_triggered: list[dict], success: bool) -> None:
 
     Args:
         diagnostics_triggered: list of dicts with key "type" (e.g. "DEADLOCK").
-            Duplicates are deduplicated — each type counted once per run.
+            Duplicates are deduplicated -- each type counted once per run.
         success: True if VICTORY, False if FAILED.
     """
     if not diagnostics_triggered:
         return
 
-    # Dedup — each diagnostic type counts once per run
+    # Dedup -- each diagnostic type counts once per run
     seen = {}
     for entry in diagnostics_triggered:
         name = entry.get("type", "").strip().upper()

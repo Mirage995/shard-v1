@@ -1,5 +1,5 @@
 """
-repomix_bridge.py — SHARD integration layer for Repomix.
+repomix_bridge.py -- SHARD integration layer for Repomix.
 
 Packs any GitHub repo (or local path) into a single AI-friendly string
 using `npx repomix`, ready to be injected into SHARD's context.
@@ -31,7 +31,7 @@ def ingest_repo(url_or_path: str, output_format: str = "xml", timeout: int = 120
     Raises:
         RepomixError: If npx is not installed, repo not found, or repomix fails.
     """
-    # On Windows, npx is npx.cmd — check both
+    # On Windows, npx is npx.cmd -- check both
     npx_cmd = shutil.which("npx") or shutil.which("npx.cmd")
     if npx_cmd is None:
         raise RepomixError(

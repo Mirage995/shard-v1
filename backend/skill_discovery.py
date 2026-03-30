@@ -1,14 +1,14 @@
-"""Automatic Skill Discovery — Pattern-based skill detection from strategies.
+"""Automatic Skill Discovery -- Pattern-based skill detection from strategies.
 
 Analyzes successful strategy text to discover implicit skills via keyword
-matching. No LLM calls — purely lightweight pattern detection.
+matching. No LLM calls -- purely lightweight pattern detection.
 Discovered skills are registered in the CapabilityGraph.
 """
 import re
 from typing import Dict, List
 
 
-# Default keyword → skill mapping
+# Default keyword -> skill mapping
 DEFAULT_PATTERN_MAP: Dict[str, str] = {
     "numpy": "numerical_computation",
     "pandas": "data_manipulation",
@@ -93,6 +93,6 @@ class SkillDiscovery:
                 new_skills.append(skill)
 
         if not new_skills and skills:
-            print(f"[SKILL DISCOVERY] No new skills — {len(skills)} already known")
+            print(f"[SKILL DISCOVERY] No new skills -- {len(skills)} already known")
 
         return new_skills

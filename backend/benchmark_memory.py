@@ -1,8 +1,8 @@
-"""benchmark_memory.py — Episodic memory for benchmark tasks.
+"""benchmark_memory.py -- Episodic memory for benchmark tasks.
 
 Persiste la storia di ogni sessione su disco. Quando il flag
 use_episodic_memory è attivo, SHARD inietta un Experience Summary
-nel primo prompt — così non ripete mai gli stessi errori.
+nel primo prompt -- così non ripete mai gli stessi errori.
 """
 import json
 import uuid
@@ -78,14 +78,14 @@ def build_experience_summary(episodes: list) -> str:
         return ""
 
     lines = [
-        f"╔═══ EPISODIC MEMORY — {len(episodes)} past session(s) for this exact task ═══╗",
+        f"╔═══ EPISODIC MEMORY -- {len(episodes)} past session(s) for this exact task ═══╗",
         "║  SHARD has already attempted this task. Study this history carefully.     ║",
         "╚═════════════════════════════════════════════════════════════════════════════╝",
         "",
     ]
 
     for i, ep in enumerate(episodes[-3:], 1):   # show last 3 sessions max
-        status = "✓ SUCCESS" if ep["success"] else f"✗ FAILED after {ep['total_attempts']} attempts"
+        status = "OK SUCCESS" if ep["success"] else f"FAIL FAILED after {ep['total_attempts']} attempts"
         lines.append(f"─── Session {i}  ({ep['timestamp'][:10]})  {status} ───")
 
         prev_passed: set = set()
@@ -112,24 +112,24 @@ def build_experience_summary(episodes: list) -> str:
                 lines.append(f"  Attempt {att['attempt']} [{mode}]: {p} passed / {f} failed")
             if att["failed"] and att.get("error_summary"):
                 excerpt = att["error_summary"][:300].replace("\n", " ").strip()
-                lines.append(f"    → {excerpt}")
+                lines.append(f"    -> {excerpt}")
 
         if regressions:
-            lines.append("  ⚠ REGRESSIONS (had it, then broke it):")
+            lines.append("  [WARN] REGRESSIONS (had it, then broke it):")
             for att_n, lost in regressions:
                 lines.append(f"    Attempt {att_n} lost: {', '.join(lost)}")
 
         never = sorted(all_failed - all_passed)
         if never:
-            lines.append(f"  ✗ Never solved: {', '.join(never)}")
+            lines.append(f"  FAIL Never solved: {', '.join(never)}")
 
         if ep.get("winning_hint"):
-            lines.append(f"  ✓ What worked: {ep['winning_hint']}")
+            lines.append(f"  OK What worked: {ep['winning_hint']}")
 
         lines.append("")
 
     lines += [
-        "CRITICAL — learn from the above before writing a single line of code:",
+        "CRITICAL -- learn from the above before writing a single line of code:",
         "  • Do NOT repeat any approach that failed in a previous session.",
         "  • If you previously fixed some tests but regressed others, identify",
         "    the exact regression and fix it WITHOUT touching what was working.",

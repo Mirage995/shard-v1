@@ -1,5 +1,5 @@
 """
-api_validator.py — Input validation pipeline for an internal API server.
+api_validator.py -- Input validation pipeline for an internal API server.
 Validates and sanitizes user registration + request payloads before processing.
 """
 import re

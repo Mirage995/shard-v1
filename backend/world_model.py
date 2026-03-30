@@ -1,11 +1,11 @@
-"""world_model.py — SHARD's model of the external software world.
+"""world_model.py -- SHARD's model of the external software world.
 
 Answers the question: "what actually matters out there?" so SHARD
 studies high-leverage skills instead of random topics.
 
 Two layers:
-  1. Static seed — curated 2026 software landscape relevance scores
-  2. Dynamic layer — updated as SHARD certifies topics (tracks what
+  1. Static seed -- curated 2026 software landscape relevance scores
+  2. Dynamic layer -- updated as SHARD certifies topics (tracks what
      it already knows vs what the world needs)
 
 Influences:
@@ -19,7 +19,7 @@ File written:
 Usage:
     from world_model import WorldModel
     wm = WorldModel.load_or_default()
-    print(wm.relevance("asyncio and async patterns in python"))  # → 0.92
+    print(wm.relevance("asyncio and async patterns in python"))  # -> 0.92
     wm.mark_known("asyncio and async patterns in python", score=8.5)
     gaps = wm.priority_gaps(known_skills={"numpy", "asyncio"})
 """
@@ -37,7 +37,7 @@ _WORLD_MODEL_PATH = _MEMORY / "world_model.json"
 # relevance: 0.0–1.0 (how critical this skill is in real-world codebases)
 # xp_leverage: how much knowing this helps with adjacent skills
 _SEED: dict[str, dict] = {
-    # Python — core
+    # Python -- core
     "asyncio and async patterns in python":         {"relevance": 0.95, "domain": "python", "xp_leverage": 1.4},
     "python generators and coroutines":             {"relevance": 0.88, "domain": "python", "xp_leverage": 1.3},
     "python typing system and generics":            {"relevance": 0.85, "domain": "python", "xp_leverage": 1.2},
@@ -52,7 +52,7 @@ _SEED: dict[str, dict] = {
     "regular expressions in python":               {"relevance": 0.76, "domain": "python", "xp_leverage": 0.9},
     "json parsing and serialization python":        {"relevance": 0.77, "domain": "python", "xp_leverage": 0.9},
 
-    # Python — advanced
+    # Python -- advanced
     "numpy array operations and boolean indexing":  {"relevance": 0.90, "domain": "data_science", "xp_leverage": 1.3},
     "concurrent programming and thread safety python": {"relevance": 0.87, "domain": "python", "xp_leverage": 1.3},
     "memory management and optimization":           {"relevance": 0.83, "domain": "systems", "xp_leverage": 1.2},
@@ -86,7 +86,7 @@ _SEED: dict[str, dict] = {
     "go goroutines and channels":                   {"relevance": 0.78, "domain": "go", "xp_leverage": 1.2},
 }
 
-# Domain priority — how much SHARD should focus on each area
+# Domain priority -- how much SHARD should focus on each area
 _DOMAIN_PRIORITY = {
     "cs_fundamentals": 1.0,
     "python":          0.95,
@@ -107,8 +107,8 @@ class WorldModel:
     """SHARD's model of the external software world.
 
     Two layers:
-    - static seed (above) — curated by hand, never changes
-    - dynamic known_skills — updated as SHARD certifies topics
+    - static seed (above) -- curated by hand, never changes
+    - dynamic known_skills -- updated as SHARD certifies topics
     """
 
     def __init__(self, data: dict):
@@ -134,7 +134,7 @@ class WorldModel:
         entry = self._data["skills"].get(skill.lower())
         if entry:
             return entry["relevance"]
-        # Fuzzy match — find the highest-relevance known skill that overlaps
+        # Fuzzy match -- find the highest-relevance known skill that overlaps
         best = 0.0
         skill_tokens = set(re.split(r"[\s\-_]+", skill.lower()))
         for known_skill, meta in self._data["skills"].items():
@@ -242,7 +242,7 @@ class WorldModel:
         elif event_type == "momentum_changed":
             new_momentum = data.get("new", "")
             if new_momentum == "stagnating":
-                # Re-calibrate with lower threshold — stagnation needs more signal, not less
+                # Re-calibrate with lower threshold -- stagnation needs more signal, not less
                 self.self_calibrate(min_experiments=5)
                 self.save()
 

@@ -11,8 +11,8 @@ logger = logging.getLogger("shard.core")
 # ── Constants (must match vad_logic.py) ───────────────────────────────────────
 FORMAT              = pyaudio.paInt16
 CHANNELS            = 1
-SEND_SAMPLE_RATE    = 16000   # mic → Gemini
-RECEIVE_SAMPLE_RATE = 24000   # Gemini → speakers
+SEND_SAMPLE_RATE    = 16000   # mic -> Gemini
+RECEIVE_SAMPLE_RATE = 24000   # Gemini -> speakers
 CHUNK_SIZE          = 1024
 
 MODEL = "models/gemini-2.5-flash-native-audio-preview-12-2025"
@@ -39,7 +39,7 @@ except ImportError:
 
 class ShardCore:
     """
-    SHARD V2 — modular entry point.
+    SHARD V2 -- modular entry point.
     Orchestrates AudioVideoIO + SessionOrchestrator + Gemini Live connection.
     """
 
@@ -108,7 +108,7 @@ class ShardCore:
 
     async def start_system(self, session_host=None):
         """Fire-and-forget: opens the Gemini Live session in a background task."""
-        logger.info("[SISTEMA] SHARD V2 starting — launching Gemini Live task.")
+        logger.info("[SISTEMA] SHARD V2 starting -- launching Gemini Live task.")
 
         self.main_task = asyncio.create_task(
             self._run_live_session(), name="live_session"
@@ -137,7 +137,7 @@ class ShardCore:
         """Opens the Gemini Live connection and runs all I/O tasks inside it.
 
         Implements exponential backoff reconnect:
-          1s → 2s → 4s → 8s → … → 30s (cap)
+          1s -> 2s -> 4s -> 8s -> ... -> 30s (cap)
         Logs [Gemini Voice] Connection lost / Reconnected messages.
         Stops cleanly when stop() sets _stop_requested=True.
         """
@@ -146,7 +146,7 @@ class ShardCore:
 
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            logger.error("[SISTEMA] GEMINI_API_KEY not set — cannot connect.")
+            logger.error("[SISTEMA] GEMINI_API_KEY not set -- cannot connect.")
             return
 
         client = genai.Client(
@@ -166,9 +166,9 @@ class ShardCore:
             live_config = self._build_live_config(types, system_instruction)
 
             if attempt == 1:
-                logger.info("[SISTEMA] Connecting to Gemini Live (%s)…", MODEL)
+                logger.info("[SISTEMA] Connecting to Gemini Live (%s)...", MODEL)
             else:
-                logger.info("[Gemini Voice] Reconnecting (attempt %d)…", attempt)
+                logger.info("[Gemini Voice] Reconnecting (attempt %d)...", attempt)
 
             try:
                 async with client.aio.live.connect(model=MODEL, config=live_config) as session:
@@ -181,7 +181,7 @@ class ShardCore:
                     backoff = self._RECONNECT_BASE  # reset on clean connect
                     self.audio_video_io.set_session(session)
 
-                    # Playback queue: Gemini audio → speakers
+                    # Playback queue: Gemini audio -> speakers
                     audio_in_queue: asyncio.Queue = asyncio.Queue()
 
                     # Wire audio response callback into the orchestrator
@@ -212,10 +212,10 @@ class ShardCore:
                         logger.info("[SISTEMA] Live session cancelled.")
                         _cancelled = True
                     except* Exception as eg:
-                        # At least one subtask died — log and fall through to reconnect
+                        # At least one subtask died -- log and fall through to reconnect
                         for exc in eg.exceptions:
                             logger.warning(
-                                "[Gemini Voice] Subtask error: %s — %s",
+                                "[Gemini Voice] Subtask error: %s -- %s",
                                 type(exc).__name__, exc,
                             )
                     finally:
@@ -229,7 +229,7 @@ class ShardCore:
                 return
             except Exception as e:
                 logger.warning(
-                    "[Gemini Voice] Connection error: %s — %s",
+                    "[Gemini Voice] Connection error: %s -- %s",
                     type(e).__name__, e,
                 )
 
@@ -237,7 +237,7 @@ class ShardCore:
             if self._stop_requested:
                 break
 
-            logger.info("[Gemini Voice] Connection lost. Reconnecting in %d seconds…", backoff)
+            logger.info("[Gemini Voice] Connection lost. Reconnecting in %d seconds...", backoff)
             try:
                 await asyncio.sleep(backoff)
             except asyncio.CancelledError:
@@ -245,7 +245,7 @@ class ShardCore:
 
             backoff = min(backoff * 2, self._RECONNECT_MAX)
 
-    # ── Outgoing: mic audio → Gemini ──────────────────────────────────────────
+    # ── Outgoing: mic audio -> Gemini ──────────────────────────────────────────
 
     async def _send_realtime(self, session):
         """Reads audio/video chunks from out_queue and sends them to the session."""
@@ -256,13 +256,13 @@ class ShardCore:
             except Exception as e:
                 logger.warning("[SEND] Error sending chunk: %s", e)
 
-    # ── Incoming: Gemini audio → speakers ─────────────────────────────────────
+    # ── Incoming: Gemini audio -> speakers ─────────────────────────────────────
 
     async def _play_audio(self, audio_in_queue: asyncio.Queue):
         """Plays audio bytes received from Gemini through the default output device.
 
         Implements half-duplex Deaf Mode: activates mic mute while audio is playing
-        and deactivates it 300 ms after the last chunk — preventing acoustic feedback
+        and deactivates it 300 ms after the last chunk -- preventing acoustic feedback
         loops when a soundbar or speaker is used as output.
         """
         stream = await asyncio.to_thread(
@@ -278,12 +278,12 @@ class ShardCore:
                     # Wait up to 300 ms for the next audio chunk.
                     data = await asyncio.wait_for(audio_in_queue.get(), timeout=0.3)
                 except asyncio.TimeoutError:
-                    # Queue empty for 300 ms → AI finished speaking → re-enable mic.
+                    # Queue empty for 300 ms -> AI finished speaking -> re-enable mic.
                     if self.audio_video_io._ai_speaking:
                         self.audio_video_io.set_ai_speaking(False)
                     continue
 
-                # First chunk of a new burst → mute the mic immediately.
+                # First chunk of a new burst -> mute the mic immediately.
                 if not self.audio_video_io._ai_speaking:
                     self.audio_video_io.set_ai_speaking(True)
 
@@ -299,7 +299,7 @@ class ShardCore:
             "Sei SHARD (System of Hybrid Autonomous Reasoning and Design). "
             "Sei l'AI personale del Boss Andrea. "
             "Rispondi sempre in italiano, in modo conciso e diretto. "
-            "Non usare metafore di fisica quantistica per descrivere te stesso — "
+            "Non usare metafore di fisica quantistica per descrivere te stesso -- "
             "usa termini informatici reali. "
             "Hai capacità visive tramite webcam."
         )

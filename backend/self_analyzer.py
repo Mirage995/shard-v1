@@ -1,4 +1,4 @@
-"""self_analyzer.py — SHARD's introspective analysis engine.
+"""self_analyzer.py -- SHARD's introspective analysis engine.
 
 Reads experiment history, failed cache, night reports, and capability graph
 to identify patterns of failure, near-misses, and capability gaps.
@@ -7,10 +7,10 @@ Produces ImprovementTickets consumed by improvement_engine.py.
 No LLM calls. No external dependencies. Fast enough to run at NightRunner startup.
 
 Ticket types and their meaning:
-  retry_chronic_failure  — topic failed 2+ times, avg score < 6.0, never certified
-  certify_near_miss      — topic stuck at 6.0–7.4, never crossed the certification bar
-  retry_grown            — topic is in failed_cache but SHARD has grown 15+ skills since
-  fill_capability_gap    — skill in DEFAULT_LEARNING_MAP not yet in capability_graph
+  retry_chronic_failure  -- topic failed 2+ times, avg score < 6.0, never certified
+  certify_near_miss      -- topic stuck at 6.0–7.4, never crossed the certification bar
+  retry_grown            -- topic is in failed_cache but SHARD has grown 15+ skills since
+  fill_capability_gap    -- skill in DEFAULT_LEARNING_MAP not yet in capability_graph
 """
 import json
 import logging
@@ -34,7 +34,7 @@ CHRONIC_FAILURE_MIN_EXPERIMENTS = 2      # need at least N attempts before flagg
 CHRONIC_FAILURE_MAX_AVG_SCORE   = 6.0   # avg below this = chronic failure
 NEAR_MISS_MIN_SCORE             = 6.0   # bottom of near-miss band
 NEAR_MISS_MAX_SCORE             = 7.4   # top of near-miss band (cert threshold = 7.5)
-GROWN_SKILLS_DELTA              = 15    # skills gained since failure → ready to retry
+GROWN_SKILLS_DELTA              = 15    # skills gained since failure -> ready to retry
 STAGNATION_SESSIONS             = 3     # look at last N sessions for stagnation
 STAGNATION_MAX_SKILLS_PER_SESSION = 2   # avg skills/session below this = stagnant
 
@@ -86,7 +86,7 @@ class AnalysisReport:
         if self.tickets:
             lines.append("  Top tickets:")
             for t in self.tickets[:5]:
-                lines.append(f"    [P{t.priority}] {t.ticket_type} — {t.topic!r}")
+                lines.append(f"    [P{t.priority}] {t.ticket_type} -- {t.topic!r}")
         return "\n".join(lines)
 
     def to_dict(self) -> dict:
@@ -114,7 +114,7 @@ class SelfAnalyzer:
 
     async def analyze(self) -> AnalysisReport:
         """Run full analysis and return a report with ranked ImprovementTickets."""
-        logger.info("[ANALYZER] Starting self-analysis…")
+        logger.info("[ANALYZER] Starting self-analysis...")
 
         experiments   = self._load_experiments()
         failed_cache  = self._load_failed_cache()
@@ -350,7 +350,7 @@ class SelfAnalyzer:
 
         if stagnating:
             logger.warning(
-                "[ANALYZER] Stagnation detected — avg %.1f skills/session over last %d sessions",
+                "[ANALYZER] Stagnation detected -- avg %.1f skills/session over last %d sessions",
                 avg_growth, STAGNATION_SESSIONS,
             )
         return stagnating, evidence
@@ -457,7 +457,7 @@ class SelfAnalyzer:
                     "New prerequisite knowledge available."
                 ),
                 suggested_action=(
-                    "Retry — SHARD's expanded skill set may unlock a better approach."
+                    "Retry -- SHARD's expanded skill set may unlock a better approach."
                 ),
                 metadata=gr,
             ))

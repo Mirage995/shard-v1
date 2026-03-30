@@ -1,4 +1,4 @@
-"""study_utils.py — Utility functions and types for the SHARD study pipeline.
+"""study_utils.py -- Utility functions and types for the SHARD study pipeline.
 
 Extracted from study_agent.py as part of SSJ3 Phase 1: Core Hardening.
 Import from here instead of study_agent to avoid loading the full agent.

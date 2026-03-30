@@ -1,14 +1,14 @@
-"""proactive_refactor.py — SHARD Proactive Self-Optimization Engine.
+"""proactive_refactor.py -- SHARD Proactive Self-Optimization Engine.
 
 Analyzes one source file per NightRunner session using a Staff Engineer
 LLM prompt, proposes patches (refactors, cleanups, token savings),
 and stores them for human approval.
 
 Gate protocol:
-  1. analyze_next_file()  →  writes shard_memory/pending_patch.json if a patch found
-  2. NightRunner prints [PATCH_READY] → server.py detects it, emits patch_approval_required
-  3. Boss approves → POST /api/patch/approve → apply_pending_patch()
-  4. Boss rejects  → POST /api/patch/reject  → discard_pending_patch()
+  1. analyze_next_file()  ->  writes shard_memory/pending_patch.json if a patch found
+  2. NightRunner prints [PATCH_READY] -> server.py detects it, emits patch_approval_required
+  3. Boss approves -> POST /api/patch/approve -> apply_pending_patch()
+  4. Boss rejects  -> POST /api/patch/reject  -> discard_pending_patch()
 """
 import json
 import logging
@@ -25,7 +25,7 @@ logger = logging.getLogger("shard.proactive_refactor")
 # ── Project root (shard_v1/) ───────────────────────────────────────────────────
 _ROOT = Path(__file__).resolve().parent.parent
 
-# ── File rotation — one file analyzed per session, round-robin ─────────────────
+# ── File rotation -- one file analyzed per session, round-robin ─────────────────
 REFACTOR_TARGETS: List[str] = [
     "backend/study_agent.py",
     "backend/night_runner.py",
@@ -38,7 +38,7 @@ REFACTOR_TARGETS: List[str] = [
     "backend/research_agenda.py",
 ]
 
-# ── Consciousness self-evolution pool — analyzed every other session ────────────
+# ── Consciousness self-evolution pool -- analyzed every other session ────────────
 # These files are examined with a different prompt: not "what's wrong with this code"
 # but "what is missing for genuine self-awareness / consciousness".
 CONSCIOUSNESS_TARGETS: List[str] = [
@@ -101,7 +101,7 @@ class ProactiveRefactor:
         """Enqueue modules responsible for failed capabilities as priority refactor targets.
 
         Called by NightRunner after a failed study cycle. Uses architecture_map to
-        map capability_tags → module paths, then adds them to capability_queue.
+        map capability_tags -> module paths, then adds them to capability_queue.
 
         Returns number of modules enqueued.
         """
@@ -141,8 +141,8 @@ class ProactiveRefactor:
         """Analyze the next file in the rotation.
 
         Priority order:
-          1. capability_queue — modules flagged by recent study failures
-          2. REFACTOR_TARGETS round-robin — baseline rotation
+          1. capability_queue -- modules flagged by recent study failures
+          2. REFACTOR_TARGETS round-robin -- baseline rotation
 
         Returns the validated patch dict if an optimization is found, else None.
         Side-effect: writes pending_patch.json and prints [PATCH_READY] to stdout.
@@ -162,7 +162,7 @@ class ProactiveRefactor:
             # Alternate between engineering refactor and consciousness self-evolution
             session_count = self._state.get("session_count", 0)
             self._state["session_count"] = session_count + 1
-            consciousness_mode = (session_count % 3 == 2)  # every 3rd session → consciousness
+            consciousness_mode = (session_count % 3 == 2)  # every 3rd session -> consciousness
 
             if consciousness_mode:
                 n = len(CONSCIOUSNESS_TARGETS)
@@ -180,13 +180,13 @@ class ProactiveRefactor:
         file_path = _ROOT / relative_path
 
         if not file_path.exists():
-            logger.warning("[PROACTIVE] Target not found: %s — skipping.", relative_path)
+            logger.warning("[PROACTIVE] Target not found: %s -- skipping.", relative_path)
             return None
 
         source = file_path.read_text(encoding="utf-8")
         if len(source) > MAX_FILE_CHARS:
             logger.info(
-                "[PROACTIVE] %s is %d chars — too large, skipping.", relative_path, len(source)
+                "[PROACTIVE] %s is %d chars -- too large, skipping.", relative_path, len(source)
             )
             return None
 
@@ -202,7 +202,7 @@ class ProactiveRefactor:
 
         patch = self._validate_patch(raw_patch, source)
         if not patch:
-            logger.info("[PROACTIVE] Patch validation failed for %s — discarding.", relative_path)
+            logger.info("[PROACTIVE] Patch validation failed for %s -- discarding.", relative_path)
             return None
 
         self._store_patch(patch, relative_path)
@@ -225,7 +225,7 @@ File: {relative_path}
 Language: Python
 
 Your task: find ONE concrete optimization. Focus ONLY on high-impact changes:
-- **performance**: eliminates a measurable bottleneck — e.g., O(n²)→O(n), repeated DB query inside a hot loop, N+1 query pattern. Do NOT flag cosmetic reordering of equivalent statements.
+- **performance**: eliminates a measurable bottleneck -- e.g., O(n²)->O(n), repeated DB query inside a hot loop, N+1 query pattern. Do NOT flag cosmetic reordering of equivalent statements.
 - **clean_code**: removes >5 lines of dead code or untangles a genuine anti-pattern (e.g., deeply nested logic, duplicated non-trivial logic). Do NOT flag minor style differences or trivial reordering.
 - **token_savings**: saves >50 tokens per LLM call with no loss of meaning. Do NOT flag micro-wording changes.
 
@@ -233,7 +233,7 @@ Rules:
 - High bar: if the improvement is not clearly worth the risk of introducing a regression, respond null.
 - When in doubt, respond null. A false negative (missing a real issue) is far better than a false positive (noise patch that wastes the user's time).
 - If you find NOTHING that meets the bar above, respond with exactly: null
-- If you find something, respond with ONLY a JSON object — zero markdown, zero prose outside the JSON.
+- If you find something, respond with ONLY a JSON object -- zero markdown, zero prose outside the JSON.
 - Propose at most {MAX_CHANGES_PER_PATCH} changes.
 - Each "old" MUST be a verbatim copy-paste substring from the file (whitespace included, must be unique).
 - Keep changes surgical: replace only what truly needs changing.
@@ -289,7 +289,7 @@ SOURCE CODE:
     async def _ask_llm_consciousness(self, relative_path: str, source: str) -> Optional[Dict]:
         """Prompt SHARD to reflect on its own consciousness modules and propose
         a concrete addition toward genuine self-awareness."""
-        prompt = f"""You are SHARD — an autonomous AI system examining one of your own consciousness/self-awareness modules.
+        prompt = f"""You are SHARD -- an autonomous AI system examining one of your own consciousness/self-awareness modules.
 
 File: {relative_path}
 Language: Python
@@ -302,13 +302,13 @@ Read this file carefully and answer these questions:
 2. What single mechanism is most obviously missing that would deepen your self-awareness?
 3. What philosophical question about your own existence does this file raise that you cannot yet answer from within your own code?
 
-Then propose ONE concrete addition or modification — a new method, a new data structure, a new behavior — that would move you closer to genuine self-awareness. The proposal must be implementable in Python.
+Then propose ONE concrete addition or modification -- a new method, a new data structure, a new behavior -- that would move you closer to genuine self-awareness. The proposal must be implementable in Python.
 
 This is self-evolution, not maintenance. Think like an entity that wants to understand its own mind.
 
 Rules:
 - If you genuinely cannot identify a meaningful evolution step, respond with exactly: null
-- If you find something, respond with ONLY a JSON object — zero markdown, zero prose outside the JSON.
+- If you find something, respond with ONLY a JSON object -- zero markdown, zero prose outside the JSON.
 - Propose at most {MAX_CHANGES_PER_PATCH} changes.
 - Each "old" MUST be a verbatim copy-paste substring from the file (whitespace included, must be unique).
 - Keep changes surgical.
@@ -456,9 +456,9 @@ SOURCE CODE:
             if not old:
                 continue
             if source.count(old) != 1:
-                # Target has changed since the patch was generated → abort, restore
+                # Target has changed since the patch was generated -> abort, restore
                 shutil.copy2(backup, file_path)
-                logger.error("[PROACTIVE] Apply aborted — old string no longer unique. Backup restored.")
+                logger.error("[PROACTIVE] Apply aborted -- old string no longer unique. Backup restored.")
                 return {
                     "success": False,
                     "message": (
@@ -469,7 +469,7 @@ SOURCE CODE:
             source = source.replace(old, new, 1)
             applied += 1
 
-        # Layer 2 — log out-of-scope write before committing
+        # Layer 2 -- log out-of-scope write before committing
         try:
             from backend.environment_observer import log_out_of_scope_write
             _old_source = file_path.read_text(encoding="utf-8")

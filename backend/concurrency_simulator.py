@@ -1,4 +1,4 @@
-"""concurrency_simulator.py — Pre-pytest stress test for concurrency bugs.
+"""concurrency_simulator.py -- Pre-pytest stress test for concurrency bugs.
 
 Run AFTER code generation, BEFORE pytest, on concurrency-sensitive tasks.
 Executes generated code under heavy thread stress in an isolated subprocess.
@@ -8,7 +8,7 @@ Integration point: benchmark_loop.py calls `probe_concurrency()` when the task
 is detected as concurrency-sensitive (README or test file contains threading keywords).
 
 Example output injected into repair prompt:
-    ⚡ CONCURRENCY PROBE — Race condition detected in Bank.deposit():
+    ⚡ CONCURRENCY PROBE -- Race condition detected in Bank.deposit():
        Expected balance: 50000.00, Got: 49870.00 (lost: 130.00)
        Probe: 50 threads × 100 deposits × $10 = $50000 expected
        Hint: use threading.Lock() or RLock to protect balance updates.
@@ -93,7 +93,7 @@ def probe_deposits():
         _sys.setswitchinterval(old)
 
     if alive:
-        errors.append("PROBE_DEPOSITS: TIMEOUT — threads still alive after 15s")
+        errors.append("PROBE_DEPOSITS: TIMEOUT -- threads still alive after 15s")
         return
 
     expected = n_threads * n_deposits * amount
@@ -139,7 +139,7 @@ def probe_conservation():
         _sys.setswitchinterval(old)
 
     if alive:
-        errors.append("PROBE_CONSERVATION: TIMEOUT — possible deadlock")
+        errors.append("PROBE_CONSERVATION: TIMEOUT -- possible deadlock")
         return
 
     total_after = bank.total_funds()
@@ -222,9 +222,9 @@ def _run_bank_probes(code_path: Path, class_name: str) -> list[str]:
         lines = (result.stdout + result.stderr).strip().splitlines()
         return [l.strip() for l in lines if l.strip()]
     except subprocess.TimeoutExpired:
-        return ["PROBE: GLOBAL TIMEOUT — simulator exceeded 60s"]
+        return ["PROBE: GLOBAL TIMEOUT -- simulator exceeded 60s"]
     except Exception as e:
-        return [f"PROBE: RUNNER ERROR — {e}"]
+        return [f"PROBE: RUNNER ERROR -- {e}"]
     finally:
         try:
             Path(tmp_path).unlink()
@@ -255,7 +255,7 @@ def probe_concurrency(
     """Run concurrency probes on generated code.
 
     Called by benchmark_loop after writing the file, before running pytest.
-    Returns ConcurrencyReport — if triggered=False, no probes ran (task not concurrent).
+    Returns ConcurrencyReport -- if triggered=False, no probes ran (task not concurrent).
 
     Args:
         code:         Generated Python source code (as string).
@@ -269,7 +269,7 @@ def probe_concurrency(
             summary="", details=[],
         )
 
-    logger.info("[CONC_SIM] Concurrency task detected — running probes on %s", code_path.name)
+    logger.info("[CONC_SIM] Concurrency task detected -- running probes on %s", code_path.name)
 
     # Bank-style probe
     if is_bank_like(tests_source):

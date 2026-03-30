@@ -2394,5 +2394,359 @@
     ],
     "acquired": "2026-03-27T16:23:15.894402",
     "source_topic": "tcp socket programming python"
+  },
+  "socket concepts and protocols theory": {
+    "requires": [],
+    "acquired": "2026-03-27T18:10:28.785788",
+    "source_topic": "socket concepts and protocols theory"
+  },
+  "client-server model": {
+    "requires": [
+      "socket concepts and protocols theory"
+    ],
+    "acquired": "2026-03-27T18:10:28.795422",
+    "source_topic": "socket concepts and protocols theory"
+  },
+  "stream socket": {
+    "requires": [
+      "socket concepts and protocols theory"
+    ],
+    "acquired": "2026-03-27T18:10:28.804288",
+    "source_topic": "socket concepts and protocols theory"
+  },
+  "datagram socket": {
+    "requires": [
+      "socket concepts and protocols theory"
+    ],
+    "acquired": "2026-03-27T18:10:28.811839",
+    "source_topic": "socket concepts and protocols theory"
+  },
+  "http request parsing python": {
+    "requires": [],
+    "acquired": "2026-03-27T18:15:45.379586",
+    "source_topic": "http request parsing python"
+  },
+  "multiprocessing and process pools python": {
+    "requires": [],
+    "acquired": "2026-03-27T18:18:33.383188",
+    "source_topic": "multiprocessing and process pools python"
+  },
+  "process pool": {
+    "requires": [
+      "multiprocessing and process pools python"
+    ],
+    "acquired": "2026-03-27T18:18:33.393468",
+    "source_topic": "multiprocessing and process pools python"
+  },
+  "inter-process communication (ipc)": {
+    "requires": [
+      "multiprocessing and process pools python"
+    ],
+    "acquired": "2026-03-27T18:18:33.401146",
+    "source_topic": "multiprocessing and process pools python"
+  },
+  "global interpreter lock (gil)": {
+    "requires": [
+      "multiprocessing and process pools python"
+    ],
+    "acquired": "2026-03-27T18:18:33.408947",
+    "source_topic": "multiprocessing and process pools python"
+  },
+  "event driven architecture patterns python": {
+    "requires": [],
+    "acquired": "2026-03-27T18:23:08.203322",
+    "source_topic": "event driven architecture patterns python"
+  },
+  "event-driven architecture (eda)": {
+    "requires": [
+      "event driven architecture patterns python"
+    ],
+    "acquired": "2026-03-27T18:23:08.213311",
+    "source_topic": "event driven architecture patterns python"
+  },
+  "message bus": {
+    "requires": [
+      "event driven architecture patterns python"
+    ],
+    "acquired": "2026-03-27T18:23:08.221716",
+    "source_topic": "event driven architecture patterns python"
+  },
+  "event handlers": {
+    "requires": [
+      "event driven architecture patterns python"
+    ],
+    "acquired": "2026-03-27T18:23:08.229963",
+    "source_topic": "event driven architecture patterns python"
+  },
+  "asynchronous messaging": {
+    "requires": [
+      "event driven architecture patterns python"
+    ],
+    "acquired": "2026-03-27T18:23:08.238337",
+    "source_topic": "event driven architecture patterns python"
+  },
+  "concurrent programming threading python": {
+    "requires": [],
+    "acquired": "2026-03-27T18:33:28.623346",
+    "source_topic": "concurrent programming threading python"
+  },
+  "i/o-bound tasks": {
+    "requires": [
+      "concurrent programming threading python"
+    ],
+    "acquired": "2026-03-27T18:33:28.633310",
+    "source_topic": "concurrent programming threading python"
+  },
+  "network protocol design patterns": {
+    "requires": [],
+    "acquired": "2026-03-27T18:47:13.185427",
+    "source_topic": "network protocol design patterns"
+  },
+  "git internals object model": {
+    "requires": [],
+    "acquired": "2026-03-27T18:50:45.758668",
+    "source_topic": "git internals object model"
+  },
+  "message queue design patterns python": {
+    "requires": [],
+    "acquired": "2026-03-27T19:04:01.765969",
+    "source_topic": "message queue design patterns python"
+  },
+  "redis data structures implementation python": {
+    "requires": [],
+    "acquired": "2026-03-27T19:18:15.018069",
+    "source_topic": "redis data structures implementation python"
+  },
+  "lexical analysis (lexing)": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-28T12:25:10.261736",
+    "source_topic": "template parser handling and debugging"
+  },
+  "syntax analysis (parsing)": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-03-28T12:25:10.274968",
+    "source_topic": "template parser handling and debugging"
+  },
+  "checked exceptions": {
+    "requires": [
+      "integration of custom exceptions and optimization techniques"
+    ],
+    "acquired": "2026-03-28T13:48:31.619001",
+    "source_topic": "Integration of custom exceptions and optimization techniques"
+  },
+  "unchecked exceptions": {
+    "requires": [
+      "integration of custom exceptions and optimization techniques"
+    ],
+    "acquired": "2026-03-28T13:48:31.630690",
+    "source_topic": "Integration of custom exceptions and optimization techniques"
+  },
+  "try-catch block": {
+    "requires": [
+      "integration of custom exceptions and optimization techniques"
+    ],
+    "acquired": "2026-03-28T13:48:31.647527",
+    "source_topic": "Integration of custom exceptions and optimization techniques"
+  },
+  "password hashing bcrypt argon2": {
+    "requires": [],
+    "acquired": "2026-03-28T14:45:30.706661",
+    "source_topic": "password hashing bcrypt argon2"
+  },
+  "finally block": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T14:48:15.914281",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "context managers": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T14:48:15.923323",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "try-except block": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T14:53:48.858744",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "exception hierarchy": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T14:53:48.866044",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "active record": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-28T18:32:40.016306",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "data validation": {
+    "requires": [
+      "sql injection prevention and input sanitization"
+    ],
+    "acquired": "2026-03-28T18:32:40.024598",
+    "source_topic": "sql injection prevention and input sanitization"
+  },
+  "try-except-finally blocks": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T18:35:54.020935",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "specific exception handling": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T18:35:54.029246",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "syntax errors": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T19:06:25.814602",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "runtime exceptions": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T19:06:25.825541",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "recurrence relation": {
+    "requires": [
+      "integration of dynamic content handling and dynamic programming memoization"
+    ],
+    "acquired": "2026-03-28T19:09:29.053193",
+    "source_topic": "Integration of dynamic content handling and dynamic programming memoization"
+  },
+  "state transition model": {
+    "requires": [
+      "integration of dynamic content handling and dynamic programming memoization"
+    ],
+    "acquired": "2026-03-28T19:09:29.066203",
+    "source_topic": "Integration of dynamic content handling and dynamic programming memoization"
+  },
+  "heap data structure": {
+    "requires": [],
+    "acquired": "2026-03-28T19:17:18.744602",
+    "source_topic": "Integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+  },
+  "priority queue and implementazione python da zero di un perceptron": {
+    "requires": [],
+    "acquired": "2026-03-28T19:17:18.755236",
+    "source_topic": "Integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+  },
+  "priority queue": {
+    "requires": [
+      "integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+    ],
+    "acquired": "2026-03-28T19:17:18.764938",
+    "source_topic": "Integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+  },
+  "heapq module": {
+    "requires": [
+      "integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+    ],
+    "acquired": "2026-03-28T19:17:18.775039",
+    "source_topic": "Integration of heap data structure and priority queue and implementazione python da zero di un perceptron"
+  },
+  "resource cleanup": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T19:48:57.009844",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "error codes": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T19:52:37.652288",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "circuit breaker": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-28T22:48:08.304762",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "half-open state": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-28T22:48:08.313091",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "failure threshold": {
+    "requires": [
+      "circuit breaker pattern python"
+    ],
+    "acquired": "2026-03-28T22:48:08.320760",
+    "source_topic": "circuit breaker pattern python"
+  },
+  "dependent task": {
+    "requires": [
+      "integration of dependency management and sorted data prerequisite"
+    ],
+    "acquired": "2026-03-28T22:52:26.708908",
+    "source_topic": "Integration of dependency management and sorted data prerequisite"
+  },
+  "linear mixed models (lmms)": {
+    "requires": [
+      "integration of dependency management and sorted data prerequisite"
+    ],
+    "acquired": "2026-03-28T22:52:26.751020",
+    "source_topic": "Integration of dependency management and sorted data prerequisite"
+  },
+  "fixed effects": {
+    "requires": [
+      "integration of dependency management and sorted data prerequisite"
+    ],
+    "acquired": "2026-03-28T22:52:26.786607",
+    "source_topic": "Integration of dependency management and sorted data prerequisite"
+  },
+  "multi-threading error handling": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T22:57:32.644155",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "try...except blocks": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T22:57:32.653499",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "pydantic validation": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T23:01:14.630474",
+    "source_topic": "Python Advanced Error Handling"
+  },
+  "multi-processing error handling": {
+    "requires": [
+      "python advanced error handling"
+    ],
+    "acquired": "2026-03-28T23:01:14.641409",
+    "source_topic": "Python Advanced Error Handling"
   }
 }

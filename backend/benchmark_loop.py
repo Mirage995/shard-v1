@@ -1,4 +1,4 @@
-"""benchmark_loop.py — Closed feedback loop for SHARD benchmark tasks.
+"""benchmark_loop.py -- Closed feedback loop for SHARD benchmark tasks.
 
 The core proof that LLM + SHARD > stateless LLM.
 
@@ -35,7 +35,7 @@ try:
 except ImportError:
     from backend.llm_router import llm_complete
 
-# -- Import swarm_engine (optional — degrades gracefully if absent) ------------
+# -- Import swarm_engine (optional -- degrades gracefully if absent) ------------
 try:
     from swarm_engine import swarm_complete
 except ImportError:
@@ -44,7 +44,7 @@ except ImportError:
     except ImportError:
         swarm_complete = None
 
-# -- Import concurrency_simulator (optional — degrades gracefully) -------------
+# -- Import concurrency_simulator (optional -- degrades gracefully) -------------
 try:
     from concurrency_simulator import probe_concurrency, format_for_prompt, is_concurrency_task
     _conc_sim_available = True
@@ -150,10 +150,10 @@ def _build_self_profile(task_key: str, lang: str) -> str:
     lang_available = probe.get(lang_tool, {}).get("available", False)
     lang_version   = probe.get(lang_tool, {}).get("version", "unknown")
 
-    env_status = f"READY ({lang_version})" if lang_available else "NOT AVAILABLE — expect runner errors"
+    env_status = f"READY ({lang_version})" if lang_available else "NOT AVAILABLE -- expect runner errors"
     sections.append(f"Runtime ({lang}): {env_status}")
 
-    # 2. Capability graph — count acquired nodes as proxy for knowledge breadth
+    # 2. Capability graph -- count acquired nodes as proxy for knowledge breadth
     try:
         cap_path = Path(__file__).resolve().parent.parent / "shard_memory" / "capability_graph.json"
         if cap_path.exists():
@@ -173,7 +173,7 @@ def _build_self_profile(task_key: str, lang: str) -> str:
     except Exception:
         pass
 
-    # 3. Benchmark episode history — success rate on similar tasks
+    # 3. Benchmark episode history -- success rate on similar tasks
     try:
         from benchmark_memory import load_episodes
         past = load_episodes(task_key)
@@ -188,11 +188,11 @@ def _build_self_profile(task_key: str, lang: str) -> str:
             # Warn if this task has a poor track record
             if n_total >= 2 and rate < 50:
                 sections.append(
-                    f"  WARNING: this task has been hard historically — "
+                    f"  WARNING: this task has been hard historically -- "
                     f"prioritize reading the failure history carefully"
                 )
         else:
-            sections.append(f"Episode history: no prior sessions for '{task_key}' — first attempt")
+            sections.append(f"Episode history: no prior sessions for '{task_key}' -- first attempt")
     except Exception:
         pass
 
@@ -252,6 +252,9 @@ class BenchmarkResult:
     elapsed_total: float
     kb_used: bool = False    # True if knowledge bridge injected context
     kb_chars: int = 0        # chars of KB context injected
+    strategy_activated: bool = False   # True if strategy signal entered top-3
+    strategy_score: float = 0.0        # gate score of strategy signal (0 if not present)
+    strategy_text: str = ""            # raw content of strategy signal (for diagnosis)
 
 
 # -- Prompt builders -----------------------------------------------------------
@@ -281,19 +284,19 @@ _SYSTEM_PROMPTS = {
         "You are a precise Python bug-fixing and refactoring agent. "
         "Output ONLY valid Python source code. "
         "No markdown fences, no explanations, no commentary. "
-        "Every function must be fully implemented — no ellipsis, no pass, no TODO."
+        "Every function must be fully implemented -- no ellipsis, no pass, no TODO."
     ),
     "javascript": (
         "You are a precise JavaScript/Node.js bug-fixing agent. "
         "Output ONLY valid JavaScript source code (CommonJS or ESM matching the input style). "
         "No markdown fences, no explanations, no commentary. "
-        "Every function must be fully implemented — no ellipsis, no TODO comments."
+        "Every function must be fully implemented -- no ellipsis, no TODO comments."
     ),
     "cpp": (
         "You are a precise C++ bug-fixing agent. "
         "Output ONLY valid C++17 source code. "
         "No markdown fences, no explanations, no commentary. "
-        "Every function must be fully implemented — no ellipsis, no TODO."
+        "Every function must be fully implemented -- no ellipsis, no TODO."
     ),
     "rust": (
         "You are a precise Rust bug-fixing agent. "
@@ -323,7 +326,7 @@ SYSTEM_PROMPT = _SYSTEM_PROMPTS["python"]
 def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
     """Derive 1-2 study topics from a failed benchmark task.
 
-    Uses the task name and failed test names as signals — no LLM call needed.
+    Uses the task name and failed test names as signals -- no LLM call needed.
     Topics are fed to NightRunner's improvement queue so the next night session
     studies exactly what the benchmark struggled with.
     """
@@ -333,9 +336,9 @@ def _derive_study_topics(task_key: str, readme: str, best_attempt) -> list:
     if task_key.startswith("shard_challenge"):
         return []
 
-    # Topic 1: from task name (e.g. "task_03_dirty_data" → "dirty data handling and validation")
+    # Topic 1: from task name (e.g. "task_03_dirty_data" -> "dirty data handling and validation")
     name_part = task_key.lower().replace("task_", "").strip()
-    # strip leading index number (e.g. "03_dirty_data" → "dirty data")
+    # strip leading index number (e.g. "03_dirty_data" -> "dirty data")
     parts = name_part.split("_", 1)
     if len(parts) == 2 and parts[0].isdigit():
         name_part = parts[1].replace("_", " ")
@@ -383,7 +386,7 @@ def _extract_multi_bug_list(readme: str) -> str:
             continue
         if in_table:
             if line.strip().startswith("|") and not re.match(r"\|[-| ]+\|", line):
-                # Data row — extract columns 2 and 3 (function + bug description)
+                # Data row -- extract columns 2 and 3 (function + bug description)
                 cols = [c.strip() for c in line.strip().strip("|").split("|")]
                 if len(cols) >= 3:
                     bug_lines.append(f"  - [{cols[0]}] {cols[1]}: {cols[2]}")
@@ -408,7 +411,7 @@ def _extract_multi_bug_list(readme: str) -> str:
     n = len(bug_lines)
     return (
         f"\n=== MULTI-BUG TASK: {n} bugs must ALL be fixed in one shot ===\n"
-        f"Do NOT wait for test failures to discover bugs — fix ALL of these simultaneously:\n"
+        f"Do NOT wait for test failures to discover bugs -- fix ALL of these simultaneously:\n"
         + "\n".join(bug_lines)
         + "\nApproach: identify every root cause first, then write the complete fixed file.\n"
     )
@@ -518,12 +521,12 @@ except Exception as e:
         cand_ms = data["cand_ms"]
         speedup = data["speedup"]
         target_met = pct >= 30
-        status = "✓ TARGET MET" if target_met else "✗ TARGET NOT MET (need ≥30%)"
+        status = "OK TARGET MET" if target_met else "FAIL TARGET NOT MET (need ≥30%)"
         return (
             f"\n=== PERFORMANCE MEASUREMENT (actual timing) ===\n"
             f"Legacy:    {legacy_ms}ms\n"
             f"Your code: {cand_ms}ms\n"
-            f"Speedup:   {speedup}x ({pct:+.1f}%) — {status}\n"
+            f"Speedup:   {speedup}x ({pct:+.1f}%) -- {status}\n"
             + ("" if target_met else
                "You need to be at least 30% faster than legacy. "
                "Replace O(n²) loops with dict lookups, use collections.Counter/defaultdict, "
@@ -540,9 +543,9 @@ def _build_initial_prompt(source: str, readme: str, output_filename: str,
     lang_label = {"python": "Python", "javascript": "JavaScript", "cpp": "C++",
                   "rust": "Rust", "go": "Go", "java": "Java"}.get(lang, lang)
     return f"""Read the task description and source code below.
-Your job: create {output_filename} — an optimized/fixed version of the source code.
+Your job: create {output_filename} -- an optimized/fixed version of the source code.
 {memory_block}{multi_bug_block}
-=== TASK DESCRIPTION (read this FIRST — it explains what to do) ===
+=== TASK DESCRIPTION (read this FIRST -- it explains what to do) ===
 {readme}
 
 === SOURCE CODE (the code to fix/refactor) ===
@@ -568,13 +571,13 @@ def _build_correction_prompt(
     stuck_tests: list = None, lang: str = "python", diagnostic: str = "",
     task_dir: Path = None,
 ) -> str:
-    # Full details for every attempt — the LLM must see the complete history to avoid oscillating
+    # Full details for every attempt -- the LLM must see the complete history to avoid oscillating
     history_parts = []
     for rec in attempts:
         label = "LATEST" if rec is attempts[-1] else f"attempt {rec.attempt}"
         if not rec.syntax_valid:
             history_parts.append(
-                f"--- Attempt {rec.attempt} ({label}) — SYNTAX ERROR ---\n{rec.error_summary}"
+                f"--- Attempt {rec.attempt} ({label}) -- SYNTAX ERROR ---\n{rec.error_summary}"
             )
         else:
             failed_str = ", ".join(rec.tests_failed) if rec.tests_failed else "(none)"
@@ -588,7 +591,7 @@ def _build_correction_prompt(
 
     history = "\n\n".join(history_parts)
 
-    # Regression warnings — tests that were passing but are now failing
+    # Regression warnings -- tests that were passing but are now failing
     if len(attempts) >= 2:
         prev_passed = set(attempts[-2].tests_passed)
         curr_passed = set(attempts[-1].tests_passed)
@@ -600,7 +603,7 @@ def _build_correction_prompt(
     if regressions:
         reg_list = "\n".join(f"  - {t}" for t in sorted(regressions))
         regression_block = f"""
-=== REGRESSIONS (were passing, now broken — do NOT lose these) ===
+=== REGRESSIONS (were passing, now broken -- do NOT lose these) ===
 {reg_list}
 """
 
@@ -615,7 +618,7 @@ def _build_correction_prompt(
     except Exception:
         pass
 
-    # Stuck tests block — tests that haven't improved across attempts
+    # Stuck tests block -- tests that haven't improved across attempts
     stuck_block = ""
     if stuck_tests:
         stuck_list = "\n".join(f"  - {t}" for t in stuck_tests)
@@ -638,7 +641,7 @@ def _build_correction_prompt(
                         task_dir, _legacy_file, output_filename, f"{_fn_name}(data)"
                     )
             perf_hint = (
-                "\n  4. These are PERFORMANCE tests — your algorithm may be too slow. "
+                "\n  4. These are PERFORMANCE tests -- your algorithm may be too slow. "
                 "Consider: replace nested loops with O(n log n) sorting, use dict lookups "
                 "instead of list scans, avoid recomputing values in loops."
                 + (f"\n{perf_measurement}" if perf_measurement else "")
@@ -646,12 +649,12 @@ def _build_correction_prompt(
         else:
             perf_hint = ""
         stuck_block = f"""
-=== STUCK TESTS (failed in EVERY attempt so far — prioritize these) ===
+=== STUCK TESTS (failed in EVERY attempt so far -- prioritize these) ===
 {stuck_list}
 These tests have NOT improved across {len(attempts)} attempt(s). You MUST change your approach:
-  1. Read the test code literally — what exact value/type does it assert?
-  2. Trace your code mentally with the test's input — what does it actually return?
-  3. Your current implementation strategy is wrong for these cases — rethink from scratch.{perf_hint}
+  1. Read the test code literally -- what exact value/type does it assert?
+  2. Trace your code mentally with the test's input -- what does it actually return?
+  3. Your current implementation strategy is wrong for these cases -- rethink from scratch.{perf_hint}
 
 """
 
@@ -671,7 +674,7 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 {history}
 {regression_block}{stuck_block}{diagnostic}{causal_block}
 === FIX INSTRUCTIONS ===
-1. Read the FULL history — earlier attempts may have solved some problems you later broke.
+1. Read the FULL history -- earlier attempts may have solved some problems you later broke.
 2. Fix EVERY currently failing test.
 3. Do NOT regress tests that were passing in any previous attempt.
 4. Output the COMPLETE corrected {output_filename}. Raw {lang_label} only."""
@@ -681,7 +684,7 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 
 def _extract_code(response: str, lang: str = "python") -> str:
     """Extract code from LLM response, stripping markdown fences (language-aware)."""
-    # Try to extract from markdown fences — all common language identifiers
+    # Try to extract from markdown fences -- all common language identifiers
     fence_match = re.search(
         r"```(?:python|javascript|js|typescript|ts|cpp|c\+\+|c|rust|go|java|ruby)?\s*\n(.*?)```",
         response, re.DOTALL
@@ -725,7 +728,7 @@ def _validate_syntax(code: str, lang: str = "python") -> tuple:
                 return True, ""
             return False, result.stderr[:300]
         except (FileNotFoundError, subprocess.TimeoutExpired):
-            return True, ""  # node not available in this env — skip, let tests catch it
+            return True, ""  # node not available in this env -- skip, let tests catch it
     elif lang == "cpp":
         try:
             result = subprocess.run(
@@ -736,7 +739,7 @@ def _validate_syntax(code: str, lang: str = "python") -> tuple:
                 return True, ""
             return False, result.stderr[:300]
         except (FileNotFoundError, subprocess.TimeoutExpired):
-            return True, ""  # g++ not available in this env — skip
+            return True, ""  # g++ not available in this env -- skip
     return True, ""  # unknown language: skip validation, let test runner catch it
 
 
@@ -836,7 +839,7 @@ def _run_diagnostic(task_dir: Path, output_path: Path, test_source: str,
                 diag_parts.append(f"[{test_name}]\n{detail}")
 
     elif lang == "javascript":
-        # Jest already prints Expected/Received — re-run and filter those lines
+        # Jest already prints Expected/Received -- re-run and filter those lines
         try:
             result = subprocess.run(
                 ["npx", "jest", "--verbose", "--no-coverage",
@@ -852,14 +855,14 @@ def _run_diagnostic(task_dir: Path, output_path: Path, test_source: str,
         diag_lines = []
         for line in output.splitlines():
             s = line.strip()
-            if any(kw in s for kw in ("Expected", "Received", "●", "✕", "✗", "FAIL")):
+            if any(kw in s for kw in ("Expected", "Received", "●", "✕", "FAIL", "FAIL")):
                 diag_lines.append(s)
         detail = "\n".join(diag_lines[:20]) if diag_lines else output[-400:]
         if detail:
             diag_parts.append(f"[jest diagnostics]\n{detail}")
 
     elif lang == "cpp":
-        # GoogleTest prints "Value of: ...\nActual: ...\nExpected: ..." — extract those
+        # GoogleTest prints "Value of: ...\nActual: ...\nExpected: ..." -- extract those
         try:
             exe_path = task_dir / "_shard_test_runner"
             if exe_path.exists():
@@ -1033,10 +1036,11 @@ async def run_benchmark_loop(
     use_swarm: bool = False,
     use_concurrency_sim: bool = True,  # auto-detects if task needs it
     use_knowledge_base: bool = True,   # inject KB cheat sheets into prompt
+    strategy_mode: str = "normal",     # "baseline" | "normal" | "forced"
 ) -> BenchmarkResult:
     """Run the closed feedback loop on a benchmark task.
 
-    progress_cb: optional async callable(dict) — called on attempt_start and attempt_done events.
+    progress_cb: optional async callable(dict) -- called on attempt_start and attempt_done events.
     use_episodic_memory: if True, inject past session history into Attempt 1 prompt.
 
     Returns BenchmarkResult with success=True if all tests pass.
@@ -1085,7 +1089,7 @@ async def run_benchmark_loop(
     test_file = test_files[0]
     tests = test_file.read_text(encoding="utf-8")
 
-    # Discover expected output filename from test file FIRST —
+    # Discover expected output filename from test file FIRST --
     # then derive which source file is the TARGET to fix.
     _ext_map = {"python": ".py", "javascript": ".js", "cpp": ".cpp"}
     _ext = _ext_map.get(lang, ".py")
@@ -1107,17 +1111,17 @@ async def run_benchmark_loop(
         output_filename = "fixed_" + source_path.name
     output_path = task_dir / output_filename
 
-    # Build source string — multi-file tasks get all files concatenated with labels
+    # Build source string -- multi-file tasks get all files concatenated with labels
     context_files = [f for f in source_files if f != source_path]
     if context_files:
         parts = []
         for f in context_files:
             parts.append(
-                f"# === {f.name} [CONTEXT — read only, do not output this file] ===\n"
+                f"# === {f.name} [CONTEXT -- read only, do not output this file] ===\n"
                 + f.read_text(encoding="utf-8")
             )
         parts.append(
-            f"# === {source_path.name} [TARGET — fix this file, output as {output_filename}] ===\n"
+            f"# === {source_path.name} [TARGET -- fix this file, output as {output_filename}] ===\n"
             + source_path.read_text(encoding="utf-8")
         )
         source = "\n\n".join(parts)
@@ -1132,7 +1136,7 @@ async def run_benchmark_loop(
     # Warn early if the required runtime is missing
     lang_tool = {"python":"pytest","javascript":"jest","cpp":"g++"}.get(lang,"pytest")
     if not env_probe.get(lang_tool, {}).get("available", False):
-        print(f"\n  [WARNING] Runtime '{lang_tool}' not found — tests will fail to run.")
+        print(f"\n  [WARNING] Runtime '{lang_tool}' not found -- tests will fail to run.")
         print(f"            Install it before proceeding.\n")
 
     print()
@@ -1154,25 +1158,30 @@ async def run_benchmark_loop(
     print(f"  Concurrency sim: {'ON' if _run_conc_sim else 'OFF'}")
     print("=" * 68)
 
-    # -- Signal Gate: collect, rank, filter — only top-K enter the prompt ----
+    # -- Signal Gate: collect, rank, filter -- only top-K enter the prompt ----
     # Each source produces a Signal with a confidence score.
     # gate() ranks by score = confidence × type_weight, keeps top-K.
     # This shifts control: SHARD decides what matters, not the LLM.
     task_key = task_dir.name
     past_episodes = load_episodes(task_key)
 
+    # A/B test tracking -- set defaults before try block so fallback path has them
+    _strat_activated = False
+    _strat_score_val  = 0.0
+    _strat_text_val   = ""
+
     try:
         from signal_gate import Signal as _Signal, gate as _gate, build_context as _build_ctx, log_gate_result as _log_gate
         _signals: list = []
 
-        # 1. Self-profile — identity context, always grounding
+        # 1. Self-profile -- identity context, always grounding
         if self_profile:
             _signals.append(_Signal(
                 content=self_profile, confidence=0.85,
                 type="self_profile", source="self_profile",
             ))
 
-        # 2. Episodic memory — past session summaries for this task
+        # 2. Episodic memory -- past session summaries for this task
         if use_episodic_memory and past_episodes:
             _ep = build_experience_summary(past_episodes)
             if _ep:
@@ -1182,7 +1191,7 @@ async def run_benchmark_loop(
                     type="episodic", source=f"{len(past_episodes)} past sessions",
                 ))
 
-        # 3. Knowledge Base — cheat sheet for this task type
+        # 3. Knowledge Base -- cheat sheet for this task type
         kb_used = False
         kb_chars = 0
         if use_knowledge_base:
@@ -1201,7 +1210,7 @@ async def run_benchmark_loop(
         else:
             print(f"  [kb] Knowledge Base disabled (use_knowledge_base=False)")
 
-        # 4. Semantic memory — past error/fix patterns
+        # 4. Semantic memory -- past error/fix patterns
         try:
             from semantic_memory import query_semantic_memory
             _sem_query = f"{task_key} {source[:300]} {tests[:200]}"
@@ -1214,21 +1223,63 @@ async def run_benchmark_loop(
         except Exception as _sem_e:
             print(f"  [semantic] Semantic memory query failed: {_sem_e}")
 
-        # 5. Strategy memory — aggregated past successful strategies
-        try:
-            from strategy_memory import StrategyMemory as _SM
-            from signal_gate import build_strategy_signal as _build_strat
-            _strat_results = _SM().query(f"{task_key} {readme[:150]}", k=3)
-            _strat_signal = _build_strat(_strat_results)
-            if _strat_signal:
-                _signals.append(_strat_signal)
-        except Exception as _strat_e:
-            logger.debug("[strategy] query failed: %s", _strat_e)
+        # 5. Strategy memory -- aggregated past successful strategies
+        # Controlled by strategy_mode: "baseline" skips, "normal" competes, "forced" gets slot 1
+        _strat_signal = None
+        if strategy_mode != "baseline":
+            try:
+                from strategy_memory import StrategyMemory as _SM
+                from signal_gate import build_strategy_signal as _build_strat
+                _strat_results = _SM().query(f"{task_key} {readme[:150]}", k=3)
+                _strat_signal = _build_strat(_strat_results)
+                if _strat_signal:
+                    # Compile raw strategy text into grounded operational instruction
+                    try:
+                        from strategy_compiler import compile as _compile_strat
+                        _compiled = _compile_strat(
+                            _strat_signal.content,
+                            _strat_signal.confidence,
+                            source,
+                        )
+                        if _compiled:
+                            _strat_signal = _Signal(
+                                content=_compiled,
+                                confidence=_strat_signal.confidence,
+                                type=_strat_signal.type,
+                                source=_strat_signal.source,
+                            )
+                            print(f"  [strategy_compiler] compiled ({len(_compiled)} chars, confidence={_strat_signal.confidence:.2f})")
+                        else:
+                            _strat_signal = None  # below threshold, discard
+                            print(f"  [strategy_compiler] signal below threshold, discarded")
+                    except Exception as _comp_e:
+                        logger.debug("[strategy_compiler] failed: %s", _comp_e)
+                if _strat_signal and strategy_mode == "normal":
+                    _signals.append(_strat_signal)
+            except Exception as _strat_e:
+                logger.debug("[strategy] query failed: %s", _strat_e)
 
         # Gate: rank and select top-3
-        _selected = _gate(_signals, top_k=3)
+        # forced mode: strategy gets slot 1, top-2 from all other signals fill slots 2-3
+        if strategy_mode == "forced" and _strat_signal:
+            _non_strat = [s for s in _signals]  # _signals has no strategy yet in forced mode
+            _top2_rest = _gate(_non_strat, top_k=2)
+            _selected = [_strat_signal] + _top2_rest
+            print(f"  [gate] forced: strategy in slot 1, {len(_top2_rest)} others fill slots 2-3")
+            _log_gate(_selected, _signals + [_strat_signal])
+        else:
+            _selected = _gate(_signals, top_k=3)
+            _log_gate(_selected, _signals)
+
         experience_summary = _build_ctx(_selected)
-        _log_gate(_selected, _signals)
+
+        # Track strategy activation for A/B metrics
+        from signal_gate import load_diagnostic_weights as _ldw
+        _dw = _ldw()
+        _strat_activated = _strat_signal is not None and any(id(s) == id(_strat_signal) for s in _selected)
+        _strat_score_val = _strat_signal.score(_dw) if _strat_signal else 0.0
+        _strat_text_val  = _strat_signal.content[:500] if _strat_signal else ""
+        print(f"  [ab] strategy_mode={strategy_mode} activated={_strat_activated} score={_strat_score_val:.3f}")
 
     except Exception as _gate_err:
         # Fallback: legacy concat if signal_gate fails
@@ -1253,7 +1304,7 @@ async def run_benchmark_loop(
 
     # -- 2. Golden solution protection ------------------------------------
     # If a passing solution already exists, save it before the LLM overwrites it.
-    # If all attempts fail, restore it — never regress a working solution.
+    # If all attempts fail, restore it -- never regress a working solution.
     # NOTE: must run before the pivot check and before unlink, so we see the real file.
     _golden_code: str = ""
     _golden_passed: list = []
@@ -1265,11 +1316,11 @@ async def run_benchmark_loop(
             if _all_pass:
                 _p, _f, _ = _parse_test_output(_raw, lang=lang)
                 _golden_passed = _p
-                print(f"  [golden] Existing solution passes {len(_p)} test(s) — will protect on regression")
+                print(f"  [golden] Existing solution passes {len(_p)} test(s) -- will protect on regression")
         except Exception:
             _golden_code = ""
 
-    # -- 2b. Benchmark pivot — chronic block detection ----------------------
+    # -- 2b. Benchmark pivot -- chronic block detection ----------------------
     # If the same task has failed N consecutive sessions, the current fixed_*.py
     # encodes a failing approach. Restore to original source (blank slate on code)
     # and measure whether SHARD produces a structurally different solution.
@@ -1285,9 +1336,9 @@ async def run_benchmark_loop(
         _task_id = task_dir.name
         _do_pivot, _pivot_reason = should_pivot(_task_id, _bt)
         if _do_pivot and _golden_passed:
-            # Golden solution already passes all tests — no pivot needed.
+            # Golden solution already passes all tests -- no pivot needed.
             # Streak is stale; this run will register a success and reset it.
-            print(f"  [pivot] Skipped — golden solution already passes {len(_golden_passed)} test(s).")
+            print(f"  [pivot] Skipped -- golden solution already passes {len(_golden_passed)} test(s).")
             _do_pivot = False
         if _do_pivot:
             # Capture pre-pivot failing tests from most recent episode
@@ -1311,7 +1362,7 @@ async def run_benchmark_loop(
                 pre_fails=_pre_fails,
             ) or {}
             if _pivot_state:
-                # Pivot overwrote output_path with original source — reload
+                # Pivot overwrote output_path with original source -- reload
                 try:
                     source = (task_dir / source_path.name).read_text(encoding="utf-8")
                 except Exception:
@@ -1329,7 +1380,7 @@ async def run_benchmark_loop(
     # -- 3. Loop -----------------------------------------------------------
     attempts = []
     _best_state = None       # AttemptRecord with highest tests_passed count seen so far
-    _swarm_rollback = False  # True when last attempt regressed — triggers surgical mode next call
+    _swarm_rollback = False  # True when last attempt regressed -- triggers surgical mode next call
     _post_pivot_recorded = False  # Track if we've recorded post-pivot measurement
     _fired_diagnostics: list = []  # Track named diagnostics that fired this run (for weight update)
 
@@ -1353,7 +1404,7 @@ async def run_benchmark_loop(
         elif mode == "SWARM":
             print(f"  [SWARM] Architect -> Coder -> Critic pipeline")
         else:
-            # Always pass the last *syntactically valid* code — never pass broken code
+            # Always pass the last *syntactically valid* code -- never pass broken code
             last_valid = next(
                 (r for r in reversed(attempts) if r.syntax_valid),
                 None,
@@ -1401,17 +1452,17 @@ async def run_benchmark_loop(
         if mode == "SWARM":
             swarm_stuck = _detect_stuck_tests(attempts)
             if swarm_stuck:
-                print(f"  [stuck] {len(swarm_stuck)} test(s) stuck — injecting into Architect: {swarm_stuck}")
+                print(f"  [stuck] {len(swarm_stuck)} test(s) stuck -- injecting into Architect: {swarm_stuck}")
                 swarm_diag = _run_diagnostic(task_dir, output_path, tests, swarm_stuck, lang=lang)
                 if swarm_diag:
                         print(f"  [diag] Execution diagnostics injected for {len(swarm_stuck)} stuck test(s)")
                         # Inject into tests string so swarm_complete sees it
                         tests = tests + swarm_diag
-            # Consume rollback flag — active for this one call only
+            # Consume rollback flag -- active for this one call only
             _rollback_now = _swarm_rollback
             _swarm_rollback = False
             if _rollback_now and _best_state:
-                print(f"  [rollback] Modalita' chirurgica — base: tentativo {_best_state.attempt} ({len(_best_state.tests_passed)} pass)")
+                print(f"  [rollback] Modalita' chirurgica -- base: tentativo {_best_state.attempt} ({len(_best_state.tests_passed)} pass)")
             print("  [swarm] Calling... ", end="", flush=True)
             try:
                 response = await swarm_complete(
@@ -1488,7 +1539,7 @@ async def run_benchmark_loop(
                 _post_result = record_post_pivot(
                     pivot_state=_pivot_state,
                     post_code=code,
-                    post_fails=[],  # tests not run yet — updated after pytest
+                    post_fails=[],  # tests not run yet -- updated after pytest
                 )
                 print(
                     f"  [post-pivot] agency_score={_post_result['analysis']['agency_score']:.3f}"
@@ -1499,7 +1550,7 @@ async def run_benchmark_loop(
             except Exception as _pp_err:
                 print(f"  [post-pivot] non-fatal: {_pp_err}")
 
-        # -- Concurrency probe (before pytest — catches races early) ----
+        # -- Concurrency probe (before pytest -- catches races early) ----
         conc_report_text = ""
         if _run_conc_sim:
             print(f"  [conc_sim] Probing thread safety... ", end="", flush=True)
@@ -1536,12 +1587,12 @@ async def run_benchmark_loop(
         # deadlock warning into error_summary so the correction prompt addresses it.
         if raw_pytest.startswith("TIMEOUT") and not passed and not failed:
             error_summary = (
-                "DEADLOCK SUSPECTED: The test runner timed out — no tests ran. "
+                "DEADLOCK SUSPECTED: The test runner timed out -- no tests ran. "
                 "This strongly indicates a threading deadlock in your code. "
                 "Common cause: threading.Lock() used in a method that calls another "
                 "method which also acquires the same lock (non-reentrant). "
                 "FIX: Replace threading.Lock() with threading.RLock() in __init__. "
-                "RLock is reentrant — the same thread can acquire it multiple times."
+                "RLock is reentrant -- the same thread can acquire it multiple times."
             )
 
         if all_passed:
@@ -1559,7 +1610,7 @@ async def run_benchmark_loop(
                                        "passed": len(passed), "failed": 0, "failed_tests": []})
                 except Exception:
                     pass
-            # Victory — update diagnostic weights (learning)
+            # Victory -- update diagnostic weights (learning)
             try:
                 from diagnostic_learning import update_weights as _update_weights
                 _update_weights(_fired_diagnostics, success=True)
@@ -1594,11 +1645,23 @@ async def run_benchmark_loop(
                     })
                 except Exception:
                     pass
+            # Strategy memory: extract pattern from diff (only when >1 attempt)
+            if attempt_num > 1 and len(attempts) >= 2:
+                try:
+                    from strategy_memory import StrategyMemory as _SMv
+                    _prev_code = attempts[-2].code  # last failed attempt
+                    _SMv().store_from_benchmark(task_key, _prev_code, code, attempt_num)
+                except Exception as _strat_store_err:
+                    import traceback
+                    print(f"  [strategy] store_from_benchmark ERROR: {_strat_store_err}")
+                    traceback.print_exc()
             return BenchmarkResult(
                 task_dir=str(task_dir), success=True,
                 total_attempts=attempt_num, attempts=attempts,
                 final_code=code, elapsed_total=total_elapsed,
                 kb_used=kb_used, kb_chars=kb_chars,
+                strategy_activated=_strat_activated, strategy_score=_strat_score_val,
+                strategy_text=_strat_text_val,
             )
         else:
             print(f"{len(passed)} passed, {len(failed)} failed")
@@ -1636,7 +1699,7 @@ async def run_benchmark_loop(
                     if _sem_fix:
                         experience_summary = (
                             (experience_summary + "\n\n" if experience_summary else "")
-                            + f"[Semantic memory — similar past errors & fixes]\n{_sem_fix}"
+                            + f"[Semantic memory -- similar past errors & fixes]\n{_sem_fix}"
                         )
                 except Exception:
                     pass
@@ -1647,10 +1710,10 @@ async def run_benchmark_loop(
                 _best_state = current_rec
             elif (mode == "SWARM" and
                   len(current_rec.tests_passed) < len(_best_state.tests_passed)):
-                # Regression: swarm made things worse — rollback to best state
+                # Regression: swarm made things worse -- rollback to best state
                 print(f"\n  [rollback] REGRESSIONE: tentativo {attempt_num} ha {len(current_rec.tests_passed)} pass "
                       f"< best {len(_best_state.tests_passed)} pass (tentativo {_best_state.attempt})")
-                print(f"  [rollback] Scarto la patch regressiva — ripristino tentativo {_best_state.attempt}...")
+                print(f"  [rollback] Scarto la patch regressiva -- ripristino tentativo {_best_state.attempt}...")
                 _write_file(output_path, _best_state.code)
                 _swarm_rollback = True
 
@@ -1672,13 +1735,13 @@ async def run_benchmark_loop(
     # If the LLM never beat the original passing solution, restore it.
     if _golden_code and len(_golden_passed) > best_score:
         _write_file(output_path, _golden_code)
-        print(f"  [golden] LLM best={best_score} < golden={len(_golden_passed)} — restored verified solution")
+        print(f"  [golden] LLM best={best_score} < golden={len(_golden_passed)} -- restored verified solution")
     elif _golden_code and len(_golden_passed) == best_score and best_score > 0:
-        # Tie — keep golden (it's verified, LLM solution is untested at full depth)
+        # Tie -- keep golden (it's verified, LLM solution is untested at full depth)
         _write_file(output_path, _golden_code)
-        print(f"  [golden] Tied at {best_score} tests — kept verified solution")
+        print(f"  [golden] Tied at {best_score} tests -- kept verified solution")
 
-    # Failed — update diagnostic weights (learning)
+    # Failed -- update diagnostic weights (learning)
     try:
         from diagnostic_learning import update_weights as _update_weights
         _update_weights(_fired_diagnostics, success=False)
@@ -1710,6 +1773,8 @@ async def run_benchmark_loop(
         final_code=attempts[-1].code if attempts else "",
         elapsed_total=total_elapsed,
         kb_used=kb_used, kb_chars=kb_chars,
+        strategy_activated=_strat_activated, strategy_score=_strat_score_val,
+        strategy_text=_strat_text_val,
     )
 
 
@@ -1719,13 +1784,16 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="SHARD Benchmark Loop — closed feedback loop for refactoring tasks"
+        description="SHARD Benchmark Loop -- closed feedback loop for refactoring tasks"
     )
     parser.add_argument("task_dir", help="Path to benchmark task directory")
     parser.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS_DEFAULT,
                         help=f"Max correction attempts (default: {MAX_ATTEMPTS_DEFAULT})")
     parser.add_argument("--use-swarm", action="store_true", default=False,
                         help="Enable 3-agent Swarm pipeline on Attempt 2+")
+    parser.add_argument("--strategy-mode", choices=["baseline", "normal", "forced"],
+                        default="normal",
+                        help="Strategy signal mode: baseline=excluded, normal=competes, forced=slot1 (default: normal)")
     args = parser.parse_args()
 
     # Setup logging
@@ -1744,7 +1812,7 @@ def main():
     except ImportError:
         pass
 
-    result = asyncio.run(run_benchmark_loop(args.task_dir, max_attempts=args.max_attempts, use_swarm=args.use_swarm))
+    result = asyncio.run(run_benchmark_loop(args.task_dir, max_attempts=args.max_attempts, use_swarm=args.use_swarm, strategy_mode=args.strategy_mode))
     sys.exit(0 if result.success else 1)
 
 

@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 
-# ── Error pattern → remediation topic mapping ─────────────────────────────────
+# ── Error pattern -> remediation topic mapping ─────────────────────────────────
 # Each entry: (regex_on_stderr, error_label, remediation_topic_template)
 # {capability} is replaced with the failing topic name at runtime.
 
@@ -154,12 +154,12 @@ class CriticAgent:
         """
         LLM-powered meta-critique for stuck topics.
 
-        Called when attempt >= 2 — SHARD is not converging.
+        Called when attempt >= 2 -- SHARD is not converging.
         Reads episodic history for this topic and asks Gemini:
         "What is SHARD doing wrong systematically? What should it try differently?"
 
         Vettore 2: if identity_context shows a critical gap in this category,
-        CriticAgent becomes a skeptical examiner — suspects luck or flawed tests,
+        CriticAgent becomes a skeptical examiner -- suspects luck or flawed tests,
         not genuine mastery.
 
         Returns a critique string ready to inject into the retry prompt.
@@ -182,14 +182,14 @@ class CriticAgent:
                 status = "CERTIFIED" if success else f"FAILED (score {score})"
                 line = f"- {date}: {status}"
                 if reason:
-                    line += f" — reason: {reason}"
+                    line += f" -- reason: {reason}"
                 history_lines.append(line)
 
             history_text = "\n".join(history_lines) if history_lines else "No prior history."
 
             gaps_text = ", ".join(str(g) for g in current_gaps[:5]) if current_gaps else "none identified"
 
-            # Vettore 2 — Identity context: skeptical mode if critical gap
+            # Vettore 2 -- Identity context: skeptical mode if critical gap
             identity_block = ""
             skeptical_mode = False
             if identity_context and "error" not in identity_context:
@@ -204,16 +204,16 @@ class CriticAgent:
                         f"  Overall cert_rate={cert_rate:.0%} | gap_severity={gap_severity} | "
                         f"critical_categories={critical_gaps[:3]}\n"
                         f"  SHARD has a documented weakness in this area. "
-                        f"Be extra skeptical — past 'passes' in weak categories are often luck or poorly written tests, not genuine mastery.\n"
+                        f"Be extra skeptical -- past 'passes' in weak categories are often luck or poorly written tests, not genuine mastery.\n"
                     )
                 if frustration >= 2:
                     identity_block += (
-                        f"  FRUSTRATION: {frustration} session(s) failed on this topic across history — "
+                        f"  FRUSTRATION: {frustration} session(s) failed on this topic across history -- "
                         f"this is a persistent block, not a one-off. "
                         f"Diagnose the *pattern*, not just the last error.\n"
                     )
 
-            prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach — not just what went wrong, but WHY the current strategy keeps failing.
+            prompt = f"""You are SHARD's critical self-evaluator. Your job is to identify *systematic* mistakes in SHARD's learning approach -- not just what went wrong, but WHY the current strategy keeps failing.
 {identity_block}
 Topic: "{topic}"
 Current attempt: {attempt}
@@ -227,7 +227,7 @@ Analyze this pattern critically:
 1. What is SHARD consistently getting wrong across attempts?
 2. Is the approach to this topic fundamentally flawed (e.g. too abstract, wrong implementation focus, missing prerequisite)?
 3. What ONE specific change in approach would most likely break the failure pattern?
-{"4. Given the identity weakness above — is SHARD's self-assessment accurate, or is it overconfident in a weak area?" if skeptical_mode else ""}
+{"4. Given the identity weakness above -- is SHARD's self-assessment accurate, or is it overconfident in a weak area?" if skeptical_mode else ""}
 
 Be direct and concrete. Output 3-4 sentences maximum. This will be injected directly into the next attempt prompt."""
 
@@ -236,7 +236,7 @@ Be direct and concrete. Output 3-4 sentences maximum. This will be injected dire
                 system=(
                     "You are a sharp, skeptical examiner. No flattery. "
                     "Identify the root cause of repeated failure. "
-                    + ("The student has documented weaknesses here — be rigorous." if skeptical_mode else "")
+                    + ("The student has documented weaknesses here -- be rigorous." if skeptical_mode else "")
                 ),
                 max_tokens=300,
                 temperature=0.4,

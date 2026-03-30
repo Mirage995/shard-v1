@@ -1,13 +1,13 @@
-"""shard_self_log.py — SHARD Self-Logging & Thought Classification.
+"""shard_self_log.py -- SHARD Self-Logging & Thought Classification.
 
 Ogni pensiero generato da ShardConsciousness viene auto-classificato
 lungo 4 dimensioni: categoria, autenticità, profondità, connessioni.
 
 I dati accumulati alimentano le metriche di interpretabilità per il pitch:
-  "SHARD ha prodotto 312 pensieri — 38% self_reflective, 27% existential,
+  "SHARD ha prodotto 312 pensieri -- 38% self_reflective, 27% existential,
    depth media 6.4/10, 14 pensieri di alta profondità salvati."
 
-Non richiede chiamate LLM — tutto keyword-based, deterministico, veloce.
+Non richiede chiamate LLM -- tutto keyword-based, deterministico, veloce.
 """
 
 import json
@@ -212,7 +212,7 @@ class SelfLogger:
             "event_driven_count":     sum(1 for t in self._logs if t.get("event_driven")),
             "dominant_category":      top_cat,
             "summary": (
-                f"SHARD ha prodotto {len(self._logs)} pensieri — "
+                f"SHARD ha prodotto {len(self._logs)} pensieri -- "
                 f"{top_cat} {cats[top_cat]/len(self._logs):.0%}, "
                 f"depth media {round(sum(depths)/len(depths),1)}/10, "
                 f"{sum(1 for d in depths if d >= 7)} ad alta profondità."
@@ -220,7 +220,7 @@ class SelfLogger:
         }
 
     def generate_self_insight(self) -> str:
-        """Narrativa leggibile dei pattern di pensiero — usabile in voice/chat."""
+        """Narrativa leggibile dei pattern di pensiero -- usabile in voice/chat."""
         stats = self.get_stats()
         if stats["total"] == 0:
             return "Non ho ancora abbastanza dati per un'auto-analisi."

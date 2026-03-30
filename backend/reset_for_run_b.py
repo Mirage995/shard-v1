@@ -1,9 +1,9 @@
-"""reset_for_run_b.py — Reset chirurgico per Run B (cold start controllato).
+"""reset_for_run_b.py -- Reset chirurgico per Run B (cold start controllato).
 
 Resetta:
-  1. mood_state.json → neutro (score=0, frustration=0)
-  2. goals.json → nessun goal attivo (GoalEngine lo rigenera da zero)
-  3. desire_state.json → forza password hashing come top priority
+  1. mood_state.json -> neutro (score=0, frustration=0)
+  2. goals.json -> nessun goal attivo (GoalEngine lo rigenera da zero)
+  3. desire_state.json -> forza password hashing come top priority
 
 NON tocca:
   - storico SQLite (experiments, skill_library, ecc.)
@@ -36,14 +36,14 @@ def reset_mood():
         }
     }
     path.write_text(json.dumps(neutral, indent=2), encoding="utf-8")
-    print(f"[RESET] mood_state → neutral (score=0.0)")
+    print(f"[RESET] mood_state -> neutral (score=0.0)")
 
 
 def reset_goals():
     path = MEM / "goals.json"
-    # Rimuove tutti i goal attivi — GoalEngine li rigenera autonomamente
+    # Rimuove tutti i goal attivi -- GoalEngine li rigenera autonomamente
     path.write_text(json.dumps([], indent=2), encoding="utf-8")
-    print(f"[RESET] goals.json → [] (GoalEngine rigenererà da zero)")
+    print(f"[RESET] goals.json -> [] (GoalEngine rigenererà da zero)")
 
 
 def force_topic_priority():
@@ -70,12 +70,12 @@ def force_topic_priority():
             state[key]["base_priority"] = min(state[key].get("base_priority", 0.5), 0.3)
 
     path.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    print(f"[RESET] desire_state → '{TARGET_TOPIC}' forced top (priority=0.99, frustration_hits=9)")
+    print(f"[RESET] desire_state -> '{TARGET_TOPIC}' forced top (priority=0.99, frustration_hits=9)")
 
 
 def main():
     print("=" * 60)
-    print("RESET FOR RUN B — cold start controllato")
+    print("RESET FOR RUN B -- cold start controllato")
     print("=" * 60)
     reset_mood()
     reset_goals()

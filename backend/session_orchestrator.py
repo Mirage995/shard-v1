@@ -39,8 +39,8 @@ class SessionOrchestrator:
         self.on_web_data = on_web_data
         self.on_project_update = on_project_update
         self.on_study_request = on_study_request
-        self.on_audio_response = on_audio_response  # callable(bytes) — plays Gemini audio
-        self.on_transcription = on_transcription    # callable({"sender", "text"}) → chat GUI
+        self.on_audio_response = on_audio_response  # callable(bytes) -- plays Gemini audio
+        self.on_transcription = on_transcription    # callable({"sender", "text"}) -> chat GUI
 
         self._pending_confirmations = {}
         self._turn_count = 0
@@ -94,7 +94,7 @@ class SessionOrchestrator:
         self._turn_count = 0  # reset on each new session
         try:
             while True:
-                # Proactive context reset — raised BEFORE the inner try so it
+                # Proactive context reset -- raised BEFORE the inner try so it
                 # bypasses the "continue on error" handler and propagates to the
                 # TaskGroup in shard.py, triggering a clean reconnect.
                 if self._turn_count >= self._MAX_TURNS:
@@ -105,7 +105,7 @@ class SessionOrchestrator:
                 try:
                     turn = session.receive()
                     async for response in turn:
-                        # 1. Audio + text parts — parse model_turn.parts directly
+                        # 1. Audio + text parts -- parse model_turn.parts directly
                         # to avoid Gemini 2.5 SDK warnings about non-data/non-text parts.
                         sc = getattr(response, "server_content", None)
                         if sc is not None:
@@ -119,14 +119,14 @@ class SessionOrchestrator:
                                             self.on_audio_response(inline.data)
                                         except Exception:
                                             pass
-                                    # Text / thought — log only (transcription comes below)
+                                    # Text / thought -- log only (transcription comes below)
                                     part_text = getattr(part, "text", None)
                                     if part_text:
                                         logger.debug(
                                             "[Orchestrator] Gemini text part: %.120s", part_text
                                         )
 
-                            # 2. Transcriptions → chat GUI
+                            # 2. Transcriptions -> chat GUI
                             if self.on_transcription:
                                 out_tr = getattr(sc, "output_transcription", None)
                                 if out_tr:
@@ -159,23 +159,23 @@ class SessionOrchestrator:
                     self._turn_count += 1
 
                 except asyncio.CancelledError:
-                    logger.info("[Orchestrator] Session stream cancelled — shutting down cleanly.")
+                    logger.info("[Orchestrator] Session stream cancelled -- shutting down cleanly.")
                     raise  # propagate so the task is properly marked cancelled
 
                 except Exception as e:
                     # Connection-level errors mean the WebSocket is already dead.
-                    # Re-raise immediately to trigger clean reconnect in shard.py —
+                    # Re-raise immediately to trigger clean reconnect in shard.py --
                     # retrying on a broken connection only produces an infinite spam loop.
                     err_str = str(e).lower()
                     if any(kw in err_str for kw in ("1011", "1008", "connection closed", "connectionclosed")):
                         logger.warning(
-                            "[Orchestrator] Connection-level error (%s) — escalating to reconnect.",
+                            "[Orchestrator] Connection-level error (%s) -- escalating to reconnect.",
                             type(e).__name__,
                         )
                         raise
 
                     logger.error(
-                        "[Orchestrator] ERROR in session stream — loop iteration failed.\n"
+                        "[Orchestrator] ERROR in session stream -- loop iteration failed.\n"
                         "Type   : %s\n"
                         "Message: %s\n"
                         "Traceback:\n%s",
@@ -191,11 +191,11 @@ class SessionOrchestrator:
             pass  # already logged above
         except _ContextResetNeeded as e:
             logger.info(
-                "[Orchestrator] %s — triggering clean reconnect.", e
+                "[Orchestrator] %s -- triggering clean reconnect.", e
             )
-            raise  # propagates to TaskGroup → shard.py reconnect with backoff
+            raise  # propagates to TaskGroup -> shard.py reconnect with backoff
         except Exception as e:
-            # Unrecoverable error — outer loop cannot continue
+            # Unrecoverable error -- outer loop cannot continue
             logger.critical(
                 "[Orchestrator] FATAL: Session stream terminated by unrecoverable error.\n"
                 "Type   : %s\n"
@@ -216,7 +216,7 @@ class SessionOrchestrator:
         fc_args = fc.args
         
         # Permission and Confirmation Logic
-        CONFIRMATION_TIMEOUT = 60.0   # seconds — after this the tool call is auto-denied
+        CONFIRMATION_TIMEOUT = 60.0   # seconds -- after this the tool call is auto-denied
 
         confirmation_required = self.permissions.get(fc_name, True)
         if confirmation_required and self.on_tool_confirmation:
@@ -233,12 +233,12 @@ class SessionOrchestrator:
                 )
             except asyncio.TimeoutError:
                 logger.warning(
-                    "[Orchestrator] Confirmation timeout (%.0fs) for '%s' (ID: %s) — auto-denying.",
+                    "[Orchestrator] Confirmation timeout (%.0fs) for '%s' (ID: %s) -- auto-denying.",
                     CONFIRMATION_TIMEOUT, fc_name, request_id,
                 )
                 confirmed = False
             finally:
-                # Always clean up — prevents the dict from growing indefinitely
+                # Always clean up -- prevents the dict from growing indefinitely
                 self._pending_confirmations.pop(request_id, None)
                 if not future.done():
                     future.cancel()
@@ -310,11 +310,11 @@ class SessionOrchestrator:
             check_result = await pre_check(full_path, content)
             
             if check_result["risk"] == "BLOCK":
-                logger.error("[IMPACT] BLOCK %s — %s", filepath, check_result["reason"])
+                logger.error("[IMPACT] BLOCK %s -- %s", filepath, check_result["reason"])
                 function_responses.append(types.FunctionResponse(id=fc.id, name=fc_name, response={"result": f"ERROR: write_file blocked. Reason: {check_result['reason']}"}))
             else:
                 if check_result["risk"] in ("HIGH", "MEDIUM"):
-                    logger.warning("[IMPACT] %s %s — %s", check_result["risk"], filepath, check_result["reason"])
+                    logger.warning("[IMPACT] %s %s -- %s", check_result["risk"], filepath, check_result["reason"])
                 
                 result = fs_write_file(filepath, content, str(self.project_manager.workspace_root))
                 print(f"[Orchestrator DEBUG] write_file result: {result[:200]}...")
@@ -337,8 +337,8 @@ class SessionOrchestrator:
 
     # --- File summarization via Flash (keeps Native Audio context small) ---
 
-    _SUMMARIZE_THRESHOLD = 600   # chars — below this, return raw content
-    _SUMMARIZE_MAX_INPUT = 8000  # chars — cap input to Flash to avoid abuse
+    _SUMMARIZE_THRESHOLD = 600   # chars -- below this, return raw content
+    _SUMMARIZE_MAX_INPUT = 8000  # chars -- cap input to Flash to avoid abuse
 
     async def _summarize_for_voice(self, content: str, filepath: str) -> str:
         """If content is long, delegate summarization to Gemini Flash so that
@@ -358,12 +358,12 @@ class SessionOrchestrator:
             )
             summary = await llm_complete(prompt, max_tokens=512, temperature=0.2)
             logger.info(
-                "[Orchestrator] File '%s' summarized for voice: %d → %d chars",
+                "[Orchestrator] File '%s' summarized for voice: %d -> %d chars",
                 filepath, len(content), len(summary),
             )
             return f"[Summary of {filepath}]\n{summary}"
         except Exception as e:
-            logger.warning("[Orchestrator] Summarization failed (%s) — returning truncated raw.", e)
+            logger.warning("[Orchestrator] Summarization failed (%s) -- returning truncated raw.", e)
             return content[:self._SUMMARIZE_THRESHOLD]
 
     # --- Asynchronous Handlers (extracted from monolithic AudioLoop) ---

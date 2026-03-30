@@ -2,53 +2,50 @@
 
 ## Key Concepts
 *   **SQL Injection:** A code injection technique that exploits security vulnerabilities in an application's software.
-*   **Input Sanitization:** The process of cleaning user input to prevent malicious data from being processed.
-*   **Parameterized Queries (Prepared Statements):** A method of executing SQL queries where the SQL code is defined separately from the parameters.
-*   **Whitelisting:** Allowing only known good input and rejecting everything else.
-*   **Data Validation:** Ensuring that the data conforms to the expected format and type.
-*   **Output Encoding/Escaping:** Converting special characters to their corresponding HTML entities to prevent XSS.
-*   **Least Privilege:** Granting database users only the necessary permissions.
+*   **Input Sanitization:** The process of cleaning user-supplied input to prevent malicious code execution.
+*   **Prepared Statements (Parameterized Queries):** A method of executing SQL queries where the SQL logic is defined separately from the input parameters.
+*   **Principle of Least Privilege:** Granting users only the minimum level of access needed to perform their duties.
+*   **Data Validation:** Verifying that user input conforms to expected formats and constraints.
+*   **Escaping:** Converting special characters into a format that prevents them from being interpreted as SQL code.
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
-| **Parameterized Queries:** Eliminates SQL injection risk by treating input as data, not code. | Requires proper implementation and database driver support. |
-| **Input Validation:** Prevents invalid or malicious data from entering the system. | Can be bypassed if not implemented correctly on both client and server sides. |
-| **Whitelisting:** Highly effective at preventing unexpected input. | Can be difficult to maintain and may block legitimate input if not carefully designed. |
-| **Output Encoding:** Prevents XSS attacks by neutralizing potentially harmful characters in output. | Only protects against XSS, not SQL injection. |
-| **Least Privilege:** Limits the damage an attacker can do if they gain access. | Can complicate application design and require careful management of user roles. |
+| **Prepared Statements:** Effectively prevent SQL injection by separating SQL code from data. | Can be bypassed if not implemented correctly or if dynamic SQL is still used. |
+| **Input Sanitization:** Helps ensure data integrity and prevents other types of attacks (e.g., XSS). | Not a foolproof solution against SQL injection; should be used in conjunction with prepared statements. |
+| **Data Validation:** Enforces data constraints and improves application reliability. | Requires careful planning and implementation to cover all possible attack vectors. |
+| **Least Privilege:** Limits the potential damage from a successful SQL injection attack. | Can complicate application design and require more granular access control management. |
+| **ORM (Object-Relational Mapping):** Can abstract away raw SQL queries, reducing the risk of injection. | May introduce performance overhead and require careful configuration to avoid vulnerabilities. |
 
 ## Practical Example
 ```python
 import sqlite3
 
-def get_user(username):
-    conn = sqlite3.connect('users.db')
+# Vulnerable code (example)
+def vulnerable_query(user_input):
+    query = "SELECT * FROM users WHERE username = '" + user_input + "'"
+    # Execute query (vulnerable to SQL injection)
+    return query
+
+# Secure code using prepared statements
+def secure_query(user_input):
+    conn = sqlite3.connect('example.db')
     cursor = conn.cursor()
-
-    # NEVER DO THIS:  SQL Injection Vulnerability
-    # query = "SELECT * FROM users WHERE username = '" + username + "'"
-    # cursor.execute(query)
-
-    # Use parameterized query instead
     query = "SELECT * FROM users WHERE username = ?"
-    cursor.execute(query, (username,))
-
-    user = cursor.fetchone()
+    cursor.execute(query, (user_input,))
+    results = cursor.fetchall()
     conn.close()
-    return user
+    return results
 
-username = "test' OR '1'='1"  # Example of malicious input
-user = get_user(username)
-
-if user:
-    print("User found:", user)
-else:
-    print("User not found")
+# Example usage
+user_input = "test' OR '1'='1"  # Malicious input
+#print(vulnerable_query(user_input)) #DO NOT RUN THIS
+results = secure_query(user_input)
+print(results) # Safe
 ```
 
 ## SHARD's Take
-Parameterized queries are the most reliable method for preventing SQL injection. Input validation and sanitization provide additional layers of defense, but should not be relied upon as the primary means of protection. Always treat user input as untrusted data.
+Prepared statements are the most effective defense against SQL injection, but developers must ensure they are consistently used and that no dynamic SQL generation circumvents their protection. Input validation remains important for data integrity and preventing other vulnerabilities, complementing prepared statements for a robust security posture. The principle of least privilege further limits the impact of successful attacks.
 
 ---
 *Generated by SHARD Autonomous Learning Engine*

@@ -1,6 +1,6 @@
-"""identity_core.py — SHARD's persistent identity derived from real data.
+"""identity_core.py -- SHARD's persistent identity derived from real data.
 
-Every field is computed from SQLite. The LLM only writes the narrative string —
+Every field is computed from SQLite. The LLM only writes the narrative string --
 it cannot invent facts. This is not a persona prompt. It is a biography.
 
 Updated at end of every NightRunner session.
@@ -86,7 +86,7 @@ class IdentityCore:
                 )
 
         logger.info(
-            "[IDENTITY] Rebuilt — sessions=%d cert_rate=%.0f%% self_esteem=%.2f trajectory=%s domains_strong=%s",
+            "[IDENTITY] Rebuilt -- sessions=%d cert_rate=%.0f%% self_esteem=%.2f trajectory=%s domains_strong=%s",
             facts["sessions_lived"], facts["cert_rate_overall"] * 100,
             facts["self_esteem"], facts["trajectory"],
             ", ".join(facts["strong_domains"]) or "none",
@@ -98,13 +98,13 @@ class IdentityCore:
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:
         """React to events from other modules."""
         if event_type == "session_complete":
-            # Rebuild already triggered directly by NightRunner — just log
+            # Rebuild already triggered directly by NightRunner -- just log
             logger.debug("[IDENTITY] session_complete received (rebuild handled by NightRunner)")
 
     def get_context_block(self) -> str:
         """Return a compact text block to inject into study prompts.
 
-        Contains only facts — no invented personality traits.
+        Contains only facts -- no invented personality traits.
         """
         d = self._data
         if not d.get("sessions_lived"):

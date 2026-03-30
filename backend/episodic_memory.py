@@ -1,4 +1,4 @@
-"""episodic_memory.py — SHARD experience memory.
+"""episodic_memory.py -- SHARD experience memory.
 
 Stores and retrieves structured study episodes so that SHARD can learn
 not just *what* a topic contains, but *how it experienced studying it*:
@@ -121,7 +121,7 @@ class EpisodicMemory:
         lines = [f"Past experience with '{topic}' ({len(episodes)} relevant attempt(s)):"]
         for ep in episodes:
             date = ep.get("timestamp", "")[:10]
-            score = ep.get("score") or 0  # guard: DB NULL → None → 0
+            score = ep.get("score") or 0  # guard: DB NULL -> None -> 0
             reason = ep.get("failure_reason") or "unknown"
             strats = ", ".join(ep.get("strategies_reused") or []) or "none"
             success = "CERTIFIED" if ep.get("success") else f"FAILED ({reason})"

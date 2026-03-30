@@ -1,9 +1,9 @@
-"""shard_interpretability.py — SHARD Interpretability Layer.
+"""shard_interpretability.py -- SHARD Interpretability Layer.
 
 Ogni volta che SHARD prende una decisione non ovvia, valuta un rischio,
 o rileva un conflitto interno tra obiettivi, lo registra qui.
 
-Questo non è un diario emotivo — è un audit trail ragionato.
+Questo non è un diario emotivo -- è un audit trail ragionato.
 Ogni record ha: cosa è successo, perché SHARD ha scelto X, quanto era sicuro,
 e se il ragionamento può essere condiviso per trasparenza.
 
@@ -145,7 +145,7 @@ class InterpretabilityLayer:
             "dominant_type":       top_type,
             "shareable_count":     len(self.get_shareable()),
             "summary": (
-                f"SHARD ha tracciato {len(self._records)} ragionamenti interni — "
+                f"SHARD ha tracciato {len(self._records)} ragionamenti interni -- "
                 f"tipo dominante: {top_type}, confidence media: {avg_conf:.0%}, "
                 f"{low_conf} decisioni ad alta incertezza."
             ),

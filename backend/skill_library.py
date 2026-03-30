@@ -1,12 +1,12 @@
-"""skill_library.py — Voyager-inspired persistent skill library for SHARD.
+"""skill_library.py -- Voyager-inspired persistent skill library for SHARD.
 
 Every certified skill is stored with its approach and score.
 When SHARD studies a related topic, past certified solutions are injected
-as context — so SHARD never re-invents what it already knows.
+as context -- so SHARD never re-invents what it already knows.
 
 Two components:
-  1. SkillLibrary — save/retrieve certified skills from SQLite
-  2. suggest_curriculum_topics() — proactive next-topic suggestion via GraphRAG
+  1. SkillLibrary -- save/retrieve certified skills from SQLite
+  2. suggest_curriculum_topics() -- proactive next-topic suggestion via GraphRAG
 
 Design rules:
   - Storage is SQLite only (shard.db, table skill_library)
@@ -90,7 +90,7 @@ class SkillLibrary:
                         "UPDATE skill_library SET score=?, session_id=?, strategies=?, certified_at=? WHERE topic=?",
                         (score, session_id, strats_json, now, topic),
                     )
-                    logger.info("[SKILL_LIB] Updated '%s' score %.1f → %.1f", topic, existing[0]["score"], score)
+                    logger.info("[SKILL_LIB] Updated '%s' score %.1f -> %.1f", topic, existing[0]["score"], score)
             else:
                 _db_execute(
                     "INSERT INTO skill_library (topic, score, session_id, strategies, certified_at) VALUES (?,?,?,?,?)",
@@ -129,7 +129,7 @@ class SkillLibrary:
     ) -> None:
         """Save the exact code that passed the benchmark for a certified topic.
 
-        Only saves if pass_rate >= 0.80 — partial passes may have hidden bugs.
+        Only saves if pass_rate >= 0.80 -- partial passes may have hidden bugs.
         Upserts: keeps the implementation with the highest score.
         """
         if not code or not code.strip():
@@ -197,7 +197,7 @@ class SkillLibrary:
 
             code_preview = best_row["code"][:600] + ("..." if len(best_row["code"]) > 600 else "")
             return (
-                f"[PAST WORKING CODE — adapt, don't copy]\n"
+                f"[PAST WORKING CODE -- adapt, don't copy]\n"
                 f"Topic: {best_row['topic']} | score={best_row['score']:.1f} | "
                 f"pass_rate={best_row['pass_rate']:.0%}\n"
                 f"```python\n{code_preview}\n```"
@@ -212,7 +212,7 @@ class SkillLibrary:
         into the study prompt before SHARD works on `topic`.
 
         Looks for:
-          1. Exact match (topic already certified → reinforcement/review note)
+          1. Exact match (topic already certified -> reinforcement/review note)
           2. GraphRAG relatives: topics linked via extends/improves/requires/depends_on
         """
         _ensure_table()
@@ -228,13 +228,13 @@ class SkillLibrary:
             if capability_graph is not None:
                 try:
                     from shard_db import query as db_query
-                    # Relations FROM topic (topic → other)
+                    # Relations FROM topic (topic -> other)
                     out_rows = db_query(
                         "SELECT target, relation_type FROM knowledge_graph "
                         "WHERE source = ? AND relation_type IN ('extends','improves','requires','depends_on')",
                         (topic,),
                     )
-                    # Relations TO topic (other → topic)
+                    # Relations TO topic (other -> topic)
                     in_rows = db_query(
                         "SELECT source as target, relation_type FROM knowledge_graph "
                         "WHERE target = ? AND relation_type IN ('extends','improves','requires','depends_on')",
@@ -264,13 +264,13 @@ class SkillLibrary:
                 seen.add(s["topic"])
                 deduped.append(s)
 
-        lines = ["=== SHARD SKILL LIBRARY — relevant certified skills ==="]
+        lines = ["=== SHARD SKILL LIBRARY -- relevant certified skills ==="]
         for s in deduped[:3]:  # max 3 to keep prompt compact
             strats = json.loads(s.get("strategies") or "[]")
             strat_note = f" via {', '.join(strats[:2])}" if strats else ""
-            match_note = " [THIS TOPIC — review/reinforce]" if s["match"] == "exact" else " [related]"
+            match_note = " [THIS TOPIC -- review/reinforce]" if s["match"] == "exact" else " [related]"
             lines.append(
-                f"• {s['topic']} — score {s['score']:.1f}/10{strat_note}{match_note}"
+                f"• {s['topic']} -- score {s['score']:.1f}/10{strat_note}{match_note}"
             )
         lines.append("Use these as foundation. Do not re-derive what you already know.")
         return "\n".join(lines)

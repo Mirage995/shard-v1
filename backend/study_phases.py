@@ -1,20 +1,20 @@
-"""study_phases.py — All pipeline phases for the SHARD study loop.
+"""study_phases.py -- All pipeline phases for the SHARD study loop.
 
 Each phase is a BasePhase subclass that reads from / writes to StudyContext.
 The code inside each phase is lifted verbatim from study_agent.study_topic()
-— prompts, scraping logic, and validation mechanisms are UNCHANGED.
+-- prompts, scraping logic, and validation mechanisms are UNCHANGED.
 
 Phase list (in pipeline order):
-  1. InitPhase           — meta-learning hint + episodic memory context
-  2. MapPhase            — search sources (DuckDuckGo)
-  3. AggregatePhase      — scrape web pages (Playwright)
-  4. SynthesizePhase     — LLM synthesis + cross-reference
-  5. StorePhase          — persist to ChromaDB
-  6. CrossPollinatePhase — integration report (non-fatal)
-  7. MaterializePhase    — cheat sheet to filesystem (non-fatal)
-  8. SandboxPhase        — code gen + Docker exec + SWE repair (non-fatal)
-  9. CertifyRetryGroup   — VALIDATE → EVALUATE → BENCHMARK → CERTIFY × N
- 10. PostStudyPhase      — meta-learning update, strategy tracking, episodic store (non-fatal)
+  1. InitPhase           -- meta-learning hint + episodic memory context
+  2. MapPhase            -- search sources (DuckDuckGo)
+  3. AggregatePhase      -- scrape web pages (Playwright)
+  4. SynthesizePhase     -- LLM synthesis + cross-reference
+  5. StorePhase          -- persist to ChromaDB
+  6. CrossPollinatePhase -- integration report (non-fatal)
+  7. MaterializePhase    -- cheat sheet to filesystem (non-fatal)
+  8. SandboxPhase        -- code gen + Docker exec + SWE repair (non-fatal)
+  9. CertifyRetryGroup   -- VALIDATE -> EVALUATE -> BENCHMARK -> CERTIFY × N
+ 10. PostStudyPhase      -- meta-learning update, strategy tracking, episodic store (non-fatal)
 """
 import json
 import re
@@ -80,7 +80,7 @@ class InitPhase(BasePhase):
             _domain = _wm.domain_of(ctx.topic)
             if _rel > 0.3:
                 _wm_hint = (
-                    f"[WORLD MODEL] Topic '{ctx.topic}' — "
+                    f"[WORLD MODEL] Topic '{ctx.topic}' -- "
                     f"relevance={round(_rel*100)}%  domain={_domain}. "
                     f"This is a high-value skill in the current software landscape."
                 )
@@ -120,7 +120,7 @@ class AggregatePhase(BasePhase):
             await ctx.emit("ERROR", 0, "No content could be scraped from any source.")
             if ctx.on_error:
                 await ctx.on_error(ctx.topic, "AGGREGATE", "No content could be scraped from any source")
-            raise RuntimeError("No content scraped — aborting pipeline")
+            raise RuntimeError("No content scraped -- aborting pipeline")
 
 
 # ── 4. SynthesizePhase ───────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ class SynthesizePhase(BasePhase):
     async def run(self, ctx: StudyContext) -> None:
         await ctx.emit("SYNTHESIZE", 0, "Building structured knowledge...")
 
-        # Vettore 1 — CognitionCore: query experience before synthesis
+        # Vettore 1 -- CognitionCore: query experience before synthesis
         # If sandbox always returned 0 in past attempts, inject STRUCTURAL PIVOT
         core = getattr(ctx.agent, "cognition_core", None)
         if core is not None:
@@ -151,11 +151,11 @@ class SynthesizePhase(BasePhase):
                             f"PAST FAILURE PATTERN DETECTED: sandbox returned 0 in "
                             f"{exp['attempt_count']} previous attempts for this topic. "
                             "The theoretical approach is NOT working. "
-                            f"[VETTORE 3 — DIRECTED PIVOT for '{cat}' (cert_rate={cr:.0%} storico)]: "
+                            f"[VETTORE 3 -- DIRECTED PIVOT for '{cat}' (cert_rate={cr:.0%} storico)]: "
                             f"{strat_rec['best_strategy_text']} "
                             "Apply this pattern concretely: executable code, step-by-step, real data."
                         )
-                        print(f"[VETTORE 1+3] Directed pivot for '{ctx.topic}' — category={cat} cr={cr:.0%}")
+                        print(f"[VETTORE 1+3] Directed pivot for '{ctx.topic}' -- category={cat} cr={cr:.0%}")
                     else:
                         # Fallback: generic pivot (no MetaLearning history yet)
                         ctx.pivot_directive = (
@@ -167,8 +167,8 @@ class SynthesizePhase(BasePhase):
                             "Avoid abstract theory. Think: what Python code do I write, "
                             "in what exact order, with what data structures."
                         )
-                        print(f"[VETTORE 1] Generic pivot for '{ctx.topic}' — no MetaLearning history")
-                    await ctx.emit("SYNTHESIZE", 0, "[COGNITION] Structural pivot activated — shifting to executable focus")
+                        print(f"[VETTORE 1] Generic pivot for '{ctx.topic}' -- no MetaLearning history")
+                    await ctx.emit("SYNTHESIZE", 0, "[COGNITION] Structural pivot activated -- shifting to executable focus")
             except Exception as _ce:
                 pass  # non-fatal
 
@@ -265,7 +265,7 @@ class SandboxPhase(BasePhase):
 
         # ── Shared assertion requirements block ───────────────────────────
         _ASSERT_BLOCK = """
-VALIDATION REQUIREMENTS (mandatory — this is how correctness is verified):
+VALIDATION REQUIREMENTS (mandatory -- this is how correctness is verified):
 
 After your implementation, write at least 3 assert statements that test real behavior:
 - Test normal inputs with known correct outputs
@@ -273,7 +273,7 @@ After your implementation, write at least 3 assert statements that test real beh
 - Test that the implementation actually does what the topic requires
 
 End with exactly this line:
-    print("✓ All assertions passed")
+    print("OK All assertions passed")
 
 Example structure:
     def my_function(x):
@@ -283,7 +283,7 @@ Example structure:
     assert my_function(2) == 4, "basic case failed"
     assert my_function(0) == 0, "zero edge case failed"
     assert my_function(-1) == 1, "negative edge case failed"
-    print("✓ All assertions passed")
+    print("OK All assertions passed")
 
 IMPORTANT: assert statements must test actual output values, not just that the function runs.
 BAD:  assert my_function(2) is not None
@@ -397,7 +397,7 @@ If the task would normally require such libraries, implement a simplified versio
                 break
             _net_retries += 1
             banned_line = match.group(0).strip()
-            print(f"[SANDBOX] Network import detected: '{banned_line}' — retry {_net_retries}/{_MAX_NET_RETRIES}")
+            print(f"[SANDBOX] Network import detected: '{banned_line}' -- retry {_net_retries}/{_MAX_NET_RETRIES}")
             net_violation_prompt = (
                 prompt_codice
                 + f"\n\nHai violato il vincolo di assenza di rete: '{banned_line}' non è consentito. "
@@ -416,7 +416,7 @@ If the task would normally require such libraries, implement a simplified versio
                 break
         else:
             if ctx.codice_generato and _BANNED_IMPORTS.search(ctx.codice_generato):
-                print("[SANDBOX] Network import persists after retries — aborting sandbox execution")
+                print("[SANDBOX] Network import persists after retries -- aborting sandbox execution")
                 ctx.codice_generato = None
 
         # ── Execution ────────────────────────────────────────────────────
@@ -429,19 +429,19 @@ If the task would normally require such libraries, implement a simplified versio
 
                 # ── Assertion marker check ────────────────────────────────
                 # If code ran but assertions marker is missing, treat as
-                # functional failure — code ran but proved nothing.
+                # functional failure -- code ran but proved nothing.
                 if ctx.sandbox_result.get("success", False):
                     stdout = ctx.sandbox_result.get("stdout", "")
-                    # Check for marker without the ✓ character to avoid Windows/Docker
-                    # encoding corruption (✓ arrives as âœ" on some Windows setups)
+                    # Check for marker without the OK character to avoid Windows/Docker
+                    # encoding corruption (OK arrives as âœ" on some Windows setups)
                     if "All assertions passed" not in stdout:
-                        print("[SANDBOX] ⚠️  No assertion marker in stdout — code ran but did not validate behavior")
+                        print("[SANDBOX] [WARN]️  No assertion marker in stdout -- code ran but did not validate behavior")
                         ctx.sandbox_result["success"] = False
                         ctx.sandbox_result["stderr"] = (
                             ctx.sandbox_result.get("stderr", "") +
-                            "\n[SANDBOX] AssertionError: missing '✓ All assertions passed' — "
+                            "\n[SANDBOX] AssertionError: missing 'OK All assertions passed' -- "
                             "add assert statements that verify actual output values, "
-                            "then print('✓ All assertions passed')"
+                            "then print('OK All assertions passed')"
                         )
 
                 if not ctx.sandbox_result.get("success", False):
@@ -483,13 +483,13 @@ If the task would normally require such libraries, implement a simplified versio
         sandbox_file = ctx.sandbox_result.get("file_path")
         stderr_text = ctx.sandbox_result.get("stderr", "unknown error")
 
-        # Detect assertion failure vs crash — different repair strategies
+        # Detect assertion failure vs crash -- different repair strategies
         is_assertion_failure = (
             "AssertionError" in stderr_text
             or "All assertions passed" in stderr_text
         )
         if is_assertion_failure:
-            print("[SANDBOX] Assertion failure detected — code logic is wrong, not syntax")
+            print("[SANDBOX] Assertion failure detected -- code logic is wrong, not syntax")
             error_tail = (
                 f"AssertionError in topic '{ctx.topic}': the implementation produced "
                 f"wrong output values. Fix the logic so all assert statements pass. "
@@ -520,7 +520,7 @@ If the task would normally require such libraries, implement a simplified versio
         if sandbox_file:
             await swe.repair_file_with_llm(sandbox_file, stderr_text)
         else:
-            print("[SIMULATION] no sandbox file path — skipping repair")
+            print("[SIMULATION] no sandbox file path -- skipping repair")
 
         print("[STUDY] retry sandbox")
         ctx.sandbox_result = await ctx.agent.run_sandbox(ctx.topic, ctx.codice_generato)
@@ -610,7 +610,7 @@ class CertifyRetryGroup(BasePhase):
                     ctx.topic, ctx.structured, sandbox_result=ctx.sandbox_result,
                 )
             except Exception as e:
-                raise  # fatal — propagates to pipeline
+                raise  # fatal -- propagates to pipeline
 
             # ── EVALUATE ─────────────────────────────────────────────
             try:
@@ -634,7 +634,7 @@ class CertifyRetryGroup(BasePhase):
                 ctx.agent.replay_engine.add_experiment(ctx.topic)
 
             except Exception as e:
-                raise  # fatal — propagates to pipeline
+                raise  # fatal -- propagates to pipeline
 
             # ── BENCHMARK (non-fatal) ────────────────────────────────
             try:
@@ -644,7 +644,7 @@ class CertifyRetryGroup(BasePhase):
                 ctx.eval_data = {**ctx.eval_data, **bench_update}
                 ctx.score = ctx.eval_data.get("score", ctx.score)
             except Exception as bench_phase_err:
-                print(f"[BENCHMARK] Non-fatal phase error — skipping: {bench_phase_err}")
+                print(f"[BENCHMARK] Non-fatal phase error -- skipping: {bench_phase_err}")
 
             # ── CERTIFY ──────────────────────────────────────────────
             ctx.certified = await ctx.agent.phase_certify(ctx.topic, ctx.eval_data)
@@ -669,14 +669,14 @@ class CertifyRetryGroup(BasePhase):
             else:
                 ctx.gaps = ctx.eval_data.get("gaps", [])
                 focus = ctx.eval_data.get("improvement_focus", "")
-                await ctx.emit("VALIDATE", ctx.score, f"Score {ctx.score}/10 — Retrying. Focus: {focus[:80]}")
+                await ctx.emit("VALIDATE", ctx.score, f"Score {ctx.score}/10 -- Retrying. Focus: {focus[:80]}")
 
                 if ctx.attempt < MAX_RETRY:
                     # On attempt 2+: ask CriticAgent for LLM meta-critique
-                    # "What am I doing wrong systematically?" — injects into retry prompt
+                    # "What am I doing wrong systematically?" -- injects into retry prompt
                     if ctx.attempt >= 2:
                         try:
-                            # Vettore 2 — CognitionCore: pass identity to CriticAgent
+                            # Vettore 2 -- CognitionCore: pass identity to CriticAgent
                             # "How confident are we really in this category?"
                             _identity_ctx = None
                             _core = getattr(ctx.agent, "cognition_core", None)
@@ -883,17 +883,17 @@ Please analyze the problem and propose a minimal patch.
         # Inject meta-critique if CriticAgent produced one (attempt >= 2)
         critique_block = ""
         if ctx.critic_meta_critique:
-            critique_block = f"\n\nCRITICAL SELF-EVALUATION (read carefully — this is what you keep getting wrong):\n{ctx.critic_meta_critique}\n"
+            critique_block = f"\n\nCRITICAL SELF-EVALUATION (read carefully -- this is what you keep getting wrong):\n{ctx.critic_meta_critique}\n"
             print(f"[CRITIC-LLM] Injecting meta-critique into retry prompt for '{ctx.topic}'")
 
-        # Vettore 1+2 — CognitionCore relational_context on attempt >= 2
+        # Vettore 1+2 -- CognitionCore relational_context on attempt >= 2
         # Full tension-aware context: Identity vs Experience vs Knowledge
         core_block = ""
         core = getattr(ctx.agent, "cognition_core", None)
         if core is not None and ctx.attempt >= 2:
             try:
                 ctx.core_relational_ctx = core.relational_context(ctx.topic)
-                core_block = f"\n\n[COGNITION CORE — INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
+                core_block = f"\n\n[COGNITION CORE -- INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
                 print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
             except Exception as _cre:
                 pass  # non-fatal
@@ -908,7 +908,7 @@ Please analyze the problem and propose a minimal patch.
         if 5.5 <= _score_now < 7.5:
             _gap_to_cert = round(7.5 - _score_now, 1)
             near_miss_block = (
-                f"\n\nNEAR-MISS: current score {_score_now}/10 — only {_gap_to_cert} points "
+                f"\n\nNEAR-MISS: current score {_score_now}/10 -- only {_gap_to_cert} points "
                 f"from certification (threshold=7.5). Do NOT change the overall approach. "
                 f"Refine and deepen: add precise code examples, cover edge cases explicitly, "
                 f"and ensure the most complex concept is fully explained with working code.\n"
@@ -919,7 +919,7 @@ Please analyze the problem and propose a minimal patch.
 Previous study of "{ctx.topic}" had these gaps: {gaps}
 Focus area: {focus}{critique_block}{core_block}{near_miss_block}
 Re-synthesize with emphasis on filling these specific gaps.
-If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR APPROACH — do not repeat the same strategy.
+If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR APPROACH -- do not repeat the same strategy.
 Use the same JSON format as before.
 """
         raw_gap = await ctx.agent._think_fast(gap_prompt, json_mode=True)
@@ -943,7 +943,7 @@ Rewrite a minimal executable Python script for: {ctx.topic}
 The previous attempt had these gaps: {', '.join(str(g) for g in gaps[:3])}
 Focus area: {focus}{critique_block}{core_block}
 Fix those gaps explicitly in the new implementation.
-If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR IMPLEMENTATION APPROACH — use a different pattern, different data structures, or different algorithm.
+If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR IMPLEMENTATION APPROACH -- use a different pattern, different data structures, or different algorithm.
 
 Rules:
 - valid Python, no markdown, no explanations, terminates automatically
@@ -963,7 +963,7 @@ Rules:
                 success_icon = "passed" if ctx.sandbox_result.get("success") else "failed"
                 print(f"[RETRY] Sandbox re-run: {success_icon}")
 
-                # Vettore 1 — Shadow Diagnostic: audit emergence after retry
+                # Vettore 1 -- Shadow Diagnostic: audit emergence after retry
                 if core is not None and ctx.core_relational_ctx:
                     try:
                         new_score = ctx.sandbox_result.get("score", 0.0) or 0.0
@@ -980,7 +980,7 @@ Rules:
                             "v3_recommended_strategy": getattr(ctx, "v3_recommended_strategy", None),
                         }
                         audit = await core.audit_emergence(ctx.topic, "retry", delta)
-                        print(f"[SHADOW DIAGNOSTIC] {audit} — topic='{ctx.topic}' attempt={ctx.attempt}")
+                        print(f"[SHADOW DIAGNOSTIC] {audit} -- topic='{ctx.topic}' attempt={ctx.attempt}")
                         ctx.prev_strategy_used = new_strategy
                     except Exception:
                         pass  # non-fatal
@@ -1067,7 +1067,7 @@ class PostStudyPhase(BasePhase):
                 )
                 print(f"[SEMANTIC] Indexed certified knowledge: '{ctx.topic}'")
             elif ctx.score > 0 and ctx.classified_error_type:
-                # Failed but has a classifiable error — save as error pattern
+                # Failed but has a classifiable error -- save as error pattern
                 _sem_ps.add_error_pattern(
                     error_text=f"{ctx.topic}: {ctx.classified_error_type}",
                     fix=f"Strategy attempted: {ctx.strategy_used or 'none'}. Score: {ctx.score:.1f}/10.",

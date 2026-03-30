@@ -7,7 +7,7 @@ from skill_utils import is_valid_topic
 # Exploration probability: occasionally attempt harder topics to avoid local minima
 EXPLORATION_PROBABILITY = 0.2  # 20% chance to explore difficulty + 2
 
-# Skill → suggested study topic
+# Skill -> suggested study topic
 DEFAULT_LEARNING_MAP: Dict[str, str] = {
     "numerical_computation": "NumPy fundamentals",
     "data_manipulation": "Pandas data analysis",
@@ -60,7 +60,7 @@ class ResearchAgenda:
         # Coda prioritaria e Set per deduplicazione ultra-veloce
         self.priority_topics: List[str] = []
         self._priority_set = set()
-        print(f"[RESEARCH AGENDA] Initialized with {len(self.learning_map)} skill→topic mappings")
+        print(f"[RESEARCH AGENDA] Initialized with {len(self.learning_map)} skill->topic mappings")
 
     def add_priority_topic(self, topic: str):
         # Filtro all'ingresso (Evita spazzatura)
@@ -100,7 +100,7 @@ class ResearchAgenda:
                 if goal_missing:
                     skill = random.choice(goal_missing)
                     topic = self.learning_map.get(skill) or skill
-                    print(f"[RESEARCH AGENDA] Selected goal prerequisite: {skill} → {topic}")
+                    print(f"[RESEARCH AGENDA] Selected goal prerequisite: {skill} -> {topic}")
                     topic_data = {"skill": skill, "topic": topic, "difficulty": 1}
             except Exception as e:
                 print(f"[RESEARCH AGENDA] Could not extract goal gaps: {e}")
@@ -126,7 +126,7 @@ class ResearchAgenda:
                         # Lancio dei dadi stocastico per la difficoltà (20% chance per diff 3)
                         difficulty = 3 if random.random() < EXPLORATION_PROBABILITY else 2
                         
-                        print(f"[RESEARCH AGENDA] INVENTED new topic on frontier: {target_skill} → {chosen_topic} (Diff: {difficulty})")
+                        print(f"[RESEARCH AGENDA] INVENTED new topic on frontier: {target_skill} -> {chosen_topic} (Diff: {difficulty})")
                         topic_data = {"skill": target_skill, "topic": chosen_topic, "difficulty": difficulty}
                     else:
                         print(f"[RESEARCH AGENDA] Inventor failed to return a valid list for: {target_skill}")

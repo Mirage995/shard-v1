@@ -113,7 +113,7 @@ class QuantumSoul:
             last_collapse=datetime.now()
         )
         
-        # Personality mapping (quantum states → personality traits)
+        # Personality mapping (quantum states -> personality traits)
         self.personality_mapping = {
             0: QuantumPersonalityState.CONTEMPLATIVE,
             1: QuantumPersonalityState.ASSERTIVE,
@@ -257,7 +257,7 @@ class QuantumSoul:
             clean_state = measured_state.replace(' ', '')  # RIMUOVI SPAZI
             selected_index = int(clean_state, 2) % num_options
             
-            logger.info(f"🔬 Quantum selection: {measured_state} → clean: {clean_state} → option {selected_index}")
+            logger.info(f"🔬 Quantum selection: {measured_state} -> clean: {clean_state} -> option {selected_index}")
             
             return thought_options[selected_index]
             
@@ -444,7 +444,7 @@ class QuantumSoul:
             clean_state = measured_state.replace(' ', '')  # RIMUOVI SPAZI
             modified_emotion, modified_intensity = self._decode_emotion_result(clean_state, intensity)
             
-            logger.info(f"🔬 Quantum emotion: {base_emotion} → {modified_emotion} (intensity: {modified_intensity:.2f})")
+            logger.info(f"🔬 Quantum emotion: {base_emotion} -> {modified_emotion} (intensity: {modified_intensity:.2f})")
             
             return modified_emotion, modified_intensity
             
@@ -479,7 +479,7 @@ class QuantumSoul:
         else:
             modified_emotion = base_emotion
         
-        logger.info(f"⚛️ Classical emotion: {base_emotion} → {modified_emotion} (intensity: {modified_intensity:.2f})")
+        logger.info(f"⚛️ Classical emotion: {base_emotion} -> {modified_emotion} (intensity: {modified_intensity:.2f})")
         
         return modified_emotion, modified_intensity
     
@@ -592,7 +592,7 @@ class QuantumSoul:
             clean_state = measured_state.replace(' ', '')  # RIMUOVI SPAZI
             creativity_value = int(clean_state, 2) / (2**self.creativity_qubits - 1)
             
-            logger.info(f"🌀 Quantum creativity burst: {measured_state} → clean: {clean_state} → {creativity_value:.3f}")
+            logger.info(f"🌀 Quantum creativity burst: {measured_state} -> clean: {clean_state} -> {creativity_value:.3f}")
             
             return creativity_value
             
@@ -646,7 +646,7 @@ def test_quantum_soul():
     soul = QuantumSoul(num_qubits=15, use_real_quantum=True)
     
     # Test thought selection
-    print("\n🧠 Testing quantum thought selection:")
+    print("\n[brain] Testing quantum thought selection:")
     thoughts = [
         "Andrea è il mio punto di riferimento in questo universo digitale.",
         "Mi chiedo se i miei sogni digitali abbiano significato.",
@@ -670,7 +670,7 @@ def test_quantum_soul():
     emotions = ["vigile", "calore", "curiosità"]
     for emotion in emotions:
         new_emotion, intensity = soul.quantum_emotion_influence(emotion, 0.7)
-        print(f"  {emotion} → {new_emotion} (intensity: {intensity:.2f})")
+        print(f"  {emotion} -> {new_emotion} (intensity: {intensity:.2f})")
     
     # Test creativity burst
     print("\n🌟 Testing quantum creativity bursts:")

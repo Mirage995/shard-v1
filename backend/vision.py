@@ -1,5 +1,5 @@
 """
-vision.py — SHARD Vision Layer.
+vision.py -- SHARD Vision Layer.
 
 Maintains a persistent narrative statement and focus domains that shape
 autonomous goal generation. Updated by certified topics, momentum shifts,
@@ -28,7 +28,7 @@ _VISION_PATH = _REPO_ROOT / "shard_memory" / "vision.json"
 
 _DEFAULT_VISION: dict = {
     "statement": (
-        "SHARD seeks to become a reliable autonomous problem-solver — "
+        "SHARD seeks to become a reliable autonomous problem-solver -- "
         "mastering software engineering fundamentals, building robust reasoning, "
         "and compounding knowledge session by session."
     ),
@@ -180,12 +180,12 @@ class VisionEngine:
             avoid.append(topic)
         self._v["avoid_domains"] = avoid[-_MAX_AVOID:]
 
-        self._log(f"frustration: {topic} ({hits} hits) → avoid_domains")
+        self._log(f"frustration: {topic} ({hits} hits) -> avoid_domains")
         self.save()
 
     def record_momentum(self, old: str, new: str) -> None:
         """Called when NightRunner detects a momentum shift."""
-        self._log(f"momentum: {old} → {new}")
+        self._log(f"momentum: {old} -> {new}")
         if new == "accelerating":
             # Expand focus slightly
             self._maybe_add_focus("advanced topics")
@@ -234,7 +234,7 @@ class VisionEngine:
     def _refresh_statement(self, count: int) -> None:
         """Update the statement to reflect cumulative progress."""
         base = (
-            "SHARD seeks to become a reliable autonomous problem-solver — "
+            "SHARD seeks to become a reliable autonomous problem-solver -- "
             "mastering software engineering fundamentals, building robust reasoning, "
             "and compounding knowledge session by session."
         )

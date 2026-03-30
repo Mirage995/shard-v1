@@ -1,4 +1,6 @@
 import threading
+import copy
+
 
 class Bank:
     """Manages accounts with deposit, withdraw, and transfer operations."""
@@ -83,4 +85,4 @@ class Bank:
 
     def get_audit_log(self):
         with self._lock:
-            return list(self._audit_log)
+            return copy.deepcopy(self._audit_log)

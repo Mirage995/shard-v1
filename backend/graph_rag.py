@@ -1,10 +1,10 @@
-"""graph_rag.py — GraphRAG: causal knowledge graph over SQLite.
+"""graph_rag.py -- GraphRAG: causal knowledge graph over SQLite.
 
 During SYNTHESIZE, SHARD extracts causal relations between concepts and saves them.
 During MAP/BENCHMARK, SHARD can query these relations to inject warnings.
 
 Example:
-  "asyncio → threading: causes_conflict — Using Thread with asyncio causes race conditions"
+  "asyncio -> threading: causes_conflict -- Using Thread with asyncio causes race conditions"
 
 This transforms SHARD from "student who studied" to "senior with experience".
 """
@@ -66,7 +66,7 @@ async def extract_and_store_relations(
     if len(concept_names) < 2:
         return 0
 
-    # Build lightweight prompt — only concept names + snippet of raw text
+    # Build lightweight prompt -- only concept names + snippet of raw text
     names_str = ", ".join(concept_names[:20])
     snippet = raw_text[:3000] if raw_text else ""
 
@@ -216,18 +216,18 @@ def query_causal_context(topic_or_concept: str, max_hops: int = 2) -> str:
         if not relevant:
             return ""
 
-        lines = ["⚠️  CAUSAL KNOWLEDGE (from previous studies):"]
+        lines = ["[WARN]️  CAUSAL KNOWLEDGE (from previous studies):"]
         for r in relevant[:8]:
             rel_icon = {
                 "causes_conflict": "⚡",
-                "breaks": "💥",
+                "breaks": "[!]",
                 "incompatible_with": "🚫",
                 "depends_on": "🔗",
                 "requires": "🔗",
                 "replaces": "↩️",
                 "improves": "✅",
                 "extends": "➕",
-            }.get(r["relation_type"], "→")
+            }.get(r["relation_type"], "->")
             lines.append(
                 f"  {rel_icon} {r['source_concept']} {r['relation_type'].replace('_', ' ')} "
                 f"{r['target_concept']}: {r['context'] or ''}"
@@ -244,7 +244,7 @@ def get_related_topics(topic: str, relation_types: list[str] | None = None, limi
     """Return target concepts related to `topic` via the given relation types.
 
     Used by desire_engine to find adjacent unexplored topics for curiosity propagation.
-    Defaults to 'extends' and 'improves' — the forward-learning relations.
+    Defaults to 'extends' and 'improves' -- the forward-learning relations.
     """
     if relation_types is None:
         relation_types = ["extends", "improves"]

@@ -1,4 +1,4 @@
-"""semantic_memory.py — SemanticMemory: ChromaDB-backed long-term memory for SHARD.
+"""semantic_memory.py -- SemanticMemory: ChromaDB-backed long-term memory for SHARD.
 
 This is the foundation of SHARD's path toward AGI-level scaffolding.
 Instead of static keyword lookups, SHARD can now ask:
@@ -64,9 +64,9 @@ class SemanticMemory:
     """ChromaDB-backed semantic memory for SHARD.
 
     Collections:
-        episodes  — benchmark run history (indexed by error patterns + task)
-        knowledge — NightRunner knowledge base (cheat sheets, study notes)
-        errors    — recurring error fingerprints and their fixes
+        episodes  -- benchmark run history (indexed by error patterns + task)
+        knowledge -- NightRunner knowledge base (cheat sheets, study notes)
+        errors    -- recurring error fingerprints and their fixes
     """
 
     def __init__(self):
@@ -302,11 +302,11 @@ class SemanticMemory:
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:
         """React to environment events broadcast by CognitionCore.
 
-        SemanticMemory is the memory layer — it indexes knowledge and errors
+        SemanticMemory is the memory layer -- it indexes knowledge and errors
         as they are produced by other modules.
         """
         if event_type == "skill_certified":
-            # Another module certified a skill — index it so future queries find it
+            # Another module certified a skill -- index it so future queries find it
             topic = data.get("topic", "")
             score = data.get("score", 0.0)
             if topic:
@@ -320,7 +320,7 @@ class SemanticMemory:
                     pass
 
         elif event_type == "frustration_peak":
-            # A topic is chronically failing — query for similar past solutions
+            # A topic is chronically failing -- query for similar past solutions
             # and store as an error pattern hint for future study cycles
             topic = data.get("topic", "")
             hits = data.get("hits", 0)
@@ -349,7 +349,7 @@ def get_semantic_memory() -> SemanticMemory:
 
 def query_semantic_memory(text: str, top_k: int = 3,
                           min_score: float = 0.35) -> str:
-    """Convenience function for prompt injection — safe to call from anywhere."""
+    """Convenience function for prompt injection -- safe to call from anywhere."""
     try:
         return get_semantic_memory().query_for_prompt(text, top_k=top_k, min_score=min_score)
     except Exception as e:

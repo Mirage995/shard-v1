@@ -1,5 +1,5 @@
 """
-SHARD Filesystem Tools — Sandboxed file operations for Function Calling.
+SHARD Filesystem Tools -- Sandboxed file operations for Function Calling.
 
 All paths are resolved relative to a workspace directory.
 Path traversal outside the workspace is blocked.
@@ -140,7 +140,7 @@ def read_file(filepath: str, workspace: str) -> str:
             content = f.read(MAX_READ_BYTES)
 
         if file_size > MAX_READ_BYTES:
-            content += f"\n\n... [TRUNCATED — file is {file_size / 1024:.1f} KB, showing first {MAX_READ_BYTES / 1024:.0f} KB]"
+            content += f"\n\n... [TRUNCATED -- file is {file_size / 1024:.1f} KB, showing first {MAX_READ_BYTES / 1024:.0f} KB]"
 
         return content
 
@@ -172,7 +172,7 @@ def write_file(filepath: str, content: str, workspace: str = None) -> str:
         workspace = os.path.realpath(workspace)
 
         resolved = _resolve_safe_path(filepath, workspace)
-        print(f"[TOOL] write_file → resolved workspace path: {resolved}")
+        print(f"[TOOL] write_file -> resolved workspace path: {resolved}")
 
         # Ensure parent directories exist
         os.makedirs(os.path.dirname(resolved), exist_ok=True)

@@ -1,11 +1,11 @@
-"""report_agent.py — Intelligent night recap generator.
+"""report_agent.py -- Intelligent night recap generator.
 
 Instead of a static JSON dump, queries live system state to produce
 actionable insights: chronic failures, near-misses, trending categories,
 persona winners, causal knowledge growth.
 
 Called by night_runner._generate_markdown_recap() to add an INSIGHTS section
-to the recap. Non-fatal — if anything fails, returns empty string.
+to the recap. Non-fatal -- if anything fails, returns empty string.
 
 Design (from DeepSeek suggestion #6):
     chronic_failures  = topics that failed 2+ times (retry candidates)
@@ -30,7 +30,7 @@ async def generate_insights(
 
     Args:
         session_data:  List of cycle dicts from NightRunner (topic, score, certified, etc.)
-        think_fn:      study_agent._think — for the final narrative generation
+        think_fn:      study_agent._think -- for the final narrative generation
 
     Returns:
         Formatted markdown string (ready to append to recap), or "" on failure.
@@ -43,15 +43,15 @@ async def generate_insights(
         if chronic:
             lines = ["### Fallimenti Cronici (candidati ripetizione)"]
             for row in chronic[:5]:
-                lines.append(f"- `{row['topic']}` — {row['attempts']} tentativi, max score: {row['best_score']:.1f}")
+                lines.append(f"- `{row['topic']}` -- {row['attempts']} tentativi, max score: {row['best_score']:.1f}")
             sections.append("\n".join(lines))
 
         # ── 2. Near-misses Phoenix candidates ─────────────────────────────────
         near_misses = _query_near_misses()
         if near_misses:
-            lines = ["### Near-Miss (Protocol Phoenix — da ritentare)"]
+            lines = ["### Near-Miss (Protocol Phoenix -- da ritentare)"]
             for row in near_misses[:5]:
-                lines.append(f"- `{row['topic']}` — best: {row['best_score']:.1f}/10 ({row['attempt_count']} tentativi)")
+                lines.append(f"- `{row['topic']}` -- best: {row['best_score']:.1f}/10 ({row['attempt_count']} tentativi)")
             sections.append("\n".join(lines))
 
         # ── 3. Tonight's topic summary ────────────────────────────────────────

@@ -1,12 +1,12 @@
 """Shared session lock for SHARD.
 
 SHARD_SESSION_LOCK (asyncio.Semaphore) prevents NightRunner from starting
-an autonomous study cycle while a live Gemini audio session is active —
+an autonomous study cycle while a live Gemini audio session is active --
 and vice versa.
 
 Dual-layer coordination:
-  - In-process:      asyncio.Semaphore(1) — works when both run in same event loop
-  - Cross-process:   SESSION_LOCK_FILE    — works when NightRunner is a separate process
+  - In-process:      asyncio.Semaphore(1) -- works when both run in same event loop
+  - Cross-process:   SESSION_LOCK_FILE    -- works when NightRunner is a separate process
 """
 import asyncio
 from pathlib import Path

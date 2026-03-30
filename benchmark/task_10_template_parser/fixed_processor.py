@@ -1,6 +1,7 @@
 """Template argument parser — extracted from pylint/reporters/text.py"""
 import re
 import warnings
+import copy
 
 MESSAGE_FIELDS = {"category", "symbol", "msg", "C", "module", "obj", "line", "col_offset", "path", "abspath"}
 
@@ -13,6 +14,7 @@ def parse_template(template: str) -> list[str]:
     Warns if an unknown field is referenced.
     Returns the list of valid argument names found.
     """
+    template = copy.copy(template)
     arguments = PATTERN.findall(template)
     valid = []
     for field_name, _fmt in arguments:

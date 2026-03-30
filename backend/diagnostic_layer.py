@@ -1,11 +1,11 @@
-"""diagnostic_layer.py — Named failure mode classifier for SHARD.
+"""diagnostic_layer.py -- Named failure mode classifier for SHARD.
 
-Takes stuck tests + attempt history + current code → targeted diagnostic hint.
+Takes stuck tests + attempt history + current code -> targeted diagnostic hint.
 
 Three classifiers:
-  1. IDEMPOTENCY  — test calls function twice, offset applied twice
-  2. OSCILLATION  — score alternates A/B, model never combines both fixes
-  3. (DEADLOCK handled inline in benchmark_loop.py — timeout + 0/0 tests)
+  1. IDEMPOTENCY  -- test calls function twice, offset applied twice
+  2. OSCILLATION  -- score alternates A/B, model never combines both fixes
+  3. (DEADLOCK handled inline in benchmark_loop.py -- timeout + 0/0 tests)
 """
 import re
 
@@ -32,7 +32,7 @@ def classify_failure(
 # ── 1. IDEMPOTENCY ────────────────────────────────────────────────────────────
 
 def _check_idempotency(stuck_tests: list, current_code: str) -> str:
-    """Detect: function called twice → transformation applied twice."""
+    """Detect: function called twice -> transformation applied twice."""
     triggers = [t for t in stuck_tests
                 if any(kw in t.lower() for kw in ("idempotent", "twice", "double", "repeat"))]
     if not triggers:
@@ -52,11 +52,11 @@ def _check_idempotency(stuck_tests: list, current_code: str) -> str:
         hint += (
             "\nDETECTED: Your function applies an offset/transformation but has NO guard\n"
             "to prevent applying it a second time.\n"
-            "\nREQUIRED FIX — add a '_calibrated' flag:\n"
-            "    r = dict(reading)          # copy — never mutate input\n"
+            "\nREQUIRED FIX -- add a '_calibrated' flag:\n"
+            "    r = dict(reading)          # copy -- never mutate input\n"
             "    if r.get('valid') and sid in config and not r.get('_calibrated'):\n"
             "        r['value'] = round(r['value'] + config[sid]['offset'], 2)\n"
-            "        r['_calibrated'] = True   # ← marks as already processed\n"
+            "        r['_calibrated'] = True   # <- marks as already processed\n"
             "    result.append(r)\n"
             "\nWith this flag: calling the function again on the output is a no-op.\n"
         )

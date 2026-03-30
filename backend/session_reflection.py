@@ -1,5 +1,5 @@
 """
-session_reflection.py — SHARD end-of-session LLM reflection.
+session_reflection.py -- SHARD end-of-session LLM reflection.
 
 At the end of each NightRunner session, generates a structured LLM reflection
 that identifies patterns, connections, and surprises across the session's work.
@@ -146,7 +146,7 @@ class SessionReflection:
             ts = rec.get("ts", "")[:10]  # date only
             text = rec.get("text", "").strip()
             if len(text) > _MAX_REFLECTION_CHARS:
-                text = text[:_MAX_REFLECTION_CHARS] + "…"
+                text = text[:_MAX_REFLECTION_CHARS] + "..."
             certified = rec.get("certified", [])
             certified_line = (
                 f"Certified: {', '.join(certified[:6])}" if certified else ""
@@ -200,10 +200,10 @@ class SessionReflection:
 
 Write a structured reflection with these sections (use plain text, no markdown headers):
 
-1. PATTERNS — What recurring themes or error types appeared across topics?
-2. CONNECTIONS — What unexpected links did you notice between different topics?
-3. SURPRISES — What worked better or worse than expected?
-4. NEXT FOCUS — One or two concrete areas to prioritise next session based on the data above.
+1. PATTERNS -- What recurring themes or error types appeared across topics?
+2. CONNECTIONS -- What unexpected links did you notice between different topics?
+3. SURPRISES -- What worked better or worse than expected?
+4. NEXT FOCUS -- One or two concrete areas to prioritise next session based on the data above.
 
 Be specific. Reference actual topic names. Keep it under 250 words.
 """

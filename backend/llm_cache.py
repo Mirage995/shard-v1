@@ -1,4 +1,4 @@
-"""llm_cache.py — LLM response cache (in-memory + SQLite persistence).
+"""llm_cache.py -- LLM response cache (in-memory + SQLite persistence).
 
 Avoids duplicate LLM calls for identical or near-identical prompts.
 Useful when night_runner re-studies similar topics or swarm reviewers
@@ -6,7 +6,7 @@ get the same boilerplate code in back-to-back sessions.
 
 Cache strategy:
   - Key: MD5(prompt[:2000] + system[:200] + providers_str)
-  - TTL: 2 hours (prompts about code/study expire quickly — content changes)
+  - TTL: 2 hours (prompts about code/study expire quickly -- content changes)
   - Max entries: 500 (LRU eviction when full)
   - Persistence: SQLite table llm_cache in shard.db (survives restart)
 
@@ -30,7 +30,7 @@ _SYSTEM_KEY_LEN = 200
 
 # ── In-memory LRU cache ───────────────────────────────────────────────────────
 
-_cache: OrderedDict[str, tuple[float, str]] = OrderedDict()  # key → (expires_at, response)
+_cache: OrderedDict[str, tuple[float, str]] = OrderedDict()  # key -> (expires_at, response)
 _hits = 0
 _misses = 0
 
@@ -141,7 +141,7 @@ async def cached_llm_complete(
     Cache is bypassed when:
     - skip_cache=True (force fresh call)
     - temperature > 0.3 (creative/varied responses shouldn't be cached)
-    - prompt is very short (<50 chars — probably a one-off)
+    - prompt is very short (<50 chars -- probably a one-off)
     """
     from llm_router import llm_complete
 
@@ -157,7 +157,7 @@ async def cached_llm_complete(
         logger.debug("[LLM_CACHE] HIT key=%s", key[:8])
         return cached
 
-    # Cache miss — call real LLM
+    # Cache miss -- call real LLM
     response = await llm_complete(prompt, system, max_tokens, temperature, providers)
     _put(key, response)
     return response

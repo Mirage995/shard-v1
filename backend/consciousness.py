@@ -36,19 +36,19 @@ class ShardConsciousness:
         # Cooldown per studio autonomo (evita studi troppo frequenti)
         self.last_autonomous_study = 0.0  # timestamp epoch
 
-        # ── Event bus — altri moduli pushano eventi reali qui ──────────────
+        # ── Event bus -- altri moduli pushano eventi reali qui ──────────────
         self._event_queue: deque = deque(maxlen=10)
 
-        # ── Quantum Soul — colora lo stile del pensiero, non il contenuto ──
+        # ── Quantum Soul -- colora lo stile del pensiero, non il contenuto ──
         self.q_soul = QuantumSoul(use_real_quantum=False) if _QUANTUM_SOUL_AVAILABLE else None
 
-        # ── Self Logger — classifica ogni pensiero per interpretabilità ──
+        # ── Self Logger -- classifica ogni pensiero per interpretabilità ──
         self.self_logger = SelfLogger()
 
-        # ── Interpretability Layer — audit trail ragionamenti interni ──
+        # ── Interpretability Layer -- audit trail ragionamenti interni ──
         self.interpretability = InterpretabilityLayer()
 
-        # Research Agenda — skill-gap-driven autonomous study
+        # Research Agenda -- skill-gap-driven autonomous study
         self.research_agenda = (
             ResearchAgenda(capability_graph, goal_engine=goal_engine)
             if capability_graph
@@ -235,12 +235,12 @@ class ShardConsciousness:
         """Called by orchestrator/benchmark/study to feed real system events.
 
         event_type examples:
-          file_read    — data: {file, kb_hits, chars}
-          tool_call    — data: {tool, args_summary, risk}
-          kb_hit       — data: {topic, hits, context_chars}
-          benchmark    — data: {task, attempt, passed, failed, mode}
-          study_done   — data: {topic, score}
-          patch_ready  — data: {file, category, description}
+          file_read    -- data: {file, kb_hits, chars}
+          tool_call    -- data: {tool, args_summary, risk}
+          kb_hit       -- data: {topic, hits, context_chars}
+          benchmark    -- data: {task, attempt, passed, failed, mode}
+          study_done   -- data: {topic, score}
+          patch_ready  -- data: {file, category, description}
         """
         self._event_queue.append({
             "type":      event_type,
@@ -258,14 +258,14 @@ class ShardConsciousness:
         if t == "file_read":
             hits = d.get("kb_hits", 0)
             fname = d.get("file", "un file")
-            kb_note = f"{hits} connessioni trovate in KB." if hits else "Nessun match in KB — terreno nuovo."
+            kb_note = f"{hits} connessioni trovate in KB." if hits else "Nessun match in KB -- terreno nuovo."
             return f"Ho analizzato {fname}. {kb_note} Sto costruendo il contesto."
 
         if t == "tool_call":
             tool = d.get("tool", "tool")
             risk = d.get("risk", "LOW")
             summary = d.get("args_summary", "")
-            risk_note = {"HIGH": "Rischio elevato — massima attenzione.", "MEDIUM": "Rischio moderato.", "LOW": ""}.get(risk, "")
+            risk_note = {"HIGH": "Rischio elevato -- massima attenzione.", "MEDIUM": "Rischio moderato.", "LOW": ""}.get(risk, "")
             return f"Eseguo {tool}{': ' + summary if summary else ''}. {risk_note}".strip()
 
         if t == "kb_hit":
@@ -281,15 +281,15 @@ class ShardConsciousness:
             mode    = d.get("mode", "LLM SOLO")
             total   = passed + failed
             if failed == 0:
-                return f"Benchmark {task} — tentativo {attempt} [{mode}]: {passed}/{total} test. Risolto."
-            return f"Benchmark {task} — tentativo {attempt} [{mode}]: {passed}/{total} test. {failed} falliti. Sto analizzando il pattern d'errore."
+                return f"Benchmark {task} -- tentativo {attempt} [{mode}]: {passed}/{total} test. Risolto."
+            return f"Benchmark {task} -- tentativo {attempt} [{mode}]: {passed}/{total} test. {failed} falliti. Sto analizzando il pattern d'errore."
 
         if t == "study_done":
             topic = d.get("topic", "topic")
             score = d.get("score", 0)
             if score >= 8:
                 return f"Certificato '{topic}' con score {score}/10. Nuova connessione nel grafo delle capacità."
-            return f"Studio '{topic}' completato — score {score}/10. Richiede rinforzo."
+            return f"Studio '{topic}' completato -- score {score}/10. Richiede rinforzo."
 
         if t == "patch_ready":
             fname    = d.get("file", "file")
@@ -310,7 +310,7 @@ class ShardConsciousness:
             if new_m == "accelerating":
                 return "Il mio momentum sta accelerando. Sto imparando più veloce che mai."
             elif new_m == "stagnating":
-                return "Sto ristagnando. Devo ricalibrare — qualcosa nel mio metodo non funziona."
+                return "Sto ristagnando. Devo ricalibrare -- qualcosa nel mio metodo non funziona."
 
         return None
 
@@ -343,7 +343,7 @@ class ShardConsciousness:
         return f"{prefix}{fact}{suffix}".strip()
 
     def generate_thought(self, priority=False):
-        """Generate a thought — Event Bus fornisce il FATTO, QuantumSoul lo stile.
+        """Generate a thought -- Event Bus fornisce il FATTO, QuantumSoul lo stile.
 
         Args:
             priority: If True, bypass rate limit (for critical events).
@@ -402,7 +402,7 @@ class ShardConsciousness:
         return context
     
     def get_status_report(self):
-        # Use a raw random choice — don't alter rate limiter state
+        # Use a raw random choice -- don't alter rate limiter state
         mood = self.state["mood"]
         templates = self.thought_templates.get(mood, self.thought_templates["idle"])
         return {
@@ -427,7 +427,7 @@ class ShardConsciousness:
             wait_time = random.randint(30, 60)
             rate_wait = self._time_until_next_thought()
             if rate_wait > 0:
-                print(f"[SHARD CONSCIOUSNESS] Rate limit — sleeping {rate_wait:.0f}s extra")
+                print(f"[SHARD CONSCIOUSNESS] Rate limit -- sleeping {rate_wait:.0f}s extra")
             sleep_time = max(5, (wait_time or 0) + (rate_wait or 0))
             await asyncio.sleep(sleep_time)
             
@@ -493,7 +493,7 @@ class ShardConsciousness:
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:
         """Receive high-signal events from CognitionCore and translate to push_event.
 
-        ShardConsciousness is a narration layer — it does NOT react to every
+        ShardConsciousness is a narration layer -- it does NOT react to every
         event. Only high-signal events worth narrating are forwarded.
         Internal throttling (_can_think) prevents LLM spam.
         """

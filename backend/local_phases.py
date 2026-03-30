@@ -1,10 +1,10 @@
-"""local_phases.py — Pipeline phases for local codebase analysis.
+"""local_phases.py -- Pipeline phases for local codebase analysis.
 
 Replaces web-scraping phases (MapPhase + AggregatePhase) with local file reading.
 Used by social_agent_analyzer.py and any future LocalFlow-style pipelines.
 
 Phases:
-  - LocalDirMapPhase: walks a directory, reads source files → ctx.sources + ctx.raw_text
+  - LocalDirMapPhase: walks a directory, reads source files -> ctx.sources + ctx.raw_text
   - CodeReviewSandboxPhase: asks LLM to propose refactoring based on synthesized architecture
 """
 import os
@@ -115,12 +115,12 @@ class LocalDirMapPhase(BasePhase):
                 block = header + content + "\n"
 
                 if total_chars + len(block) > MAX_TOTAL_CHARS:
-                    # Truncate to fit — add as much as possible
+                    # Truncate to fit -- add as much as possible
                     remaining = MAX_TOTAL_CHARS - total_chars
                     if remaining > len(header) + 200:
                         raw_parts.append(header + content[:remaining - len(header)] + "\n... [TRUNCATED]\n")
                         total_chars = MAX_TOTAL_CHARS
-                    print(f"[LOCAL_DIR_MAP] Reached {MAX_TOTAL_CHARS} char limit — stopping file reads")
+                    print(f"[LOCAL_DIR_MAP] Reached {MAX_TOTAL_CHARS} char limit -- stopping file reads")
                     break
                 else:
                     raw_parts.append(block)
@@ -180,7 +180,7 @@ class CodeReviewSandboxPhase(BasePhase):
         file_list = "\n".join(f"  - {f['path']} ({f['lines']} lines)" for f in top_files)
 
         # IMPORTANT: keep this prompt short and the JSON schema minimal.
-        # _think() has max_tokens=2000 — we bypass it below with 4096,
+        # _think() has max_tokens=2000 -- we bypass it below with 4096,
         # but the prompt itself must stay lean to leave room for the response.
         review_prompt = f"""You are a Staff Software Engineer doing a code review. BE LETALLY CONCISE.
 
@@ -190,12 +190,12 @@ TOP FILES: {file_list}
 SOURCE CODE (excerpt):
 {ctx.raw_text[:8000]}
 
-STRICT OUTPUT RULES — VIOLATIONS WILL CORRUPT THE OUTPUT:
+STRICT OUTPUT RULES -- VIOLATIONS WILL CORRUPT THE OUTPUT:
 - architecture_assessment: MAX 200 words, single plain string, NO newlines inside the string
 - top_priorities: exactly 2 items, each MAX 25 words
 - issues: list ONLY the 2-3 most critical issues, NO more
 - fix_before / fix_after: MAX 1 line each, NO newlines
-- YOU MUST close every bracket and brace — the JSON MUST be complete and valid
+- YOU MUST close every bracket and brace -- the JSON MUST be complete and valid
 - NO markdown, NO text outside the JSON
 
 Return ONLY this JSON (nothing before, nothing after):
@@ -239,7 +239,7 @@ Return ONLY this JSON (nothing before, nothing after):
                 ctx.progress.complete_phase("CODE_REVIEW")
             return
 
-        # Parse review JSON — safe_json_load returns None on failure, never raises
+        # Parse review JSON -- safe_json_load returns None on failure, never raises
         import json
         review_data = None
         try:
@@ -253,13 +253,13 @@ Return ONLY this JSON (nothing before, nothing after):
             except Exception:
                 pass
         if not isinstance(review_data, dict):
-            # LLM returned non-JSON prose — save raw text and wrap so pipeline continues
+            # LLM returned non-JSON prose -- save raw text and wrap so pipeline continues
             review_data = {
                 "architecture_assessment": raw_review[:2000],
                 "top_priorities": [],
                 "issues": [],
             }
-            print("[CODE_REVIEW] LLM returned non-JSON — wrapped as plain assessment")
+            print("[CODE_REVIEW] LLM returned non-JSON -- wrapped as plain assessment")
             self._save_markdown(raw_review, parsed=False)
         else:
             self._save_markdown_from_data(review_data)
@@ -327,7 +327,7 @@ Rules:
                         ctx.sandbox_result["refactored_file"] = target_file
                         ctx.sandbox_result["refactored_code"] = refactored
                         ctx.sandbox_result["original_code"] = original_code
-                        await ctx.emit("CODE_REVIEW", 0, f"Refactored {target_file} — {len(issues)} issues addressed")
+                        await ctx.emit("CODE_REVIEW", 0, f"Refactored {target_file} -- {len(issues)} issues addressed")
                 except Exception as e:
                     print(f"[CODE_REVIEW] Refactoring generation failed: {e}")
 
@@ -361,10 +361,10 @@ Rules:
         fname = f"{self.codebase_path.name}_audit_raw_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         out = self._reports_dir() / fname
         content = f"# Code Review: {self.codebase_path.name}\n\n"
-        content += f"_Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} — raw output (JSON parse failed)_\n\n"
+        content += f"_Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} -- raw output (JSON parse failed)_\n\n"
         content += "```\n" + raw_text + "\n```\n"
         out.write_text(content, encoding="utf-8")
-        print(f"[CODE_REVIEW] Raw output saved → {out}")
+        print(f"[CODE_REVIEW] Raw output saved -> {out}")
 
     def _save_markdown_from_data(self, review_data: dict) -> None:
         """Render the parsed review as a clean Markdown report."""
@@ -400,7 +400,7 @@ Rules:
             f   = issue.get("file", "?")
             lr  = issue.get("line_range", "")
             lines += [
-                f"### [{sev}] `{f}`{' L' + lr if lr else ''} — {cat}",
+                f"### [{sev}] `{f}`{' L' + lr if lr else ''} -- {cat}",
                 "",
                 issue.get("problem", ""),
                 "",
@@ -418,12 +418,12 @@ Rules:
                 "",
                 f"## Refactored File: `{refactored_file}`",
                 "",
-                "_Refactored code generated by SHARD — review before applying._",
+                "_Refactored code generated by SHARD -- review before applying._",
                 "",
             ]
 
         out.write_text("\n".join(lines), encoding="utf-8")
-        print(f"[CODE_REVIEW] Audit report saved → {out}")
+        print(f"[CODE_REVIEW] Audit report saved -> {out}")
 
 
 # ── CodeReviewCertifyPhase ────────────────────────────────────────────────────
@@ -433,7 +433,7 @@ class CodeReviewCertifyPhase(BasePhase):
 
     Replaces CertifyRetryGroup for local codebase analysis.
     Uses phase_validate + phase_evaluate (LLM scoring) but skips the
-    BenchmarkGenerator — which generates algorithmic problems meaningless
+    BenchmarkGenerator -- which generates algorithmic problems meaningless
     for a code review context.
 
     Certification threshold: score >= 7.5 (same as standard pipeline).
@@ -499,7 +499,7 @@ class CodeReviewCertifyPhase(BasePhase):
         n_warn = len([i for i in issues if i.get("severity") == "warning"])
         status = "✅ CERTIFIED" if ctx.certified else "❌ NOT CERTIFIED"
         print(
-            f"[CODE_REVIEW_CERTIFY] {status} — score={ctx.score:.1f}/10 | "
+            f"[CODE_REVIEW_CERTIFY] {status} -- score={ctx.score:.1f}/10 | "
             f"{len(issues)} issues ({n_crit} critical, {n_warn} warnings) | "
             f"refactored={'yes' if has_refactored else 'no'}"
         )

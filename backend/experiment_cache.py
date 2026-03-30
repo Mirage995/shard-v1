@@ -1,4 +1,4 @@
-"""Semantic Experiment Cache — skip failed topics until SHARD learns new skills.
+"""Semantic Experiment Cache -- skip failed topics until SHARD learns new skills.
 
 Storage: shard_memory/shard.db (failed_cache table).
 Fallback: reads legacy failed_cache.json if DB is unavailable.
@@ -74,7 +74,7 @@ class SemanticExperimentCache:
             conn.commit()
             logger.info("[DB] Registered failed experiment: '%s' (skills=%d)", topic, current_skill_count)
         except Exception as exc:
-            logger.error("[DB] failed_cache register_failure write failed: %s — in-memory only", exc)
+            logger.error("[DB] failed_cache register_failure write failed: %s -- in-memory only", exc)
         print(f"[CACHE] Registered failed experiment: '{topic}' (Skills at failure: {current_skill_count})")
 
     def should_skip(self, topic: str, current_skill_count: int) -> bool:

@@ -1,15 +1,15 @@
-"""improvement_engine.py — SHARD's proactive self-improvement scheduler.
+"""improvement_engine.py -- SHARD's proactive self-improvement scheduler.
 
 Consumes ImprovementTickets from SelfAnalyzer and converts them into a
 prioritised topic queue that NightRunner drains before choosing any topic.
 
 Decision logic per ticket type:
-  retry_chronic_failure  avg < 3.5  → DECOMPOSE: split compound topic into atoms
-  retry_chronic_failure  avg ≥ 3.5  → INJECT directly (close enough to work)
-  certify_near_miss                 → INJECT directly (one push needed)
-  retry_grown                       → INJECT directly (new prereqs available)
-  fill_capability_gap               → INJECT the mapped study topic
-  stagnation_probe                  → INJECT a cross-domain challenge
+  retry_chronic_failure  avg < 3.5  -> DECOMPOSE: split compound topic into atoms
+  retry_chronic_failure  avg ≥ 3.5  -> INJECT directly (close enough to work)
+  certify_near_miss                 -> INJECT directly (one push needed)
+  retry_grown                       -> INJECT directly (new prereqs available)
+  fill_capability_gap               -> INJECT the mapped study topic
+  stagnation_probe                  -> INJECT a cross-domain challenge
 
 State is persisted to shard_memory/improvement_queue.json so the queue
 survives process restarts and NightRunner can consume it across sessions.
@@ -29,12 +29,12 @@ _ROOT        = Path(__file__).parent.parent.resolve()
 _QUEUE_FILE  = _ROOT / "shard_memory" / "improvement_queue.json"
 
 # ── Tunables ───────────────────────────────────────────────────────────────────
-DECOMPOSE_THRESHOLD  = 3.5   # avg score below this → decompose compound topics
+DECOMPOSE_THRESHOLD  = 3.5   # avg score below this -> decompose compound topics
 MAX_QUEUE_SIZE       = 12    # hard cap on persisted queue length
 MAX_INJECT_PER_RUN   = 8     # tickets evaluated per engine run
 MIN_TOPIC_WORDS      = 2     # minimum words to be a valid injected topic
 
-# Contamination tokens — reject topics containing these
+# Contamination tokens -- reject topics containing these
 _GARBAGE_TOKENS = {
     "chiedo", "facendo", "presente", "present", "silenzio",
     "potrei", "vorrei", "penso", "forse", "dovrei",
@@ -102,7 +102,7 @@ class ImprovementEngine:
         report,                   # AnalysisReport from SelfAnalyzer
         max_inject: int = MAX_INJECT_PER_RUN,
     ) -> EngineResult:
-        """Process report → decisions → persist queue. Fully synchronous."""
+        """Process report -> decisions -> persist queue. Fully synchronous."""
         decisions: List[EngineDecision] = []
         newly_queued: List[str] = []
         processed_ids: set = set(self._state.get("processed_ticket_ids", []))
@@ -124,7 +124,7 @@ class ImprovementEngine:
                 processed_ids.add(ticket.id)
             else:
                 logger.debug(
-                    "[ENGINE] Skipped %r → %s: %s",
+                    "[ENGINE] Skipped %r -> %s: %s",
                     ticket.topic, decision.action, decision.reason,
                 )
 
@@ -192,7 +192,7 @@ class ImprovementEngine:
                 reason=f"Topic contains contamination tokens: {ticket.topic!r}",
             )
 
-        # Chronic failure with very low score → decompose compound topic
+        # Chronic failure with very low score -> decompose compound topic
         if (
             ticket.ticket_type == "retry_chronic_failure"
             and ticket.metadata.get("avg_score", 10) < DECOMPOSE_THRESHOLD
@@ -206,7 +206,7 @@ class ImprovementEngine:
                     topics=parts,
                     reason=(
                         f"Avg score {ticket.metadata['avg_score']}/10 < {DECOMPOSE_THRESHOLD} "
-                        f"— topic too complex, split into {len(parts)} atomic sub-topics."
+                        f"-- topic too complex, split into {len(parts)} atomic sub-topics."
                     ),
                 )
 
@@ -237,7 +237,7 @@ class ImprovementEngine:
         return ticket.topic
 
     def _decompose(self, topic: str) -> List[str]:
-        """Split compound 'X applied to Y applied to Z' → ['X', 'Y', 'Z'].
+        """Split compound 'X applied to Y applied to Z' -> ['X', 'Y', 'Z'].
 
         Filters out parts that are too short or contaminated.
         Falls back to returning the original topic in a list if splitting fails.
@@ -257,7 +257,7 @@ class ImprovementEngine:
 
     def _is_garbage(self, topic: str) -> bool:
         if topic.strip().startswith("#"):
-            return True   # markdown header — mai un topic valido
+            return True   # markdown header -- mai un topic valido
         t = topic.lower()
         return any(token in t for token in _GARBAGE_TOKENS)
 
@@ -269,13 +269,13 @@ class ImprovementEngine:
         if topic in queue:
             return False
         if len(queue) >= MAX_QUEUE_SIZE:
-            logger.warning("[ENGINE] Queue full (%d/%d) — dropping: %r", len(queue), MAX_QUEUE_SIZE, topic)
+            logger.warning("[ENGINE] Queue full (%d/%d) -- dropping: %r", len(queue), MAX_QUEUE_SIZE, topic)
             return False
         queue.append(topic)
         return True
 
     def enqueue_topics(self, topics: List[str]) -> int:
-        """Public API — queue study topics derived from external sources (e.g. benchmark failures).
+        """Public API -- queue study topics derived from external sources (e.g. benchmark failures).
 
         Returns the number of topics actually added (duplicates and full-queue are skipped).
         """
@@ -323,11 +323,11 @@ class ImprovementEngine:
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:
         """React to CognitionCore environment events.
 
-        ImprovementEngine manages the study queue — it removes resolved topics
+        ImprovementEngine manages the study queue -- it removes resolved topics
         when skills are certified and re-prioritizes on frustration peaks.
         """
         if event_type == "skill_certified":
-            # Topic was certified — remove it from pending queue if present
+            # Topic was certified -- remove it from pending queue if present
             topic = data.get("topic", "")
             if topic:
                 queue: list = self._state.get("pending_queue", [])
@@ -341,7 +341,7 @@ class ImprovementEngine:
                     logger.info("[ENGINE] Removed certified topic from queue: %r", topic)
 
         elif event_type == "frustration_peak":
-            # Topic is chronically failing — decompose and re-enqueue subtopics
+            # Topic is chronically failing -- decompose and re-enqueue subtopics
             topic = data.get("topic", "")
             if topic:
                 subtopics = self._decompose(topic)
@@ -352,6 +352,6 @@ class ImprovementEngine:
                 if added:
                     self._save_state()
                     logger.info(
-                        "[ENGINE] Frustration peak on '%s' — enqueued %d decomposed subtopics",
+                        "[ENGINE] Frustration peak on '%s' -- enqueued %d decomposed subtopics",
                         topic, added,
                     )

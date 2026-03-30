@@ -1,4 +1,4 @@
-"""SHARD SQLite Database Manager — Single source of truth.
+"""SHARD SQLite Database Manager -- Single source of truth.
 
 Replaces the 13-file JSON sprawl with a single WAL-mode SQLite database.
 Thread-safe singleton: one connection per process, safe for concurrent
@@ -110,7 +110,7 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
             INSERT OR REPLACE INTO schema_version (version, applied_at)
             VALUES (2, datetime('now'));
         """)
-        logger.info("[SHARD_DB] Migration v2 applied — activation_log + synaptic_weights")
+        logger.info("[SHARD_DB] Migration v2 applied -- activation_log + synaptic_weights")
 
     if current < 3:
         conn.executescript("""
@@ -120,7 +120,7 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
             INSERT OR REPLACE INTO schema_version (version, applied_at)
             VALUES (3, datetime('now'));
         """)
-        logger.info("[SHARD_DB] Migration v3 applied — sig_desire + sig_difficulty")
+        logger.info("[SHARD_DB] Migration v3 applied -- sig_desire + sig_difficulty")
 
     if current < 4:
         conn.executescript("""
@@ -144,7 +144,7 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
             INSERT OR REPLACE INTO schema_version (version, applied_at)
             VALUES (4, datetime('now'));
         """)
-        logger.info("[SHARD_DB] Migration v4 applied — pivot_events table")
+        logger.info("[SHARD_DB] Migration v4 applied -- pivot_events table")
 
 
 def get_db() -> sqlite3.Connection:

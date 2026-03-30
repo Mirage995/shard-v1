@@ -2,7 +2,7 @@
 """SHARD JSON -> SQLite Migration Script.
 
 Reads all legacy JSON files and populates shard.db.
-Safe to run multiple times — uses INSERT OR IGNORE to avoid duplicates.
+Safe to run multiple times -- uses INSERT OR IGNORE to avoid duplicates.
 Always run from the backend/ directory or project root.
 
 Usage:
@@ -41,13 +41,13 @@ FILES = {
 def _load_json(path: Path) -> object:
     """Load a JSON file, returning None if missing or corrupt."""
     if not path.exists():
-        print(f"  [SKIP] {path.name} — file not found")
+        print(f"  [SKIP] {path.name} -- file not found")
         return None
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     except json.JSONDecodeError as e:
-        print(f"  [ERROR] {path.name} — invalid JSON: {e}")
+        print(f"  [ERROR] {path.name} -- invalid JSON: {e}")
         return None
 
 
@@ -440,7 +440,7 @@ def main():
     existing = conn.execute("SELECT COUNT(*) as c FROM experiments").fetchone()["c"]
     if existing > 0 and not args.dry_run:
         print(f"\n  [WARNING] Database already contains {existing} experiments.")
-        print(f"  Using INSERT OR IGNORE — existing records will be preserved.")
+        print(f"  Using INSERT OR IGNORE -- existing records will be preserved.")
 
     print()
 
@@ -466,11 +466,11 @@ def main():
         ok = verify(conn)
         print("\n" + "=" * 60)
         if ok:
-            print("MIGRATION COMPLETE — All counts verified OK")
+            print("MIGRATION COMPLETE -- All counts verified OK")
             print(f"Database: {DB_PATH}")
             print(f"Size: {os.path.getsize(DB_PATH) / 1024:.1f} KB")
         else:
-            print("MIGRATION COMPLETE — Some counts don't match (check above)")
+            print("MIGRATION COMPLETE -- Some counts don't match (check above)")
             print("This may be expected if records were deduplicated.")
         print("=" * 60)
     else:

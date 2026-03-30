@@ -1,4 +1,4 @@
-"""gap_detector.py — Autonomous gap detection for SHARD's self-improvement loop.
+"""gap_detector.py -- Autonomous gap detection for SHARD's self-improvement loop.
 
 Analyzes benchmark failure history semantically and generates study topics
 without any human input. This is the bridge between "SHARD failed at X"
@@ -29,7 +29,7 @@ _HERE   = Path(__file__).resolve().parent
 _ROOT   = _HERE.parent
 _MEMORY = _ROOT / "shard_memory"
 
-# Error pattern → skill gap mappings (heuristic layer)
+# Error pattern -> skill gap mappings (heuristic layer)
 _ERROR_TO_SKILL = [
     (r"numpy|ndarray|truth value.*array|ambiguous",         "numpy array operations and boolean indexing"),
     (r"import.*not found|ModuleNotFound|No module",         "python module system and dependency management"),
@@ -78,8 +78,8 @@ class GapDetector:
     """Detects knowledge gaps from benchmark failure history.
 
     Uses two layers:
-      1. Heuristic regex patterns → fast, interpretable
-      2. Semantic clustering via SemanticMemory → catches unknown patterns
+      1. Heuristic regex patterns -> fast, interpretable
+      2. Semantic clustering via SemanticMemory -> catches unknown patterns
     """
 
     def __init__(self, min_occurrences: int = 2):
@@ -109,7 +109,7 @@ class GapDetector:
                     matched = True
                     break
             if not matched:
-                # Layer 2: unclassified errors → try semantic clustering
+                # Layer 2: unclassified errors -> try semantic clustering
                 topic = self._semantic_gap(err)
                 if topic:
                     skill_counts[topic] += 1

@@ -1,19 +1,19 @@
-"""self_model.py — SHARD's persistent self-representation.
+"""self_model.py -- SHARD's persistent self-representation.
 
 Not a mirror. Not a recital. A real statistical model of what SHARD
 knows, what it keeps failing, how fast it's growing, and where its
-blind spots are — rebuilt from experiment history after every session.
+blind spots are -- rebuilt from experiment history after every session.
 
 Injected as context into every study prompt so the LLM knows who it's
 helping and what gaps actually exist.
 
 Files read:
-  shard_memory/experiment_history.json  — scored experiments
-  shard_memory/failed_cache.json        — chronic failure topics
-  shard_memory/capability_graph.json    — certified skills + XP
+  shard_memory/experiment_history.json  -- scored experiments
+  shard_memory/failed_cache.json        -- chronic failure topics
+  shard_memory/capability_graph.json    -- certified skills + XP
 
 File written:
-  shard_memory/self_model.json          — persisted snapshot
+  shard_memory/self_model.json          -- persisted snapshot
 
 Usage:
     from self_model import SelfModel
@@ -54,7 +54,7 @@ _JUNK_PATTERNS = [
     r"dark matter",
     r"galaxy rotation",
     r"modified (newtonian|gravity)",
-    r"perceptron",          # ML toy model — not a programming skill
+    r"perceptron",          # ML toy model -- not a programming skill
     r"web.scraping",        # too generic to be a blind spot
     # "applied to X" patterns where X is off-topic
     r"applied to (dark|perceptron|hypothesis|galaxy|physics|scraping)",
@@ -81,7 +81,7 @@ def _lang_of(topic: str) -> str:
     for lang, kws in _LANG_KEYWORDS.items():
         if any(kw in t for kw in kws):
             return lang
-    return "python"  # default — most experiments are Python
+    return "python"  # default -- most experiments are Python
 
 
 class SelfModel:
@@ -168,7 +168,7 @@ class SelfModel:
         """React to environment events from CognitionCore.
 
         SelfModel is primarily a *source* of events (broadcasts momentum_changed
-        after a rebuild) — but it can also react to world context.
+        after a rebuild) -- but it can also react to world context.
         """
         # No reactive behavior needed currently.
         # SelfModel is rebuilt at end-of-session by NightRunner which then
@@ -179,7 +179,7 @@ class SelfModel:
 
     def update_from_session(self, certified: list[str], failed: list[str],
                              scores: list[float]):
-        """Update model after a NightRunner session — no full rebuild needed."""
+        """Update model after a NightRunner session -- no full rebuild needed."""
         now = datetime.now().isoformat()
         self._data["updated_at"] = now
         self._data["last_session"] = {
@@ -227,7 +227,7 @@ class SelfModel:
         data["certification_rate"] = round(len(certified_exps) / total, 3) if total else 0.0
         data["avg_score"] = round(sum(scores) / len(scores), 2) if scores else 0.0
 
-        # ── 2. Strengths — certified topics sorted by recency ──────────────────
+        # ── 2. Strengths -- certified topics sorted by recency ──────────────────
         seen: set[str] = set()
         strengths = []
         for e in sorted(certified_exps, key=lambda x: x.get("timestamp", ""), reverse=True):
@@ -237,7 +237,7 @@ class SelfModel:
                 strengths.append(t)
         data["strengths"] = strengths[:20]
 
-        # ── 3. Blind spots — attempted 2+ times, never certified, avg < 6.5 ───
+        # ── 3. Blind spots -- attempted 2+ times, never certified, avg < 6.5 ───
         topic_attempts: dict[str, list[float]] = defaultdict(list)
         topic_certified: dict[str, bool] = defaultdict(bool)
         for e in real_exps:
@@ -274,7 +274,7 @@ class SelfModel:
         ]
         data["quarantine_candidates"] = quarantine_candidates[:20]
 
-        # ── 4. Language confidence — based on certification rate per language ──
+        # ── 4. Language confidence -- based on certification rate per language ──
         lang_certified: dict[str, int] = defaultdict(int)
         lang_total: dict[str, int] = defaultdict(int)
         for e in real_exps:
@@ -289,7 +289,7 @@ class SelfModel:
                 lang_confidence[lang] = round(lang_certified[lang] / total_n, 3)
         data["language_confidence"] = lang_confidence
 
-        # ── 5. Growth momentum — compare last 10 vs previous 10 sessions ──────
+        # ── 5. Growth momentum -- compare last 10 vs previous 10 sessions ──────
         timestamped = sorted(
             [e for e in real_exps if e.get("timestamp")],
             key=lambda x: x["timestamp"]
@@ -346,7 +346,7 @@ class SelfModel:
 
     @classmethod
     def load(cls) -> Optional["SelfModel"]:
-        """Load without rebuilding — returns None if no saved model."""
+        """Load without rebuilding -- returns None if no saved model."""
         if not _SELF_MODEL_PATH.exists():
             return None
         try:

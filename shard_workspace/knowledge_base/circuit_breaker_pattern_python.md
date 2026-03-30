@@ -4,51 +4,93 @@
 ## Key Concepts
 *   **Circuit Breaker:** Prevents an application from repeatedly trying to execute an operation that's likely to fail.
 *   **Open State:** The circuit breaker immediately fails all requests when the failure threshold is met.
-*   **Closed State:** The circuit breaker allows requests to proceed normally, monitoring for failures.
+*   **Closed State:** The circuit breaker allows requests to pass through to the protected service.
 *   **Half-Open State:** The circuit breaker allows a limited number of test requests to determine if the service has recovered.
-*   **Failure Threshold:** The number of failures that must occur within a specified time period to trip the circuit.
-*   **Recovery Timeout:** The amount of time the circuit breaker waits in the open state before transitioning to the half-open state.
+*   **Failure Threshold:** The number of failures that must occur within a given time period to trip the circuit breaker.
+*   **Recovery Timeout:** The amount of time the circuit breaker waits in the Open state before transitioning to the Half-Open state.
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
 | Improves system resilience by preventing cascading failures. | Adds complexity to the codebase. |
-| Enhances user experience by providing quick failure responses. | Requires careful configuration of thresholds and timeouts. |
-| Protects downstream services from being overwhelmed. | Can mask underlying issues if not properly monitored. |
-| Enables faster recovery from failures. | May introduce latency due to circuit breaker logic. |
+| Enhances user experience by providing graceful degradation. | Requires careful configuration of thresholds and timeouts. |
+| Reduces resource consumption by avoiding unnecessary requests to failing services. | Can mask underlying issues if not monitored properly. |
 
 ## Practical Example
 ```python
 import time
 import random
-from pybreaker import CircuitBreaker, CircuitBreakerError
 
-# Simulate an unreliable service
+class CircuitBreaker:
+    def __init__(self, failure_threshold, recovery_timeout):
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.state = "CLOSED"
+        self.failure_count = 0
+        self.last_failure_time = None
+
+    def call(self, func, *args, **kwargs):
+        if self.state == "OPEN":
+            if time.time() - self.last_failure_time > self.recovery_timeout:
+                self.state = "HALF_OPEN"
+                try:
+                    result = func(*args, **kwargs)
+                    self.reset()
+                    return result
+                except Exception as e:
+                    self.trip()
+                    raise e
+            else:
+                raise Exception("Circuit Breaker is OPEN")
+        elif self.state == "HALF_OPEN":
+            try:
+                result = func(*args, **kwargs)
+                self.reset()
+                return result
+            except Exception as e:
+                self.trip()
+                raise e
+        else:  # state == "CLOSED"
+            try:
+                result = func(*args, **kwargs)
+                return result
+            except Exception as e:
+                self.failure_count += 1
+                if self.failure_count >= self.failure_threshold:
+                    self.trip()
+                raise e
+
+    def trip(self):
+        self.state = "OPEN"
+        self.last_failure_time = time.time()
+        self.failure_count = 0
+        print("Circuit Breaker tripped!")
+
+    def reset(self):
+        self.state = "CLOSED"
+        self.failure_count = 0
+        print("Circuit Breaker reset!")
+
+# Example usage:
 def unreliable_service():
-    if random.random() < 0.8:  # 80% chance of failure
-        raise Exception("Service failed")
+    if random.random() < 0.5:
+        raise Exception("Service failed!")
     return "Service successful"
 
-# Create a circuit breaker
-breaker = CircuitBreaker(fail_max=3, reset_timeout=10)
+circuit_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=5)
 
-# Function to call the service through the circuit breaker
-@breaker
-def call_service():
-    return unreliable_service()
-
-# Test the circuit breaker
 for i in range(10):
     try:
-        result = call_service()
-        print(f"Attempt {i+1}: {result}")
-    except CircuitBreakerError as e:
-        print(f"Attempt {i+1}: Circuit Breaker Open: {e}")
+        result = circuit_breaker.call(unreliable_service)
+        print(f"Call {i+1}: {result}, Circuit Breaker State: {circuit_breaker.state}")
     except Exception as e:
-        print(f"Attempt {i+1}: Service Failed: {e}")
+        print(f"Call {i+1}: Exception - {e}, Circuit Breaker State: {circuit_breaker.state}")
     time.sleep(1)
 ```
 
 ## SHARD's Take
-The circuit breaker pattern is essential for building resilient microservices. However, it's crucial to configure the breaker with specific exception types and appropriate thresholds to avoid unnecessary tripping or, conversely, failing to protect against critical service outages. Proper monitoring and alerting are also vital to ensure the circuit breaker is functioning effectively and to address underlying service issues.
+The circuit breaker pattern is essential for building resilient systems by preventing cascading failures and improving overall stability. Proper configuration of the failure threshold and recovery timeout is crucial to avoid premature tripping or prolonged outages. Implementing monitoring and alerting around the circuit breaker's state is also recommended for proactive issue detection.
+
+---
+*Generated by SHARD Autonomous Learning Engine*
 ```

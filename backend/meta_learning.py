@@ -1,4 +1,4 @@
-"""Meta Learning — SHARD learns HOW to learn.
+"""Meta Learning -- SHARD learns HOW to learn.
 
 Observes outcomes across study sessions and builds a statistical model
 of what approaches work best for which categories of topics.
@@ -75,9 +75,9 @@ def _classify_topic(topic: str) -> str:
 def _linear_trend(values: List[float]) -> float:
     """Compute the slope of a best-fit line through the score history.
 
-    Positive  → scores are improving over time.
-    Negative  → scores are declining.
-    Near zero → stable.
+    Positive  -> scores are improving over time.
+    Negative  -> scores are declining.
+    Near zero -> stable.
     """
     n = len(values)
     if n < 2:
@@ -168,7 +168,7 @@ class MetaLearning:
                 gs["worst_category"] = min(significant, key=lambda k: significant[k]["avg_score"])
 
             n = gs["total_sessions"]
-            logger.info("[DB] MetaLearning loaded from SQLite — %d sessions.", n)
+            logger.info("[DB] MetaLearning loaded from SQLite -- %d sessions.", n)
 
             return {
                 "sessions": [],  # not cached in-memory; queried from DB on demand
@@ -177,17 +177,17 @@ class MetaLearning:
                 "global_stats": gs,
             }
         except Exception as exc:
-            logger.warning("[DB] MetaLearning SQLite load failed (%s) — falling back to JSON", exc)
+            logger.warning("[DB] MetaLearning SQLite load failed (%s) -- falling back to JSON", exc)
 
         # Fallback: legacy JSON
         try:
             if META_DB_PATH.exists():
                 data = json.loads(META_DB_PATH.read_text(encoding="utf-8"))
                 n = len(data.get("sessions", []))
-                logger.info("[META] Loaded from JSON fallback — %d sessions.", n)
+                logger.info("[META] Loaded from JSON fallback -- %d sessions.", n)
                 return data
         except Exception as exc:
-            logger.warning("[META] Could not load meta_learning.json (%s) — starting fresh.", exc)
+            logger.warning("[META] Could not load meta_learning.json (%s) -- starting fresh.", exc)
         return {
             "sessions": [],
             "score_history": [],
@@ -206,7 +206,7 @@ class MetaLearning:
     def _save(self) -> None:
         """No-op: data lives in SQLite experiments table.
 
-        Stats are computed live by SQL views — no need to persist separately.
+        Stats are computed live by SQL views -- no need to persist separately.
         Kept for backwards compatibility (callers still call _save).
         """
         pass
@@ -367,7 +367,7 @@ class MetaLearning:
     def get_stats(self) -> Dict:
         """Return a summary of meta-learning statistics.
 
-        Reads live from SQLite views — always up to date.
+        Reads live from SQLite views -- always up to date.
         """
         try:
             conn = _get_db()

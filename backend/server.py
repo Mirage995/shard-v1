@@ -4,7 +4,7 @@ import logging
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
+    format="%(asctime)s [%(levelname)s] %(name)s -- %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger("shard.server")
@@ -52,7 +52,7 @@ from shard_semaphore import (
     acquire_file_lock, release_file_lock, is_file_locked, get_lock_reason,
 )
 
-# Deferred initialization — populated in startup_event() to avoid double
+# Deferred initialization -- populated in startup_event() to avoid double
 # instantiation (global scope runs at import time, before FastAPI startup).
 storage: "GoalStorage" = None
 goal_engine: "GoalEngine" = None
@@ -115,7 +115,7 @@ async def _require_auth(sid: str, event: str) -> bool:
     """
     if not _is_authenticated(sid):
         logger.warning(
-            "[AUTH] Unauthorized access: event='%s' sid=%s — rejecting.", event, sid
+            "[AUTH] Unauthorized access: event='%s' sid=%s -- rejecting.", event, sid
         )
         await sio.emit(
             "error",
@@ -146,7 +146,7 @@ def _validate_settings_payload(data: dict) -> tuple[bool, str]:
         return False, "Payload must be a JSON object."
     for key in data:
         if key not in _ALLOWED_SETTINGS_KEYS:
-            return False, f"Unknown settings key: '{key}' — rejected."
+            return False, f"Unknown settings key: '{key}' -- rejected."
     if "tool_permissions" in data:
         perms = data["tool_permissions"]
         if not isinstance(perms, dict):
@@ -269,7 +269,7 @@ async def query_knowledge(topic: str, n: int = 3):
 
 @app.get("/api/cognition_state")
 async def cognition_state():
-    """CognitionCore pulse — the living state of SHARD's Senso Interno.
+    """CognitionCore pulse -- the living state of SHARD's Senso Interno.
 
     Returns:
         executive:      Layer 0+1 snapshot (ground truth + summary)
@@ -277,7 +277,7 @@ async def cognition_state():
         active_tensions: which emergence vectors are pushing right now
         shadow_audit:   last 5 emergence audit entries (HITS and MISSES)
         emergence_stats: session-level emergence metrics
-        identity:       Layer 2 — capability gaps and certification rate
+        identity:       Layer 2 -- capability gaps and certification rate
         top_gaps:       top 3 critical capability gaps
     """
     core = getattr(study_agent, "cognition_core", None)
@@ -285,7 +285,7 @@ async def cognition_state():
     if core is None:
         return {
             "status": "unavailable",
-            "reason": "CognitionCore not initialized — study_agent may still be starting",
+            "reason": "CognitionCore not initialized -- study_agent may still be starting",
         }
 
     # ── Layer 0+1: Executive ────────────────────────────────────────────────
@@ -320,11 +320,11 @@ async def cognition_state():
         mood_reason = f"Low avg_score={avg_score}, cert_rate={cert_rate:.0%}"
 
     # ── Active tensions (which emergence vectors are firing right now) ───────
-    # We detect tensions from the last relational_context computed — or compute fresh
+    # We detect tensions from the last relational_context computed -- or compute fresh
     # from identity + experience on the last studied topic.
     active_tensions = []
     last_topic = anchor.get("last_topic", "")
-    if last_topic and last_topic != "—":
+    if last_topic and last_topic != "--":
         try:
             exp  = core.query_experience(last_topic)
             know = core.query_knowledge(last_topic)
@@ -371,9 +371,9 @@ async def cognition_state():
             "certification_rate": anchor.get("certification_rate", 0.0),
             "total_experiments":  anchor.get("total_experiments", 0),
             "avg_score":          anchor.get("avg_score", 0.0),
-            "last_topic":         anchor.get("last_topic", "—"),
+            "last_topic":         anchor.get("last_topic", "--"),
             "last_pass":          anchor.get("last_pass", False),
-            "last_date":          anchor.get("last_date", "—"),
+            "last_date":          anchor.get("last_date", "--"),
         },
         "active_tensions": active_tensions,
         "active_vectors":  _describe_active_vectors(active_tensions),
@@ -393,11 +393,11 @@ def _describe_active_vectors(tensions: list) -> list:
     labels = []
     for t in tensions:
         if "Vettore 1" in t or "sandbox" in t.lower():
-            labels.append("V1: Intuizione del Fallimento (Experience→Synthesis)")
+            labels.append("V1: Intuizione del Fallimento (Experience->Synthesis)")
         elif "Vettore 2" in t or "Identit" in t:
-            labels.append("V2: Scettico Informato (Identity→Critique)")
+            labels.append("V2: Scettico Informato (Identity->Critique)")
         elif "Vettore 3" in t or "complessit" in t.lower():
-            labels.append("V3: Strategia Predittiva (Knowledge→Strategy)")
+            labels.append("V3: Strategia Predittiva (Knowledge->Strategy)")
         elif "Near-miss" in t:
             labels.append("Near-miss: piccolo aggiustamento può sbloccare")
         elif "gap" in t.lower():
@@ -487,7 +487,7 @@ async def connect(sid, environ):
             await sio.emit('auth_status', {'authenticated': False}, to=sid)
             asyncio.create_task(authenticator.start_authentication_loop())
         else:
-            logger.info("[AUTH] Face auth disabled — auto-authenticating sid=%s.", sid)
+            logger.info("[AUTH] Face auth disabled -- auto-authenticating sid=%s.", sid)
             _authenticated_sids.add(sid)
             await sio.emit('auth_status', {'authenticated': True}, to=sid)
 
@@ -506,7 +506,7 @@ async def connect(sid, environ):
             if elapsed >= STARTUP_TIMEOUT:
                 logger.error(
                     "[SERVER] TIMEOUT STARTUP: SHARD non ha inizializzato 'consciousness' "
-                    "entro %d secondi. Il sistema è bloccato — verifica i log di ShardCore.",
+                    "entro %d secondi. Il sistema è bloccato -- verifica i log di ShardCore.",
                     STARTUP_TIMEOUT,
                 )
                 return
@@ -583,18 +583,18 @@ async def start_audio(session_host, data=None):
         logger.info("[SESSION LOCK] Acquired by audio session.")
     except asyncio.TimeoutError:
         reason = get_lock_reason()
-        logger.warning("[SESSION LOCK] Blocked — held by: %s", reason or "unknown")
+        logger.warning("[SESSION LOCK] Blocked -- held by: %s", reason or "unknown")
         await sio.emit('error', {'msg': f'[LOCK] Cannot start: autonomous session is active ({reason or "unknown"}).'})
         return
 
-    # --- Bounded queue for audio → frontend ---
+    # --- Bounded queue for audio -> frontend ---
     # CHUNK_SIZE=1024 @ 16kHz ≈ 15 chunks/sec. maxsize=30 ≈ 2 seconds of buffer.
     # Chunks beyond the limit are dropped silently: frontend visualization is
     # best-effort and must never block or slow down audio capture.
     _audio_fe_queue: asyncio.Queue = asyncio.Queue(maxsize=30)
 
     async def _audio_frontend_worker():
-        """Single coroutine that serialises all audio→frontend emissions.
+        """Single coroutine that serialises all audio->frontend emissions.
         Replaces the per-chunk create_task pattern that caused unbounded task growth."""
         try:
             while True:
@@ -604,7 +604,7 @@ async def start_audio(session_host, data=None):
                 finally:
                     _audio_fe_queue.task_done()
         except asyncio.CancelledError:
-            logger.info("[AudioFrontend] Worker shutting down — draining queue.")
+            logger.info("[AudioFrontend] Worker shutting down -- draining queue.")
             while not _audio_fe_queue.empty():
                 try:
                     _audio_fe_queue.get_nowait()
@@ -622,11 +622,11 @@ async def start_audio(session_host, data=None):
     )
 
     def on_audio_data(data_bytes):
-        """Sync callback invoked per audio chunk. Enqueues for the worker — never blocks."""
+        """Sync callback invoked per audio chunk. Enqueues for the worker -- never blocks."""
         try:
             _audio_fe_queue.put_nowait(list(data_bytes))
         except asyncio.QueueFull:
-            pass  # drop — frontend is behind, audio capture must not wait
+            pass  # drop -- frontend is behind, audio capture must not wait
 
     # Callback to send CAL data to frontend
     def on_cad_data(data):
@@ -744,7 +744,7 @@ async def start_audio(session_host, data=None):
             pass
 
         # Start system
-        print("Starting ShardCore system…")
+        print("Starting ShardCore system...")
         await shard_core.start_system(session_host)
 
         print("Emitting 'SHARD Started'")
@@ -958,7 +958,7 @@ async def user_input(sid, data):
             
         # Use the same 'send' method that worked for audio, as 'send_realtime_input' and 'send_client_content' seem unstable in this env
         # INJECT VIDEO FRAME IF AVAILABLE (VAD-style logic for Text Input)
-        # Gemini disponibile → usa Gemini
+        # Gemini disponibile -> usa Gemini
         if audio_loop.session:
             try:
                 if audio_loop._latest_image_payload:
@@ -985,7 +985,7 @@ async def user_input(sid, data):
                 print(f"[SERVER DEBUG] Gemini error: {e}. Falling back to Groq...")
                 await groq_fallback(text)
 
-        # Gemini non disponibile → fallback Groq
+        # Gemini non disponibile -> fallback Groq
         else:
             print("[SERVER DEBUG] Gemini unavailable. Using Groq fallback.")
             await groq_fallback(text)
@@ -1012,7 +1012,7 @@ def _load_last_night_report() -> str:
         return (
             f"[NIGHT REPORT {date}] "
             f"Cicli completati: {len(certified)}/{len(cycles)}. "
-            f"Skill: {skills_before} → {skills_after} (+{int(skills_after) - int(skills_before) if str(skills_before).isdigit() and str(skills_after).isdigit() else '?'})."
+            f"Skill: {skills_before} -> {skills_after} (+{int(skills_after) - int(skills_before) if str(skills_before).isdigit() and str(skills_after).isdigit() else '?'})."
             f"{best_str} "
             f"Topic certificati con score: {topics_ok}. "
             f"Falliti: {topics_fail}."
@@ -1638,10 +1638,10 @@ async def start_study(sid, data):
             except Exception as e:
                 print(f"[SERVER] ❌ Errore nell'iniezione vocale: {e}")
         else:
-            print(f"[SERVER] ⚠️ Sessione Gemini non attiva, notifica vocale saltata per '{topic}'")
+            print(f"[SERVER] [WARN]️ Sessione Gemini non attiva, notifica vocale saltata per '{topic}'")
 
     async def on_error(topic, phase, error_msg):
-        """Callback for study crash — notify frontend + vocal alert."""
+        """Callback for study crash -- notify frontend + vocal alert."""
         await sio.emit('study_progress', {
             'phase': 'ERROR',
             'topic': topic,
@@ -1667,7 +1667,7 @@ async def start_study(sid, data):
             except Exception as e:
                 print(f"[SERVER] ❌ Errore nell'iniezione vocale di crash: {e}")
         else:
-            print(f"[SERVER] ⚠️ Sessione Gemini non attiva, notifica vocale di crash saltata")
+            print(f"[SERVER] [WARN]️ Sessione Gemini non attiva, notifica vocale di crash saltata")
                 
     asyncio.create_task(
         study_agent.study_topic(topic, tier=tier, on_progress=on_progress, on_certify=on_certify, on_error=on_error)
@@ -1693,8 +1693,8 @@ async def test_mood(sid, data):
 async def _voice_queue_poller():
     """
     Polls voice_broadcaster queue every 3 seconds.
-    If Gemini Live is active → injects text into session (native voice).
-    Otherwise → emits shard_voice_event to frontend (Web Speech API fallback).
+    If Gemini Live is active -> injects text into session (native voice).
+    Otherwise -> emits shard_voice_event to frontend (Web Speech API fallback).
     """
     try:
         from voice_broadcaster import pop_all
@@ -1709,7 +1709,7 @@ async def _voice_queue_poller():
                 text = event.get("text", "")
                 if not text:
                     continue
-                # Approccio B: Gemini Live attivo → inject voce nativa
+                # Approccio B: Gemini Live attivo -> inject voce nativa
                 core = _shard_core if _shard_core is not None else audio_loop
                 if core is not None and hasattr(core, "session") and core.session:
                     try:
@@ -1785,7 +1785,7 @@ async def health():
             "total_sessions": gs.get("total_sessions", 0),
             "avg_score": gs.get("avg_score", 0.0),
             "cert_rate": gs.get("cert_rate", 0.0),
-            "score_trend": "↑" if trend > 0.05 else ("↓" if trend < -0.05 else "→"),
+            "score_trend": "↑" if trend > 0.05 else ("↓" if trend < -0.05 else "->"),
             "best_category": gs.get("best_category"),
             "worst_category": gs.get("worst_category"),
             "categories": raw.get("categories", {}),
@@ -1833,7 +1833,7 @@ async def _monitor_night_process():
             if "[PATCH_READY]" in line:
                 asyncio.create_task(_emit_patch_approval())
 
-            # -- Cycle progress → NightRunnerWidget
+            # -- Cycle progress -> NightRunnerWidget
             m = _cycle_re.search(line)
             if m:
                 await sio.emit("nightrunner_cycle", {
@@ -1842,13 +1842,13 @@ async def _monitor_night_process():
                 })
                 continue
 
-            # -- Topic selected → NightRunnerWidget
+            # -- Topic selected -> NightRunnerWidget
             m = _topic_re.search(line)
             if m:
                 await sio.emit("nightrunner_topic", {"topic": m.group(1).strip()})
                 continue
 
-            # -- Study phase progress → StudyWidget
+            # -- Study phase progress -> StudyWidget
             m = _study_re.search(line)
             if m:
                 pct, phase, msg = int(m.group(1)), m.group(2), m.group(3).strip()
@@ -1860,7 +1860,7 @@ async def _monitor_night_process():
                 })
                 continue
 
-            # -- Certification → StudyWidget complete
+            # -- Certification -> StudyWidget complete
             if _certif_re.search(line):
                 score_m = _re.search(r'score=(\d+(?:\.\d+)?)/10', line)
                 score = float(score_m.group(1)) if score_m else 0
@@ -1872,20 +1872,20 @@ async def _monitor_night_process():
     state = "crashed" if returncode not in (0, None) else "finished"
     await sio.emit("nightrunner_state_changed", {"running": False, "state": state})
     await sio.emit("nightrunner_cycle", {"cycle": 0, "total": 0})
-    logger.info(f"[NIGHT RUNNER] Subprocess ended — state: {state} (rc={returncode})")
+    logger.info(f"[NIGHT RUNNER] Subprocess ended -- state: {state} (rc={returncode})")
 
 
 async def _emit_patch_approval():
     """Read pending_patch.json and emit patch_approval_required to the frontend.
 
     Enriches the payload with a static PatchSimulator risk assessment
-    (no LLM call — instant) so the human sees risk info immediately.
+    (no LLM call -- instant) so the human sees risk info immediately.
     """
     try:
         from proactive_refactor import ProactiveRefactor, _ROOT
         patch = ProactiveRefactor.get_pending_patch()
         if patch:
-            # Static simulation (no LLM — instant risk estimate)
+            # Static simulation (no LLM -- instant risk estimate)
             try:
                 from patch_simulator import simulate_patch_sync
                 file_path = _ROOT / patch["file"]
@@ -2029,7 +2029,7 @@ async def start_night_runner(params: NightRunnerParams):
     global _session_lock_held
     if is_file_locked():
         reason = get_lock_reason()
-        logger.warning("[NIGHT RUNNER] Stale lock detected (reason: %s) — force-releasing before start.", reason)
+        logger.warning("[NIGHT RUNNER] Stale lock detected (reason: %s) -- force-releasing before start.", reason)
         try:
             release_file_lock()
         except Exception:
@@ -2076,7 +2076,7 @@ async def start_night_runner(params: NightRunnerParams):
     else:
         await sio.emit("shard_voice_event", {"text": greeting, "priority": "high", "event_type": "session_start"})
 
-    logger.info(f"[NIGHT RUNNER] Subprocess started — PID {_night_process.pid}")
+    logger.info(f"[NIGHT RUNNER] Subprocess started -- PID {_night_process.pid}")
     return {"ok": True, "pid": _night_process.pid}
 
 
@@ -2146,21 +2146,21 @@ async def improvement_queue():
 
 @app.get("/api/consciousness/thought_stats")
 async def thought_stats():
-    """Metriche di interpretabilità sui pensieri di SHARD — per pitch e debug."""
+    """Metriche di interpretabilità sui pensieri di SHARD -- per pitch e debug."""
     if audio_loop and hasattr(audio_loop, 'consciousness'):
         return audio_loop.consciousness.self_logger.get_stats()
     return {"total": 0, "summary": "SHARD non ancora inizializzato."}
 
 @app.get("/api/consciousness/reasoning_stats")
 async def reasoning_stats():
-    """Audit trail ragionamenti interni di SHARD — per pitch e debug."""
+    """Audit trail ragionamenti interni di SHARD -- per pitch e debug."""
     if audio_loop and hasattr(audio_loop, 'consciousness'):
         return audio_loop.consciousness.interpretability.get_stats()
     return {"total": 0, "summary": "SHARD non ancora inizializzato."}
 
 @app.get("/api/brain_graph")
 async def brain_graph():
-    """Brain Graph data — nodes (skills) + edges (requires/improves) for 3D visualization."""
+    """Brain Graph data -- nodes (skills) + edges (requires/improves) for 3D visualization."""
     import json, os
     from datetime import datetime
 
@@ -2183,7 +2183,7 @@ async def brain_graph():
             if not raw_topic or s is None:
                 continue
             score = float(s)
-            # Session topics can be composite: "A applied to B" — split and score all parts
+            # Session topics can be composite: "A applied to B" -- split and score all parts
             parts = [p.strip() for p in raw_topic.replace(" applied to ", "\n").splitlines()]
             for part in parts:
                 if part and (part not in score_map or score_map[part] < score):
@@ -2218,7 +2218,7 @@ async def brain_graph():
 
 @app.get("/api/knowledge/graph_stats")
 async def knowledge_graph_stats():
-    """Statistiche GraphRAG — relazioni causali tra concetti."""
+    """Statistiche GraphRAG -- relazioni causali tra concetti."""
     try:
         from graph_rag import get_graph_stats
         return get_graph_stats()
@@ -2262,7 +2262,7 @@ async def activation_log(limit: int = 50):
 
 @app.get("/api/skill_library")
 async def skill_library_status():
-    """Voyager skill library — tutte le skill certificate di SHARD."""
+    """Voyager skill library -- tutte le skill certificate di SHARD."""
     try:
         from backend.skill_library import SkillLibrary
         from shard_db import query as db_query
@@ -2277,7 +2277,7 @@ async def skill_library_status():
 
 @app.get("/api/identity")
 async def identity_status():
-    """Biografia persistente di SHARD — derivata da dati SQLite reali."""
+    """Biografia persistente di SHARD -- derivata da dati SQLite reali."""
     try:
         from backend.identity_core import IdentityCore
         ic = IdentityCore()
@@ -2394,7 +2394,7 @@ async def simulate_pending_patch():
     """Run full PatchSimulator (static + LLM) on the pending patch.
 
     Returns SimulationReport with risk_level, affected_modules, module_risks.
-    Async — may take 10-20s (parallel LLM calls for each dependent module).
+    Async -- may take 10-20s (parallel LLM calls for each dependent module).
     """
     try:
         from proactive_refactor import ProactiveRefactor, _ROOT
@@ -2443,7 +2443,7 @@ async def approve_patch():
         for change in patch_record.get("changes", []):
             simulated = simulated.replace(change["old"], change["new"], 1)
 
-        # 2. Impact Analyzer gate — BLOCK stops the apply
+        # 2. Impact Analyzer gate -- BLOCK stops the apply
         check = await pre_check(str(file_path), simulated)
         _interp = getattr(getattr(audio_loop, 'consciousness', None), 'interpretability', None)
         if check["risk"] == "BLOCK":
@@ -2452,7 +2452,7 @@ async def approve_patch():
                 _interp.log_patch_decision(patch_record["file"], "BLOCK", False, check["reason"])
             return {"success": False, "message": f"Blocked by Impact Analyzer: {check['reason']}"}
         if check["risk"] in ("HIGH", "MEDIUM"):
-            logger.warning("[PROACTIVE] Impact Analyzer %s: %s — applying anyway (human approved).",
+            logger.warning("[PROACTIVE] Impact Analyzer %s: %s -- applying anyway (human approved).",
                            check["risk"], check["reason"])
 
         # 3. Apply

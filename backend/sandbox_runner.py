@@ -1,4 +1,4 @@
-"""sandbox_runner.py — Hardened Docker sandbox execution for SHARD study experiments.
+"""sandbox_runner.py -- Hardened Docker sandbox execution for SHARD study experiments.
 
 Extracted from study_agent.py as part of SSJ3 Phase 1: Core Hardening.
 """
@@ -11,7 +11,7 @@ import sys
 import uuid
 from typing import Dict, Optional, Callable
 
-# ── Import name → pip package name ────────────────────────────────────────────
+# ── Import name -> pip package name ────────────────────────────────────────────
 # Add mappings here when import name differs from pip package name.
 _IMPORT_TO_PIP: Dict[str, str] = {
     "bs4":        "beautifulsoup4",
@@ -28,7 +28,7 @@ _IMPORT_TO_PIP: Dict[str, str] = {
     "pkg_resources": "setuptools",
 }
 
-# Packages already baked into the base Dockerfile layers — skip auto-install.
+# Packages already baked into the base Dockerfile layers -- skip auto-install.
 _ALREADY_INSTALLED = frozenset({
     "requests", "beautifulsoup4", "numpy", "pandas", "matplotlib",
     "scikit-learn", "scipy", "flask", "fastapi", "sqlalchemy",
@@ -78,12 +78,12 @@ class DockerSandboxRunner:
 
         # Safety: only allow sane package names
         if not re.match(r'^[A-Za-z0-9_\-\.]+$', pip_name):
-            print(f"[SANDBOX] ⚠️ Auto-install rejected unsafe package name: {pip_name!r}")
+            print(f"[SANDBOX] [WARN]️ Auto-install rejected unsafe package name: {pip_name!r}")
             return False
 
         # Skip if already in base image
         if pip_name.lower() in _ALREADY_INSTALLED or import_name.lower() in _ALREADY_INSTALLED:
-            print(f"[SANDBOX] ℹ️ '{pip_name}' should already be installed — skipping auto-install.")
+            print(f"[SANDBOX] ℹ️ '{pip_name}' should already be installed -- skipping auto-install.")
             return False
 
         print(f"[SANDBOX] 🔧 Auto-installing '{pip_name}' (import: '{import_name}')...")
@@ -96,7 +96,7 @@ class DockerSandboxRunner:
                 f.write(f"{pip_name}\n")
             print(f"[SANDBOX] ✅ Added '{pip_name}' to sandbox_requirements.txt")
 
-        # Rebuild — only the dynamic layer invalidates (fast, other layers cached)
+        # Rebuild -- only the dynamic layer invalidates (fast, other layers cached)
         backend_dir = str(pathlib.Path(__file__).parent)
         build_cmd = [
             "docker", "build", "--no-cache=false",
@@ -128,7 +128,7 @@ class DockerSandboxRunner:
         if not sandbox_path.is_absolute():
             raise ValueError(f"[SANDBOX SECURITY] Path is not absolute: {sandbox_path}")
 
-        # 2. Walk every component — reject if any segment is a symlink
+        # 2. Walk every component -- reject if any segment is a symlink
         check = sandbox_path
         while check != check.parent:  # Walk up to root
             if check.exists() and check.is_symlink():
@@ -139,7 +139,7 @@ class DockerSandboxRunner:
 
         # 3. Verify the resolved path hasn't escaped the expected parent
         #    (prevents crafted paths like sandbox/../../etc)
-        #    Uses Path.is_relative_to() — correct path-aware check, not string startswith.
+        #    Uses Path.is_relative_to() -- correct path-aware check, not string startswith.
         expected_parent = self.resolved_sandbox_dir.parent
         try:
             sandbox_path.relative_to(expected_parent)
@@ -340,13 +340,13 @@ class DockerSandboxRunner:
                                 success = proc.returncode == 0
                                 print(f"[SANDBOX] {'✅' if success else '❌'} Retry after auto-install: rc={proc.returncode}")
                             except Exception as retry_err:
-                                print(f"[SANDBOX] ⚠️ Retry failed: {retry_err}")
+                                print(f"[SANDBOX] [WARN]️ Retry failed: {retry_err}")
                         else:
-                            print(f"[SANDBOX] ⚠️ Missing module '{_module}' — auto-install unavailable.")
+                            print(f"[SANDBOX] [WARN]️ Missing module '{_module}' -- auto-install unavailable.")
 
             except subprocess.TimeoutExpired:
-                # ── 5. Timeout → explicit container kill ─────────────────
-                print(f"[SANDBOX] ⚠️ Timeout ({self.SANDBOX_TIMEOUT}s) — killing container {container_name}")
+                # ── 5. Timeout -> explicit container kill ─────────────────
+                print(f"[SANDBOX] [WARN]️ Timeout ({self.SANDBOX_TIMEOUT}s) -- killing container {container_name}")
                 try:
                     await asyncio.to_thread(
                         subprocess.run,
@@ -356,7 +356,7 @@ class DockerSandboxRunner:
                     print(f"[SANDBOX] Container {container_name} killed successfully")
                 except Exception as kill_err:
                     # Kill failure must never crash the agent
-                    print(f"[SANDBOX] ⚠️ docker kill failed (non-fatal): {kill_err}")
+                    print(f"[SANDBOX] [WARN]️ docker kill failed (non-fatal): {kill_err}")
 
                 if progress:
                     progress.complete_phase("SANDBOX")

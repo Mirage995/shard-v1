@@ -14,7 +14,6 @@ EVERY function looks correct. The bugs are in the INTERACTIONS between them.
 The agent must run the code, read the tracebacks, and fix the root causes.
 """
 from copy import deepcopy
-import statistics
 
 # ── Sensor configuration ──────────────────────────────────────────────────────
 
@@ -53,7 +52,7 @@ def validate_readings(readings, config):
     """Validate readings against sensor config. Returns list of validated readings."""
     results = []
     for reading in readings:
-        r = deepcopy(reading)  # BUG: shallow copy is fine for flat dicts... right?
+        r = deepcopy(reading)
         sid = r["sensor_id"]
 
         if sid not in config:
@@ -80,18 +79,16 @@ def validate_readings(readings, config):
 
 def calibrate_values(validated_readings, config):
     """Apply sensor-specific calibration offsets to validated readings."""
-    calibrated_readings = []
     for reading in validated_readings:
-        r = deepcopy(reading)
-        if not r.get("valid", False):
-            calibrated_readings.append(r)
+        if not reading.get("valid", False):
             continue
-        sid = r["sensor_id"]
-        if sid in config and not r.get("_calibrated"):
-            r["value"] = round(r["value"] + config[sid]["offset"], 2)
-            r["_calibrated"] = True
-        calibrated_readings.append(r)
-    return calibrated_readings
+        if reading.get("_calibrated", False):
+            continue
+        sid = reading["sensor_id"]
+        if sid in config:
+            reading["value"] = round(reading["value"] + config[sid]["offset"], 2)
+            reading["_calibrated"] = True
+    return validated_readings
 
 
 # ── Bug 3: aggregate_by_group assumes "value" exists on all readings ─────────
@@ -104,7 +101,7 @@ def aggregate_by_group(calibrated_readings, config):
     """Group readings by sensor group and compute averages."""
     groups = {}
     for reading in calibrated_readings:
-        if not reading.get("valid"):
+        if not reading.get("valid", False):
             continue
         sid = reading["sensor_id"]
         if sid not in config:
@@ -133,6 +130,7 @@ def aggregate_by_group(calibrated_readings, config):
 
 def detect_anomalies(groups, threshold=2.0):
     """Flag readings with z-score above threshold as anomalies."""
+    import statistics
 
     anomalies = []
     for group_name, data in groups.items():
@@ -141,10 +139,7 @@ def detect_anomalies(groups, threshold=2.0):
             continue  # can't compute stddev with < 2 points
 
         mean = statistics.mean(values)
-        try:
-            stdev = statistics.stdev(values)
-        except statistics.StatisticsError:
-            continue
+        stdev = statistics.stdev(values)
         if stdev == 0:
             continue
 

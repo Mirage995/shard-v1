@@ -1,4 +1,4 @@
-"""study_pipeline.py — Configurable study pipeline for SHARD.
+"""study_pipeline.py -- Configurable study pipeline for SHARD.
 
 Replaces the 750-line study_topic() orchestration with a declarative
 sequence of BasePhase objects threaded through a shared StudyContext.
@@ -49,7 +49,7 @@ class BasePhase(ABC):
         """Execute this phase.
 
         Read inputs from ctx, write outputs to ctx.
-        Raise on failure — the pipeline catches and routes based on self.fatal.
+        Raise on failure -- the pipeline catches and routes based on self.fatal.
         """
         ...
 

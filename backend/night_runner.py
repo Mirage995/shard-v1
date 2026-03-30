@@ -146,7 +146,7 @@ def is_valid_topic(topic: str, logger: logging.Logger) -> bool:
     import re as _re
     t = topic.lower()
 
-    # Reject markdown headers (e.g. "# Task 03 — Optimize the Transaction Processor")
+    # Reject markdown headers (e.g. "# Task 03 -- Optimize the Transaction Processor")
     if topic.strip().startswith("#"):
         logger.info(f"[TOPIC FILTER] Discarded markdown header topic: {topic}")
         return False
@@ -212,12 +212,12 @@ def is_valid_topic(topic: str, logger: logging.Logger) -> bool:
         "ho imparato", "mi chiedo", "dovrei", "il boss", "quante", "quanto", "riflessione", "pensiero", "sistema stabile", "momento per"
     ]
     if any(kw in t for kw in blacklist):
-        logger.info(f"[TOPIC FILTER] Discarded invalid topic: {topic} — Reason: matched blacklist pattern")
+        logger.info(f"[TOPIC FILTER] Discarded invalid topic: {topic} -- Reason: matched blacklist pattern")
         return False
         
     avg_len = sum(len(w) for w in words) / len(words)
     if avg_len < 3:
-        logger.info(f"[TOPIC FILTER] Discarded invalid topic: {topic} — Reason: average word length < 3")
+        logger.info(f"[TOPIC FILTER] Discarded invalid topic: {topic} -- Reason: average word length < 3")
         return False
         
     logger.info(f"[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): {topic}")
@@ -250,8 +250,8 @@ class SessionState(Enum):
     STUDY    = auto()  # study_agent.study_topic() running
     REFACTOR = auto()  # enqueue_from_failure() after a failed cycle
     RECORD   = auto()  # writing experiment to SQLite + updating cycle_data
-    COMPLETE = auto()  # cycle certified — moving to next cycle
-    FAILED   = auto()  # cycle not certified — moving to next cycle
+    COMPLETE = auto()  # cycle certified -- moving to next cycle
+    FAILED   = auto()  # cycle not certified -- moving to next cycle
     DONE     = auto()  # session finished (limit reached or all cycles done)
 
 
@@ -311,7 +311,7 @@ class NightRunner:
         """Log a state transition and update _state."""
         old = self._state.name
         self._state = new_state
-        msg = f"[STATE] {old} → {new_state.name}"
+        msg = f"[STATE] {old} -> {new_state.name}"
         if detail:
             msg += f"  ({detail})"
         self.logger.info(msg)
@@ -332,7 +332,7 @@ class NightRunner:
     def _is_quarantined(self, topic: str) -> bool:
         """Fix C: True if this topic has 3+ hard failures (max score < 6.0).
 
-        Near-misses (score >= 6.0) are NOT quarantined — they should be retried
+        Near-misses (score >= 6.0) are NOT quarantined -- they should be retried
         with score context (Fix B).  Only truly hopeless topics get blocked.
         Uses SQLite VIEW quarantined_topics, fallback to JSON.
         """
@@ -361,7 +361,7 @@ class NightRunner:
         """Returns (topic, source, reason)"""
 
         # Priority -1: ImprovementEngine queue (SSJ3 proactive self-improvement)
-        # Fix A: validate every improvement topic — SSJ3 can re-inject garbage topics
+        # Fix A: validate every improvement topic -- SSJ3 can re-inject garbage topics
         while self._improvement_topics:
             topic = self._improvement_topics.pop(0)
             try:
@@ -376,12 +376,12 @@ class NightRunner:
                 self.logger.warning("[QUARANTINE] Improvement topic is quarantined (3+ hard fails): %r", topic)
                 continue
             if self._is_avoided(topic):
-                self.logger.info("[VISION] Improvement topic in avoid_domains — skipping: %r", topic)
+                self.logger.info("[VISION] Improvement topic in avoid_domains -- skipping: %r", topic)
                 continue
             self.logger.info("[SSJ3] Improvement topic dequeued: %r", topic)
             return topic, "improvement_engine", "Proactive improvement ticket (SSJ3)"
 
-        # Priority 0: Phoenix Protocol — replays near-miss topics (score 6.0–7.4).
+        # Priority 0: Phoenix Protocol -- replays near-miss topics (score 6.0–7.4).
         # Base probability 25%, boosted to 50% when the DB has known near-miss topics
         # (score 7.0–7.4, just under the 7.5 certification threshold).
         try:
@@ -409,14 +409,14 @@ class NightRunner:
                 topic = topic_data.get("topic")
                 past_score = topic_data.get("score")
                 if self._is_quarantined(topic) or self._is_avoided(topic):
-                    self.logger.info(f"[PHOENIX] Candidate '{topic}' is quarantined/avoided — skipping.")
+                    self.logger.info(f"[PHOENIX] Candidate '{topic}' is quarantined/avoided -- skipping.")
                 else:
                     self.logger.info(f"[PHOENIX] Replay candidate found: '{topic}' (previous score: {past_score})")
                     return topic, "failure_replay", f"Phoenix replay: score precedente {past_score}|prev_score={past_score}"
             else:
                  self.logger.info("[PHOENIX] No valid candidates found. Falling back to normal selection.")
 
-        # Priority 0.5: Desire engine — high-frustration or high-curiosity topics
+        # Priority 0.5: Desire engine -- high-frustration or high-curiosity topics
         # Cap: max 1 desire-driven topic per session to avoid thrashing between
         # frustrated topics instead of advancing the active goal.
         try:
@@ -435,7 +435,7 @@ class NightRunner:
                         "[DESIRE] Curiosity pull: '%s' (pull=%.2f)", _dt, _dc["curiosity_pull"]
                     )
                     self._desire_selections_this_session += 1
-                    return _dt, "curiosity_driven", f"Lateral curiosity — adjacent to recent cert (pull={_dc['curiosity_pull']:.2f})"
+                    return _dt, "curiosity_driven", f"Lateral curiosity -- adjacent to recent cert (pull={_dc['curiosity_pull']:.2f})"
                 # Frustration drive: pick frustrated topic 40% of the time
                 if _dc["frustration_hits"] >= 2 and random.random() < 0.40:
                     self.logger.info(
@@ -443,11 +443,11 @@ class NightRunner:
                         _dt, _dc["frustration_hits"], _dc["desire_score"],
                     )
                     self._desire_selections_this_session += 1
-                    return _dt, "frustration_driven", f"Frustration drive — {_dc['frustration_hits']} prior blocks (desire={_dc['desire_score']:.2f})"
+                    return _dt, "frustration_driven", f"Frustration drive -- {_dc['frustration_hits']} prior blocks (desire={_dc['desire_score']:.2f})"
         except Exception as _de_sel_err:
             self.logger.debug("[DESIRE] Topic selection non-fatal: %s", _de_sel_err)
 
-        # Priority 0.5: Curriculum suggestion — topics that extend certified skills
+        # Priority 0.5: Curriculum suggestion -- topics that extend certified skills
         try:
             from backend.skill_library import suggest_curriculum_topics as _suggest_curr
             _cert_set = set(capability_graph.capabilities.keys())
@@ -467,7 +467,7 @@ class NightRunner:
         except Exception as _curr_err:
             self.logger.debug("[CURRICULUM] non-fatal: %s", _curr_err)
 
-        # Priority 1: Curated topics list (primary source — replaces ExperimentInventor)
+        # Priority 1: Curated topics list (primary source -- replaces ExperimentInventor)
         _curated_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
         if _curated_file.exists():
             try:
@@ -505,7 +505,7 @@ class NightRunner:
             except Exception as _cur_err:
                 self.logger.warning("[CURATED] Could not read curated_topics.txt: %s", _cur_err)
 
-        sources = ["research_agenda"]  # consciousness removed — generates garbage from Italian thoughts; ExperimentInventor disabled
+        sources = ["research_agenda"]  # consciousness removed -- generates garbage from Italian thoughts; ExperimentInventor disabled
 
         # TASK 2: Try curiosity-driven frontier exploration (20% chance)
         if random.random() < 0.20:
@@ -522,7 +522,7 @@ class NightRunner:
             else:
                 self.logger.info(f"[CURIOSITY ENGINE] Insufficient frontier capabilities ({frontier_size} < 2)")
         
-        # TASK 5: Capability recombination DISABLED — generates nonsense composite topics
+        # TASK 5: Capability recombination DISABLED -- generates nonsense composite topics
         if False and random.random() < 0.25:
             candidate = generate_recombined_topic(capability_graph.list_capabilities() if hasattr(capability_graph, "list_capabilities") else list(capability_graph.capabilities.keys()) if hasattr(capability_graph, "capabilities") else [])
             if candidate and topic_quality(candidate):
@@ -564,11 +564,11 @@ class NightRunner:
 
             # Fix C: quarantine hopeless topics (3+ attempts, max score < 6.0)
             if self._is_quarantined(topic):
-                self.logger.info(f"[QUARANTINE] Skipping '{topic}' — 3+ hard failures, max score < 6.0")
+                self.logger.info(f"[QUARANTINE] Skipping '{topic}' -- 3+ hard failures, max score < 6.0")
                 self.topic_filter_discards += 1
                 continue
             if self._is_avoided(topic):
-                self.logger.info(f"[VISION] Skipping '{topic}' — in avoid_domains (chronic failure)")
+                self.logger.info(f"[VISION] Skipping '{topic}' -- in avoid_domains (chronic failure)")
                 self.topic_filter_discards += 1
                 continue
 
@@ -609,7 +609,7 @@ class NightRunner:
         # Cross-process: file lock blocks if an audio session is live
         #
         # Background mode: if audio is active, NightRunner runs silently
-        # alongside it instead of aborting — voice events are suppressed and
+        # alongside it instead of aborting -- voice events are suppressed and
         # an extra pause is added between cycles to yield CPU to audio.
         _semaphore_acquired = False
         try:
@@ -623,12 +623,12 @@ class NightRunner:
                 if is_audio_active():
                     self._background_mode = True
                     self.logger.info(
-                        "[LOCK] Audio session active — NightRunner starting in silent background mode."
+                        "[LOCK] Audio session active -- NightRunner starting in silent background mode."
                     )
                     # Do not acquire semaphore or overwrite audio lock file
                 else:
                     self.logger.warning(
-                        "[LOCK] Session locked by '%s' — NightRunner will not start.",
+                        "[LOCK] Session locked by '%s' -- NightRunner will not start.",
                         get_lock_reason(),
                     )
                     return
@@ -642,7 +642,7 @@ class NightRunner:
                 acquire_file_lock("night_runner")
                 self.logger.info("[SESSION LOCK] Acquired by NightRunner.")
         except ImportError:
-            self.logger.warning("[LOCK] shard_semaphore not available — running without session lock.")
+            self.logger.warning("[LOCK] shard_semaphore not available -- running without session lock.")
 
         try:
             await self._run_session()
@@ -657,7 +657,7 @@ class NightRunner:
                     self.logger.error("[LOCK] Failed to release lock: %s", exc)
 
     async def _run_session(self):
-        """Core study loop — called by run() inside the session lock guard."""
+        """Core study loop -- called by run() inside the session lock guard."""
         # In background mode (audio session active) suppress all voice broadcasts
         # Always assign _vb as a local to avoid UnboundLocalError from Python scoping rules
         _module_vb = globals()["_vb"]
@@ -669,7 +669,7 @@ class NightRunner:
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
 
-        # ── Environment Observer — Layer 1/2: golden solution protection ─────
+        # ── Environment Observer -- Layer 1/2: golden solution protection ─────
         _env_obs = None
         try:
             from backend.environment_observer import EnvironmentObserver
@@ -678,8 +678,8 @@ class NightRunner:
             self.logger.info("[ENV OBS] Golden solutions snapshotted.")
         except Exception as _eo_err:
             self.logger.warning("[ENV OBS] Init failed (non-fatal): %s", _eo_err)
-        # ── Strategy pivot tracker — chronic block detection ─────────────────
-        # Two independent triggers for strategy memory wipe (pure amnesia —
+        # ── Strategy pivot tracker -- chronic block detection ─────────────────
+        # Two independent triggers for strategy memory wipe (pure amnesia --
         # no dissonance injection, so we can measure autonomous agency):
         #
         #   A) Fail streak:  same topic fails _PIVOT_THRESHOLD times in a row
@@ -687,17 +687,17 @@ class NightRunner:
         #      score std < _VARIANCE_THRESHOLD (stuck at a "crystal ceiling")
         #
         # When either fires: pivot_on_chronic_block() wipes strategy memory.
-        # No prompt injection — blank slate only. (SSJ17 experiment design)
-        _consecutive_fails: dict = {}   # topic → int
-        _recent_scores:     dict = {}   # topic → List[float] (last N scores this session)
-        _pivot_tracking:    dict = {}   # topic → {event_id, pre_fingerprint} for post-pivot distance
+        # No prompt injection -- blank slate only. (SSJ17 experiment design)
+        _consecutive_fails: dict = {}   # topic -> int
+        _recent_scores:     dict = {}   # topic -> List[float] (last N scores this session)
+        _pivot_tracking:    dict = {}   # topic -> {event_id, pre_fingerprint} for post-pivot distance
         _PIVOT_THRESHOLD    = 3
         _VARIANCE_THRESHOLD = 0.5       # std < this = near-miss loop
         _VARIANCE_WINDOW    = 3         # min attempts to compute variance
         _CERT_THRESHOLD     = 7.5       # mirrors constants.SUCCESS_SCORE_THRESHOLD
 
         def _strategy_fingerprint(strats: list) -> str:
-            """SHA256[:12] of strategy text — short stable identifier for comparison."""
+            """SHA256[:12] of strategy text -- short stable identifier for comparison."""
             import hashlib
             text = " ".join(
                 s.get("topic", "") + " " + s.get("strategy", "") + " " + s.get("outcome", "")
@@ -807,7 +807,7 @@ class NightRunner:
 
         # ── AUTONOMOUS GOAL GENERATION ────────────────────────────────────────
         # SHARD reads its own self_model + world_model and decides what to
-        # pursue this session — no human input required.
+        # pursue this session -- no human input required.
         try:
             self.goal_engine.capability_graph = capability_graph
             _auto_goal = self.goal_engine.autonomous_generate()
@@ -821,7 +821,7 @@ class NightRunner:
                 self.logger.info("[GOAL AUTO] Keywords: %s", _auto_goal.domain_keywords)
                 self.logger.info("[GOAL AUTO] Reason: %s", _auto_goal.description.splitlines()[1] if '\n' in _auto_goal.description else "")
             else:
-                self.logger.info("[GOAL AUTO] No goal generated — no world model gaps found")
+                self.logger.info("[GOAL AUTO] No goal generated -- no world model gaps found")
         except Exception as _ag_err:
             self.logger.warning("[GOAL AUTO] non-fatal error: %s", _ag_err)
 
@@ -834,7 +834,7 @@ class NightRunner:
             _sem = get_semantic_memory()
             _sem_stats = _sem.stats()
             if _sem_stats["episodes"] == 0 or _sem_stats["knowledge"] == 0:
-                self.logger.info("[SEMANTIC] ChromaDB sparse — running index_all()")
+                self.logger.info("[SEMANTIC] ChromaDB sparse -- running index_all()")
                 _sem.index_all(verbose=False)
                 _new_stats = _sem.stats()
                 self.logger.info(
@@ -877,7 +877,7 @@ class NightRunner:
             _desire = None
             self.logger.warning("[DESIRE] Bootstrap non-fatal error: %s", _de_err)
 
-        # ── COGNITIONCORE ENVIRONMENT — register all modules ──────────────────
+        # ── COGNITIONCORE ENVIRONMENT -- register all modules ──────────────────
         # Each module becomes a citizen: it can receive and react to broadcasts.
         try:
             from backend.cognition.cognition_core import get_cognition_core
@@ -977,7 +977,7 @@ class NightRunner:
         except Exception as _ve_err:
             self.logger.warning("[VISION] non-fatal: %s", _ve_err)
 
-        # ── SESSION REFLECTION — inject past context ───────────────────────────
+        # ── SESSION REFLECTION -- inject past context ───────────────────────────
         try:
             from backend.session_reflection import make_session_reflection as _make_sr
             _session_reflection = _make_sr(llm_call_fn=None)  # LLM attached at end of session
@@ -991,16 +991,16 @@ class NightRunner:
             _full_context = "\n\n".join(b for b in [_sr_block, _hypo_block] if b)
             if _full_context:
                 self.logger.info(
-                    "[REFLECTION] Past context loaded (%d chars) — injecting into study_agent system prompt.",
+                    "[REFLECTION] Past context loaded (%d chars) -- injecting into study_agent system prompt.",
                     len(_full_context),
                 )
                 study_agent.session_context = _full_context
             else:
-                self.logger.info("[REFLECTION] No past context — first session.")
+                self.logger.info("[REFLECTION] No past context -- first session.")
         except Exception as _sr_err:
             self.logger.warning("[REFLECTION] non-fatal: %s", _sr_err)
 
-        # ── HEBBIAN UPDATER — register as CognitionCore citizen ─────────────
+        # ── HEBBIAN UPDATER -- register as CognitionCore citizen ─────────────
         try:
             from backend.hebbian_updater import HebbianUpdater as _HU_cls
             _hebbian_singleton = _HU_cls()
@@ -1013,7 +1013,7 @@ class NightRunner:
         except Exception as _hu_err:
             self.logger.warning("[HEBBIAN] Init non-fatal: %s", _hu_err)
 
-        # ── SKILL LIBRARY — load Voyager-style skill cache ───────────────────
+        # ── SKILL LIBRARY -- load Voyager-style skill cache ───────────────────
         try:
             from backend.skill_library import SkillLibrary as _SL
             _skill_lib = _SL()
@@ -1021,13 +1021,13 @@ class NightRunner:
                 _core_env.register("skill_library", _skill_lib, ["skill_certified"])
             _sl_stats = _skill_lib.get_stats()
             self.logger.info(
-                "[SKILL_LIB] Loaded — %d certified skills (avg=%.1f)",
+                "[SKILL_LIB] Loaded -- %d certified skills (avg=%.1f)",
                 _sl_stats["total_skills"], _sl_stats["avg_score"],
             )
         except Exception as _sl_err:
             self.logger.warning("[SKILL_LIB] Init non-fatal: %s", _sl_err)
 
-        # ── IDENTITY CORE — inject persistent biography ───────────────────────
+        # ── IDENTITY CORE -- inject persistent biography ───────────────────────
         try:
             from backend.identity_core import IdentityCore as _IC
             _identity = _IC()
@@ -1042,18 +1042,18 @@ class NightRunner:
                 _base_ctx = study_agent.session_context or ""
                 study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
                 self.logger.info(
-                    "[IDENTITY] Biography injected (%d chars) — sessions=%d self_esteem=%.2f trajectory=%s",
+                    "[IDENTITY] Biography injected (%d chars) -- sessions=%d self_esteem=%.2f trajectory=%s",
                     len(_id_block),
                     _identity.get_status().get("sessions_lived", 0),
                     _identity.get_status().get("self_esteem", 0.0),
                     _identity.get_status().get("trajectory", "unknown"),
                 )
             else:
-                self.logger.info("[IDENTITY] No biography yet — first session.")
+                self.logger.info("[IDENTITY] No biography yet -- first session.")
         except Exception as _id_init_err:
             self.logger.warning("[IDENTITY] Init non-fatal: %s", _id_init_err)
 
-        # ── BENCHMARK TRACKER — log delta from previous session ───────────────
+        # ── BENCHMARK TRACKER -- log delta from previous session ───────────────
         try:
             from backend.benchmark_tracker import get_benchmark_tracker as _get_btrk
             _bench_tracker = _get_btrk()
@@ -1069,7 +1069,7 @@ class NightRunner:
             _gap_report = GapDetector().detect(enqueue=True)
             self.logger.info("[GAP] %s", _gap_report.summary())
             if _gap_report.topics_queued:
-                # Reload improvement queue — now includes both SSJ3 + gap topics
+                # Reload improvement queue -- now includes both SSJ3 + gap topics
                 from backend.improvement_engine import ImprovementEngine as _IE2
                 self._improvement_topics = list(_IE2().peek_queue())
         except Exception as _gap_err:
@@ -1084,7 +1084,7 @@ class NightRunner:
             self._transition(SessionState.SELECT, f"cycle {cycle}/{self.max_cycles}")
             topic, source, reason = await self._select_topic(capability_graph, "")
 
-            # ── PREREQUISITE GATE — se il topic è difficile, studia prima i prereq ──
+            # ── PREREQUISITE GATE -- se il topic è difficile, studia prima i prereq ──
             try:
                 from backend.prerequisite_checker import get_missing_prerequisites as _get_prereqs
                 from shard_db import query as _prereq_db
@@ -1114,7 +1114,7 @@ class NightRunner:
                     if _safe_prereqs:
                         _prereq_topic = _safe_prereqs[0]
                         self.logger.info(
-                            "[PREREQ] '%s' (difficulty=%.2f) needs '%s' first — redirecting",
+                            "[PREREQ] '%s' (difficulty=%.2f) needs '%s' first -- redirecting",
                             _original_topic, _prereq_difficulty, _prereq_topic,
                         )
                         # Queue remaining prereqs + original topic for future cycles
@@ -1130,7 +1130,7 @@ class NightRunner:
                         reason = f"Prerequisite for '{_original_topic}' (difficulty={_prereq_difficulty:.2f})"
                     else:
                         self.logger.debug(
-                            "[PREREQ] All prereqs for '%s' are quarantined/invalid — proceeding as-is",
+                            "[PREREQ] All prereqs for '%s' are quarantined/invalid -- proceeding as-is",
                             _original_topic,
                         )
             except Exception as _prereq_err:
@@ -1176,7 +1176,7 @@ class NightRunner:
                     else "IDENTICAL (deterministic bias)"
                 )
                 self.logger.warning(
-                    "[POST-PIVOT] '%s': pre=%s → post=%s  distance=%.3f  → %s",
+                    "[POST-PIVOT] '%s': pre=%s -> post=%s  distance=%.3f  -> %s",
                     topic, _pt["pre_fingerprint"], _post_fp, _dist, _direction,
                 )
                 try:
@@ -1190,13 +1190,13 @@ class NightRunner:
                 del _pivot_tracking[topic]  # clear after first post-pivot cycle
 
             # ── SELF-MODEL: predict score before studying ─────────────────────
-            # Features are observable facts about this cycle — not invented.
+            # Features are observable facts about this cycle -- not invented.
             # sig_* are citizen signals (0.0-1.0) for activation_log / synaptic weights.
             _sig_desire     = 0.0
             _sig_difficulty = 0.5
             _sig_graphrag   = 0.0
 
-            # sig_desire — desire_score composito (frustration + curiosity + engagement)
+            # sig_desire -- desire_score composito (frustration + curiosity + engagement)
             try:
                 from backend.desire_engine import get_desire_engine as _get_de_sig
                 _de_sig = _get_de_sig()
@@ -1205,7 +1205,7 @@ class NightRunner:
             except Exception:
                 pass
 
-            # sig_difficulty — 1 - cert_rate storica (topic mai visto = 0.5 neutro)
+            # sig_difficulty -- 1 - cert_rate storica (topic mai visto = 0.5 neutro)
             try:
                 from shard_db import query as _smq_diff
                 _diff_hist = _smq_diff(
@@ -1227,7 +1227,7 @@ class NightRunner:
                     )
                     _prior_scores = [r["score"] for r in _prior]
 
-                    # sig_graphrag — conteggio reale relazioni causali nel knowledge graph
+                    # sig_graphrag -- conteggio reale relazioni causali nel knowledge graph
                     try:
                         from backend.graph_rag import count_causal_hits as _cch
                         _sig_graphrag = round(min(1.0, _cch(topic) / 10.0), 2)
@@ -1241,7 +1241,7 @@ class NightRunner:
                         "first_attempt":        len(_prior_scores) == 0,
                         "graphrag_hits":        _sig_graphrag,
                         "source_improvement":   source == "improvement_engine",
-                        # Continuous signals — feed into predictive processing loop
+                        # Continuous signals -- feed into predictive processing loop
                         "sig_difficulty":       _sig_difficulty,
                         "sig_desire":           _sig_desire,
                         "sig_graphrag":         _sig_graphrag,
@@ -1278,7 +1278,7 @@ class NightRunner:
                 except (ValueError, IndexError):
                     pass
 
-            # Dynamic persona selection — picks best study strategy for this topic/category
+            # Dynamic persona selection -- picks best study strategy for this topic/category
             persona_cfg = select_persona(topic, category=cycle_data.get("source"))
             self.logger.info(
                 "[PERSONA] Selected '%s' (tier=%d) for: %s",
@@ -1289,7 +1289,7 @@ class NightRunner:
                 self._transition(SessionState.STUDY, topic)
                 self.api_calls_used += 3
 
-                # ── SKILL LIBRARY INJECTION — past certified solutions ────────
+                # ── SKILL LIBRARY INJECTION -- past certified solutions ────────
                 _sl_injected = False
                 if _skill_lib is not None:
                     try:
@@ -1305,7 +1305,7 @@ class NightRunner:
                     except Exception as _sl_inj_err:
                         self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
 
-                # ── MOOD INJECTION — stato affettivo → prompt di studio ────────
+                # ── MOOD INJECTION -- stato affettivo -> prompt di studio ────────
                 if _mood:
                     try:
                         _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
@@ -1327,7 +1327,7 @@ class NightRunner:
                     previous_score=prev_score,
                 )
 
-                # Restore session_context — strip mood and skill lib prefixes
+                # Restore session_context -- strip mood and skill lib prefixes
                 _ctx = study_agent.session_context or ""
                 if _mood and "[AFFECTIVE STATE:" in _ctx:
                     _ctx = "\n\n".join(
@@ -1346,7 +1346,7 @@ class NightRunner:
                     _vb(f"Topic fallito: {topic}. Miglior score raggiunto: {round(best_score, 2)} su dieci.", priority="medium", event_type="cycle_failed")
                 self.logger.info(f"Sandbox/Study result: {'success' if cycle_data['certified'] else 'failed'}")
 
-                # ── Strategy pivot — chronic block detection ──────────────────
+                # ── Strategy pivot -- chronic block detection ──────────────────
                 # Track scores for variance check regardless of outcome
                 _cycle_score = cycle_data["score"] or 0.0
                 _recent_scores.setdefault(topic, []).append(_cycle_score)
@@ -1437,7 +1437,7 @@ class NightRunner:
                     score=cycle_data["score"] or 0.0,
                 )
 
-                # ── ENVIRONMENT BROADCAST — modules react autonomously ─────
+                # ── ENVIRONMENT BROADCAST -- modules react autonomously ─────
                 # One broadcast replaces all the manual per-module calls below.
                 # WorldModel, GoalEngine, DesireEngine all react via on_event().
                 try:
@@ -1469,7 +1469,7 @@ class NightRunner:
                             except Exception as _sl_save_err:
                                 self.logger.debug("[SKILL_LIB] save non-fatal: %s", _sl_save_err)
 
-                        # Broadcast: skill certified → all registered modules react
+                        # Broadcast: skill certified -> all registered modules react
                         if _core_env:
                             _n_rcv = _core_env.broadcast(
                                 "skill_certified",
@@ -1477,7 +1477,7 @@ class NightRunner:
                                 source="night_runner",
                             )
                             self.logger.info(
-                                "[CORE ENV] broadcast 'skill_certified' → %d recipient(s) reacted",
+                                "[CORE ENV] broadcast 'skill_certified' -> %d recipient(s) reacted",
                                 _n_rcv,
                             )
                         # Desire engine: record engagement (not covered by on_event)
@@ -1498,7 +1498,7 @@ class NightRunner:
                                 source="night_runner",
                             )
                             self.logger.info(
-                                "[CORE ENV] broadcast 'skill_failed' → %d recipient(s) reacted",
+                                "[CORE ENV] broadcast 'skill_failed' -> %d recipient(s) reacted",
                                 _n_rcv,
                             )
                         if _desire:
@@ -1513,7 +1513,7 @@ class NightRunner:
                                     source="desire_engine",
                                 )
                                 self.logger.info(
-                                    "[CORE ENV] broadcast 'frustration_peak' (hits=%d) → %d recipient(s) reacted",
+                                    "[CORE ENV] broadcast 'frustration_peak' (hits=%d) -> %d recipient(s) reacted",
                                     _hits,
                                     _n_rcv,
                                 )
@@ -1529,7 +1529,7 @@ class NightRunner:
                 except Exception as _bc_err:
                     self.logger.debug("[CORE ENV] Per-cycle broadcast error (non-fatal): %s", _bc_err)
 
-                # ── LOOP CLOSURE: gap resolved → semantic memory + gap log ────
+                # ── LOOP CLOSURE: gap resolved -> semantic memory + gap log ────
                 if cycle_data["certified"] and source == "improvement_engine":
                     try:
                         from backend.semantic_memory import get_semantic_memory
@@ -1581,10 +1581,10 @@ class NightRunner:
                 from backend.study_agent import TopicBudgetExceeded as _TBE
                 if isinstance(e, _TBE):
                     self.logger.warning(
-                        "[BUDGET] Topic '%s' hard-stopped: %s — skipping to next topic",
+                        "[BUDGET] Topic '%s' hard-stopped: %s -- skipping to next topic",
                         topic, e,
                     )
-                    print(f"[API BUDGET] Hard stop: '{topic}' — {e}")
+                    print(f"[API BUDGET] Hard stop: '{topic}' -- {e}")
                     cycle_data["certified"] = False
                     cycle_data["score"] = 0.0
                     cycle_data["failures"] = [f"BUDGET_EXCEEDED: {e}"]
@@ -1620,18 +1620,18 @@ class NightRunner:
             self.session_data.append(cycle_data)
 
             # ── Write experiment to SQLite ─────────────────────────────────────
-            # Single INSERT replaces the old read-all → append → rewrite-all JSON cycle.
+            # Single INSERT replaces the old read-all -> append -> rewrite-all JSON cycle.
             # Determine failure_reason from available signals
             _failures_list = cycle_data.get("failures", [])
             if cycle_data["certified"]:
                 _failure_reason = "none"
             elif any(f.startswith("BUDGET_EXCEEDED") for f in _failures_list):
-                # LLM call budget exhausted — not a model quality issue
+                # LLM call budget exhausted -- not a model quality issue
                 _failure_reason = "budget_exceeded"
             elif any(f.startswith("CRASH") for f in _failures_list):
                 _failure_reason = "crash"
             elif cycle_data["score"] == 0.0:
-                # Score zero without explicit exception — broken phase or empty LLM response
+                # Score zero without explicit exception -- broken phase or empty LLM response
                 _failure_reason = "phase_error"
             elif cycle_data["score"] < 5.0:
                 _failure_reason = "low_score"
@@ -1639,7 +1639,7 @@ class NightRunner:
                 # 5.0–7.4: passed study but didn't reach certification threshold
                 _failure_reason = "near_miss"
             else:
-                # score >= 7.5 but not certified — synthesis or sandbox gate failed
+                # score >= 7.5 but not certified -- synthesis or sandbox gate failed
                 _failure_reason = "gate_fail"
 
             try:
@@ -1707,8 +1707,8 @@ class NightRunner:
                 except Exception as _smt_err:
                     self.logger.debug("[SELF_MODEL] record_outcome non-fatal: %s", _smt_err)
 
-            # ── ACTIVATION LOG — sinapsi: salva segnali cittadini + outcome ──────
-            # Sempre loggato — indipendente da _self_tracker e _cycle_features.
+            # ── ACTIVATION LOG -- sinapsi: salva segnali cittadini + outcome ──────
+            # Sempre loggato -- indipendente da _self_tracker e _cycle_features.
             try:
                 from shard_db import execute as _db_exec
                 _db_exec(
@@ -1741,7 +1741,7 @@ class NightRunner:
             except Exception as _act_err:
                 self.logger.debug("[ACTIVATION] non-fatal: %s", _act_err)
 
-            # ── HEBBIAN UPDATE — plasticita sinaptica dopo ogni ciclo ──────────
+            # ── HEBBIAN UPDATE -- plasticita sinaptica dopo ogni ciclo ──────────
             try:
                 from backend.hebbian_updater import HebbianUpdater as _HU
                 _hebbian = _hebbian_singleton if _hebbian_singleton is not None else _HU()
@@ -1767,13 +1767,13 @@ class NightRunner:
                         from backend.shard_semaphore import is_audio_active
                         if is_audio_active():
                             self.logger.info(
-                                "[BG] Audio still active — adding 60s yield before next cycle."
+                                "[BG] Audio still active -- adding 60s yield before next cycle."
                             )
                             await asyncio.sleep(60)
                         else:
-                            # Audio ended — exit background mode
+                            # Audio ended -- exit background mode
                             self._background_mode = False
-                            self.logger.info("[BG] Audio session ended — resuming normal mode.")
+                            self.logger.info("[BG] Audio session ended -- resuming normal mode.")
                     except ImportError:
                         pass
                 self.logger.info(f"Pausing for {self.pause_minutes} minutes...")
@@ -1787,7 +1787,7 @@ class NightRunner:
                 _env_events = _env_obs.check(trigger_context={"source_module": "post_study_loop"})
                 if _env_events:
                     self.logger.warning(
-                        "[ENV OBS] %d golden file(s) modified during study loop — all restored.",
+                        "[ENV OBS] %d golden file(s) modified during study loop -- all restored.",
                         len(_env_events),
                     )
             except Exception as _eo_err:
@@ -1849,7 +1849,7 @@ class NightRunner:
             _prev_momentum = _self_model.momentum if _self_model else "unknown"
             _sm_final = SelfModel.build()  # full rebuild with latest data
             self.logger.info(
-                "[SELF MODEL] Rebuilt — cert_rate=%.0f%%  avg=%.1f  momentum=%s  blind_spots=%s",
+                "[SELF MODEL] Rebuilt -- cert_rate=%.0f%%  avg=%.1f  momentum=%s  blind_spots=%s",
                 _sm_final.certification_rate * 100,
                 _sm_final.avg_score,
                 _sm_final.momentum,
@@ -1864,11 +1864,11 @@ class NightRunner:
                     source="self_model",
                 )
                 self.logger.info(
-                    "[CORE ENV] broadcast 'momentum_changed' (%s → %s) → %d recipient(s) reacted",
+                    "[CORE ENV] broadcast 'momentum_changed' (%s -> %s) -> %d recipient(s) reacted",
                     _prev_momentum, _sm_final.momentum, _n_rcv,
                 )
                 self.logger.info(
-                    "[CORE ENV] momentum_changed: %s → %s",
+                    "[CORE ENV] momentum_changed: %s -> %s",
                     _prev_momentum, _sm_final.momentum,
                 )
         except Exception as _e:
@@ -1886,9 +1886,9 @@ class NightRunner:
             from backend.error_watchdog import repair_detected_errors
             repair_results = await repair_detected_errors(self.log_file)
             for r in repair_results:
-                status = "✓ PATCHED" if r["success"] else "✗ FAILED"
+                status = "OK PATCHED" if r["success"] else "FAIL FAILED"
                 self.logger.info(
-                    "[WATCHDOG] %s %s — %s",
+                    "[WATCHDOG] %s %s -- %s",
                     status, Path(r["filepath"]).name,
                     r["commit_hash"] if r["success"] else r["error"][:80],
                 )
@@ -1920,7 +1920,7 @@ class NightRunner:
                 pass
 
 
-        # ── SESSION REFLECTION — LLM-generated end-of-session analysis ──────────
+        # ── SESSION REFLECTION -- LLM-generated end-of-session analysis ──────────
         if _session_reflection is not None:
             try:
                 _certified_topics = [c["topic"] for c in self.session_data if c.get("certified")]
@@ -1946,7 +1946,7 @@ class NightRunner:
             except Exception as _refl_err:
                 self.logger.warning("[REFLECTION] Generation non-fatal: %s", _refl_err)
 
-        # ── IDENTITY CORE — rebuild biography end-of-session ─────────────────
+        # ── IDENTITY CORE -- rebuild biography end-of-session ─────────────────
         try:
             if _identity is not None:
                 _final_momentum = getattr(self, "_last_momentum", "stable")
@@ -1955,7 +1955,7 @@ class NightRunner:
                     momentum=_final_momentum,
                 )
                 self.logger.info(
-                    "[IDENTITY] Rebuilt — sessions=%d cert_rate=%.0f%% self_esteem=%.2f trajectory=%s",
+                    "[IDENTITY] Rebuilt -- sessions=%d cert_rate=%.0f%% self_esteem=%.2f trajectory=%s",
                     _identity.get_status().get("sessions_lived", 0),
                     _identity.get_status().get("cert_rate_overall", 0.0) * 100,
                     _identity.get_status().get("self_esteem", 0.0),
@@ -1983,12 +1983,12 @@ class NightRunner:
         """Discover and run all benchmark tasks in benchmark/ directory."""
         benchmark_root = Path(PROJECT_ROOT) / "benchmark"
         if not benchmark_root.exists():
-            self.logger.info("[BENCHMARK] No benchmark/ directory found — skipping.")
+            self.logger.info("[BENCHMARK] No benchmark/ directory found -- skipping.")
             return
 
         task_dirs = sorted(d for d in benchmark_root.iterdir() if d.is_dir() and d.name.startswith("task_"))
         if not task_dirs:
-            self.logger.info("[BENCHMARK] No task directories found — skipping.")
+            self.logger.info("[BENCHMARK] No task directories found -- skipping.")
             return
 
         self.logger.info("[BENCHMARK] Found %d task(s): %s", len(task_dirs), [d.name for d in task_dirs])
@@ -2018,12 +2018,12 @@ class NightRunner:
                 self.benchmark_results.append(summary)
                 status = "SUCCESS" if result.success else "FAILED"
                 self.logger.info(
-                    "[BENCHMARK] %s %s — %d attempt(s), %.1fs",
+                    "[BENCHMARK] %s %s -- %d attempt(s), %.1fs",
                     status, task_dir.name, result.total_attempts, result.elapsed_total,
                 )
             except asyncio.TimeoutError:
                 self.logger.warning(
-                    "[BENCHMARK] Task %s TIMED OUT after %ds — skipping.",
+                    "[BENCHMARK] Task %s TIMED OUT after %ds -- skipping.",
                     task_dir.name, _TASK_TIMEOUT_S,
                 )
                 self.benchmark_results.append({
@@ -2058,9 +2058,9 @@ class NightRunner:
             if src.exists():
                 dst = backups_dir / dst_name
                 shutil.copy2(src, dst)
-                self.logger.info("[BACKUP] %s → backups/%s", src.name, dst_name)
+                self.logger.info("[BACKUP] %s -> backups/%s", src.name, dst_name)
             else:
-                self.logger.warning("[BACKUP] %s not found — skipped.", src)
+                self.logger.warning("[BACKUP] %s not found -- skipped.", src)
 
     def _generate_json_dump(self):
         date_str = datetime.now().strftime("%Y-%m-%d")
@@ -2099,14 +2099,14 @@ class NightRunner:
         strat_reuse_rate = (strats_reused_cycles / completed_cycles * 100) if completed_cycles else 0.0
         
         md_lines = [
-            f"# SHARD Night Report — {date_str}",
+            f"# SHARD Night Report -- {date_str}",
             "",
             "## Panoramica Sessione",
             f"- Durata totale: {total_time} minuti",
             f"- Cicli completati: {completed_cycles} / {self.max_cycles}",
             f"- Motivo stop: {stop_reason}",
             f"- API calls totali: {self.api_calls_used} (stima)",
-            f"- Skill totali: {skills_start} → {skills_end} (+{skills_diff} nuove)",
+            f"- Skill totali: {skills_start} -> {skills_end} (+{skills_diff} nuove)",
             "",
             "## Evolution Metrics",
             f"- Average score: {avg_score:.1f}",
@@ -2133,7 +2133,7 @@ class NightRunner:
                 failed_topics.extend(failure_reasons)
                 
             md_lines.extend([
-                f"\n### Ciclo {c} — {topic}",
+                f"\n### Ciclo {c} -- {topic}",
                 f"- Fonte: {cycle['source']} ({cycle['reason']})",
                 f"- Score: {score}/10",
                 f"- Esito: {outcome}",
@@ -2203,7 +2203,7 @@ if __name__ == "__main__":
         def _lobotomized_init(self, *a, **kw):
             _orig_init(self, *a, **kw)
             self.cognition_core = None
-            print("[LOBOTOMY] CognitionCore DISABLED — naked baseline mode")
+            print("[LOBOTOMY] CognitionCore DISABLED -- naked baseline mode")
         _sa_mod.StudyAgent.__init__ = _lobotomized_init
 
     runner = NightRunner(

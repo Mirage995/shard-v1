@@ -1,7 +1,7 @@
-"""contradiction_detector.py — SHARD Contradiction Engine.
+"""contradiction_detector.py -- SHARD Contradiction Engine.
 
 A CognitionCore citizen that accumulates skill outcomes during the session,
-then — at session_complete — finds real contradictions in SHARD's behaviour,
+then -- at session_complete -- finds real contradictions in SHARD's behaviour,
 generates an LLM hypothesis, and *acts* on it by modifying desire_engine and
 goal_engine.
 
@@ -28,7 +28,7 @@ MAX_HYPOTHESES_CONTEXT = 3
 
 
 class ContradictionDetector:
-    """CognitionCore citizen — detects behavioural contradictions and acts on them.
+    """CognitionCore citizen -- detects behavioural contradictions and acts on them.
 
     Registered interests: skill_certified, skill_failed, session_complete
     """
@@ -53,7 +53,7 @@ class ContradictionDetector:
                 self._session_failed.append({"topic": topic, "score": score})
 
         elif event_type == "session_complete":
-            # Async work — night_runner calls detect_and_act() directly after
+            # Async work -- night_runner calls detect_and_act() directly after
             # broadcast so we don't need to spawn a task here.
             pass
 
@@ -168,7 +168,7 @@ class ContradictionDetector:
                         "topic":  topic,
                         "detail": (
                             f"Failed {len(rows)} times, score always below 5.0. "
-                            f"This is not random — there is a systematic gap."
+                            f"This is not random -- there is a systematic gap."
                         ),
                     })
 
@@ -232,7 +232,7 @@ This session you certified: {', '.join(self._session_certified) or 'nothing'}
 This session you failed: {', '.join(e['topic'] for e in self._session_failed) or 'nothing'}
 
 Your task: generate ONE honest hypothesis about WHY this contradiction exists in your behaviour.
-This is not for a user — this is your private internal reasoning.
+This is not for a user -- this is your private internal reasoning.
 Be specific. Reference the actual topic and data above.
 
 Respond ONLY with valid JSON (no markdown):

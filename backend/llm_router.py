@@ -1,6 +1,6 @@
-"""LLM Router — Multi-provider completion with exponential backoff + circuit breaker.
+"""LLM Router -- Multi-provider completion with exponential backoff + circuit breaker.
 
-Provider chain: Claude (Anthropic) → Groq (LLaMA-70B) → Gemini (Flash) → Ollama (local).
+Provider chain: Claude (Anthropic) -> Groq (LLaMA-70B) -> Gemini (Flash) -> Ollama (local).
 Each provider has its own in-memory circuit breaker and retry policy.
 
 Retry logic:
@@ -9,10 +9,10 @@ Retry logic:
   - Circuit breaker: trips after 3 consecutive failures, recovers after 60s probe.
 
 Log markers to watch:
-  [CIRCUIT] *** <name> → OPEN ***   — provider is down, being skipped
-  [CIRCUIT] <name> → HALF_OPEN      — probing recovery
-  [CIRCUIT] <name> → CLOSED         — provider back online
-  [LLM_ROUTER] <name> exhausted     — all retries done, falling through
+  [CIRCUIT] *** <name> -> OPEN ***   -- provider is down, being skipped
+  [CIRCUIT] <name> -> HALF_OPEN      -- probing recovery
+  [CIRCUIT] <name> -> CLOSED         -- provider back online
+  [LLM_ROUTER] <name> exhausted     -- all retries done, falling through
   [LLM_ROUTER] *** ALL PROVIDERS FAILED ***
 """
 import asyncio
@@ -31,7 +31,7 @@ from typing import Callable, Awaitable
 
 logger = logging.getLogger("shard.llm_router")
 
-# Weak ref to consciousness — set by server.py after init
+# Weak ref to consciousness -- set by server.py after init
 _consciousness_ref = None
 
 def set_consciousness(c):
@@ -49,7 +49,7 @@ def _log_fallback(from_p: str, to_p: str, reason: str):
 _FAILURE_THRESHOLD = 3     # consecutive failures before circuit trips
 _RECOVERY_TIMEOUT  = 60.0  # seconds before HALF_OPEN probe
 _MAX_RETRIES       = 3     # total attempts per provider (1 + 2 retries)
-_BASE_DELAY        = 1.0   # seconds — doubles each retry
+_BASE_DELAY        = 1.0   # seconds -- doubles each retry
 _MAX_DELAY         = 16.0  # backoff ceiling
 
 _TIMEOUT: dict[str, float] = {
@@ -106,7 +106,7 @@ class _CircuitBreaker:
             if elapsed >= self.recovery_timeout:
                 self.state = _HALF_OPEN
                 logger.warning(
-                    "[CIRCUIT] %s → HALF_OPEN — probing recovery after %.0fs down",
+                    "[CIRCUIT] %s -> HALF_OPEN -- probing recovery after %.0fs down",
                     self.name, elapsed,
                 )
                 return True
@@ -115,7 +115,7 @@ class _CircuitBreaker:
 
     def record_success(self):
         if self.state != _CLOSED:
-            logger.info("[CIRCUIT] %s → CLOSED (provider recovered)", self.name)
+            logger.info("[CIRCUIT] %s -> CLOSED (provider recovered)", self.name)
         self.state = _CLOSED
         self.failure_count = 0
 
@@ -127,7 +127,7 @@ class _CircuitBreaker:
             self.state = _OPEN
             if prev != _OPEN:
                 logger.critical(
-                    "[CIRCUIT] *** %s → OPEN — provider DOWN after %d failures,"
+                    "[CIRCUIT] *** %s -> OPEN -- provider DOWN after %d failures,"
                     " skipping for %.0fs ***",
                     self.name, self.failure_count, self.recovery_timeout,
                 )
@@ -154,7 +154,7 @@ async def _call_with_backoff(
     """Run coro_factory() with exponential backoff; update circuit breaker on outcome.
 
     coro_factory is called fresh on every attempt (new coroutine each time).
-    Hard errors propagate immediately — no backoff wasted.
+    Hard errors propagate immediately -- no backoff wasted.
     """
     cb      = _breakers[name]
     timeout = _TIMEOUT[name]
@@ -172,13 +172,13 @@ async def _call_with_backoff(
                 "[LLM_ROUTER] %s attempt %d/%d timed out (%.0fs)",
                 name, attempt, _MAX_RETRIES, timeout,
             )
-            # Timeouts are always transient — fall through to backoff logic below
+            # Timeouts are always transient -- fall through to backoff logic below
 
         except Exception as exc:
             last_exc = exc
             if _is_hard(exc):
                 logger.error(
-                    "[LLM_ROUTER] %s hard error — no retry: %s", name, exc,
+                    "[LLM_ROUTER] %s hard error -- no retry: %s", name, exc,
                 )
                 cb.record_failure()
                 raise  # caller sees this and falls through to next provider
@@ -240,14 +240,14 @@ def _get_gemini():
     if _gemini_client is None:
         key = os.getenv("GEMINI_API_KEY")
         if not key:
-            logger.warning("[LLM_ROUTER] GEMINI_API_KEY not set — Gemini Flash disabled.")
+            logger.warning("[LLM_ROUTER] GEMINI_API_KEY not set -- Gemini Flash disabled.")
             return None
         try:
             from google import genai
             _gemini_client = genai.Client(api_key=key)
             logger.info("[LLM_ROUTER] Gemini Flash client initialized OK.")
         except ImportError:
-            logger.warning("[LLM_ROUTER] google-genai package not installed — Gemini Flash disabled.")
+            logger.warning("[LLM_ROUTER] google-genai package not installed -- Gemini Flash disabled.")
         except Exception as exc:
             logger.critical("[LLM_ROUTER] Gemini Flash init FAILED: %s", exc)
     return _gemini_client
@@ -293,7 +293,7 @@ async def llm_complete(
                         logger.info("[LLM_ROUTER] Claude OK (%d chars)", len(result))
                         return result
                     except Exception as exc:
-                        logger.warning("[LLM_ROUTER] Claude exhausted — falling through. Reason: %s", exc)
+                        logger.warning("[LLM_ROUTER] Claude exhausted -- falling through. Reason: %s", exc)
                         errors.append(f"Claude: {exc}")
                         _log_fallback("Claude", "Groq", str(exc))
             else:
@@ -324,7 +324,7 @@ async def llm_complete(
                         logger.info("[LLM_ROUTER] Groq OK (%d chars)", len(result))
                         return result
                     except Exception as exc:
-                        logger.warning("[LLM_ROUTER] Groq exhausted — falling through. Reason: %s", exc)
+                        logger.warning("[LLM_ROUTER] Groq exhausted -- falling through. Reason: %s", exc)
                         errors.append(f"Groq: {exc}")
                         _log_fallback("Groq", "Gemini", str(exc))
             else:
@@ -359,7 +359,7 @@ async def llm_complete(
                         logger.info("[LLM_ROUTER] Gemini OK (%d chars)", len(result))
                         return result
                     except Exception as exc:
-                        logger.critical("[LLM_ROUTER] Gemini exhausted — RAW ERROR: %s", exc)
+                        logger.critical("[LLM_ROUTER] Gemini exhausted -- RAW ERROR: %s", exc)
                         errors.append(f"Gemini: {exc}")
             else:
                 logger.warning("[LLM_ROUTER] Gemini circuit OPEN")
@@ -374,7 +374,7 @@ async def llm_complete(
 # ── Health / introspection ─────────────────────────────────────────────────────
 
 def get_circuit_breaker_status() -> dict:
-    """Snapshot of all circuit breakers — plug into a /health endpoint."""
+    """Snapshot of all circuit breakers -- plug into a /health endpoint."""
     return {
         name: {
             "state": cb.state,

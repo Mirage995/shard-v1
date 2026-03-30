@@ -1,8 +1,8 @@
-"""social_agent_refactor.py — Consolidate agent_posts.py + agent_posts_optimized.py
+"""social_agent_refactor.py -- Consolidate agent_posts.py + agent_posts_optimized.py
 
 Smart merge strategy:
   - Uses AST to extract only functions unique to the legacy file (not in optimized)
-  - Sends: full optimized file + unique legacy functions → ~9K input tokens
+  - Sends: full optimized file + unique legacy functions -> ~9K input tokens
   - Attempts single-pass (leaves ~8K tokens for output)
   - Auto-falls-back to two-pass if still truncated
 
@@ -65,7 +65,7 @@ def extract_unique_functions(legacy_src: str, optimized_src: str) -> str:
 
         return "\n\n".join(chunks)
     except SyntaxError as e:
-        print(f"  [WARN] AST parse failed ({e}) — falling back to full legacy")
+        print(f"  [WARN] AST parse failed ({e}) -- falling back to full legacy")
         return legacy_src
 
 
@@ -84,7 +84,7 @@ def get_function_names(src: str) -> list[str]:
 
 SYSTEM_PROMPT = (
     "You are a senior Python engineer performing a code merge. "
-    "Output ONLY valid Python source code — no markdown, no fences, no commentary. "
+    "Output ONLY valid Python source code -- no markdown, no fences, no commentary. "
     "Every function must be fully implemented. "
     "All HTML content MUST be inside Python string literals (triple-quotes or concatenation). "
     "Never write raw HTML tags as bare code lines."
@@ -98,8 +98,8 @@ MERGE RULES:
 3. Include EVERY function from both files. Prefer FILE B's version for duplicates.
 4. CLI unchanged: `python agent_posts_unified.py [CLIENT_NAME]`
 5. Section comments: # ══ SETUP, # ══ MODELS, # ══ GENERATION, # ══ SELECTION, etc.
-6. All HTML must be inside Python string literals — never bare HTML lines in code.
-7. Output ONLY valid Python — no markdown, no fences, no explanations.
+6. All HTML must be inside Python string literals -- never bare HTML lines in code.
+7. Output ONLY valid Python -- no markdown, no fences, no explanations.
 """
 
 
@@ -110,12 +110,12 @@ def build_single_pass_prompt(optimized: str, unique_legacy: str, unique_names: l
     )
     return f"""You are merging two Python files into one unified implementation.
 {RULES}
-## FILE B — agent_posts_optimized.py (BASE — use this as your foundation)
+## FILE B -- agent_posts_optimized.py (BASE -- use this as your foundation)
 ```python
 {optimized}
 ```
 
-## UNIQUE FUNCTIONS FROM FILE A (legacy only — not in FILE B)
+## UNIQUE FUNCTIONS FROM FILE A (legacy only -- not in FILE B)
 {unique_note}
 ```python
 {unique_legacy if unique_legacy.strip() else "# (none)"}
@@ -123,7 +123,7 @@ def build_single_pass_prompt(optimized: str, unique_legacy: str, unique_names: l
 
 Write the COMPLETE unified file from top to bottom.
 Do NOT use ellipsis (...) or skip any section.
-Do NOT truncate — write every function in full."""
+Do NOT truncate -- write every function in full."""
 
 
 def build_part1_prompt(optimized: str, unique_legacy: str, unique_names: list) -> str:
@@ -133,7 +133,7 @@ def build_part1_prompt(optimized: str, unique_legacy: str, unique_names: list) -
     )
     return f"""You are merging two Python files. Write PART 1 ONLY of the unified file.
 {RULES}
-## FILE B — agent_posts_optimized.py (BASE)
+## FILE B -- agent_posts_optimized.py (BASE)
 ```python
 {optimized}
 ```
@@ -151,17 +151,17 @@ Do NOT write select_best_variants or anything after it."""
 
 
 def build_part2_prompt(optimized: str, part1_code: str) -> str:
-    # Only send signatures of optimized for context — saves tokens
+    # Only send signatures of optimized for context -- saves tokens
     lines  = optimized.splitlines()
     sigs   = [l for l in lines if l.startswith("def ") or l.startswith("class ") or l.startswith("    def ")]
     sig_summary = "\n".join(sigs)
 
     return f"""You are writing PART 2 of a merged Python file. Part 1 is already written.
 {RULES}
-## FUNCTION SIGNATURES (for reference only — do NOT repeat these):
+## FUNCTION SIGNATURES (for reference only -- do NOT repeat these):
 {sig_summary}
 
-## PART 1 (already written — do NOT repeat):
+## PART 1 (already written -- do NOT repeat):
 ```python
 {part1_code}
 ```
@@ -230,7 +230,7 @@ def attempt_syntax_fix(code: str, error: str) -> str:
         else:
             fixed.append(line)
     if count:
-        print(f"     Auto-fixed {count} bare HTML lines → quoted strings")
+        print(f"     Auto-fixed {count} bare HTML lines -> quoted strings")
     return "\n".join(fixed)
 
 
@@ -240,7 +240,7 @@ async def run_merge(dry_run: bool = False):
     print()
     print("=" * 68)
     print("  SHARD Social Agent Refactor")
-    print(f"  {FILE_LEGACY.name} + {FILE_OPTIMIZED.name}  →  {OUTPUT_FILE.name}")
+    print(f"  {FILE_LEGACY.name} + {FILE_OPTIMIZED.name}  ->  {OUTPUT_FILE.name}")
     print(f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 68)
 
@@ -256,7 +256,7 @@ async def run_merge(dry_run: bool = False):
     unique_legacy = extract_unique_functions(legacy, optimized)
     unique_names  = get_function_names(unique_legacy)
     print(f"      Unique to legacy: {unique_names or ['(none)']}")
-    print(f"      Input reduction: {len(legacy):,} → {len(unique_legacy):,} chars of legacy")
+    print(f"      Input reduction: {len(legacy):,} -> {len(unique_legacy):,} chars of legacy")
 
     # ── Build single-pass prompt ──────────────────────────────────────────
     prompt_single = build_single_pass_prompt(optimized, unique_legacy, unique_names)
@@ -286,21 +286,21 @@ async def run_merge(dry_run: bool = False):
     code, stop = await call_claude(client, prompt_single, "single-pass")
 
     if stop == "end_turn":
-        print("      ✅ Single-pass complete — no truncation")
+        print("      ✅ Single-pass complete -- no truncation")
         unified = code
     else:
         # Fall back to two-pass
-        print("      ⚠️  Truncated — switching to two-pass fallback")
+        print("      [WARN]️  Truncated -- switching to two-pass fallback")
 
         p1 = build_part1_prompt(optimized, unique_legacy, unique_names)
         part1_raw, stop1 = await call_claude(client, p1, "Part 1")
 
         if PART_SPLIT in part1_raw:
             part1_code = part1_raw.split(PART_SPLIT)[0].rstrip()
-            print(f"      Part 1 marker found — split clean ({len(part1_code.splitlines())} lines)")
+            print(f"      Part 1 marker found -- split clean ({len(part1_code.splitlines())} lines)")
         else:
             part1_code = part1_raw
-            print(f"      ⚠️  Part 1 marker missing — using full response ({len(part1_code.splitlines())} lines)")
+            print(f"      [WARN]️  Part 1 marker missing -- using full response ({len(part1_code.splitlines())} lines)")
 
         p2 = build_part2_prompt(optimized, part1_code)
         print(f"      Part 2 prompt: {len(p2):,} chars")
@@ -315,11 +315,11 @@ async def run_merge(dry_run: bool = False):
     if ok:
         print("✅ valid Python")
     else:
-        print(f"⚠️  error detected — attempting auto-fix")
+        print(f"[WARN]️  error detected -- attempting auto-fix")
         print(f"     {err}")
         unified = attempt_syntax_fix(unified, err)
         ok, err = syntax_check(unified)
-        print(f"     Re-check: {'✅ fixed' if ok else f'⚠️  still broken: {err}'}")
+        print(f"     Re-check: {'✅ fixed' if ok else f'[WARN]️  still broken: {err}'}")
 
     # ── Save ──────────────────────────────────────────────────────────────
     SANDBOX_DIR.mkdir(parents=True, exist_ok=True)
@@ -335,7 +335,7 @@ async def run_merge(dry_run: bool = False):
     print(f"  Input  : {orig_total:,} lines ({FILE_LEGACY.name} + {FILE_OPTIMIZED.name})")
     print(f"  Output : {unified_lines:,} lines  (reduction: {reduction:.0f}%)")
     print(f"  File   : {OUTPUT_FILE}")
-    print(f"  Status : {'✅ valid Python' if ok else '⚠️  syntax issues — review before running'}")
+    print(f"  Status : {'✅ valid Python' if ok else '[WARN]️  syntax issues -- review before running'}")
     print("=" * 68)
     print()
 

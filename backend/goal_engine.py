@@ -1,4 +1,4 @@
-"""goal_engine.py — SHARD's goal management and topic steering engine.
+"""goal_engine.py -- SHARD's goal management and topic steering engine.
 
 Goals are not decorations. They actively steer what SHARD studies.
 When a goal is active, topic selection in NightRunner biases toward
@@ -13,7 +13,7 @@ Usage:
 
     # In NightRunner topic selection:
     ranked = engine.steer(candidates=["asyncio", "raft consensus", "sorting"])
-    # → ["raft consensus", "asyncio", "sorting"]  (goal-aligned first)
+    # -> ["raft consensus", "asyncio", "sorting"]  (goal-aligned first)
 """
 import json
 import re
@@ -178,7 +178,7 @@ class GoalEngine:
 
     When an active goal exists, topic selection is biased toward
     topics that advance that goal. Topics with zero alignment are
-    not blocked — they just get lower priority.
+    not blocked -- they just get lower priority.
     """
 
     def __init__(self, storage: GoalStorage, capability_graph=None):
@@ -295,30 +295,30 @@ class GoalEngine:
     # ── Autonomous goal generation ─────────────────────────────────────────────
 
     def autonomous_generate(self) -> Optional["Goal"]:
-        """SHARD decides its own next goal — no human input.
+        """SHARD decides its own next goal -- no human input.
 
         Logic:
-          1. If an active non-completed goal exists with < 80% progress → keep it.
+          1. If an active non-completed goal exists with < 80% progress -> keep it.
           2. Read self_model: momentum, blind_spots, certification_rate.
           3. Read world_model: top priority gaps SHARD doesn't know yet.
           4. Cross-reference blind spots with world relevance to pick the most
              urgent goal:
-               - momentum=stagnating → foundational skill with highest relevance
-               - momentum=accelerating → ambitious skill with highest xp_leverage
-               - momentum=stable/early → highest world priority gap overall
+               - momentum=stagnating -> foundational skill with highest relevance
+               - momentum=accelerating -> ambitious skill with highest xp_leverage
+               - momentum=stable/early -> highest world priority gap overall
           5. Create the goal, activate it, persist it.
 
         Returns the newly created (or existing) active goal.
         """
         # Keep existing active goal if meaningful progress still to make.
-        # Persistence rule: goals resist replacement based on priority —
+        # Persistence rule: goals resist replacement based on priority --
         # higher priority goals require more sessions before being reconsidered.
         current = self.get_active_goal()
         if current and not current.completed:
             progress = current.compute_progress(self.capability_graph) if self.capability_graph else current.progress
-            min_sessions = max(2, round(current.priority * 5))  # priority 1.0 → 5 sessions, 0.5 → 3
+            min_sessions = max(2, round(current.priority * 5))  # priority 1.0 -> 5 sessions, 0.5 -> 3
             if progress < 0.8 and current.sessions_active < min_sessions:
-                # Goal is sticky — increment counter and keep it
+                # Goal is sticky -- increment counter and keep it
                 current.sessions_active += 1
                 self.storage.save_goal(current)
                 return current
@@ -347,15 +347,15 @@ class GoalEngine:
 
         # Pick strategy based on momentum
         if momentum == "stagnating":
-            # Go foundational — easiest high-relevance skill to build confidence
+            # Go foundational -- easiest high-relevance skill to build confidence
             candidate = min(wm_gaps, key=lambda g: -(g["relevance"] - g["xp_leverage"] * 0.1))
             strategy  = "foundational (stagnating momentum - rebuild confidence)"
         elif momentum == "accelerating":
-            # Go ambitious — highest leverage skill
+            # Go ambitious -- highest leverage skill
             candidate = max(wm_gaps, key=lambda g: g["xp_leverage"] * g["relevance"])
             strategy  = "ambitious (accelerating momentum - push harder)"
         else:
-            # Stable/early — highest overall priority
+            # Stable/early -- highest overall priority
             candidate = wm_gaps[0]
             strategy  = "priority-driven (stable momentum - highest ROI gap)"
 
@@ -378,7 +378,7 @@ class GoalEngine:
 
         title = f"master: {skill}"
         description = (
-            f"Autonomous goal — {strategy}.\n"
+            f"Autonomous goal -- {strategy}.\n"
             f"World relevance: {round(relevance*100)}%  domain: {domain}\n"
             f"SHARD cert_rate={round(cert_rate*100)}%  momentum={momentum}"
         )
@@ -435,21 +435,21 @@ class GoalEngine:
         elif event_type == "mood_shift":
             new_label = data.get("to", "")
             if new_label in ("confident", "focused"):
-                # Good mood → nudge active goal progress (momentum carries over)
+                # Good mood -> nudge active goal progress (momentum carries over)
                 goal = self.get_active_goal()
                 if goal:
                     goal.progress = round(min(1.0, goal.progress + 0.01), 4)
                     self.storage.save_goal(goal)
-                    logger.debug("[GOAL] mood_shift(%s) → progress nudge +0.01 on '%s'", new_label, goal.title)
+                    logger.debug("[GOAL] mood_shift(%s) -> progress nudge +0.01 on '%s'", new_label, goal.title)
             elif new_label == "frustrated":
-                # Frustration → slow goal aging (SHARD needs time to recover, not pivot)
+                # Frustration -> slow goal aging (SHARD needs time to recover, not pivot)
                 goal = self.get_active_goal()
                 if goal and goal.sessions_active > 0:
                     goal.sessions_active = min(goal.sessions_active + 1, 10)
                     self.storage.save_goal(goal)
 
         elif event_type == "world_recalibrated":
-            # World relevance scores updated — re-evaluate if active goal is still optimal
+            # World relevance scores updated -- re-evaluate if active goal is still optimal
             # Force re-generation check next session by resetting sessions_active
             goal = self.get_active_goal()
             if goal and goal.goal_type == "autonomous":

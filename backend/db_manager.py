@@ -1,4 +1,4 @@
-"""ChromaDB Singleton Manager — Fase 1 SSJ3: Core Hardening.
+"""ChromaDB Singleton Manager -- Fase 1 SSJ3: Core Hardening.
 
 Garantisce un solo PersistentClient per path database in tutto SHARD.
 Elimina la lock contention su SQLite (critica su Windows) causata da
@@ -14,10 +14,10 @@ Usage:
     col = get_collection(DB_PATH_SHARD_MEMORY, "conversations",
                          metadata={"description": "Chat history"})
 
-Path constants (importa da qui — non ridefinire altrove):
-    DB_PATH_SHARD_MEMORY  — shard_v1/shard_memory/
-    DB_PATH_STRATEGY_DB   — shard_v1/shard_memory/strategy_db/
-    DB_PATH_KNOWLEDGE_DB  — shard_v1/knowledge_db/
+Path constants (importa da qui -- non ridefinire altrove):
+    DB_PATH_SHARD_MEMORY  -- shard_v1/shard_memory/
+    DB_PATH_STRATEGY_DB   -- shard_v1/shard_memory/strategy_db/
+    DB_PATH_KNOWLEDGE_DB  -- shard_v1/knowledge_db/
 """
 
 import logging

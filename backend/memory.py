@@ -10,7 +10,7 @@ logger = logging.getLogger("shard.memory")
 
 class ShardMemory:
     def __init__(self):
-        # Collezioni di memoria — usa il singleton db_manager (no lock contention)
+        # Collezioni di memoria -- usa il singleton db_manager (no lock contention)
         self.conversations = get_collection(
             DB_PATH_SHARD_MEMORY,
             name="conversations",
@@ -63,7 +63,7 @@ class ShardMemory:
         print("[SHARD MEMORY] Core memory initialized with fundamental facts.")
     
     def remember_conversation(self, sender, text):
-        """Salva un messaggio nella memoria conversazionale (sync — usa remember_conversation_async nelle coroutine)."""
+        """Salva un messaggio nella memoria conversazionale (sync -- usa remember_conversation_async nelle coroutine)."""
         timestamp = datetime.now().isoformat()
         doc_id = f"conv_{timestamp}_{sender}"
         self.conversations.add(
@@ -73,11 +73,11 @@ class ShardMemory:
         )
 
     async def remember_conversation_async(self, sender, text):
-        """Async wrapper — non blocca l'event loop durante la scrittura ChromaDB."""
+        """Async wrapper -- non blocca l'event loop durante la scrittura ChromaDB."""
         await asyncio.to_thread(self.remember_conversation, sender, text)
 
     def recall(self, query, n_results=5):
-        """Cerca nella memoria (sync — usa recall_async nelle coroutine)."""
+        """Cerca nella memoria (sync -- usa recall_async nelle coroutine)."""
         results = {"conversations": [], "core": []}
 
         if self.conversations.count() > 0:
@@ -99,7 +99,7 @@ class ShardMemory:
         return results
 
     async def recall_async(self, query, n_results=5):
-        """Async wrapper — non blocca l'event loop durante le query ChromaDB."""
+        """Async wrapper -- non blocca l'event loop durante le query ChromaDB."""
         return await asyncio.to_thread(self.recall, query, n_results)
 
     def add_core_fact(self, fact_id, fact_text):
@@ -155,7 +155,7 @@ class ShardMemory:
     def memory_gate(docs):
         """Filter retrieved docs before injecting into prompt context.
         
-        Pipeline: normalize → dedup (Jaccard) → length filter → cap to 3.
+        Pipeline: normalize -> dedup (Jaccard) -> length filter -> cap to 3.
         Reduces prompt size by 60-80% while keeping semantically useful content.
         """
         # ── Normalize: handle raw ChromaDB response or flat list ──

@@ -1,20 +1,20 @@
-"""cognition_core.py — SHARD CognitionCore / Senso Interno.
+"""cognition_core.py -- SHARD CognitionCore / Senso Interno.
 
 5-layer Global Workspace that aggregates internal tensions and exposes them
 to the rest of the pipeline. Designed to create the *conditions* for
-emergent behavior — not to program it.
+emergent behavior -- not to program it.
 
 Architecture (COGNITION_CORE.txt):
-  Layer 0 — ANCHOR       : ground truth (sandbox pass/fail, score, cert rate)
-  Layer 1 — EXECUTIVE    : who SHARD is right now (lightweight snapshot)
-  Layer 2 — IDENTITY     : SelfModel — capabilities, gaps, frontier topics
-  Layer 3 — KNOWLEDGE    : GraphRAG  — causal relations, structural complexity
-  Layer 4 — EXPERIENCE   : EpisodicMemory + StrategyMemory — history, patterns
-  Layer 5 — CRITIQUE     : CriticAgent + MetaLearning — systematic errors, strategy
+  Layer 0 -- ANCHOR       : ground truth (sandbox pass/fail, score, cert rate)
+  Layer 1 -- EXECUTIVE    : who SHARD is right now (lightweight snapshot)
+  Layer 2 -- IDENTITY     : SelfModel -- capabilities, gaps, frontier topics
+  Layer 3 -- KNOWLEDGE    : GraphRAG  -- causal relations, structural complexity
+  Layer 4 -- EXPERIENCE   : EpisodicMemory + StrategyMemory -- history, patterns
+  Layer 5 -- CRITIQUE     : CriticAgent + MetaLearning -- systematic errors, strategy
 
 Shadow Diagnostic Layer:
-  audit_emergence(topic, action, delta) → [EMERGENCE HIT] or [MISSED EMERGENCE]
-  Judges ONLY measurable behavioral metrics — never text output (anti-recita rule).
+  audit_emergence(topic, action, delta) -> [EMERGENCE HIT] or [MISSED EMERGENCE]
+  Judges ONLY measurable behavioral metrics -- never text output (anti-recita rule).
 
 Token budget:
   executive()         ~200 tokens  (always loaded)
@@ -41,15 +41,15 @@ def _get_db():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Layer 0 — ANCHOR
+# Layer 0 -- ANCHOR
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _anchor() -> Dict[str, Any]:
     """Read ground-truth metrics directly from SQLite. No LLM, no inference."""
     _default = {
         "certification_rate": 0.0, "total_experiments": 0,
-        "total_certified": 0, "last_topic": "—", "last_score": 0.0,
-        "last_pass": False, "last_date": "—", "avg_score": 0.0,
+        "total_certified": 0, "last_topic": "--", "last_score": 0.0,
+        "last_pass": False, "last_date": "--", "avg_score": 0.0,
     }
     try:
         conn = _get_db()
@@ -67,13 +67,13 @@ def _anchor() -> Dict[str, Any]:
         ).fetchone()
 
         if last and not _is_mock(last):
-            last_topic = str(last["topic"])   if last["topic"]     else "—"
+            last_topic = str(last["topic"])   if last["topic"]     else "--"
             last_score = float(last["score"]) if last["score"] is not None else 0.0
             last_pass  = bool(last["certified"])
             ts         = last["timestamp"]
-            last_date  = str(ts)[:10] if ts and not _is_mock(ts) else "—"
+            last_date  = str(ts)[:10] if ts and not _is_mock(ts) else "--"
         else:
-            last_topic, last_score, last_pass, last_date = "—", 0.0, False, "—"
+            last_topic, last_score, last_pass, last_date = "--", 0.0, False, "--"
 
         avg_row = conn.execute(
             "SELECT AVG(score) AS avg FROM experiments"
@@ -101,7 +101,7 @@ def _is_mock(value) -> bool:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Layer 1 — EXECUTIVE SUMMARY
+# Layer 1 -- EXECUTIVE SUMMARY
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _executive_summary(anchor: Dict) -> str:
@@ -122,7 +122,7 @@ def _executive_summary(anchor: Dict) -> str:
         status = "struggling"
 
     lines = [
-        f"SHARD Executive Summary — {anchor['last_date']}",
+        f"SHARD Executive Summary -- {anchor['last_date']}",
         f"Status: {status}",
         f"Certification rate: {cert_pct} ({anchor['total_certified']}/{anchor['total_experiments']})",
         f"Average score: {anchor['avg_score']}/10",
@@ -138,7 +138,7 @@ def _executive_summary(anchor: Dict) -> str:
 class CognitionCore:
     """Central aggregator for SHARD's internal state.
 
-    The Core does NOT orchestrate — it aggregates and exposes tensions.
+    The Core does NOT orchestrate -- it aggregates and exposes tensions.
     Layers never call each other; they only talk to the Core.
 
     Usage:
@@ -165,12 +165,12 @@ class CognitionCore:
         self._meta_learning   = meta_learning
         self._critic_agent    = critic_agent
 
-        # Layer 0+1 cache — refreshed every NightRunner cycle
+        # Layer 0+1 cache -- refreshed every NightRunner cycle
         self._anchor_cache:    Optional[Dict]  = None
         self._exec_cache:      Optional[str]   = None
         self._cache_timestamp: float           = 0.0
 
-        # Shadow Diagnostic Layer — emergence tracking
+        # Shadow Diagnostic Layer -- emergence tracking
         self._emergence_log: List[Dict] = []
         self._emergence_stats = {
             "opportunities": 0,
@@ -180,13 +180,13 @@ class CognitionCore:
             "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0, "ignored_v3": 0},
         }
 
-        # ── Shared Environment — module registry + event bus ──────────────────
+        # ── Shared Environment -- module registry + event bus ──────────────────
         # Modules register here and receive broadcasts from each other.
         # CognitionCore is the environment: it routes events, never decides.
-        self._registry: Dict[str, Dict] = {}   # name → {module, interests}
+        self._registry: Dict[str, Dict] = {}   # name -> {module, interests}
         self._broadcast_log: List[Dict] = []   # last 50 events (Shadow Diagnostic)
 
-    # ── Shared Environment — register / broadcast ─────────────────────────────
+    # ── Shared Environment -- register / broadcast ─────────────────────────────
 
     def register(self, name: str, module, interests: List[str]) -> None:
         """Register a module as a citizen of this environment.
@@ -197,12 +197,12 @@ class CognitionCore:
             interests: List of event types to receive. Use ["*"] for all events.
         """
         self._registry[name] = {"module": module, "interests": set(interests)}
-        logger.info("[CORE ENV] Registered '%s' — interests: %s", name, interests)
+        logger.info("[CORE ENV] Registered '%s' -- interests: %s", name, interests)
 
     def broadcast(self, event_type: str, data: Dict, source: str = "system") -> int:
         """Broadcast an event to all registered modules that declared interest.
 
-        CognitionCore routes the event — it does NOT decide what to do with it.
+        CognitionCore routes the event -- it does NOT decide what to do with it.
         Each module reacts autonomously via its on_event() method.
 
         Returns the number of modules that received the event.
@@ -232,7 +232,7 @@ class CognitionCore:
             self._broadcast_log = self._broadcast_log[-50:]
 
         logger.info(
-            "[CORE ENV] broadcast '%s' from '%s' → %d recipient(s)",
+            "[CORE ENV] broadcast '%s' from '%s' -> %d recipient(s)",
             event_type, source, recipients,
         )
         return recipients
@@ -247,7 +247,7 @@ class CognitionCore:
         """Pre-warm Layer 0+1 cache. Call once at NightRunner startup."""
         self._refresh_anchor_cache()
         logger.info(
-            "[COGNITION CORE] Initialized — cert_rate=%.1f%% experiments=%d",
+            "[COGNITION CORE] Initialized -- cert_rate=%.1f%% experiments=%d",
             self._anchor_cache["certification_rate"] * 100,
             self._anchor_cache["total_experiments"],
         )
@@ -258,7 +258,7 @@ class CognitionCore:
         self._exec_cache      = _executive_summary(anchor)
         self._cache_timestamp = time.time()
 
-    # ── Layer 0 + 1 — executive() — always available ──────────────────────────
+    # ── Layer 0 + 1 -- executive() -- always available ──────────────────────────
 
     def executive(self) -> Dict[str, Any]:
         """Return Layer 0 (Anchor) + Layer 1 (Executive Summary).
@@ -275,7 +275,7 @@ class CognitionCore:
             "summary": self._exec_cache,
         }
 
-    # ── Layer 2 — IDENTITY ────────────────────────────────────────────────────
+    # ── Layer 2 -- IDENTITY ────────────────────────────────────────────────────
 
     def query_identity(self) -> Dict[str, Any]:
         """Layer 2: SelfModel snapshot.
@@ -306,7 +306,7 @@ class CognitionCore:
             logger.warning("[COGNITION] query_identity failed: %s", exc)
             return {"error": str(exc)}
 
-    # ── Layer 3 — KNOWLEDGE ───────────────────────────────────────────────────
+    # ── Layer 3 -- KNOWLEDGE ───────────────────────────────────────────────────
 
     def query_knowledge(self, topic: str) -> Dict[str, Any]:
         """Layer 3: GraphRAG causal context for a topic.
@@ -354,7 +354,7 @@ class CognitionCore:
             return {"topic": topic, "causal_context": "", "topic_complexity": 0,
                     "total_relations": 0, "complexity_level": "unknown", "error": str(exc)}
 
-    # ── Layer 4 — EXPERIENCE ──────────────────────────────────────────────────
+    # ── Layer 4 -- EXPERIENCE ──────────────────────────────────────────────────
 
     def query_experience(self, topic: str) -> Dict[str, Any]:
         """Layer 4: EpisodicMemory + StrategyMemory history for a topic.
@@ -423,7 +423,7 @@ class CognitionCore:
             return {"topic": topic, "attempt_count": 0, "avg_score": 0.0,
                     "error": str(exc)}
 
-    # ── Layer 5 — CRITIQUE ────────────────────────────────────────────────────
+    # ── Layer 5 -- CRITIQUE ────────────────────────────────────────────────────
 
     def query_critique(self, topic: str) -> Dict[str, Any]:
         """Layer 5: MetaLearning strategy recommendation + systematic error patterns.
@@ -457,7 +457,7 @@ class CognitionCore:
             return {"topic": topic, "recommended_strategy": None,
                     "category": "unknown", "error": str(exc)}
 
-    # ── Vettore 3 — Strategy Recommendation ──────────────────────────────────
+    # ── Vettore 3 -- Strategy Recommendation ──────────────────────────────────
 
     def query_strategy_recommendation(self, topic: str) -> Dict[str, Any]:
         """Cross-layer: MetaLearning category stats + best historical strategy.
@@ -467,11 +467,11 @@ class CognitionCore:
 
         Returns:
             {
-              "category":            str   — topic category (concurrency, web, etc.)
-              "best_strategy_text":  str   — formatted strategy description from MetaLearning
-              "category_cert_rate":  float — historical cert_rate for this category
-              "category_avg_score":  float — historical avg_score for this category
-              "has_history":         bool  — True if MetaLearning has data for this category
+              "category":            str   -- topic category (concurrency, web, etc.)
+              "best_strategy_text":  str   -- formatted strategy description from MetaLearning
+              "category_cert_rate":  float -- historical cert_rate for this category
+              "category_avg_score":  float -- historical avg_score for this category
+              "has_history":         bool  -- True if MetaLearning has data for this category
             }
         """
         result: Dict[str, Any] = {
@@ -506,7 +506,7 @@ class CognitionCore:
             logger.warning("[COGNITION] query_strategy_recommendation failed: %s", exc)
         return result
 
-    # ── Relational Context — composite view with tensions ─────────────────────
+    # ── Relational Context -- composite view with tensions ─────────────────────
 
     def relational_context(self, topic: str) -> str:
         """Compose all relevant layers into a tension-aware context string.
@@ -568,7 +568,7 @@ class CognitionCore:
                 f"MetaLearning [{cat}]: cert_rate={cr:.0%} avg={avg:.1f}/10"
             )
             lines.append(
-                f"[VETTORE 3 — DIRECTED PIVOT]: {strat_rec['best_strategy_text']}"
+                f"[VETTORE 3 -- DIRECTED PIVOT]: {strat_rec['best_strategy_text']}"
             )
         else:
             strat_rec = {}
@@ -629,12 +629,12 @@ class CognitionCore:
 
         return "\n".join(lines)
 
-    # ── Layer W — WORLD MODEL ─────────────────────────────────────────────────
+    # ── Layer W -- WORLD MODEL ─────────────────────────────────────────────────
 
     def query_world(self, topic: str) -> Dict[str, Any]:
         """World model signal: how relevant is this topic in the real software landscape?
 
-        Uses backend/world_model.py — 58 seeded skills, self-calibrating from
+        Uses backend/world_model.py -- 58 seeded skills, self-calibrating from
         SHARD's own cert data. No external calls.
         """
         try:
@@ -656,12 +656,12 @@ class CognitionCore:
             logger.warning("[COGNITION] query_world failed: %s", exc)
             return {"topic": topic, "relevance": 0.0, "domain": "unknown", "error": str(exc)}
 
-    # ── Layer G — GOAL ENGINE ─────────────────────────────────────────────────
+    # ── Layer G -- GOAL ENGINE ─────────────────────────────────────────────────
 
     def query_goal(self, topic: str) -> Dict[str, Any]:
         """Active goal signal: how does this topic align with SHARD's current goal?
 
-        Uses backend/goal_engine.py — goal persisted across sessions,
+        Uses backend/goal_engine.py -- goal persisted across sessions,
         generated autonomously from self_model + world_model.
         """
         try:
@@ -685,7 +685,7 @@ class CognitionCore:
             logger.warning("[COGNITION] query_goal failed: %s", exc)
             return {"topic": topic, "active_goal": None, "alignment": 0.0, "error": str(exc)}
 
-    # ── Layer R — REAL SELF MODEL (augments Layer 2) ──────────────────────────
+    # ── Layer R -- REAL SELF MODEL (augments Layer 2) ──────────────────────────
 
     def query_real_identity(self) -> Dict[str, Any]:
         """Augments query_identity() with data from backend/self_model.py.
@@ -727,7 +727,7 @@ class CognitionCore:
             logger.warning("[COGNITION] query_desire failed: %s", exc)
             return {"error": str(exc), "frustration_hits": 0, "desire_score": 0.0}
 
-    # ── Shadow Diagnostic Layer — audit_emergence() ───────────────────────────
+    # ── Shadow Diagnostic Layer -- audit_emergence() ───────────────────────────
 
     async def audit_emergence(
         self,
@@ -745,12 +745,12 @@ class CognitionCore:
             action: The pipeline action taken (e.g. "synthesize", "retry", "critique").
             delta:  Dict with behavioral measurements:
                     {
-                      "strategy_used":      str  — strategy used this attempt
-                      "strategy_prev":      str  — strategy used last attempt (or None)
-                      "sandbox_score":      float — score this attempt
-                      "sandbox_score_prev": float — score last attempt (or None)
-                      "attempt_number":     int   — current attempt index
-                      "tension_present":    bool  — was a tension injected into the prompt?
+                      "strategy_used":      str  -- strategy used this attempt
+                      "strategy_prev":      str  -- strategy used last attempt (or None)
+                      "sandbox_score":      float -- score this attempt
+                      "sandbox_score_prev": float -- score last attempt (or None)
+                      "attempt_number":     int   -- current attempt index
+                      "tension_present":    bool  -- was a tension injected into the prompt?
                     }
 
         Returns:
@@ -759,7 +759,7 @@ class CognitionCore:
         tension_present = delta.get("tension_present", False)
 
         if not tension_present:
-            return "[NO TENSION]"  # Nothing to audit — no tension was signaled
+            return "[NO TENSION]"  # Nothing to audit -- no tension was signaled
 
         self._emergence_stats["opportunities"] += 1
 
@@ -784,7 +784,7 @@ class CognitionCore:
                 hits.append(f"novel_approach: {strategy_now!r} (not in history)")
 
         # Fewer retries than average (early resolution).
-        # Only valid when current session has already produced a passing score —
+        # Only valid when current session has already produced a passing score --
         # comparing attempt=1 against historical count is always a false positive.
         attempt_num  = delta.get("attempt_number", 1)
         score_now_ea = score_now if score_now is not None else 0.0
@@ -883,7 +883,7 @@ def _detect_tensions(
 
     Returns a list of human-readable tension strings.
     These tensions are injected into the prompt to create the conditions
-    for emergent behavior — not as rules, but as signals.
+    for emergent behavior -- not as rules, but as signals.
     """
     tensions = []
 
@@ -904,7 +904,7 @@ def _detect_tensions(
     if experience.get("theory_high_sandbox_low"):
         tensions.append(
             "Vettore 1 (Esperienza↔Sintesi): score teorico accettabile ma sandbox sempre 0 "
-            "-> problema implementativo, non teorico — focus su codice eseguibile"
+            "-> problema implementativo, non teorico -- focus su codice eseguibile"
         )
 
     # Vettore 3: Knowledge shows high structural complexity
@@ -936,7 +936,7 @@ def _detect_tensions(
         if rel >= 0.80 and real_cr < 0.30:
             tensions.append(
                 f"Vettore 4 (Mondo->Identità): rilevanza mondiale {rel:.0%} nel dominio '{domain}' "
-                f"ma cert_rate SHARD {real_cr:.0%} — gap critico, massima priorità"
+                f"ma cert_rate SHARD {real_cr:.0%} -- gap critico, massima priorità"
             )
 
     # Vettore 5: Goal alignment signal
@@ -946,12 +946,12 @@ def _detect_tensions(
         if goal_title and alignment >= 0.3:
             tensions.append(
                 f"Vettore 5 (Goal->Topic): topic allineato {alignment:.0%} al goal '{goal_title}' "
-                f"— studiarlo avanza il goal attivo"
+                f"-- studiarlo avanza il goal attivo"
             )
         elif goal_title and alignment == 0.0:
             tensions.append(
                 f"Vettore 5 (Goal->Topic): topic NON allineato al goal '{goal_title}' "
-                f"— valuta se questo studio è prioritario rispetto al goal"
+                f"-- valuta se questo studio è prioritario rispetto al goal"
             )
 
     # Vettore 6: Momentum stagnation
@@ -960,24 +960,24 @@ def _detect_tensions(
         if momentum == "stagnating":
             tensions.append(
                 "Vettore 6 (Momentum): SHARD in stagnazione nelle ultime sessioni "
-                "— considera approccio più fondamentale, tier basso, evita topic compositi"
+                "-- considera approccio più fondamentale, tier basso, evita topic compositi"
             )
 
-    # Vettore 7: Frustration — persistent block, not a one-off failure
+    # Vettore 7: Frustration -- persistent block, not a one-off failure
     if desire and desire.get("frustration_hits", 0) >= 2:
         frust = desire["frustration_hits"]
         tensions.append(
             f"Vettore 7 (Desiderio->Blocco): {frust} sessioni fallite su questo topic "
-            f"— non è un errore isolato, è un pattern persistente. "
+            f"-- non è un errore isolato, è un pattern persistente. "
             f"Cambia approccio radicalmente o decomponi il topic."
         )
 
-    # Vettore 8: Curiosity pull — adjacent territory is calling
+    # Vettore 8: Curiosity pull -- adjacent territory is calling
     if desire and desire.get("curiosity_pull", 0.0) > 0.3:
         pull = desire["curiosity_pull"]
         tensions.append(
             f"Vettore 8 (Desiderio->Curiosità): attrazione laterale {pull:.0%} "
-            f"— questo topic è adiacente a qualcosa che SHARD ha appena padroneggiato. "
+            f"-- questo topic è adiacente a qualcosa che SHARD ha appena padroneggiato. "
             f"Sfrutta il momentum cognitivo recente."
         )
 
@@ -1004,7 +1004,7 @@ def _classify_miss_cause(delta: Dict) -> str:
     """Produce a human-readable miss cause string."""
     prompt_tokens = delta.get("prompt_tokens", 0)
     if prompt_tokens > 3000:
-        return f"Context Dilution (prompt ~{prompt_tokens} tokens — tensione sepolta)"
+        return f"Context Dilution (prompt ~{prompt_tokens} tokens -- tensione sepolta)"
     if not delta.get("strategy_prev"):
         return "Model Inertia (nessun cambiamento di strategia tentato)"
     return "Low Signal-to-Noise (tensione presente ma comportamento invariato)"

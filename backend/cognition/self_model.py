@@ -1,12 +1,12 @@
-"""self_model.py — SHARD self-awareness model.
+"""self_model.py -- SHARD self-awareness model.
 
 Summarizes capabilities, computes live performance metrics, and assesses
 capability gaps against the DEFAULT_LEARNING_MAP.
 
 Metrics computed from disk data (no LLM, no external calls):
-  get_certification_rate()  — certified / total attempts (experiment_history)
-  get_avg_repair_loops()    — avg retries per topic (repeat appearances in history)
-  self_assess_gaps()        — categories with < GAP_SKILL_THRESHOLD certified skills
+  get_certification_rate()  -- certified / total attempts (experiment_history)
+  get_avg_repair_loops()    -- avg retries per topic (repeat appearances in history)
+  self_assess_gaps()        -- categories with < GAP_SKILL_THRESHOLD certified skills
                               vs DEFAULT_LEARNING_MAP; returns severity + gap list
 """
 import logging
@@ -80,7 +80,7 @@ class SelfModel:
     def get_avg_repair_loops(self) -> float:
         """Average number of study attempts per unique topic.
 
-        > 1.0 means SHARD frequently retries — indicates learning difficulty.
+        > 1.0 means SHARD frequently retries -- indicates learning difficulty.
         """
         try:
             import sys as _sys
@@ -119,7 +119,7 @@ class SelfModel:
         try:
             from research_agenda import DEFAULT_LEARNING_MAP
         except ImportError:
-            logger.warning("[SELF MODEL] Cannot import DEFAULT_LEARNING_MAP — skipping gap assessment.")
+            logger.warning("[SELF MODEL] Cannot import DEFAULT_LEARNING_MAP -- skipping gap assessment.")
             return self._empty_gap_report()
 
         try:
@@ -168,7 +168,7 @@ class SelfModel:
             severity = "none"
 
         logger.info(
-            "[SELF MODEL] Gap assessment: %d/%d missing (%.0f%%) — severity=%s  critical_categories=%s",
+            "[SELF MODEL] Gap assessment: %d/%d missing (%.0f%%) -- severity=%s  critical_categories=%s",
             missing_cnt, total_map, gap_rate * 100, severity, critical_gaps,
         )
 
@@ -199,7 +199,7 @@ class SelfModel:
             return "Architecture map not available."
         return _arch_map.summary()
 
-    # ── describe() — the credible self-portrait ───────────────────────────────
+    # ── describe() -- the credible self-portrait ───────────────────────────────
 
     def describe(self) -> str:
         """Return a human-readable self-description with live metrics."""
