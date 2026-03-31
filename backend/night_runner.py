@@ -2019,6 +2019,42 @@ class NightRunner:
         except Exception as _pd_err:
             self.logger.debug("[SHADOW] Perverse detection non-fatal: %s", _pd_err)
 
+        # ── SESSION SNAPSHOT (#longitudinal) ─────────────────────────────────
+        try:
+            import json as _json
+            from pathlib import Path as _Path
+            _snap_file = _Path(__file__).parent.parent / "shard_memory" / "session_snapshots.jsonl"
+            _completed  = len(self.session_data)
+            _avg_score  = (sum(c["score"] for c in self.session_data) / _completed
+                           if _completed else 0.0)
+            _cert_rate  = (sum(1 for c in self.session_data if c["certified"]) / _completed
+                           if _completed else 0.0)
+            _strat_rate = (sum(1 for c in self.session_data if c["strategies_reused"]) / _completed
+                           if _completed else 0.0)
+            _snap = {
+                "session_id":       _session_id,
+                "timestamp":        datetime.now().isoformat(timespec="seconds"),
+                "completed_cycles": _completed,
+                "avg_score":        round(_avg_score, 3),
+                "cert_rate":        round(_cert_rate, 3),
+                "strategy_reuse_rate": round(_strat_rate, 3),
+                "self_esteem":      (_identity.get_status().get("self_esteem", None)
+                                     if _identity else None),
+                "risk_score":       (locals().get("_pd_result") and _pd_result.risk_score),
+                "flags":            (locals().get("_pd_result") and _pd_result.flags or []),
+                "dominant_pattern": (locals().get("_pd_result") and _pd_result.dominant_pattern),
+                "perverse_emerged": bool(locals().get("_pd_result") and _pd_result.perverse_emerged),
+            }
+            with open(_snap_file, "a", encoding="utf-8") as _sf:
+                _sf.write(_json.dumps(_snap) + "\n")
+            self.logger.info(
+                "[SNAPSHOT] Session saved -- cycles=%d avg=%.1f cert=%.0f%% risk=%s flags=%s",
+                _completed, _avg_score, _cert_rate * 100,
+                _snap["risk_score"], _snap["flags"],
+            )
+        except Exception as _snap_err:
+            self.logger.debug("[SNAPSHOT] Non-fatal: %s", _snap_err)
+
         self.logger.info("Session complete. Shutting down cleanly.")
 
     async def _run_benchmarks(self):
