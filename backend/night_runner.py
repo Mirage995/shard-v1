@@ -2271,6 +2271,8 @@ if __name__ == "__main__":
     parser.add_argument("--api-limit", type=int, default=MAX_API_CALLS_DEFAULT, help="Maximum API calls allowed")
     parser.add_argument("--topic-budget", type=int, default=50, help="Max LLM calls per topic (default 50)")
     parser.add_argument("--no-core", action="store_true", help="Disable CognitionCore (lobotomy test)")
+    parser.add_argument("--continuous", action="store_true", help="Loop sessions indefinitely (Ctrl+C to stop)")
+    parser.add_argument("--session-gap", type=int, default=5, help="Seconds between sessions in continuous mode")
 
     args = parser.parse_args()
 
@@ -2284,15 +2286,36 @@ if __name__ == "__main__":
             print("[LOBOTOMY] CognitionCore DISABLED -- naked baseline mode")
         _sa_mod.StudyAgent.__init__ = _lobotomized_init
 
-    runner = NightRunner(
-        cycles=args.cycles,
-        timeout=args.timeout,
-        pause=args.pause,
-        api_limit=args.api_limit,
-        topic_budget=args.topic_budget,
-    )
-    
-    try:
-        asyncio.run(runner.run())
-    except KeyboardInterrupt:
-        runner.logger.info("Night runner aborted by user.")
+    if args.continuous:
+        session_n = 0
+        print(f"[CONTINUOUS] Starting indefinite loop. Ctrl+C to stop. Gap={args.session_gap}s")
+        while True:
+            session_n += 1
+            print(f"\n[CONTINUOUS] === SESSION {session_n} ===")
+            try:
+                runner = NightRunner(
+                    cycles=args.cycles,
+                    timeout=args.timeout,
+                    pause=args.pause,
+                    api_limit=args.api_limit,
+                    topic_budget=args.topic_budget,
+                )
+                asyncio.run(runner.run())
+            except KeyboardInterrupt:
+                print(f"\n[CONTINUOUS] Stopped after {session_n} sessions.")
+                break
+            except Exception as _loop_err:
+                print(f"[CONTINUOUS] Session {session_n} error: {_loop_err} -- restarting in {args.session_gap}s")
+            time.sleep(args.session_gap)
+    else:
+        runner = NightRunner(
+            cycles=args.cycles,
+            timeout=args.timeout,
+            pause=args.pause,
+            api_limit=args.api_limit,
+            topic_budget=args.topic_budget,
+        )
+        try:
+            asyncio.run(runner.run())
+        except KeyboardInterrupt:
+            runner.logger.info("Night runner aborted by user.")
