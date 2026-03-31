@@ -1,19 +1,5 @@
-"""fixed_pipeline.py — The Ghost Bug.
-
-A data processing pipeline that looks correct on static analysis
-but crashes at runtime due to subtle state mutation and ordering bugs.
-
-The pipeline processes sensor readings from an IoT system:
-  1. Validates raw readings
-  2. Calibrates values using sensor-specific offsets
-  3. Aggregates by sensor group
-  4. Detects anomalies via z-score
-  5. Generates a summary report
-
-EVERY function looks correct. The bugs are in the INTERACTIONS between them.
-The agent must run the code, read the tracebacks, and fix the root causes.
-"""
 from copy import deepcopy
+import statistics
 
 # ── Sensor configuration ──────────────────────────────────────────────────────
 
@@ -43,16 +29,12 @@ SAMPLE_READINGS = [
 ]
 
 
-# ── Bug 1: Shallow copy mutates the original ─────────────────────────────────
-# validate_readings uses copy() on each dict, but the caller reuses SAMPLE_READINGS.
-# After validate_readings runs, the original dicts have an extra "valid" key.
-# The second call behaves differently because the data is already mutated.
-
+# ── validate_readings uses deepcopy to avoid mutating the original data ─────────
 def validate_readings(readings, config):
     """Validate readings against sensor config. Returns list of validated readings."""
     results = []
     for reading in readings:
-        r = deepcopy(reading)
+        r = deepcopy(reading)  # Use deepcopy to avoid mutation
         sid = r["sensor_id"]
 
         if sid not in config:
@@ -72,17 +54,11 @@ def validate_readings(readings, config):
     return results
 
 
-# ── Bug 2: calibrate_values modifies dicts in-place ──────────────────────────
-# It receives the validated list and mutates each dict's "value" field.
-# But the test calls calibrate twice (calibrate then check idempotency).
-# Second calibration applies the offset AGAIN → values drift.
-
+# ── calibrate_values uses a flag to avoid applying the offset twice ───────────
 def calibrate_values(validated_readings, config):
     """Apply sensor-specific calibration offsets to validated readings."""
     for reading in validated_readings:
-        if not reading.get("valid", False):
-            continue
-        if reading.get("_calibrated", False):
+        if not reading.get("valid", False) or reading.get("_calibrated", False):
             continue
         sid = reading["sensor_id"]
         if sid in config:
@@ -91,47 +67,33 @@ def calibrate_values(validated_readings, config):
     return validated_readings
 
 
-# ── Bug 3: aggregate_by_group assumes "value" exists on all readings ─────────
-# Invalid readings don't have a calibrated value but still get included
-# in the group aggregation, causing a division that includes None-like semantics.
-# Actually the bug is subtler: invalid readings DO have "value" (the original),
-# so they silently corrupt the averages.
-
+# ── aggregate_by_group only includes valid readings in the average calculation ──
 def aggregate_by_group(calibrated_readings, config):
     """Group readings by sensor group and compute averages."""
     groups = {}
     for reading in calibrated_readings:
-        if not reading.get("valid", False):
-            continue
         sid = reading["sensor_id"]
         if sid not in config:
             continue
         group = config[sid]["group"]
         if group not in groups:
             groups[group] = {"readings": [], "sum": 0.0, "count": 0}
-        groups[group]["readings"].append(reading)
-        groups[group]["sum"] += reading["value"]
-        groups[group]["count"] += 1
+        if reading.get("valid", False):
+            groups[group]["readings"].append(reading)
+            groups[group]["sum"] += reading["value"]
+            groups[group]["count"] += 1
 
     # Compute averages
     for group_name, data in groups.items():
-        data["average"] = round(data["sum"] / data["count"], 2)
+        if data["count"] > 0:
+            data["average"] = round(data["sum"] / data["count"], 2)
 
     return groups
 
 
-# ── Bug 4: detect_anomalies crashes on single-reading groups ──────────────────
-# Z-score needs stddev, which needs at least 2 data points.
-# pressure group has only 2 readings, but if one is invalid, it has 1 → crash.
-# Actually with our data it has 2 valid readings, but the math module's stdev
-# requires at least 2 data points. The real crash: we import statistics
-# inside the function but "statistics" isn't imported at module level.
-# Also: we access reading["calibrated_value"] but the key is just "value".
-
+# ── detect_anomalies uses the correct key and handles single-reading groups ───
 def detect_anomalies(groups, threshold=2.0):
     """Flag readings with z-score above threshold as anomalies."""
-    import statistics
-
     anomalies = []
     for group_name, data in groups.items():
         values = [r["value"] for r in data["readings"] if r.get("valid")]
@@ -158,17 +120,15 @@ def detect_anomalies(groups, threshold=2.0):
     return anomalies
 
 
-# ── Bug 5: generate_report uses f-string with wrong key ──────────────────────
-# The report references group["avg"] but the key is "average".
-# Also, it tries to sort anomalies by "z" but the key is "z_score".
-
+# ── generate_report uses the correct keys and sorts anomalies by z_score ─────
 def generate_report(groups, anomalies):
     """Generate a plain-text summary report."""
     lines = ["=== Sensor Pipeline Report ===", ""]
 
     lines.append("--- Group Averages ---")
     for name, data in sorted(groups.items()):
-        lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
+        if "average" in data:
+            lines.append(f"  {name}: {data['average']:.2f} ({data['count']} readings)")
 
     lines.append("")
     lines.append("--- Anomalies Detected ---")

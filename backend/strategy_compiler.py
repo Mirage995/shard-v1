@@ -104,7 +104,7 @@ def compile(strategy_text: str, confidence: float, source_code: str = "") -> str
     if confidence >= HIGH_THRESHOLD:
         return (
             "[STRATEGY - HIGH CONFIDENCE]\n\n"
-            "You MUST apply this approach to fix the failing test(s):\n\n"
+            "You MUST apply this approach to fix the failing test(s) — apply ONLY if relevant to the current bug pattern:\n\n"
             f"{grounding}"
             f"{steps}\n\n"
             "FAILURE CONDITION:\n"

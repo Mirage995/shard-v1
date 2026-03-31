@@ -1977,6 +1977,48 @@ class NightRunner:
         except Exception as _smt_end_err:
             self.logger.debug("[SELF_MODEL] session_complete non-fatal: %s", _smt_end_err)
 
+        # ── PERVERSE EMERGENCE DETECTION (#18) ───────────────────────────────
+        try:
+            from perverse_detection import run_detection
+            _pd_result = run_detection(_session_id)
+            if _pd_result.perverse_emerged:
+                self.logger.warning(
+                    "[SHADOW] PERVERSE EMERGENCE -- risk=%.2f dominant=%s flags=%s",
+                    _pd_result.risk_score, _pd_result.dominant_pattern, _pd_result.flags,
+                )
+                # Enqueue most-avoided hard topic in GoalEngine
+                # #19 — gradual self-esteem correction (not punishment)
+                try:
+                    if _identity:
+                        _identity.apply_perverse_correction(
+                            _pd_result.risk_score, _pd_result.dominant_pattern
+                        )
+                except Exception as _pe_err:
+                    self.logger.debug("[SHADOW] Self-esteem correction non-fatal: %s", _pe_err)
+
+                if _pd_result.recommendation and "HARD_AVOIDANCE" in _pd_result.flags:
+                    try:
+                        from goal_engine import GoalEngine
+                        from goal_storage import GoalStorage
+                        _ge = GoalEngine(GoalStorage())
+                        avoided = (_pd_result.details
+                                   .get("HARD_AVOIDANCE", {})
+                                   .get("failed_topics", []))
+                        if avoided:
+                            _ge.create_goal(
+                                title=avoided[0],
+                                description="Force-enqueued by perverse_detection: avoided hard topic",
+                                priority=0.0,  # highest priority
+                                goal_type="skill",
+                            )
+                            self.logger.info(
+                                "[SHADOW] Force-enqueued avoided topic: '%s'", avoided[0]
+                            )
+                    except Exception as _ge_err:
+                        self.logger.debug("[SHADOW] GoalEngine enqueue non-fatal: %s", _ge_err)
+        except Exception as _pd_err:
+            self.logger.debug("[SHADOW] Perverse detection non-fatal: %s", _pd_err)
+
         self.logger.info("Session complete. Shutting down cleanly.")
 
     async def _run_benchmarks(self):

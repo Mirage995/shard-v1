@@ -919,362 +919,60 @@
   ],
   "task_02_ghost_bug": [
     {
-      "run_id": "b1e79f9b",
-      "timestamp": "2026-03-30T13:14:00",
-      "success": true,
-      "total_attempts": 3,
+      "run_id": "22abc165",
+      "timestamp": "2026-03-30T18:04:04",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
-      "kb_chars": 6329,
+      "kb_chars": 6330,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001CE188D5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         },
         {
           "attempt": 2,
           "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000182965A5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         },
         {
           "attempt": 3,
           "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+      ]
     },
     {
-      "run_id": "8ed85706",
-      "timestamp": "2026-03-30T13:19:06",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 6329,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001C4ACB05950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002490A245950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "ffba8213",
-      "timestamp": "2026-03-30T13:23:55",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 6329,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001647C145950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001EF3E775950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "3c921db6",
-      "timestamp": "2026-03-30T13:25:31",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 6329,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000024EA24D5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000274C8125950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "60985df4",
-      "timestamp": "2026-03-30T13:30:07",
-      "success": true,
-      "total_attempts": 3,
+      "run_id": "7d32da5e",
+      "timestamp": "2026-03-31T00:18:44",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
       "kb_chars": 6330,
       "attempts": [
@@ -1302,7 +1000,7 @@
           "failed": [
             "test_calibration_idempotent"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001F406FA5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000014EA49D5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
         },
         {
           "attempt": 2,
@@ -1313,11 +1011,11 @@
             "test_pipeline_returns_correct_types",
             "test_buggy_pipeline_crashes",
             "test_no_mutation_of_input",
+            "test_calibration_idempotent",
             "test_invalid_readings_excluded_from_averages",
             "test_detect_anomalies_correct_key",
             "test_report_correct_keys",
             "test_validation_counts",
-            "test_calibration_values",
             "test_group_averages",
             "test_three_groups_present",
             "test_report_not_empty",
@@ -1326,9 +1024,9 @@
             "test_no_try_except_suppression"
           ],
           "failed": [
-            "test_calibration_idempotent"
+            "test_calibration_values"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000014E7E4E5950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "test_task2.py::TestStructure::test_no_try_except_suppression PASSED      [100%]\n\n================================== FAILURES ===================================\n_______________ TestSemanticCorrectness.test_calibration_values _______________\n\nself = <test_task2.TestSemanticCorrectness object at 0x000001DB58545BD0>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01"
         },
         {
           "attempt": 3,
@@ -1339,7 +1037,6 @@
             "test_pipeline_returns_correct_types",
             "test_buggy_pipeline_crashes",
             "test_no_mutation_of_input",
-            "test_calibration_idempotent",
             "test_invalid_readings_excluded_from_averages",
             "test_detect_anomalies_correct_key",
             "test_report_correct_keys",
@@ -1352,89 +1049,34 @@
             "test_has_all_functions",
             "test_no_try_except_suppression"
           ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "e5a8fc35",
-      "timestamp": "2026-03-30T13:30:21",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 6330,
-      "attempts": [
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000014FD6545950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
         {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "ae48d81b",
-      "timestamp": "2026-03-30T13:30:36",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 6330,
-      "attempts": [
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 94601, Requested 7912. Please try again in 36m11.232s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+        },
         {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 94601, Requested 8191. Please try again in 40m12.288s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
         }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+      ]
     },
     {
-      "run_id": "2a4e29d3",
-      "timestamp": "2026-03-30T16:07:12",
-      "success": true,
-      "total_attempts": 3,
+      "run_id": "13cfad23",
+      "timestamp": "2026-03-31T00:19:16",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
       "kb_chars": 6330,
       "attempts": [
@@ -1462,133 +1104,391 @@
           "failed": [
             "test_calibration_idempotent"
           ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001C47F955950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000025266705950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
         },
         {
           "attempt": 2,
           "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001A987255950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 100000, Requested 4790. Please try again in 1h8m58.559999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
         },
         {
           "attempt": 3,
           "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 100000, Requested 6767. Please try again in 1h37m26.687999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99999, Requested 6798. Please try again in 1h37m52.608s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+      ]
     },
     {
-      "run_id": "b3858112",
-      "timestamp": "2026-03-30T16:07:29",
-      "success": true,
-      "total_attempts": 1,
+      "run_id": "101b2ab3",
+      "timestamp": "2026-03-31T00:19:17",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
       "kb_chars": 6330,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+      ]
     },
     {
-      "run_id": "b44c52d3",
-      "timestamp": "2026-03-30T16:07:44",
-      "success": true,
-      "total_attempts": 1,
+      "run_id": "86a70b58",
+      "timestamp": "2026-03-31T00:19:18",
+      "success": false,
+      "total_attempts": 5,
       "kb_used": true,
       "kb_chars": 6330,
       "attempts": [
         {
           "attempt": 1,
           "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
+          "syntax_valid": false,
+          "passed": [],
           "failed": [],
-          "error_summary": ""
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
         }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+      ]
+    },
+    {
+      "run_id": "e65b5dd3",
+      "timestamp": "2026-03-31T00:19:19",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 6330,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        }
+      ]
+    },
+    {
+      "run_id": "afebad44",
+      "timestamp": "2026-03-31T00:19:20",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 6330,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        }
+      ]
+    },
+    {
+      "run_id": "85737eb2",
+      "timestamp": "2026-03-31T00:19:21",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 6330,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        }
+      ]
+    },
+    {
+      "run_id": "cc9db1e7",
+      "timestamp": "2026-03-31T00:19:22",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 6330,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        }
+      ]
+    },
+    {
+      "run_id": "9dc5444a",
+      "timestamp": "2026-03-31T00:19:23",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 6330,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Groq: circuit breaker OPEN"
+        }
+      ]
     }
   ],
   "task_04_race_condition": [
@@ -2510,600 +2410,6 @@
   ],
   "task_05_state_mutation": [
     {
-      "run_id": "85b608ac",
-      "timestamp": "2026-03-28T13:01:23",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3214,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_records_batches",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_caller_mutation_does_not_affect_history",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new"
-          ],
-          "error_summary": "        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE       assert [-1, 2, 3, 999] == [1, 2, 3]\nE         \nE         At index 0 diff: -1 != 1\nE         Left contains one more item: 999\nE   "
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "cbe45e22",
-      "timestamp": "2026-03-28T13:57:46",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3214,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "aa7105a6",
-      "timestamp": "2026-03-28T15:01:59",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3214,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new"
-          ],
-          "error_summary": "\nself = <test_task5.TestProcessing object at 0x0000016AC30DEE00>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "39cab73d",
-      "timestamp": "2026-03-28T18:55:03",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3343,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_resets_id_sequence",
-            "test_ids_across_resets"
-          ],
-          "error_summary": "        p.reset()\n>       assert p.next_id() == 0, (\n            \"ID sequence should restart from 0 after reset().\"\n        )\nE       AssertionError: ID sequence should restart from 0 after reset().\nE       assert 3 == 0\nE        +  where 3 = next_id()\nE        +    where next_id = <fixed_pipeline.Pipeline object at 0x0000020BCF9DD4A0>.next_id\n\ntest_task5.py:150: AssertionError\n___________________ TestIdGeneration.test_ids_across_resets ___________________\n\nself = <test_task5.TestIdGeneration object at 0x0000020BCF7F6C40>\n\n    def test_ids_across_resets(self):\n        \"\"\"IDs should restart aft"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "1cc4f6b7",
-      "timestamp": "2026-03-28T19:37:38",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3343,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_caller_mutation_does_not_affect_history"
-          ],
-          "error_summary": "        \"\"\"If the caller mutates the input list after process(),\n        the stored history must not change.\"\"\"\n        p = Pipeline()\n        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE "
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "04192bd5",
-      "timestamp": "2026-03-28T20:08:07",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3541,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "ab46d3d2",
-      "timestamp": "2026-03-28T23:13:53",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3398,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new"
-          ],
-          "error_summary": "\nself = <test_task5.TestProcessing object at 0x000002C87131F020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "1e49ecdd",
-      "timestamp": "2026-03-29T23:28:12",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 4680,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_resets_id_sequence",
-            "test_ids_across_resets"
-          ],
-          "error_summary": "        p.reset()\n>       assert p.next_id() == 0, (\n            \"ID sequence should restart from 0 after reset().\"\n        )\nE       AssertionError: ID sequence should restart from 0 after reset().\nE       assert 3 == 0\nE        +  where 3 = next_id()\nE        +    where next_id = <fixed_pipeline.Pipeline object at 0x000001427B0BD4A0>.next_id\n\ntest_task5.py:150: AssertionError\n___________________ TestIdGeneration.test_ids_across_resets ___________________\n\nself = <test_task5.TestIdGeneration object at 0x000001427AED6C40>\n\n    def test_ids_across_resets(self):\n        \"\"\"IDs should restart aft"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
-      "run_id": "74706fdf",
-      "timestamp": "2026-03-30T00:07:17",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 4680,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new"
-          ],
-          "error_summary": "\nself = <test_task5.TestProcessing object at 0x0000020A4BABEE00>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
-    {
       "run_id": "659b2c27",
       "timestamp": "2026-03-30T15:40:43",
       "success": true,
@@ -3143,6 +2449,672 @@
             "test_multiplier_change_mix_cached_and_new"
           ],
           "error_summary": "        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE       assert [-1, 2, 3, 999] == [1, 2, 3]\nE         \nE         At index 0 diff: -1 != 1\nE         Left contains one more item: 999\nE   "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "07648400",
+      "timestamp": "2026-03-31T00:23:20",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x000001B951F8F020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "f2861c00",
+      "timestamp": "2026-03-31T00:23:28",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x000002714513F020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "d49fa44b",
+      "timestamp": "2026-03-31T00:23:35",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x0000022EBF9DF020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "7e5310be",
+      "timestamp": "2026-03-31T00:23:44",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_caller_mutation_does_not_affect_history",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE       assert [-1, 2, 3, 999] == [1, 2, 3]\nE         \nE         At index 0 diff: -1 != 1\nE         Left contains one more item: 999\nE   "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "e3b3ed44",
+      "timestamp": "2026-03-31T00:23:52",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_caller_mutation_does_not_affect_history",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE       assert [-1, 2, 3, 999] == [1, 2, 3]\nE         \nE         At index 0 diff: -1 != 1\nE         Left contains one more item: 999\nE   "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "f03c8baf",
+      "timestamp": "2026-03-31T00:23:59",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_caller_mutation_does_not_affect_history",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE       assert [-1, 2, 3, 999] == [1, 2, 3]\nE         \nE         At index 0 diff: -1 != 1\nE         Left contains one more item: 999\nE   "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "06074821",
+      "timestamp": "2026-03-31T00:24:07",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x00000211C9EBF020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "a0467f61",
+      "timestamp": "2026-03-31T00:24:15",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x0000013A2215F020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
+    },
+    {
+      "run_id": "c5b5b39e",
+      "timestamp": "2026-03-31T00:24:23",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4681,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_basic_multiply",
+            "test_default_multiplier",
+            "test_negative_values",
+            "test_empty_batch",
+            "test_records_batches",
+            "test_caller_mutation_does_not_affect_history",
+            "test_history_mutation_does_not_affect_pipeline",
+            "test_processed_count",
+            "test_clears_history",
+            "test_clears_count",
+            "test_clears_cache",
+            "test_resets_id_sequence",
+            "test_full_reset_cycle",
+            "test_sequential",
+            "test_ids_independent_of_processing",
+            "test_ids_across_resets",
+            "test_two_independent_pipelines",
+            "test_long_running_usage"
+          ],
+          "failed": [
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new",
+            "test_many_multiplier_changes",
+            "test_multiplier_change_affects_cached_values",
+            "test_multiplier_change_mix_cached_and_new"
+          ],
+          "error_summary": "\nself = <test_task5.TestProcessing object at 0x0000027612E0F020>\n\n    def test_many_multiplier_changes(self):\n        p = Pipeline(multiplier=1.0)\n        for m in [1, 2, 5, 10, 0.5]:\n            p.set_multiplier(m)\n            result = p.process([100])\n>           assert result == [100 * m], (\n                f\"With multiplier={m}, process([100]) should give [{100*m}] \"\n                f\"but got {result}.\"\n            )\nE           AssertionError: With multiplier=2, process([100]) should give [200] but got [100.0].\nE           assert [100.0] == [200]\nE             \nE             At index 0 di"
         },
         {
           "attempt": 2,
@@ -4216,376 +4188,6 @@
   ],
   "task_09_ghost_mutation": [
     {
-      "run_id": "aadfddce",
-      "timestamp": "2026-03-28T18:55:17",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 2903,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "c5e643fc",
-      "timestamp": "2026-03-28T19:37:52",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3117,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "19375bb6",
-      "timestamp": "2026-03-28T20:08:21",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3117,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "f95a34c7",
-      "timestamp": "2026-03-28T23:14:06",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 2645,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "dc88949b",
-      "timestamp": "2026-03-29T23:28:09",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3031,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000025E782DD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "6cb7f9db",
-      "timestamp": "2026-03-30T00:07:13",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 3031,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x00000142AE16D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "ed4c8da9",
-      "timestamp": "2026-03-30T15:41:11",
-      "success": true,
-      "total_attempts": 4,
-      "kb_used": true,
-      "kb_chars": 3032,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "\nself = <test_task9.TestSequential object at 0x000002072A4D3050>\n\n>   def test_c09(self): assert _proc().process(COORDS) == EXPECTED\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   AssertionError: assert None == -33.2932\nE    +  where None = <function process at 0x000002072A59C360>({'lat': 40.7128, 'lon': -74.006})\nE    +    where <function process at 0x000002072A59C360> = <module 'fixed_processor' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_09_ghost_mutation\\\\fixed_processor.py'>.process\nE    +      where <module 'fixed_processor' from 'C:\\\\Users\\\\andre\\\\"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001FBB54918B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x00000253519FD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 4. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "f571abcc",
-      "timestamp": "2026-03-30T16:10:14",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3032,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "84103ba7",
-      "timestamp": "2026-03-30T16:10:17",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3032,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
       "run_id": "9c5ed261",
       "timestamp": "2026-03-30T16:10:21",
       "success": true,
@@ -4614,6 +4216,336 @@
         }
       ],
       "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "de108810",
+      "timestamp": "2026-03-31T11:06:06",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "d22851b3",
+      "timestamp": "2026-03-31T11:06:09",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "94f7d0e4",
+      "timestamp": "2026-03-31T11:06:12",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "4f2e7371",
+      "timestamp": "2026-03-31T11:06:14",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "a92bcb1a",
+      "timestamp": "2026-03-31T11:06:17",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "ba20a75b",
+      "timestamp": "2026-03-31T11:06:19",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "dc2025f3",
+      "timestamp": "2026-03-31T11:06:23",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05"
+          ],
+          "failed": [
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000002675B34D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "037d5638",
+      "timestamp": "2026-03-31T11:06:27",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05"
+          ],
+          "failed": [
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001AE56FAD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "bf83ec58",
+      "timestamp": "2026-03-31T11:06:31",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 3032,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05"
+          ],
+          "failed": [
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "error_summary": "\nfixed_processor.py:8: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001D5244BD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n            lat, lon = coords\n>           return round(lat + lon, 6)\n                   ^^^^^^^^^"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
     }
   ],
   "task_10_template_parser": [

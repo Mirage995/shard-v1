@@ -93,6 +93,26 @@ class IdentityCore:
         )
         return self._data
 
+    def apply_perverse_correction(self, risk_score: float, dominant_pattern: str | None = None) -> float:
+        """Gradual self-esteem correction on perverse emergence (backlog #19).
+
+        Applies a small downward nudge (-0.10 max) proportional to risk_score.
+        Does NOT crash self-esteem -- goal is reorientation, not punishment.
+        Returns the new self_esteem value.
+        """
+        current = self._data.get("self_esteem", 0.5)
+        # Clamp correction: max -0.10 per session, proportional to risk
+        correction = min(0.10, risk_score * 0.15)
+        new_esteem = max(0.10, round(current - correction, 4))
+        self._data["self_esteem"] = new_esteem
+        self._save()
+        logger.warning(
+            "[IDENTITY] Perverse correction applied -- self_esteem %.2f -> %.2f  "
+            "(risk=%.2f dominant=%s)",
+            current, new_esteem, risk_score, dominant_pattern or "unknown",
+        )
+        return new_esteem
+
     # ── CognitionCore interface ───────────────────────────────────────────────
 
     def on_event(self, event_type: str, data: dict, source: str = "") -> None:

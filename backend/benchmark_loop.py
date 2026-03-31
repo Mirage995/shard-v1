@@ -1037,6 +1037,7 @@ async def run_benchmark_loop(
     use_concurrency_sim: bool = True,  # auto-detects if task needs it
     use_knowledge_base: bool = True,   # inject KB cheat sheets into prompt
     strategy_mode: str = "normal",     # "baseline" | "normal" | "forced"
+    providers: list[str] | None = None,  # override LLM provider chain
 ) -> BenchmarkResult:
     """Run the closed feedback loop on a benchmark task.
 
@@ -1488,12 +1489,15 @@ async def run_benchmark_loop(
         else:
             print("  [llm] Calling... ", end="", flush=True)
             try:
-                response = await llm_complete(
+                call_kwargs = dict(
                     prompt=prompt,
                     system=_get_system_prompt(lang),
                     max_tokens=LLM_MAX_TOKENS,
                     temperature=LLM_TEMPERATURE,
                 )
+                if providers:
+                    call_kwargs["providers"] = providers
+                response = await llm_complete(**call_kwargs)
                 print(f"OK ({len(response):,} chars)")
             except Exception as e:
                 print(f"FAILED: {e}")
