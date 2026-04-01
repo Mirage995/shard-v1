@@ -4,6 +4,8 @@ Transforms numeric values with a configurable multiplier,
 tracks processing history, and assigns sequential IDs.
 """
 
+import copy
+
 
 class Pipeline:
     """Processes batches of numeric data with caching and history."""
@@ -28,10 +30,10 @@ class Pipeline:
         results = []
         for v in values:
             if v not in self._cache:
-                self._cache[v] = float(v) * self._multiplier
+                self._cache[v] = v * self._multiplier
             results.append(self._cache[v])
         self._processed_count += len(values)
-        self._history.append(list(values))
+        self._history.append(copy.deepcopy(values))
         return results
 
     def next_id(self):

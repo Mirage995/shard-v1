@@ -1,27 +1,25 @@
 {
   "pending_queue": [
     "ghost bug handling and debugging",
-    "# Task 02 — The Ghost Bug",
-    "race condition handling and debugging",
-    "# Task 04 — Fix the Banking Module",
-    "note tag handling and debugging",
-    "# Task 12 — Note Tag Matcher",
-    "template parser handling and debugging",
-    "# Task 10 — Template Parser"
+    "# Task 02 — The Ghost Bug"
   ],
   "processed_ticket_ids": [
-    "cf_dns_resolution_python",
-    "cf_fail_fast_principle_applied_to_python_ap",
     "cf_#_task_04_—_fix_the_banking_module",
-    "nm_dfs_algorithm",
-    "cf_api_integration_applied_to_web_scraping",
-    "cf_convolutional_neural_network_basics",
     "cf_convolutional_neural_networks_(cnns)_app",
-    "cf_observability_applied_to_dark_matter_hyp",
-    "cf_impossible_differentials_in_cryptography",
+    "nm_dfs_algorithm",
+    "cf_async_io_with_python_selectors",
+    "cf_caching_strategies_lru_cache",
+    "cf_fail_fast_principle_applied_to_python_ap",
     "cf_exception-driven_control_flow_applied_to",
-    "cf_#_task_03_—_optimize_the_transaction_pro"
+    "cf_dns_resolution_python",
+    "cf_impossible_differentials_in_cryptography",
+    "cf_observability_applied_to_dark_matter_hyp",
+    "cf_[missed_emergence]_rest_api_design_patte",
+    "cf_asyncio_advanced_patterns",
+    "cf_api_integration_applied_to_web_scraping",
+    "cf_#_task_03_—_optimize_the_transaction_pro",
+    "cf_convolutional_neural_network_basics"
   ],
-  "total_topics_ever_queued": 131,
-  "last_run_at": "2026-03-25T00:28:09.881437"
+  "total_topics_ever_queued": 345,
+  "last_run_at": "2026-04-01T18:13:47.556943"
 }

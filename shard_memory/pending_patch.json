@@ -1,20 +1,20 @@
 {
-  "id": "44b5b5fa-8360-4a9d-a1af-8be724056783",
-  "timestamp": "2026-03-29T18:42:40.395584",
+  "id": "f94892e8-4c5b-49ab-a447-5cb4da6f1491",
+  "timestamp": "2026-04-01T22:17:41.700488",
   "type": "refactor",
-  "file": "backend/strategy_memory.py",
-  "description": "Optimize get_all_strategies to fetch all data at once instead of metadata only, avoiding a potential N+1 query pattern.",
+  "file": "backend/study_agent.py",
+  "description": "Avoids repeated calls to `datetime.now()` by storing the timestamp in a variable.",
   "category": "performance",
-  "rationale": "Currently, get_all_strategies fetches only metadatas. The ChromaDB client might be configured to lazy-load documents, leading to a separate query for each document's content when it's accessed later. Fetching all data upfront avoids this N+1 pattern, especially when the number of strategies grows.",
+  "rationale": "Calling `datetime.now()` repeatedly creates multiple `datetime` objects, which is unnecessary. Storing the result in a variable and reusing it avoids this overhead.",
   "philosophical_question": "",
   "changes": [
     {
-      "old": "            for meta in results.get(\"metadatas\", []):",
-      "new": "            for i, meta in enumerate(results.get(\"metadatas\", [])):"
+      "old": "            self.kb.upsert(\n                ids=[f\"{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}\"],\n                documents=[doc_text],\n                metadatas=[{\"topic\": topic, \"timestamp\": datetime.now().isoformat()}]\n            )",
+      "new": "            now = datetime.now()\n            self.kb.upsert(\n                ids=[f\"{topic}_{now.strftime('%Y%m%d%H%M%S')}\"],\n                documents=[doc_text],\n                metadatas=[{\"topic\": topic, \"timestamp\": now.isoformat()}]\n            )"
     },
     {
-      "old": "                strategies.append(meta)",
-      "new": "                strategies.append({**meta, \"document\": results[\"documents\"][i]})"
+      "old": "            report_id = f\"integration_{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}\"\n            self.kb.upsert(\n                ids=[report_id],\n                documents=[f\"Integration Report -- {topic}:\\n{report}\"],\n                metadatas=[{\n                    \"topic\": topic,\n                    \"type\": \"deep_knowledge\",\n                    \"timestamp\": datetime.now().isoformat(),\n                    \"source\": \"cross_pollination\"\n                }]\n            )",
+      "new": "            now = datetime.now()\n            report_id = f\"integration_{topic}_{now.strftime('%Y%m%d%H%M%S')}\"\n            self.kb.upsert(\n                ids=[report_id],\n                documents=[f\"Integration Report -- {topic}:\\n{report}\"],\n                metadatas=[{\n                    \"topic\": topic,\n                    \"type\": \"deep_knowledge\",\n                    \"timestamp\": now.isoformat(),\n                    \"source\": \"cross_pollination\"\n                }]\n            )"
     }
   ],
   "status": "pending"

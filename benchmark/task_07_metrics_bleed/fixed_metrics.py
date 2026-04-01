@@ -5,7 +5,6 @@ Some users report metric values from one collector bleeding into
 another, and percentile calculations returning inconsistent results.
 """
 
-import copy
 
 class Counter:
     """A monotonically increasing integer counter."""
@@ -38,10 +37,6 @@ class Histogram:
         self.bucket_bounds = tuple(bucket_bounds)
         self.samples = []
         self._buckets = [0] * (len(self.bucket_bounds) + 1)
-        self._buckets_initialized = False
-        if not self._buckets_initialized:
-            self._buckets = [0] * (len(self.bucket_bounds) + 1)
-            self._buckets_initialized = True
 
     def observe(self, value):
         self.samples.append(value)

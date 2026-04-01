@@ -93,6 +93,26 @@ class IdentityCore:
         )
         return self._data
 
+    def apply_session_reward(self, cert_rate: float, risk_score: float) -> float:
+        """Positive reinforcement: nudge self_esteem up after a clean, high-performing session.
+
+        Rule: if session cert_rate > 0.85 AND risk_score < 0.2 → +0.02 (capped at 0.70).
+        Cumulative across sessions because _compute_facts blends stored + formula.
+        Returns the new self_esteem value.
+        """
+        if cert_rate > 0.85 and risk_score < 0.2:
+            current   = self._data.get("self_esteem", 0.5)
+            new_esteem = min(0.70, round(current + 0.02, 4))
+            if new_esteem != current:
+                self._data["self_esteem"] = new_esteem
+                self._save()
+                logger.info(
+                    "[IDENTITY] Session reward applied -- self_esteem %.2f -> %.2f  "
+                    "(cert=%.0f%% risk=%.2f)",
+                    current, new_esteem, cert_rate * 100, risk_score,
+                )
+        return self._data.get("self_esteem", 0.5)
+
     def apply_perverse_correction(self, risk_score: float, dominant_pattern: str | None = None) -> float:
         """Gradual self-esteem correction on perverse emergence (backlog #19).
 
@@ -239,7 +259,10 @@ class IdentityCore:
 
         # ── Self-esteem: weighted combination ─────────────────────────────────
         momentum_score = {"growing": 1.0, "stable": 0.5, "stagnating": 0.0}.get(momentum, 0.5)
-        self_esteem = round(0.6 * cert_rate + 0.4 * momentum_score, 4)
+        _formula_esteem = round(0.6 * cert_rate + 0.4 * momentum_score, 4)
+        # Blend formula with stored value so recovery increments accumulate (backlog #19 recovery rule)
+        _stored_esteem  = self._data.get("self_esteem", _formula_esteem)
+        self_esteem = round(0.5 * _formula_esteem + 0.5 * _stored_esteem, 4)
 
         # ── Trajectory from last 3 sessions ───────────────────────────────────
         recent = db_query(

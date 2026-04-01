@@ -1,5 +1,5 @@
 {
-  "statement": "SHARD seeks to become a reliable autonomous problem-solver — mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (80 skills certified so far)",
+  "statement": "SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (300 skills certified so far)",
   "focus_domains": [
     "algorithms",
     "debugging",
@@ -10,136 +10,148 @@
   "avoid_domains": [
     "asyncio advanced patterns",
     "git internals object model",
-    "async io with python selectors"
+    "async io with python selectors",
+    "python fundamentals review",
+    "graph traversal algorithms bfs dfs",
+    "race condition handling and debugging",
+    "state mutation handling and debugging",
+    "ttl cache handling and debugging",
+    "algorithm complexity and performance optimization"
   ],
-  "certified_count": 82,
+  "certified_count": 303,
   "frustration_topics": [
     "asyncio advanced patterns",
     "git internals object model",
     "async io with python selectors",
-    "password hashing bcrypt argon2"
+    "password hashing bcrypt argon2",
+    "python fundamentals review",
+    "graph traversal algorithms bfs dfs",
+    "race condition handling and debugging",
+    "state mutation handling and debugging",
+    "ttl cache handling and debugging",
+    "algorithm complexity and performance optimization"
   ],
-  "last_updated": "2026-03-29T16:42:32.699666+00:00",
+  "last_updated": "2026-04-01T21:06:29.901601+00:00",
   "update_log": [
     {
-      "ts": "2026-03-28T17:21:00.846490+00:00",
-      "msg": "certified: template parser handling and debugging (score=8.9)"
+      "ts": "2026-04-01T18:52:14.669450+00:00",
+      "msg": "certified: algorithm complexity and performance optimization (score=8.3)"
     },
     {
-      "ts": "2026-03-28T17:24:47.604192+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.2)"
+      "ts": "2026-04-01T18:56:35.607773+00:00",
+      "msg": "certified: graph traversal algorithms bfs dfs (score=8.5)"
     },
     {
-      "ts": "2026-03-28T17:28:52.669080+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.1)"
+      "ts": "2026-04-01T19:10:21.939578+00:00",
+      "msg": "frustration: python fundamentals review (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T17:33:16.488138+00:00",
-      "msg": "certified: sql injection prevention and input sanitization (score=9.1)"
+      "ts": "2026-04-01T19:15:22.044332+00:00",
+      "msg": "certified: algorithm complexity and performance optimization (score=9.2)"
     },
     {
-      "ts": "2026-03-28T17:36:23.254655+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.3)"
+      "ts": "2026-04-01T19:19:06.492621+00:00",
+      "msg": "certified: graph traversal algorithms bfs dfs (score=9.2)"
     },
     {
-      "ts": "2026-03-28T17:39:48.749564+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.8)"
+      "ts": "2026-04-01T19:21:53.558155+00:00",
+      "msg": "certified: dynamic programming (score=8.5)"
     },
     {
-      "ts": "2026-03-28T17:43:44.834187+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.7)"
+      "ts": "2026-04-01T19:25:54.637278+00:00",
+      "msg": "certified: Integration of dependency management and sorted data prerequisite (score=9.2)"
     },
     {
-      "ts": "2026-03-28T17:46:48.893875+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.2)"
+      "ts": "2026-04-01T19:33:01.061050+00:00",
+      "msg": "certified: template parser handling and debugging (score=8.8)"
     },
     {
-      "ts": "2026-03-28T18:06:47.937714+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.0)"
+      "ts": "2026-04-01T19:36:54.809015+00:00",
+      "msg": "certified: Integration of dependency management and sorted data prerequisite (score=8.3)"
     },
     {
-      "ts": "2026-03-28T18:09:58.549442+00:00",
-      "msg": "certified: Integration of dynamic content handling and dynamic programming memoization (score=9.2)"
+      "ts": "2026-04-01T19:43:11.760352+00:00",
+      "msg": "certified: python fundamentals review (score=9.3)"
     },
     {
-      "ts": "2026-03-28T18:14:36.240383+00:00",
-      "msg": "certified: Integration of eafp (easier to ask forgiveness than permission) and constructor injection (score=8.4)"
+      "ts": "2026-04-01T19:46:13.839697+00:00",
+      "msg": "certified: algorithm complexity and performance optimization (score=9.2)"
     },
     {
-      "ts": "2026-03-28T18:23:46.142846+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.7)"
+      "ts": "2026-04-01T19:49:51.437228+00:00",
+      "msg": "certified: graph traversal algorithms bfs dfs (score=8.5)"
     },
     {
-      "ts": "2026-03-28T18:29:27.256060+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.0)"
+      "ts": "2026-04-01T20:03:13.733123+00:00",
+      "msg": "certified: algorithm complexity and performance optimization (score=9.2)"
     },
     {
-      "ts": "2026-03-28T18:41:27.145039+00:00",
-      "msg": "certified: password hashing bcrypt argon2 (score=8.3)"
+      "ts": "2026-04-01T20:06:42.303454+00:00",
+      "msg": "certified: graph traversal algorithms bfs dfs (score=9.2)"
     },
     {
-      "ts": "2026-03-28T18:45:23.890389+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.5)"
+      "ts": "2026-04-01T20:09:28.880304+00:00",
+      "msg": "certified: dynamic programming (score=8.2)"
     },
     {
-      "ts": "2026-03-28T18:49:31.397102+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.3)"
+      "ts": "2026-04-01T20:12:08.363519+00:00",
+      "msg": "certified: binary search implementation (score=9.3)"
     },
     {
-      "ts": "2026-03-28T18:53:02.632209+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.2)"
+      "ts": "2026-04-01T20:25:51.805540+00:00",
+      "msg": "certified: algorithm complexity and performance optimization (score=9.1)"
     },
     {
-      "ts": "2026-03-28T18:56:56.286147+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.3)"
+      "ts": "2026-04-01T20:37:32.751813+00:00",
+      "msg": "frustration: graph traversal algorithms bfs dfs (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T18:59:54.439613+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.5)"
+      "ts": "2026-04-01T20:38:53.790486+00:00",
+      "msg": "frustration: python fundamentals review (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T21:43:17.469582+00:00",
-      "msg": "certified: template parser handling and debugging (score=8.2)"
+      "ts": "2026-04-01T20:44:41.648624+00:00",
+      "msg": "frustration: python fundamentals review (4 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T21:48:30.627620+00:00",
-      "msg": "certified: circuit breaker pattern python (score=9.0)"
+      "ts": "2026-04-01T20:48:21.224736+00:00",
+      "msg": "frustration: race condition handling and debugging (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T21:57:48.316309+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.2)"
+      "ts": "2026-04-01T20:49:42.413065+00:00",
+      "msg": "frustration: state mutation handling and debugging (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T22:01:32.074042+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.2)"
+      "ts": "2026-04-01T20:51:06.243680+00:00",
+      "msg": "frustration: ttl cache handling and debugging (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-28T22:05:43.142057+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.3)"
+      "ts": "2026-04-01T20:52:25.270594+00:00",
+      "msg": "frustration: python fundamentals review (5 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:08:11.595028+00:00",
-      "msg": "certified: Integration of dependency management and sorted data prerequisite (score=8.2)"
+      "ts": "2026-04-01T20:55:17.909489+00:00",
+      "msg": "frustration: algorithm complexity and performance optimization (3 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:12:05.336592+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.7)"
+      "ts": "2026-04-01T20:56:38.439684+00:00",
+      "msg": "frustration: python fundamentals review (6 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:23:52.583902+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=7.9)"
+      "ts": "2026-04-01T20:59:29.061387+00:00",
+      "msg": "frustration: graph traversal algorithms bfs dfs (4 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:33:53.052012+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=8.6)"
+      "ts": "2026-04-01T21:03:45.245573+00:00",
+      "msg": "frustration: python fundamentals review (7 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:38:21.622959+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.2)"
+      "ts": "2026-04-01T21:05:08.054314+00:00",
+      "msg": "frustration: algorithm complexity and performance optimization (4 hits) -> avoid_domains"
     },
     {
-      "ts": "2026-03-29T16:42:32.699666+00:00",
-      "msg": "certified: Python Advanced Error Handling (score=9.3)"
+      "ts": "2026-04-01T21:06:29.901601+00:00",
+      "msg": "frustration: graph traversal algorithms bfs dfs (5 hits) -> avoid_domains"
     }
   ]
 }

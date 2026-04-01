@@ -15,6 +15,9 @@ Signal types and base weights:
 
 Diagnostic weights are dynamic: loaded from shard_memory/diagnostic_weights.json.
 improvement_engine is the sole writer of that file (based on outcome after each run).
+
+#22 Cross-Task Router: build_strategy_signal() now accepts topic + error_text,
+applies cluster-based filtering/boosting via cross_task_router.apply_routing().
 """
 from __future__ import annotations
 
@@ -22,6 +25,8 @@ import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+
+from cross_task_router import apply_routing
 
 logger = logging.getLogger("shard.signal_gate")
 
@@ -97,21 +102,36 @@ def strategy_multiplier(avg_score: float, success_rate: float | None = None) -> 
     return max(0.8, min(1.5, round(base, 3)))
 
 
-def build_strategy_signal(strategies: list[dict]) -> "Signal | None":
+def build_strategy_signal(
+    strategies: list[dict],
+    topic: str = "",
+    error_text: str = "",
+) -> "Signal | None":
     """Aggregate top-N strategy results into ONE Signal for the gate.
 
     Args:
         strategies: list of dicts from strategy_memory.query() with keys
                     "strategy", "topic", "score" (0-10 range), "outcome".
+        topic     : current study/benchmark topic -- used for cluster routing (#22)
+        error_text: optional error message -- used for cluster detection (#22)
 
     Returns a single Signal or None if no usable strategies found.
     Confidence is boosted by strategy_multiplier() based on avg_score and
     success_rate -- strategies with a strong track record rank higher.
+    Cluster boost (cross_task_router) is applied last, after track-record mult.
     """
     if not strategies:
         return None
 
-    scores = [float(s.get("score", 0)) for s in strategies]
+    # #22 Cross-Task Router: filter blacklisted/penalized, get cluster boost
+    filtered, cluster_boost = apply_routing(strategies, topic, error_text)
+    if not filtered:
+        return None
+
+    # Cap at top-3 by score -- cross-inject can inflate to 9+ entries
+    filtered = sorted(filtered, key=lambda s: float(s.get("score", 0)), reverse=True)[:3]
+
+    scores = [float(s.get("score", 0)) for s in filtered]
     avg = sum(scores) / len(scores)
 
     confidence = round(max(0.0, min(1.0, avg / 10.0)), 3)
@@ -119,24 +139,33 @@ def build_strategy_signal(strategies: list[dict]) -> "Signal | None":
         return None
 
     # Track record multiplier -- boost confidence based on past performance
-    successes = sum(1 for s in strategies if str(s.get("outcome", "")).lower() == "success")
-    sr = round(successes / len(strategies), 3)
+    successes = sum(1 for s in filtered if str(s.get("outcome", "")).lower() == "success")
+    sr = round(successes / len(filtered), 3)
     mult = strategy_multiplier(avg, sr)
-    confidence = round(max(0.0, confidence * mult), 3)
+
+    # Apply cluster boost last (cluster_boost already encodes near-miss)
+    confidence = round(max(0.0, min(1.0, confidence * mult * cluster_boost)), 3)
 
     lines = ["[STRATEGY GUIDANCE -- from past successful sessions]", ""]
-    for s in strategies:
+    for s in filtered:
         strat_text = s.get("strategy", "").strip()
         if strat_text:
             lines.append(f"- {strat_text[:200]}")
     lines.append("")
 
     content = "\n".join(lines)
+    logger.info(
+        "[gate] strategy signal: topic='%s' cluster_boost=%.2f mult=%.3f confidence=%.3f (%d strategies)",
+        topic[:50], cluster_boost, mult, confidence, len(filtered),
+    )
     return Signal(
         content=content,
         confidence=confidence,
         type="strategy",
-        source=f"{len(strategies)} past strategies (avg_score={avg:.1f}, sr={sr:.2f}, mult={mult:.3f})",
+        source=(
+            f"{len(filtered)} past strategies "
+            f"(avg={avg:.1f}, sr={sr:.2f}, mult={mult:.3f}, boost={cluster_boost:.2f})"
+        ),
     )
 
 

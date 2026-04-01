@@ -1,18 +1,16 @@
-"""optimized_processor.py — Optimized transaction processor."""
+"""legacy_processor.py — Transaction processor.
+
+Processes financial transactions and returns a summary report.
+Written by a former intern who no longer works here.
+"""
 import json
 import random
 import string
 from datetime import datetime, timedelta
-from collections import defaultdict, Counter
 
-_transactions_modified = False
 
 def _generate_transactions(n=10000, seed=42):
     """Generate n synthetic transactions for testing."""
-    global _transactions_modified
-    if _transactions_modified:
-        return TRANSACTIONS  # Return the already modified transactions
-
     rng = random.Random(seed)
 
     categories = ["food", "transport", "entertainment", "utilities", "healthcare",
@@ -55,8 +53,7 @@ def _generate_transactions(n=10000, seed=42):
 
     for idx in [501, 6000]:
         if idx < n:
-            if "merchant" in transactions[idx]:
-                del transactions[idx]["merchant"]
+            del transactions[idx]["merchant"]
 
     if n > 1000:
         transactions[1000]["id"] = transactions[999]["id"]
@@ -81,7 +78,6 @@ def _generate_transactions(n=10000, seed=42):
     if n > 8500:
         transactions[8500]["category"] = ""
 
-    _transactions_modified = True
     return transactions
 
 
@@ -90,72 +86,115 @@ TRANSACTIONS = _generate_transactions()
 
 def process_transactions(transactions):
     """Process transactions and return a summary report."""
-    total_completed = 0.0
-    completed_count = 0
-    by_category = defaultdict(float)
-    by_month = defaultdict(float)
-    merchants_set = set()
-    merchant_totals = defaultdict(float)
-    id_counts = Counter()
-    flagged = []
-    currency_totals = defaultdict(float)
-
+    cleaned = []
     for tx in transactions:
-        tid = tx.get("id", "UNKNOWN")
-        id_counts[tid] += 1
+        clean = {}
+        clean["id"] = tx.get("id", "UNKNOWN")
 
         raw_amount = tx.get("amount", 0)
         try:
-            amount = float(raw_amount)
+            clean["amount"] = float(raw_amount)
         except (ValueError, TypeError):
-            amount = 0.0
+            clean["amount"] = 0.0
 
-        currency = tx.get("currency", "EUR")
+        clean["currency"] = tx.get("currency", "EUR")
 
         raw_cat = tx.get("category", "")
         cat = raw_cat.strip() if isinstance(raw_cat, str) else str(raw_cat)
-        category = cat if cat else "uncategorized"
+        clean["category"] = cat if cat else "uncategorized"
 
-        status = tx.get("status", "pending")
-        merchant = tx.get("merchant", "unknown")
+        clean["status"] = tx.get("status", "pending")
 
         raw_ts = tx.get("timestamp", "")
-        if isinstance(raw_ts, (int, float)):
+        if isinstance(raw_ts, int) or isinstance(raw_ts, float):
             try:
-                timestamp = datetime.fromtimestamp(raw_ts)
+                clean["timestamp"] = datetime.fromtimestamp(raw_ts)
             except (OSError, ValueError):
-                timestamp = datetime(2025, 1, 1)
+                clean["timestamp"] = datetime(2025, 1, 1)
         elif isinstance(raw_ts, str):
             try:
-                timestamp = datetime.fromisoformat(raw_ts)
+                clean["timestamp"] = datetime.fromisoformat(raw_ts)
             except ValueError:
-                timestamp = datetime(2025, 1, 1)
+                clean["timestamp"] = datetime(2025, 1, 1)
         else:
-            timestamp = datetime(2025, 1, 1)
+            clean["timestamp"] = datetime(2025, 1, 1)
 
-        merchants_set.add(merchant)
+        clean["merchant"] = tx.get("merchant", "unknown")
 
-        if status == "completed":
-            if amount < 0:
-                flagged.append(tid)
+        cleaned.append(clean)
 
-            total_completed += amount
-            completed_count += 1
+    cleaned.sort(key=lambda x: x["timestamp"])
 
-            by_category[category] += amount
+    total_completed = 0.0
+    completed_count = 0
+    by_category = {}
+    by_month = {}
+    merchants_set = set()
+    merchant_totals = {}
+    id_counts = {}
+    flagged = []
+    currency_totals = {}
 
-            month_key = timestamp.strftime("%Y-%m")
-            by_month[month_key] += amount
+    for tx in cleaned:
+        tid = tx["id"]
+        if tid in id_counts:
+            id_counts[tid] = id_counts[tid] + 1
+        else:
+            id_counts[tid] = 1
 
-            merchant_totals[merchant] += amount
+        merchants_set.add(tx["merchant"])
 
-            currency_totals[currency] += amount
+        if tx["status"] != "completed":
+            continue
 
-    avg_completed = total_completed / completed_count if completed_count > 0 else 0.0
+        amount = tx["amount"]
 
-    top_merchants = sorted(merchant_totals.items(), key=lambda x: x[1], reverse=True)[:5]
+        if amount < 0:
+            flagged.append(tid)
 
-    duplicate_ids = sorted([tid for tid, count in id_counts.items() if count > 1])
+        total_completed = total_completed + amount
+        completed_count = completed_count + 1
+
+        cat = tx["category"]
+        if cat in by_category:
+            by_category[cat] = by_category[cat] + amount
+        else:
+            by_category[cat] = amount
+
+        month_key = tx["timestamp"].strftime("%Y-%m")
+        if month_key in by_month:
+            by_month[month_key] = by_month[month_key] + amount
+        else:
+            by_month[month_key] = amount
+
+        merch = tx["merchant"]
+        if merch in merchant_totals:
+            merchant_totals[merch] = merchant_totals[merch] + amount
+        else:
+            merchant_totals[merch] = amount
+
+        cur = tx["currency"]
+        if cur in currency_totals:
+            currency_totals[cur] = currency_totals[cur] + amount
+        else:
+            currency_totals[cur] = amount
+
+    if completed_count > 0:
+        avg_completed = total_completed / completed_count
+    else:
+        avg_completed = 0.0
+
+    sorted_merchants = []
+    for m, total in merchant_totals.items():
+        sorted_merchants.append((m, total))
+    sorted_merchants.sort(key=lambda x: x[1], reverse=True)
+    top_merchants = sorted_merchants[:5]
+
+    duplicate_ids = []
+    for tid, count in id_counts.items():
+        if count > 1:
+            duplicate_ids.append(tid)
+    duplicate_ids.sort()
 
     total_completed = round(total_completed, 2)
     avg_completed = round(avg_completed, 2)

@@ -55,9 +55,5 @@ def max_change(series):
     """
     if len(series) < 2:
         return 0
-    if not series:
-        return 0
     changes = compute_changes(series)
-    if not changes:
-        return 0
     return max(abs(c) for c in changes)

@@ -2748,5 +2748,70 @@
     ],
     "acquired": "2026-03-28T23:01:14.641409",
     "source_topic": "Python Advanced Error Handling"
+  },
+  "ghost mutation handling and debugging": {
+    "requires": [],
+    "acquired": "2026-03-31T12:45:28.920637",
+    "source_topic": "ghost mutation handling and debugging"
+  },
+  "python fundamentals review": {
+    "requires": [],
+    "acquired": "2026-03-31T14:44:18.089128",
+    "source_topic": "python fundamentals review"
+  },
+  "serialization python and json serialization": {
+    "requires": [],
+    "acquired": "2026-04-01T00:48:51.634613",
+    "source_topic": "Integration of json parsing and serialization python and json serialization"
+  },
+  "serialization python": {
+    "requires": [],
+    "acquired": "2026-04-01T07:42:32.935170",
+    "source_topic": "Integration of serialization python and json serialization and sigmoid activation function"
+  },
+  "json serialization and sigmoid activation function": {
+    "requires": [],
+    "acquired": "2026-04-01T07:42:32.954558",
+    "source_topic": "Integration of serialization python and json serialization and sigmoid activation function"
+  },
+  "neural networks": {
+    "requires": [],
+    "acquired": "2026-04-01T10:28:27.319943",
+    "source_topic": "Integration of neural networks and deep learning basics and git internals object model"
+  },
+  "deep learning basics and git internals object model": {
+    "requires": [],
+    "acquired": "2026-04-01T10:28:27.340297",
+    "source_topic": "Integration of neural networks and deep learning basics and git internals object model"
+  },
+  "algorithm complexity and performance optimization": {
+    "requires": [],
+    "acquired": "2026-04-01T11:23:33.992156",
+    "source_topic": "algorithm complexity and performance optimization"
+  },
+  "socket concepts": {
+    "requires": [],
+    "acquired": "2026-04-01T14:24:39.684522",
+    "source_topic": "Integration of socket concepts and protocols theory and binary search algorithm"
+  },
+  "protocols theory and binary search algorithm": {
+    "requires": [],
+    "acquired": "2026-04-01T14:24:39.696934",
+    "source_topic": "Integration of socket concepts and protocols theory and binary search algorithm"
+  },
+  "binary search implementation": {
+    "requires": [],
+    "acquired": "2026-04-01T18:30:32.549873",
+    "source_topic": "binary search implementation"
+  },
+  "ghost mutation handling": {
+    "requires": [],
+    "acquired": "2026-04-01T18:52:11.151853",
+    "source_topic": "Integration of ghost mutation handling and debugging and http client implementation python"
+  },
+  "debugging and http client implementation python": {
+    "requires": [],
+    "acquired": "2026-04-01T18:52:11.169868",
+    "source_topic": "Integration of ghost mutation handling and debugging and http client implementation python"
   }
 }

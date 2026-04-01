@@ -1,6 +1,6 @@
 {
   "created_at": "2026-03-26T00:43:55.456004",
-  "updated_at": "2026-03-29T18:42:32.656438",
+  "updated_at": "2026-04-01T22:25:51.747327",
   "skills": {
     "asyncio and async patterns in python": {
       "relevance": 0.95,
@@ -118,8 +118,8 @@
       "relevance": 0.91,
       "domain": "cs_fundamentals",
       "xp_leverage": 1.5,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.1
     },
     "test driven development and assertion design": {
       "relevance": 0.88,
@@ -146,15 +146,15 @@
       "relevance": 0.85,
       "domain": "networking",
       "xp_leverage": 1.2,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 8.7
     },
     "graph traversal algorithms bfs dfs": {
       "relevance": 0.88,
       "domain": "cs_fundamentals",
       "xp_leverage": 1.4,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 9.2
     },
     "union find disjoint set": {
       "relevance": 0.75,
@@ -174,8 +174,8 @@
       "relevance": 0.85,
       "domain": "cs_fundamentals",
       "xp_leverage": 1.4,
-      "known": false,
-      "known_score": null
+      "known": true,
+      "known_score": 8.2
     },
     "binary search and variants": {
       "relevance": 0.82,
@@ -434,7 +434,7 @@
       "domain": "unknown",
       "xp_leverage": 1.0,
       "known": true,
-      "known_score": 8.2
+      "known_score": 8.8
     },
     "note tag handling and debugging": {
       "relevance": 0.5,
@@ -651,7 +651,7 @@
       "domain": "unknown",
       "xp_leverage": 1.0,
       "known": true,
-      "known_score": 9.3
+      "known_score": 8.7
     },
     "integration of dynamic content handling and dynamic programming memoization": {
       "relevance": 0.5,
@@ -679,7 +679,266 @@
       "domain": "unknown",
       "xp_leverage": 1.0,
       "known": true,
+      "known_score": 8.3
+    },
+    "integration of @responsestatus annotation and setter injection": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of @responsestatus annotation and python object oriented programming": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.1
+    },
+    "ghost mutation handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.4
+    },
+    "integration of k-nearest neighbors classifier and stochastic gradient descent": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.6
+    },
+    "integration of data quality and priority queue and implementazione python da zero di un perceptron": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
       "known_score": 8.2
+    },
+    "caching strategies lru cache": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.2
+    },
+    "python fundamentals review": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "integration of dynamic programming memoization and test topic": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.2
+    },
+    "integration of json parsing and serialization python and json serialization": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "integration of post-quantum key encapsulation mechanisms and logistic regression": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.2
+    },
+    "integration of binary search tree operations and data quality": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.8
+    },
+    "integration of prepared statements and finally clause": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of specific exception handling and coroutine chaining": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "integration of message bus and data validation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "integration of serialization python and json serialization and sigmoid activation function": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "integration of exception as control flow anti-pattern and asyncio advanced patterns": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.7
+    },
+    "integration of correlation state and sha256 implementation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of neural networks and deep learning basics and git internals object model": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.5
+    },
+    "integration of websocket protocol and html parsing": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "integration of custom exceptions and html trap handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of aes encryption python and tcp socket programming python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "integration of socket concepts and protocols theory and binary search algorithm": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.9
+    },
+    "integration of unit testing and json serialization and sigmoid activation function": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "integration of property-based testing and bb84 protocol": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.9
+    },
+    "integration of websocketstream interface and serialization python and json serialization": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "integration of tcp sockets and garbage collection": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "integration of closed state and binary search": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "integration of solid principles and race condition handling and debugging": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "integration of debugging tools and leaky relu": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.7
+    },
+    "integration of dns resolution and redis data structures implementation python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "integration of exception chaining and time complexity": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.0
+    },
+    "integration of linear search comparison and time complexity": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "integration of dynamic content handling and dns protocol": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "binary search implementation": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "integration of ghost mutation handling and debugging and http client implementation python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.2
+    },
+    "integration of dns protocol and performance bottleneck": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.3
+    },
+    "integration of parameterized queries and event loop": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.25
     }
   },
   "last_calibrated": "2026-03-26T14:57:50.720693"

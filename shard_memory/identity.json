@@ -1,17 +1,15 @@
 {
-  "sessions_lived": 14,
+  "sessions_lived": 86,
   "narrative": "",
-  "total_attempts": 542,
-  "total_certified": 268,
-  "cert_rate_overall": 0.4736,
+  "total_attempts": 1253,
+  "total_certified": 790,
+  "cert_rate_overall": 0.6152,
   "strong_domains": [
     "algorithms",
     "data",
     "debugging"
   ],
-  "weak_domains": [
-    "cryptography"
-  ],
+  "weak_domains": [],
   "peak_skills": [
     "Python decorators and metaclasses",
     "python descriptor protocol",
@@ -34,7 +32,7 @@
     "dns resolution python",
     "message queue rabbitmq python"
   ],
-  "self_esteem": 0.1942,
+  "self_esteem": 0.3706,
   "trajectory": "stagnating",
-  "updated_at": "2026-03-29T18:42:43.629132"
+  "updated_at": "2026-04-01T23:01:07.806534"
 }

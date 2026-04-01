@@ -89,6 +89,13 @@ class ResearchAgenda:
         if not topic_data and self.replay_engine:
             replay_topic = self.replay_engine.get_next_replay_topic()
             if replay_topic and is_valid_topic(replay_topic):
+                # Skip and evict if already certified
+                _caps = getattr(self.capability_graph, "capabilities", {})
+                if replay_topic.lower() in {c.lower() for c in _caps}:
+                    print(f"[RESEARCH AGENDA] Replay topic '{replay_topic}' already certified -- evicting")
+                    self.replay_engine.remove_topic(replay_topic)
+                    replay_topic = None
+            if replay_topic:
                 print(f"[RESEARCH AGENDA] Selected replay topic: {replay_topic}")
                 topic_data = {"skill": replay_topic, "topic": replay_topic, "difficulty": 1}
 

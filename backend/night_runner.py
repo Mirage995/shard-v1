@@ -278,6 +278,12 @@ class NightRunner:
         self.topic_filter_discards = 0
         self._desire_selections_this_session = 0  # cap: max 1 desire topic per session
 
+        # Agenda starvation fix (#29)
+        from collections import deque
+        self._recent_topics: deque = deque(maxlen=10)   # cooldown window
+        self._fallback_count: int  = 0                  # how many times fallback fired this session
+        self._last_topic: str      = ""                 # to block consecutive fallback
+
         self._setup_directories()
         self._setup_logging()
         
@@ -356,6 +362,25 @@ class NightRunner:
             return False
         topic_l = topic.lower().strip()
         return any(topic_l == a.lower().strip() or a.lower().strip() in topic_l for a in ve.avoid_domains)
+
+    def _is_on_cooldown(self, topic: str) -> bool:
+        """True if topic appeared in the last 5 selections (agenda starvation fix #29)."""
+        recent_5 = list(self._recent_topics)[-5:]
+        return topic.lower().strip() in [t.lower().strip() for t in recent_5]
+
+    def _record_topic(self, topic: str, source: str) -> None:
+        """Track selected topic for cooldown and fallback ratio (#29)."""
+        self._recent_topics.append(topic)
+        self._last_topic = topic
+        if source == "fallback":
+            self._fallback_count += 1
+
+    def _fallback_ratio(self) -> float:
+        total = len(self._recent_topics)
+        if total == 0:
+            return 0.0
+        fallbacks = sum(1 for t in self._recent_topics if t == "python fundamentals review")
+        return fallbacks / total
 
     async def _select_topic(self, capability_graph, config_context) -> tuple[str, str, str]:
         """Returns (topic, source, reason)"""
@@ -591,13 +616,55 @@ class NightRunner:
                 _lines = _curated_file.read_text(encoding="utf-8").splitlines()
                 _curated = [l.strip() for l in _lines if l.strip() and not l.startswith("#")]
                 _certified = set(capability_graph.capabilities.keys())
-                _candidates = [t for t in _curated if t.lower() not in _certified]
+                _candidates = [t for t in _curated if t.lower() not in _certified and not self._is_on_cooldown(t)]
                 if _candidates:
                     return random.choice(_candidates), "curated_list", "Fallback (curated list)"
+                # Cooldown removed all candidates -- try without cooldown filter
+                _candidates_no_cooldown = [t for t in _curated if t.lower() not in _certified]
+                if _candidates_no_cooldown:
+                    return random.choice(_candidates_no_cooldown), "curated_list", "Fallback (curated list, no cooldown)"
             except Exception:
                 pass
 
-        return "Python Advanced Error Handling", "fallback", "Hardcoded ultimate fallback"
+        # ── Agenda starvation fix #29: gap-based auto-population ─────────────
+        # Before hitting the hardcoded fallback, try to pull a topic from
+        # the capability graph's missing skills (world model gaps).
+        try:
+            _missing = capability_graph.get_missing_skills() if hasattr(capability_graph, "get_missing_skills") else []
+            _gap_candidates = [s for s in _missing if is_valid_topic(s, self.logger)
+                               and not self._is_on_cooldown(s)
+                               and not self._is_quarantined(s)
+                               and not self._is_avoided(s)]
+            if _gap_candidates:
+                _gap_topic = random.choice(_gap_candidates[:10])  # pick from top-10 gaps
+                self.logger.info("[AGENDA #29] Gap-based topic selected: %r", _gap_topic)
+                return _gap_topic, "gap_fill", "Agenda starvation fix: capability gap"
+        except Exception as _gap_err:
+            self.logger.debug("[AGENDA #29] Gap fill failed: %s", _gap_err)
+
+        # ── Hard rule: block consecutive fallback (#29) ────────────────────────
+        if self._last_topic == "python fundamentals review":
+            self.logger.warning("[AGENDA #29] Consecutive fallback blocked -- forcing gap or skip")
+            _forced_pool = ["algorithm complexity and performance optimization",
+                            "graph traversal algorithms bfs dfs",
+                            "dynamic programming",
+                            "binary search implementation",
+                            "sorting algorithms comparison"]
+            _forced = next((t for t in _forced_pool if not self._is_on_cooldown(t)), _forced_pool[0])
+            return _forced, "gap_fill", "Anti-consecutive-fallback"
+
+        # ── Hard cap: fallback ≤ 20% of recent selections (#29) ───────────────
+        if self._fallback_ratio() >= 0.20:
+            self.logger.warning("[AGENDA #29] Fallback ratio %.0f%% >= 20%% -- forcing gap topic", self._fallback_ratio() * 100)
+            _forced_pool = ["algorithm complexity and performance optimization",
+                            "graph traversal algorithms bfs dfs",
+                            "dynamic programming",
+                            "binary search implementation",
+                            "sorting algorithms comparison"]
+            _forced = next((t for t in _forced_pool if not self._is_on_cooldown(t)), _forced_pool[0])
+            return _forced, "gap_fill", "Fallback cap enforced"
+
+        return "python fundamentals review", "fallback", "Hardcoded ultimate fallback"
 
     async def run(self):
         self.start_time = time.time()
@@ -1083,6 +1150,7 @@ class NightRunner:
                 
             self._transition(SessionState.SELECT, f"cycle {cycle}/{self.max_cycles}")
             topic, source, reason = await self._select_topic(capability_graph, "")
+            self._record_topic(topic, source)  # agenda starvation fix #29
 
             # ── PREREQUISITE GATE -- se il topic è difficile, studia prima i prereq ──
             try:
@@ -1998,8 +2066,6 @@ class NightRunner:
 
                 if _pd_result.recommendation and "HARD_AVOIDANCE" in _pd_result.flags:
                     try:
-                        from goal_engine import GoalEngine
-                        from goal_storage import GoalStorage
                         _ge = GoalEngine(GoalStorage())
                         avoided = (_pd_result.details
                                    .get("HARD_AVOIDANCE", {})
@@ -2054,6 +2120,17 @@ class NightRunner:
             )
         except Exception as _snap_err:
             self.logger.debug("[SNAPSHOT] Non-fatal: %s", _snap_err)
+
+        # ── SESSION REWARD (recovery rule, backlog #19) ───────────────────────
+        try:
+            if _identity is not None:
+                _snap_cert  = (sum(1 for c in self.session_data if c["certified"]) / len(self.session_data)
+                               if self.session_data else 0.0)
+                _snap_risk  = (_pd_result.risk_score
+                               if locals().get("_pd_result") and _pd_result else 0.0)
+                _identity.apply_session_reward(_snap_cert, _snap_risk)
+        except Exception as _rw_err:
+            self.logger.debug("[REWARD] Non-fatal: %s", _rw_err)
 
         self.logger.info("Session complete. Shutting down cleanly.")
 
@@ -2287,10 +2364,13 @@ if __name__ == "__main__":
         _sa_mod.StudyAgent.__init__ = _lobotomized_init
 
     if args.continuous:
+        from shard_semaphore import SESSION_LOCK_FILE
         session_n = 0
         print(f"[CONTINUOUS] Starting indefinite loop. Ctrl+C to stop. Gap={args.session_gap}s")
         while True:
             session_n += 1
+            # Release any stale lock before starting next session
+            SESSION_LOCK_FILE.unlink(missing_ok=True)
             print(f"\n[CONTINUOUS] === SESSION {session_n} ===")
             try:
                 runner = NightRunner(

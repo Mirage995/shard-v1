@@ -196,8 +196,20 @@ class StrategyMemory:
         )
         print(f"  [strategy] Stored from diff: '{strategy_text}' (score={score})")
 
-    def query(self, topic: str, k: int = 3) -> List[Dict]:
-        """Retrieve the most relevant strategies for a topic (sync)."""
+    def query(
+        self,
+        topic: str,
+        k: int = 3,
+        cross_inject_queries: Optional[List[str]] = None,
+    ) -> List[Dict]:
+        """Retrieve the most relevant strategies for a topic (sync).
+
+        Args:
+            topic               : primary query string
+            k                   : max results from primary query
+            cross_inject_queries: extra query strings from cross_task_router (#22)
+                                  Each contributes up to 2 extra results.
+        """
         if self.collection.count() == 0:
             return []
 
@@ -207,8 +219,12 @@ class StrategyMemory:
         )
 
         strategies = []
+        seen_ids: set = set()
+
         if results and results["documents"]:
+            ids = results.get("ids", [[]])[0]
             for i, doc in enumerate(results["documents"][0]):
+                doc_id = ids[i] if i < len(ids) else None
                 meta = results["metadatas"][0][i] if results["metadatas"] else {}
                 strategies.append({
                     "strategy": doc,
@@ -216,11 +232,45 @@ class StrategyMemory:
                     "outcome": meta.get("outcome", ""),
                     "score": float(meta.get("score", 0)),
                 })
+                if doc_id:
+                    seen_ids.add(doc_id)
+
+        # #22 Cross-inject: fetch up to 2 results per extra query, deduplicate by id
+        if cross_inject_queries:
+            for cq in cross_inject_queries:
+                try:
+                    cq_results = self.collection.query(
+                        query_texts=[cq],
+                        n_results=min(2, self.collection.count()),
+                    )
+                    if cq_results and cq_results["documents"]:
+                        cq_ids = cq_results.get("ids", [[]])[0]
+                        for j, doc in enumerate(cq_results["documents"][0]):
+                            doc_id = cq_ids[j] if j < len(cq_ids) else None
+                            if doc_id and doc_id in seen_ids:
+                                continue  # already in results
+                            meta = cq_results["metadatas"][0][j] if cq_results.get("metadatas") else {}
+                            strategies.append({
+                                "strategy": doc,
+                                "topic": meta.get("topic", ""),
+                                "outcome": meta.get("outcome", ""),
+                                "score": float(meta.get("score", 0)),
+                            })
+                            if doc_id:
+                                seen_ids.add(doc_id)
+                except Exception as exc:
+                    logger.debug("[strategy] cross-inject query failed for '%s': %s", cq[:40], exc)
+
         return strategies
 
-    async def query_async(self, topic: str, k: int = 3) -> List[Dict]:
+    async def query_async(
+        self,
+        topic: str,
+        k: int = 3,
+        cross_inject_queries: Optional[List[str]] = None,
+    ) -> List[Dict]:
         """Async wrapper -- non blocca l'event loop durante la query ChromaDB."""
-        return await asyncio.to_thread(self.query, topic, k)
+        return await asyncio.to_thread(self.query, topic, k, cross_inject_queries)
 
     async def store_strategy_async(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
         """Async-safe write -- serialises concurrent NightRunner/SessionOrchestrator calls."""

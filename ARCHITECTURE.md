@@ -1,8 +1,8 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ19 (Causal strategy proof — strategy compiler, memory quality fix, A/B test infrastructure, bulk Unicode hardening)
-Last updated: 2026-03-30
+Version: SSJ22 (Cross-Task Transfer Layer — micro-cluster routing, activation triggering, strategy injection)
+Last updated: 2026-04-02
 
 ---
 
@@ -58,6 +58,10 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Diagnostic Learning** — `diagnostic_weights.json` updated each run: success +0.05, fail -0.03, clamped [0.5, 2.0]. Atomic write, dedup. IDEMPOTENCY weight: 1.650 after 9 victories (SSJ18)
 - **Strategy Compiler** — transforms raw strategy text into grounded operational instructions. Confidence gating: >=0.75 MANDATORY, 0.60-0.74 SUGGESTED. Heuristic function-name grounding anchors instruction to specific functions in source code. `extract_from_diff` extracts actionable patterns from benchmark diffs at VICTORY time (SSJ19)
 - **Causal proof** — A/B/C test (baseline/normal/forced) confirmed: strategy signal alone reduces attempts 3->1 on task_02 without IDEMPOTENCY diagnostic firing. B=C confirmed: gate selects correctly, no need to force (SSJ19)
+- **Perverse emergence detection** — HARD_AVOIDANCE flag (SHARD routes around difficult topics autonomously), STAGNATION flag (strategy_reuse_rate=1.0 — exploitation without exploration). 14 stress tests: false positives, edge cases, degeneration, stability (SSJ20)
+- **Longitudinal observability** — `session_snapshots.jsonl`: per-session metrics snapshot. `--continuous` flag for unattended long runs. `analyze_snapshots.py` for offline analysis of N sessions (SSJ20)
+- **65-session empirical analysis** — strategy win rates by cluster: exception_flow 87% (META-STRATEGY), concurrency 36% (FALSE NEGATIVE), mutation_state 63% (GOLD ZONE), bcrypt/argon2 11% (toxic). 55 certified skills, 1515 causal relations. Self-esteem +0.08 over 65 sessions (SSJ21)
+- **Cross-Task Transfer Layer** — `cross_task_router.py`: 11 micro-clusters, cluster-differentiated boosts (concurrency 1.40x FALSE NEGATIVE fix, mutation_state 1.25x, crypto 0.70x), cross-inject rules (mutation_state→exception_flow, concurrency→threading), NEAR_MISS boost 1.30x, strategy blacklist+penalties. Wired into signal_gate + strategy_memory.query(). Key insight: activation triggering, not knowledge transfer (SSJ22)
 - **Semantic memory** via ChromaDB triple-store
 - **Domain-specific agents**: CAD, web, smart home, 3D printing
 
@@ -109,6 +113,12 @@ shard_v1/
 │   ├── experiment_cache.py         # Skips failed topics (SQLite + JSON fallback)
 │   ├── episodic_memory.py          # [SSJ5] Episodic memory (SQLite + JSON fallback)
 │   ├── strategy_memory.py          # ChromaDB — stores strategies; asyncio.Lock protected
+│   │                               #   query(topic, cross_inject_queries) — #22 cross-cluster fetch
+│   ├── cross_task_router.py        # [SSJ22] Micro-cluster router — activation triggering
+│   │                               #   classify_cluster() → 11 clusters from topic+error text
+│   │                               #   apply_routing() → filter blacklist/penalty + cluster boost
+│   │                               #   Boosts: concurrency 1.40x, mutation_state 1.25x, crypto 0.70x
+│   │                               #   Cross-inject: mutation_state→exception_flow, concurrency→threading
 │   ├── meta_learning.py            # [SSJ4] Per-category stats via SQL VIEWs + strategy injection
 │   ├── strategy_extractor.py       # Extracts strategy descriptions from experiments
 │   ├── strategy_tracker.py         # Tracks strategy effectiveness over time

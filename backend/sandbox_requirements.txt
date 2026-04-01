@@ -16,3 +16,11 @@ redis
 pycryptodome
 argon2-cffi
 OpenSSL
+decouple
+jsonschema
+aiofiles
+ijson
+toml
+jsonpickle
+orjson
+marshmallow

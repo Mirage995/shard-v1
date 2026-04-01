@@ -1231,8 +1231,11 @@ async def run_benchmark_loop(
             try:
                 from strategy_memory import StrategyMemory as _SM
                 from signal_gate import build_strategy_signal as _build_strat
-                _strat_results = _SM().query(f"{task_key} {readme[:150]}", k=3)
-                _strat_signal = _build_strat(_strat_results)
+                from cross_task_router import classify_cluster as _classify, get_cross_inject_queries as _cx
+                _topic_str = f"{task_key} {readme[:150]}"
+                _cross_injects = _cx(_classify(_topic_str))
+                _strat_results = _SM().query(_topic_str, k=3, cross_inject_queries=_cross_injects)
+                _strat_signal = _build_strat(_strat_results, topic=_topic_str)
                 if _strat_signal:
                     # Compile raw strategy text into grounded operational instruction
                     try:

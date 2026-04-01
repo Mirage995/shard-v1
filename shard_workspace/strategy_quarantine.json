@@ -1,0 +1,1203 @@
+[
+  {
+    "id": "strat_obj_2026-03-11T16:24:32.564690_0b37df76-4",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "0b37df76-451e-46e6-ae89-9c261260e7ec",
+      "created_timestamp": "2026-03-11T16:24:32.564664",
+      "domains": "[]",
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-11T16:24:32.564670",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "usage_count": 0,
+      "timestamp": "2026-03-11T16:24:32.564690",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": ""
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T16:28:15.364667_6edafb27-c",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "usage_count": 0,
+      "created_timestamp": "2026-03-11T16:28:15.364646",
+      "success_rate": "1.0",
+      "name": "derived_strategy",
+      "strategy_id": "6edafb27-c212-4174-8edc-2ad3bcda0f23",
+      "timestamp": "2026-03-11T16:28:15.364667",
+      "domains": "[]",
+      "last_used_timestamp": "2026-03-11T16:28:15.364653"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T16:31:43.205407_71f66e72-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "domains": "[]",
+      "created_timestamp": "2026-03-11T16:31:43.205389",
+      "last_used_timestamp": "2026-03-11T16:31:43.205395",
+      "usage_count": 0,
+      "last_success_timestamp": "",
+      "strategy_id": "71f66e72-023b-436e-90d3-28b50a9f9672",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-11T16:31:43.205407",
+      "name": "derived_strategy"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T16:31:43.404172_71f66e72-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "created_timestamp": "2026-03-11T16:31:43.205389",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "usage_count": 1,
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "0.9",
+      "timestamp": "2026-03-11T16:31:43.404172",
+      "last_used_timestamp": "2026-03-11T16:31:43.404163",
+      "strategy_id": "71f66e72-023b-436e-90d3-28b50a9f9672"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T16:57:53.166598_f7746bc1-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "success_rate": "1.0",
+      "strategy_id": "f7746bc1-1fe7-46df-9343-d1ad2b342983",
+      "created_timestamp": "2026-03-11T16:57:53.166333",
+      "timestamp": "2026-03-11T16:57:53.166598",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_used_timestamp": "2026-03-11T16:57:53.166344",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:01:19.340850_60a4f57c-3",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "timestamp": "2026-03-11T17:01:19.340850",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "created_timestamp": "2026-03-11T17:01:19.340824",
+      "name": "derived_strategy",
+      "strategy_id": "60a4f57c-30a0-4318-860b-3ecc003aff30",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 0,
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-11T17:01:19.340833"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:04:45.687422_1492c1f6-8",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-11T17:04:45.687408",
+      "usage_count": 0,
+      "description": "Strategy derived from successful experiment",
+      "created_timestamp": "2026-03-11T17:04:45.687400",
+      "strategy_id": "1492c1f6-8455-4d64-a407-a97fd6740f83",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "timestamp": "2026-03-11T17:04:45.687422",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:04:45.904999_1492c1f6-8",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "1492c1f6-8455-4d64-a407-a97fd6740f83",
+      "last_success_timestamp": "",
+      "usage_count": 1,
+      "pattern": "[\"research\", \"validate\"]",
+      "last_used_timestamp": "2026-03-11T17:04:45.904988",
+      "name": "derived_strategy",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "0.9",
+      "created_timestamp": "2026-03-11T17:04:45.687400",
+      "domains": "[]",
+      "timestamp": "2026-03-11T17:04:45.904999"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:27:40.931394_559ee29e-f",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-11T17:27:40.931274",
+      "name": "derived_strategy",
+      "usage_count": 0,
+      "timestamp": "2026-03-11T17:27:40.931394",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "strategy_id": "559ee29e-fc14-43e2-a9ad-7d16e3f082fd",
+      "created_timestamp": "2026-03-11T17:27:40.931266"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:30:35.121829_027df670-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "timestamp": "2026-03-11T17:30:35.121829",
+      "last_success_timestamp": "",
+      "usage_count": 0,
+      "pattern": "[\"research\", \"validate\"]",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-11T17:30:35.121809",
+      "last_used_timestamp": "2026-03-11T17:30:35.121816",
+      "success_rate": "1.0",
+      "strategy_id": "027df670-bdfa-4a65-ae06-265ffbfdee56"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:33:53.079099_46c50a63-f",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "name": "derived_strategy",
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-11T17:33:53.079085",
+      "strategy_id": "46c50a63-f29f-4309-a098-b019b67542be",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "last_success_timestamp": "",
+      "timestamp": "2026-03-11T17:33:53.079099",
+      "usage_count": 0,
+      "created_timestamp": "2026-03-11T17:33:53.079077",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:33:53.307090_46c50a63-f",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 1,
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "domains": "[]",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "success_rate": "0.9",
+      "created_timestamp": "2026-03-11T17:33:53.079077",
+      "strategy_id": "46c50a63-f29f-4309-a098-b019b67542be",
+      "last_used_timestamp": "2026-03-11T17:33:53.307076",
+      "timestamp": "2026-03-11T17:33:53.307090"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:55:42.192093_c5357b0a-9",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "timestamp": "2026-03-11T17:55:42.192093",
+      "domains": "[]",
+      "strategy_id": "c5357b0a-99e3-41d6-9869-2b0a8ea8a8da",
+      "last_used_timestamp": "2026-03-11T17:55:42.192078",
+      "pattern": "[\"research\", \"validate\"]",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-11T17:55:42.192070",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "success_rate": "1.0",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T17:59:42.104351_4fec5e28-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-11T17:59:42.104328",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "created_timestamp": "2026-03-11T17:59:42.104317",
+      "timestamp": "2026-03-11T17:59:42.104351",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "",
+      "strategy_id": "4fec5e28-b794-4fd0-82f9-39db1040ad89"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T18:03:17.362294_d1f5639c-d",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "created_timestamp": "2026-03-11T18:03:17.362270",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "pattern": "[\"research\", \"validate\"]",
+      "strategy_id": "d1f5639c-d1c9-4184-82ce-64fdfc31e8a3",
+      "name": "derived_strategy",
+      "timestamp": "2026-03-11T18:03:17.362294",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-11T18:03:17.362279"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T18:03:17.577014_d1f5639c-d",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "domains": "[]",
+      "usage_count": 1,
+      "created_timestamp": "2026-03-11T18:03:17.362270",
+      "name": "derived_strategy",
+      "strategy_id": "d1f5639c-d1c9-4184-82ce-64fdfc31e8a3",
+      "success_rate": "0.9",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "timestamp": "2026-03-11T18:03:17.577014",
+      "last_used_timestamp": "2026-03-11T18:03:17.577004"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T19:06:53.347769_1d5ddc6c-7",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "usage_count": 0,
+      "strategy_id": "1d5ddc6c-733b-47f2-9054-7852368e4827",
+      "created_timestamp": "2026-03-11T19:06:53.347739",
+      "last_used_timestamp": "2026-03-11T19:06:53.347746",
+      "timestamp": "2026-03-11T19:06:53.347769",
+      "name": "derived_strategy",
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T19:09:52.839889_03c3750e-8",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-11T19:09:52.839877",
+      "usage_count": 0,
+      "timestamp": "2026-03-11T19:09:52.839889",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "strategy_id": "03c3750e-887f-4c08-9c0a-9e7817eb932a",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-11T19:09:52.839871"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T19:12:33.602932_124357dc-9",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "timestamp": "2026-03-11T19:12:33.602932",
+      "usage_count": 0,
+      "strategy_id": "124357dc-99e9-4dcc-8b3c-c49610557a76",
+      "created_timestamp": "2026-03-11T19:12:33.602912",
+      "last_used_timestamp": "2026-03-11T19:12:33.602920",
+      "pattern": "[\"research\", \"validate\"]",
+      "name": "derived_strategy"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-11T19:12:33.808094_124357dc-9",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-11T19:12:33.808083",
+      "success_rate": "0.9",
+      "created_timestamp": "2026-03-11T19:12:33.602912",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "usage_count": 1,
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "strategy_id": "124357dc-99e9-4dcc-8b3c-c49610557a76",
+      "timestamp": "2026-03-11T19:12:33.808094",
+      "name": "derived_strategy"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T15:24:53.710387_4215a76a-3",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "last_used_timestamp": "2026-03-12T15:24:53.710372",
+      "success_rate": "1.0",
+      "usage_count": 0,
+      "strategy_id": "4215a76a-394d-4fb7-807d-7e27ecd5a780",
+      "pattern": "[\"research\", \"validate\"]",
+      "created_timestamp": "2026-03-12T15:24:53.710362",
+      "name": "derived_strategy",
+      "timestamp": "2026-03-12T15:24:53.710387"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T15:27:49.385646_218cfcb6-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "name": "derived_strategy",
+      "last_used_timestamp": "2026-03-12T15:27:49.385633",
+      "timestamp": "2026-03-12T15:27:49.385646",
+      "pattern": "[\"research\", \"validate\"]",
+      "description": "Strategy derived from successful experiment",
+      "created_timestamp": "2026-03-12T15:27:49.385623",
+      "domains": "[]",
+      "last_success_timestamp": "",
+      "success_rate": "1.0",
+      "strategy_id": "218cfcb6-ba5d-4c48-a169-87bc4f6d47e8"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T15:34:30.036242_27801649-9",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "name": "derived_strategy",
+      "last_success_timestamp": "",
+      "strategy_id": "27801649-9fe8-45ae-9b85-8329dd1436a0",
+      "pattern": "[\"research\", \"validate\"]",
+      "success_rate": "1.0",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "timestamp": "2026-03-12T15:34:30.036242",
+      "last_used_timestamp": "2026-03-12T15:34:30.036223",
+      "created_timestamp": "2026-03-12T15:34:30.036218",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T15:48:14.277104_34239ef5-5",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "timestamp": "2026-03-12T15:48:14.277104",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_used_timestamp": "2026-03-12T15:48:14.277087",
+      "created_timestamp": "2026-03-12T15:48:14.277082",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "strategy_id": "34239ef5-58a2-4b9f-aa6d-edf98b66a2a7",
+      "success_rate": "1.0"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T15:56:40.336452_02ecfb70-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "pattern": "[\"research\", \"validate\"]",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "strategy_id": "02ecfb70-a061-4fe5-9a0c-6f04772c7d03",
+      "last_used_timestamp": "2026-03-12T15:56:40.336436",
+      "success_rate": "1.0",
+      "created_timestamp": "2026-03-12T15:56:40.336428",
+      "timestamp": "2026-03-12T15:56:40.336452"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:02:46.443227_fbae3572-3",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "last_success_timestamp": "",
+      "strategy_id": "fbae3572-33bd-4382-b681-e07870e569eb",
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-12T16:02:46.443227",
+      "last_used_timestamp": "2026-03-12T16:02:46.443219",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "description": "Strategy derived from successful experiment",
+      "created_timestamp": "2026-03-12T16:02:46.443212"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:05:25.713434_b2789857-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "success_rate": "1.0",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-12T16:05:25.713419",
+      "created_timestamp": "2026-03-12T16:05:25.713414",
+      "domains": "[]",
+      "usage_count": 0,
+      "timestamp": "2026-03-12T16:05:25.713434",
+      "strategy_id": "b2789857-a400-4b7d-9f28-b97ae3cecad4",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:05:25.919688_b2789857-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 1,
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-12T16:05:25.919676",
+      "last_success_timestamp": "2026-03-12T16:05:25.919682",
+      "pattern": "[\"research\", \"validate\"]",
+      "created_timestamp": "2026-03-12T16:05:25.713414",
+      "description": "Strategy derived from successful experiment",
+      "timestamp": "2026-03-12T16:05:25.919688",
+      "strategy_id": "b2789857-a400-4b7d-9f28-b97ae3cecad4",
+      "domains": "[]",
+      "name": "derived_strategy"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:07:57.385936_385f34b4-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "385f34b4-17bb-40c1-94e5-41fe39158a18",
+      "success_rate": "1.0",
+      "created_timestamp": "2026-03-12T16:07:57.385913",
+      "timestamp": "2026-03-12T16:07:57.385936",
+      "pattern": "[\"research\", \"validate\"]",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-12T16:07:57.385921",
+      "name": "derived_strategy",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:07:57.649029_385f34b4-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T16:07:57.385913",
+      "last_success_timestamp": "2026-03-12T16:07:57.649021",
+      "last_used_timestamp": "2026-03-12T16:07:57.649012",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-12T16:07:57.649029",
+      "usage_count": 1,
+      "strategy_id": "385f34b4-17bb-40c1-94e5-41fe39158a18",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:23:12.967451_706e70f4-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-12T16:23:12.967451",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "strategy_id": "706e70f4-051f-4d2c-b82c-67fe7cb49f81",
+      "last_success_timestamp": "",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T16:23:12.967428",
+      "last_used_timestamp": "2026-03-12T16:23:12.967434",
+      "success_rate": "1.0",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:23:13.244303_706e70f4-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "timestamp": "2026-03-12T16:23:13.244303",
+      "success_rate": "1.0",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_used_timestamp": "2026-03-12T16:23:13.244288",
+      "created_timestamp": "2026-03-12T16:23:12.967428",
+      "usage_count": 1,
+      "strategy_id": "706e70f4-051f-4d2c-b82c-67fe7cb49f81",
+      "last_success_timestamp": "2026-03-12T16:23:13.244296",
+      "domains": "[]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:37:09.540975_470ee26b-6",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "created_timestamp": "2026-03-12T16:37:09.540952",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-12T16:37:09.540959",
+      "pattern": "[\"research\", \"validate\"]",
+      "strategy_id": "470ee26b-6ad9-4478-917b-e80a36c11bb1",
+      "name": "derived_strategy",
+      "last_success_timestamp": "",
+      "timestamp": "2026-03-12T16:37:09.540975",
+      "usage_count": 0
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:37:09.815791_470ee26b-6",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "470ee26b-6ad9-4478-917b-e80a36c11bb1",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-12T16:37:09.815791",
+      "last_success_timestamp": "2026-03-12T16:37:09.815783",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "usage_count": 1,
+      "name": "derived_strategy",
+      "last_used_timestamp": "2026-03-12T16:37:09.815776",
+      "created_timestamp": "2026-03-12T16:37:09.540952"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:51:52.944554_362b9e22-5",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "timestamp": "2026-03-12T16:51:52.944554",
+      "success_rate": "1.0",
+      "description": "Strategy derived from successful experiment",
+      "pattern": "[\"research\", \"validate\"]",
+      "domains": "[]",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-12T16:51:52.944541",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T16:51:52.944536",
+      "strategy_id": "362b9e22-5169-4225-b269-723f23332c81"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T16:51:53.210259_362b9e22-5",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "2026-03-12T16:51:53.210252",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T16:51:52.944536",
+      "last_used_timestamp": "2026-03-12T16:51:53.210244",
+      "timestamp": "2026-03-12T16:51:53.210259",
+      "success_rate": "1.0",
+      "usage_count": 1,
+      "domains": "[]",
+      "strategy_id": "362b9e22-5169-4225-b269-723f23332c81"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T17:05:58.574912_bbde3713-8",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "timestamp": "2026-03-12T17:05:58.574912",
+      "created_timestamp": "2026-03-12T17:05:58.574890",
+      "name": "derived_strategy",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "pattern": "[\"research\", \"validate\"]",
+      "strategy_id": "bbde3713-86f5-40c4-8e00-82ba8a71fe16",
+      "success_rate": "1.0",
+      "last_success_timestamp": "",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-12T17:05:58.574898"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T17:07:50.888113_c7700a29-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "created_timestamp": "2026-03-12T17:07:50.888079",
+      "timestamp": "2026-03-12T17:07:50.888113",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-12T17:07:50.888090",
+      "strategy_id": "c7700a29-a60d-4739-8e71-591e1fc07451",
+      "name": "derived_strategy",
+      "success_rate": "1.0"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T17:07:51.160131_c7700a29-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "c7700a29-a60d-4739-8e71-591e1fc07451",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "2026-03-12T17:07:51.160126",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_used_timestamp": "2026-03-12T17:07:51.160120",
+      "name": "derived_strategy",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "usage_count": 1,
+      "created_timestamp": "2026-03-12T17:07:50.888079",
+      "timestamp": "2026-03-12T17:07:51.160131"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T17:22:43.368519_57c1899a-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "success_rate": "1.0",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T17:22:43.368499",
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-12T17:22:43.368519",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "strategy_id": "57c1899a-03db-442e-857b-b9e5f78b57fb",
+      "last_used_timestamp": "2026-03-12T17:22:43.368504",
+      "usage_count": 0,
+      "last_success_timestamp": ""
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T17:22:43.661866_57c1899a-0",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 1,
+      "domains": "[]",
+      "strategy_id": "57c1899a-03db-442e-857b-b9e5f78b57fb",
+      "last_used_timestamp": "2026-03-12T17:22:43.661853",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T17:22:43.368499",
+      "last_success_timestamp": "2026-03-12T17:22:43.661860",
+      "timestamp": "2026-03-12T17:22:43.661866"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T23:34:37.806579_5a2f59d7-3",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "created_timestamp": "2026-03-12T23:34:37.806554",
+      "last_success_timestamp": "",
+      "description": "Strategy derived from successful experiment",
+      "pattern": "[\"research\", \"validate\"]",
+      "name": "derived_strategy",
+      "timestamp": "2026-03-12T23:34:37.806579",
+      "domains": "[]",
+      "last_used_timestamp": "2026-03-12T23:34:37.806563",
+      "success_rate": "1.0",
+      "usage_count": 0,
+      "strategy_id": "5a2f59d7-37fe-4101-a38a-c937726a358d"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T23:36:06.482233_7fa063a1-c",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "name": "derived_strategy",
+      "success_rate": "1.0",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-12T23:36:06.482221",
+      "strategy_id": "7fa063a1-c34c-4bfa-9036-5f2c60c00948",
+      "domains": "[]",
+      "pattern": "[\"research\", \"validate\"]",
+      "description": "Strategy derived from successful experiment",
+      "created_timestamp": "2026-03-12T23:36:06.482216",
+      "timestamp": "2026-03-12T23:36:06.482233"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T23:36:06.692344_7fa063a1-c",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 1,
+      "timestamp": "2026-03-12T23:36:06.692344",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "last_used_timestamp": "2026-03-12T23:36:06.692334",
+      "created_timestamp": "2026-03-12T23:36:06.482216",
+      "domains": "[]",
+      "strategy_id": "7fa063a1-c34c-4bfa-9036-5f2c60c00948",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "2026-03-12T23:36:06.692339"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T23:49:17.960811_5a53dd4d-d",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "strategy_id": "5a53dd4d-d629-4b60-bf44-bc8039bb7b38",
+      "timestamp": "2026-03-12T23:49:17.960811",
+      "usage_count": 0,
+      "created_timestamp": "2026-03-12T23:49:17.960788",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-12T23:49:17.960794",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": ""
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-12T23:49:18.234120_5a53dd4d-d",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 1,
+      "description": "Strategy derived from successful experiment",
+      "last_used_timestamp": "2026-03-12T23:49:18.234106",
+      "strategy_id": "5a53dd4d-d629-4b60-bf44-bc8039bb7b38",
+      "success_rate": "1.0",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-12T23:49:17.960788",
+      "timestamp": "2026-03-12T23:49:18.234120",
+      "last_success_timestamp": "2026-03-12T23:49:18.234113"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T00:43:58.052210_9c0a54bd-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "last_success_timestamp": "",
+      "strategy_id": "9c0a54bd-b92f-4386-b562-0ef7abde4a0a",
+      "last_used_timestamp": "2026-03-13T00:43:58.052194",
+      "usage_count": 0,
+      "success_rate": "1.0",
+      "timestamp": "2026-03-13T00:43:58.052210",
+      "name": "derived_strategy",
+      "description": "Strategy derived from successful experiment",
+      "created_timestamp": "2026-03-13T00:43:58.052186",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T00:46:17.898134_f2630283-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "strategy_id": "f2630283-1959-4ad0-95f3-edca23be0da6",
+      "last_success_timestamp": "",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-13T00:46:17.898113",
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "pattern": "[\"research\", \"validate\"]",
+      "success_rate": "1.0",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-13T00:46:17.898119",
+      "timestamp": "2026-03-13T00:46:17.898134"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T00:46:18.180744_f2630283-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "name": "derived_strategy",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "2026-03-13T00:46:18.180738",
+      "strategy_id": "f2630283-1959-4ad0-95f3-edca23be0da6",
+      "domains": "[]",
+      "created_timestamp": "2026-03-13T00:46:17.898113",
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-13T00:46:18.180744",
+      "success_rate": "1.0",
+      "usage_count": 1,
+      "last_used_timestamp": "2026-03-13T00:46:18.180733"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T00:58:50.894787_4d993f7b-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "created_timestamp": "2026-03-13T00:58:50.894768",
+      "usage_count": 0,
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "success_rate": "1.0",
+      "strategy_id": "4d993f7b-ad1a-4c02-89b9-40a5c11d59b8",
+      "last_used_timestamp": "2026-03-13T00:58:50.894772",
+      "description": "Strategy derived from successful experiment",
+      "timestamp": "2026-03-13T00:58:50.894787"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T00:58:51.129894_4d993f7b-a",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-13T00:58:51.129884",
+      "domains": "[]",
+      "last_success_timestamp": "2026-03-13T00:58:51.129889",
+      "description": "Strategy derived from successful experiment",
+      "pattern": "[\"research\", \"validate\"]",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-13T00:58:51.129894",
+      "usage_count": 1,
+      "strategy_id": "4d993f7b-ad1a-4c02-89b9-40a5c11d59b8",
+      "created_timestamp": "2026-03-13T00:58:50.894768",
+      "name": "derived_strategy"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:09:31.080360_eb3eb57d-2",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "usage_count": 0,
+      "name": "derived_strategy",
+      "strategy_id": "eb3eb57d-2905-494d-9fb0-9be5979f603a",
+      "last_used_timestamp": "2026-03-13T01:09:31.080349",
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "created_timestamp": "2026-03-13T01:09:31.080342",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-13T01:09:31.080360",
+      "domains": "[]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:10:56.616877_faf24ae7-7",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "success_rate": "1.0",
+      "domains": "[]",
+      "last_used_timestamp": "2026-03-13T01:10:56.616866",
+      "timestamp": "2026-03-13T01:10:56.616877",
+      "strategy_id": "faf24ae7-7b1a-4a76-a46e-bf9bc6ac8fa3",
+      "usage_count": 0,
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "created_timestamp": "2026-03-13T01:10:56.616858",
+      "pattern": "[\"research\", \"validate\"]",
+      "last_success_timestamp": ""
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:12:51.447861_ae5d75aa-e",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "strategy_id": "ae5d75aa-ecea-43b5-948e-07bca7f6c0e4",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-13T01:12:51.447861",
+      "created_timestamp": "2026-03-13T01:12:51.447840",
+      "description": "Strategy derived from successful experiment",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 0,
+      "last_used_timestamp": "2026-03-13T01:12:51.447848",
+      "last_success_timestamp": ""
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:12:51.731840_ae5d75aa-e",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 1,
+      "domains": "[]",
+      "success_rate": "0.9",
+      "created_timestamp": "2026-03-13T01:12:51.447840",
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-13T01:12:51.731819",
+      "timestamp": "2026-03-13T01:12:51.731840",
+      "name": "derived_strategy",
+      "strategy_id": "ae5d75aa-ecea-43b5-948e-07bca7f6c0e4"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:21:17.991105_da7fafb0-9",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-13T01:21:17.991094",
+      "usage_count": 0,
+      "last_success_timestamp": "",
+      "pattern": "[\"research\", \"validate\"]",
+      "strategy_id": "da7fafb0-9355-48c2-a5b8-2f4ff446ebc9",
+      "name": "derived_strategy",
+      "timestamp": "2026-03-13T01:21:17.991105",
+      "success_rate": "1.0",
+      "description": "Strategy derived from successful experiment",
+      "domains": "[]",
+      "created_timestamp": "2026-03-13T01:21:17.991086"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:24:45.345647_c03f9bde-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_success_timestamp": "",
+      "timestamp": "2026-03-13T01:24:45.345647",
+      "created_timestamp": "2026-03-13T01:24:45.345629",
+      "last_used_timestamp": "2026-03-13T01:24:45.345635",
+      "success_rate": "1.0",
+      "strategy_id": "c03f9bde-1fd3-4b3e-b50f-feeeefa31ead",
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "usage_count": 0,
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:32:58.064689_3ddbec06-2",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "created_timestamp": "2026-03-13T01:32:58.064672",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-13T01:32:58.064676",
+      "description": "Strategy derived from successful experiment",
+      "usage_count": 0,
+      "strategy_id": "3ddbec06-21df-4dd8-a3b3-83032ab7d322",
+      "name": "derived_strategy",
+      "domains": "[]",
+      "timestamp": "2026-03-13T01:32:58.064689"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T01:32:58.304694_3ddbec06-2",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_used_timestamp": "2026-03-13T01:32:58.304683",
+      "success_rate": "1.0",
+      "description": "Strategy derived from successful experiment",
+      "strategy_id": "3ddbec06-21df-4dd8-a3b3-83032ab7d322",
+      "timestamp": "2026-03-13T01:32:58.304694",
+      "created_timestamp": "2026-03-13T01:32:58.064672",
+      "name": "derived_strategy",
+      "usage_count": 1,
+      "domains": "[]",
+      "last_success_timestamp": "2026-03-13T01:32:58.304688",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T11:33:49.666430_ecc939b5-8",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-13T11:33:49.666415",
+      "strategy_id": "ecc939b5-85b6-4ee6-90a4-27e6435f4c7b",
+      "name": "derived_strategy",
+      "description": "Strategy derived from successful experiment",
+      "success_rate": "1.0",
+      "timestamp": "2026-03-13T11:33:49.666430",
+      "domains": "[]",
+      "created_timestamp": "2026-03-13T11:33:49.666412",
+      "usage_count": 0,
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T11:35:14.942538_fda84c30-1",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "last_success_timestamp": "",
+      "success_rate": "1.0",
+      "pattern": "[\"research\", \"validate\"]",
+      "name": "derived_strategy",
+      "strategy_id": "fda84c30-18dd-49a6-9649-2cc9d6a88901",
+      "created_timestamp": "2026-03-13T11:35:14.942514",
+      "domains": "[]",
+      "usage_count": 0,
+      "timestamp": "2026-03-13T11:35:14.942538",
+      "description": "Strategy derived from successful experiment",
+      "last_used_timestamp": "2026-03-13T11:35:14.942521"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T11:37:04.076192_d45d0ec1-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "description": "Strategy derived from successful experiment",
+      "last_success_timestamp": "",
+      "domains": "[]",
+      "name": "derived_strategy",
+      "success_rate": "1.0",
+      "last_used_timestamp": "2026-03-13T11:37:04.076177",
+      "strategy_id": "d45d0ec1-b383-4200-84c9-0acfc2277e32",
+      "usage_count": 0,
+      "created_timestamp": "2026-03-13T11:37:04.076168",
+      "timestamp": "2026-03-13T11:37:04.076192",
+      "pattern": "[\"research\", \"validate\"]"
+    }
+  },
+  {
+    "id": "strat_obj_2026-03-13T11:37:04.327975_d45d0ec1-b",
+    "text": "derived_strategy: Strategy derived from successful experiment\nPattern: research -> validate",
+    "meta": {
+      "domains": "[]",
+      "description": "Strategy derived from successful experiment",
+      "strategy_id": "d45d0ec1-b383-4200-84c9-0acfc2277e32",
+      "last_success_timestamp": "",
+      "last_used_timestamp": "2026-03-13T11:37:04.327958",
+      "created_timestamp": "2026-03-13T11:37:04.076168",
+      "success_rate": "0.9",
+      "usage_count": 1,
+      "name": "derived_strategy",
+      "pattern": "[\"research\", \"validate\"]",
+      "timestamp": "2026-03-13T11:37:04.327975"
+    }
+  },
+  {
+    "id": "strat_2026-03-13T18:35:35.359987_swe_repair",
+    "text": "{\"topic\": \"rate_limiter_failure_simulation\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "runs": 1,
+      "avg_score": 10.0,
+      "timestamp": "2026-03-13T18:35:35.359987",
+      "outcome": "success",
+      "success_rate": 1.0,
+      "score": "10.0",
+      "topic": "swe_repair"
+    }
+  },
+  {
+    "id": "strat_2026-03-13T20:16:05.528996_swe_repair",
+    "text": "{\"topic\": \"rate_limiter_failure_simulation\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "topic": "swe_repair",
+      "score": "10.0",
+      "timestamp": "2026-03-13T20:16:05.528996",
+      "runs": 2,
+      "success_rate": 1.0,
+      "avg_score": 10.0,
+      "outcome": "success"
+    }
+  },
+  {
+    "id": "strat_2026-03-13T20:22:41.344081_swe_repair",
+    "text": "{\"topic\": \"rate_limiter_failure_simulation\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "outcome": "success",
+      "runs": 3,
+      "timestamp": "2026-03-13T20:22:41.344081",
+      "score": "10.0",
+      "success_rate": 1.0,
+      "avg_score": 10.0,
+      "topic": "swe_repair"
+    }
+  },
+  {
+    "id": "strat_2026-03-23T13:14:08.077499_swe_repair",
+    "text": "{\"topic\": \"ghost bug handling and debugging\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "outcome": "success",
+      "success_rate": 1.0,
+      "timestamp": "2026-03-23T13:14:08.077499",
+      "runs": 4,
+      "score": "10.0",
+      "avg_score": 10.0,
+      "topic": "swe_repair"
+    }
+  },
+  {
+    "id": "strat_2026-03-23T13:19:22.243379_swe_repair",
+    "text": "{\"topic\": \"race condition handling and debugging\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "score": "10.0",
+      "success_rate": 1.0,
+      "runs": 5,
+      "outcome": "success",
+      "topic": "swe_repair",
+      "avg_score": 10.0,
+      "timestamp": "2026-03-23T13:19:22.243379"
+    }
+  },
+  {
+    "id": "strat_2026-03-23T13:30:04.960704_swe_repair",
+    "text": "{\"topic\": \"heap data structure and priority queue\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "outcome": "success",
+      "runs": 6,
+      "topic": "swe_repair",
+      "success_rate": 1.0,
+      "score": "10.0",
+      "avg_score": 10.0,
+      "timestamp": "2026-03-23T13:30:04.960704"
+    }
+  },
+  {
+    "id": "strat_2026-03-25T00:42:16.303211_swe_repair",
+    "text": "{\"topic\": \"http client implementation python\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "score": "10.0",
+      "outcome": "success",
+      "success_rate": 1.0,
+      "timestamp": "2026-03-25T00:42:16.303211",
+      "topic": "swe_repair",
+      "avg_score": 10.0,
+      "runs": 7
+    }
+  },
+  {
+    "id": "strat_2026-03-26T23:47:32.729272_swe_repair",
+    "text": "{\"topic\": \"template parser handling and debugging\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "avg_score": 10.0,
+      "score": "10.0",
+      "timestamp": "2026-03-26T23:47:32.729272",
+      "runs": 8,
+      "outcome": "success",
+      "topic": "swe_repair",
+      "success_rate": 1.0
+    }
+  },
+  {
+    "id": "strat_2026-03-27T01:53:33.843695_swe_repair",
+    "text": "{\"topic\": \"redis data structures python\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "outcome": "success",
+      "runs": 9,
+      "timestamp": "2026-03-27T01:53:33.843695",
+      "score": "10.0",
+      "success_rate": 1.0,
+      "avg_score": 10.0,
+      "topic": "swe_repair"
+    }
+  },
+  {
+    "id": "strat_2026-03-27T15:58:42.281393_swe_repair",
+    "text": "{\"topic\": \"Integration of rest api and quantum linear key-recovery attacks\", \"repair\": \"llm_patch\"}",
+    "meta": {
+      "score": "10.0",
+      "avg_score": 10.0,
+      "success_rate": 1.0,
+      "timestamp": "2026-03-27T15:58:42.281393",
+      "runs": 10,
+      "outcome": "success",
+      "topic": "swe_repair"
+    }
+  }
+]
