@@ -31,12 +31,8 @@
     "ttl cache handling and debugging",
     "algorithm complexity and performance optimization"
   ],
-  "last_updated": "2026-04-01T21:06:29.901601+00:00",
+  "last_updated": "2026-04-02T11:39:13.883966+00:00",
   "update_log": [
-    {
-      "ts": "2026-04-01T18:52:14.669450+00:00",
-      "msg": "certified: algorithm complexity and performance optimization (score=8.3)"
-    },
     {
       "ts": "2026-04-01T18:56:35.607773+00:00",
       "msg": "certified: graph traversal algorithms bfs dfs (score=8.5)"
@@ -152,6 +148,10 @@
     {
       "ts": "2026-04-01T21:06:29.901601+00:00",
       "msg": "frustration: graph traversal algorithms bfs dfs (5 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-02T11:39:13.883966+00:00",
+      "msg": "frustration: python fundamentals review (8 hits) -> avoid_domains"
     }
   ]
 }

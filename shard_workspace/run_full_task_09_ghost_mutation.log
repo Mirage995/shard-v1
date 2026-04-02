@@ -1,0 +1,55 @@
+23:27:43 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_09_ghost_mutation
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+  [memory] Injecting 10 past session(s) into Attempt 1 prompt
+  [self] Self-profile injected (204 chars)
+  [kb] Injected 3031 chars of knowledge base context into prompt
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (5,536 chars)
+  [llm] Calling... 23:28:06 [shard.llm_router] INFO: [LLM_ROUTER] Gemini Flash client initialized OK.
+23:28:06 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:07 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:07 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (218 chars)
+OK (218 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (10 lines)
+  [pytest] Running test_task9.py... 23:28:07 [shard.db] INFO: [SHARD_DB] Connection established: C:\Users\andre\Desktop\shard_v1\shard_memory\shard.db (WAL mode)
+5 passed, 5 failed
+    FAIL: test_c06
+    FAIL: test_c07
+    FAIL: test_c08
+    FAIL: test_c09
+    FAIL: test_c10
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (2,670 chars)
+  [llm] Calling... 23:28:07 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:08 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:08 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (325 chars)
+OK (325 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (13 lines)
+  [pytest] Running test_task9.py... ALL PASSED (10 tests)
+
+====================================================================
+  VICTORY on attempt 2/5
+  Tests passed: 10
+  Total time: 28.3s
+====================================================================
+

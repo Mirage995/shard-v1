@@ -1,0 +1,112 @@
+23:17:47 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+23:17:53 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu
+23:17:53 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+23:17:58 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_02_ghost_bug'  reason=A:streak=-16  pre_fp=110fc1cfd736  pre_strategies=['exception', 'hash_map', 'sorting', 'two_pointers']  restored to original source.
+23:17:58 [shard.db] INFO: [SHARD_DB] Connection established: C:\Users\andre\Desktop\shard_v1\shard_memory\shard.db (WAL mode)
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+  [memory] Injecting 10 past session(s) into Attempt 1 prompt
+  [self] Self-profile injected (297 chars)
+  [kb] Injected 6329 chars of knowledge base context into prompt
+  [semantic] Injected 1273 chars of semantic memory into prompt
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (23,217 chars)
+  [llm] Calling... 23:17:59 [shard.llm_router] INFO: [LLM_ROUTER] Gemini Flash client initialized OK.
+23:17:59 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:18:12 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:18:12 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (8236 chars)
+23:18:12 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_02_ghost_bug'  pre=110fc1cfd736 \u2192 post=73ac8cb38669  agency_score=0.378  verdict=SIMILAR (partial variation, bias dominant)
+OK (8,236 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (207 lines)
+  [post-pivot] agency_score=0.378  verdict=SIMILAR (partial variation, bias dominant)
+  [conc_sim] Probing thread safety... 23:18:12 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on fixed_pipeline.py
+OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (20,256 chars)
+  [llm] Calling... 23:18:12 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:18:23 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:18:23 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (8239 chars)
+OK (8,239 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (207 lines)
+  [conc_sim] Probing thread safety... 23:18:23 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on fixed_pipeline.py
+OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 3/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [SHARD FEEDBACK] Correction prompt (23,498 chars)
+  [llm] Calling... 23:18:24 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:18:35 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:18:35 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (8239 chars)
+OK (8,239 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (207 lines)
+  [conc_sim] Probing thread safety... 23:18:35 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on fixed_pipeline.py
+OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 4/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [SHARD FEEDBACK] Correction prompt (26,080 chars)
+  [llm] Calling... 23:18:37 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:18:48 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:18:48 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (8321 chars)
+OK (8,321 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (210 lines)
+  [conc_sim] Probing thread safety... 23:18:48 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on fixed_pipeline.py
+OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 5/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [SHARD FEEDBACK] Correction prompt (28,744 chars)
+  [llm] Calling... 23:18:49 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:19:00 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:19:00 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (8421 chars)
+OK (8,421 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (211 lines)
+  [conc_sim] Probing thread safety... 23:19:00 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on fixed_pipeline.py
+OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+====================================================================
+  FAILED after 5 attempts
+  Best score: 15/16 tests
+  Total time: 75.3s
+====================================================================
+
+  [benchmark->NightRunner] Queued 0 study topic(s): ['ghost bug handling and debugging', '# Task 02 — The Ghost Bug']

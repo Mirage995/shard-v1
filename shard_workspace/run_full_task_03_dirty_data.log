@@ -1,0 +1,90 @@
+23:27:43 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_03_dirty_data
+  Language: PYTHON
+  Source: legacy_processor.py -> optimized_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+  [memory] Injecting 10 past session(s) into Attempt 1 prompt
+  [self] Self-profile injected (198 chars)
+  [kb] Injected 4872 chars of knowledge base context into prompt
+  [semantic] Injected 1291 chars of semantic memory into prompt
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (17,563 chars)
+  [llm] Calling... 23:28:05 [shard.llm_router] INFO: [LLM_ROUTER] Gemini Flash client initialized OK.
+23:28:05 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:14 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:14 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (6581 chars)
+OK (6,581 chars)
+  [syntax] Valid
+  [write] optimized_processor.py (204 lines)
+  [conc_sim] Probing thread safety... 23:28:14 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on optimized_processor.py
+OK (thread-safe)
+  [pytest] Running test_task3.py... 23:28:17 [shard.db] INFO: [SHARD_DB] Connection established: C:\Users\andre\Desktop\shard_v1\shard_memory\shard.db (WAL mode)
+23 passed, 1 failed
+    FAIL: test_faster_than_legacy
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (16,740 chars)
+  [llm] Calling... 23:28:17 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:26 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:26 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (6379 chars)
+OK (6,379 chars)
+  [syntax] Valid
+  [write] optimized_processor.py (194 lines)
+  [conc_sim] Probing thread safety... 23:28:26 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on optimized_processor.py
+OK (thread-safe)
+  [pytest] Running test_task3.py... 23 passed, 1 failed
+    FAIL: test_faster_than_legacy
+
+--------------------------------------------------
+  Attempt 3/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_faster_than_legacy']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [SHARD FEEDBACK] Correction prompt (19,993 chars)
+  [llm] Calling... 23:28:31 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:40 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:40 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (6379 chars)
+OK (6,379 chars)
+  [syntax] Valid
+  [write] optimized_processor.py (194 lines)
+  [conc_sim] Probing thread safety... 23:28:40 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on optimized_processor.py
+OK (thread-safe)
+  [pytest] Running test_task3.py... 23 passed, 1 failed
+    FAIL: test_faster_than_legacy
+
+--------------------------------------------------
+  Attempt 4/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_faster_than_legacy']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [SHARD FEEDBACK] Correction prompt (22,292 chars)
+  [llm] Calling... 23:28:44 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:52 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:52 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (6179 chars)
+OK (6,179 chars)
+  [syntax] Valid
+  [write] optimized_processor.py (186 lines)
+  [conc_sim] Probing thread safety... 23:28:52 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected — running probes on optimized_processor.py
+OK (thread-safe)
+  [pytest] Running test_task3.py... ALL PASSED (24 tests)
+
+====================================================================
+  VICTORY on attempt 4/5
+  Tests passed: 24
+  Total time: 74.6s
+====================================================================
+

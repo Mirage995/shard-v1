@@ -1,0 +1,38 @@
+23:27:43 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu
+23:27:56 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_08_multi_file_labyrinth
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+  [memory] Injecting 10 past session(s) into Attempt 1 prompt
+  [self] Self-profile injected (210 chars)
+  [kb] Injected 6499 chars of knowledge base context into prompt
+  [semantic] Injected 868 chars of semantic memory into prompt
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (10,232 chars)
+  [llm] Calling... 23:28:05 [shard.llm_router] INFO: [LLM_ROUTER] Gemini Flash client initialized OK.
+23:28:05 [google_genai.models] INFO: AFC is enabled with max remote calls: 10.
+23:28:06 [httpx] INFO: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+23:28:06 [shard.llm_router] INFO: [LLM_ROUTER] Gemini OK (162 chars)
+OK (162 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (8 lines)
+  [pytest] Running test_task8.py... ALL PASSED (10 tests)
+
+====================================================================
+  VICTORY on attempt 1/5
+  Tests passed: 10
+  Total time: 25.9s
+====================================================================
+

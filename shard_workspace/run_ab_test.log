@@ -1,0 +1,519 @@
+[ab] Running 3 conditions × 3 tasks
+
+====================================================================
+A/B TEST: task_02_ghost_bug
+====================================================================
+
+--- Condition: BASELINE ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+  [gate] Selected: self_profile     score=0.85  (197 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (3,771 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,329 chars)  [knowledge_base]
+  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]
+  [ab] strategy_mode=baseline activated=False score=0.000
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (19,691 chars)
+  [llm] Calling... OK (8,153 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (204 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (20,173 chars)
+  [llm] Calling... OK (8,233 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (207 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 3/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [diag] Named diagnostic: !! IDEMPOTENCY DIAGNOSTIC !!
+  [SHARD FEEDBACK] Correction prompt (24,181 chars)
+  [llm] Calling... OK (8,298 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (208 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... ALL PASSED (16 tests)
+  [learning] IDEMPOTENCY: 1.100 +> 1.150 (success)
+
+====================================================================
+  VICTORY on attempt 3/5
+  Tests passed: 16
+  Total time: 54.4s
+====================================================================
+
+  >> PASS in 3 attempts | strategy=OFF score=0.000 | hash=c23ceadd
+
+--- Condition: NORMAL ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] Selected: self_profile     score=0.85  (197 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (3,771 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,329 chars)  [knowledge_base]
+  [gate] Dropped : semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]
+  [gate] Selected: strategy         score=0.82  (662 chars)  [3 past strategies (avg_score=7.4)]
+  [ab] strategy_mode=normal activated=True score=0.816
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (19,061 chars)
+  [llm] Calling... OK (8,180 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (207 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (20,200 chars)
+  [llm] Calling... OK (8,261 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (210 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 3/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [diag] Named diagnostic: !! IDEMPOTENCY DIAGNOSTIC !!
+  [SHARD FEEDBACK] Correction prompt (24,209 chars)
+  [llm] Calling... OK (8,326 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (211 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... ALL PASSED (16 tests)
+  [learning] IDEMPOTENCY: 1.150 +> 1.200 (success)
+
+====================================================================
+  VICTORY on attempt 3/5
+  Tests passed: 16
+  Total time: 42.5s
+====================================================================
+
+  >> PASS in 3 attempts | strategy=ON score=0.816 | hash=f2f7f540
+
+--- Condition: FORCED ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] forced: strategy in slot 1, 2 others fill slots 2-3
+  [gate] Selected: self_profile     score=0.85  (197 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (3,771 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,329 chars)  [knowledge_base]
+  [gate] Dropped : semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]
+  [gate] Selected: strategy         score=0.82  (662 chars)  [3 past strategies (avg_score=7.4)]
+  [ab] strategy_mode=forced activated=True score=0.816
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (19,061 chars)
+  [llm] Calling... OK (8,095 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (204 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (20,115 chars)
+  [llm] Calling... OK (8,184 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (208 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... 15 passed, 1 failed
+    FAIL: test_calibration_idempotent
+
+--------------------------------------------------
+  Attempt 3/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [stuck] 1 test(s) stuck across attempts: ['test_calibration_idempotent']
+  [diag] Execution diagnostics injected for 1 stuck test(s)
+  [diag] Named diagnostic: !! IDEMPOTENCY DIAGNOSTIC !!
+  [SHARD FEEDBACK] Correction prompt (24,132 chars)
+  [llm] Calling... OK (8,249 chars)
+  [syntax] Valid
+  [write] fixed_pipeline.py (209 lines)
+  [conc_sim] Probing thread safety... OK (thread-safe)
+  [pytest] Running test_task2.py... ALL PASSED (16 tests)
+  [learning] IDEMPOTENCY: 1.200 +> 1.250 (success)
+
+====================================================================
+  VICTORY on attempt 3/5
+  Tests passed: 16
+  Total time: 42.9s
+====================================================================
+
+  >> PASS in 3 attempts | strategy=ON score=0.816 | hash=a54c6341
+
+====================================================================
+A/B TEST: task_04_race_condition
+====================================================================
+
+--- Condition: BASELINE ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_04_race_condition
+  Language: PYTHON
+  Source: bank.py -> fixed_bank.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+  [gate] Selected: self_profile     score=0.85  (202 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,620 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,911 chars)  [knowledge_base]
+  [gate] Selected: semantic_memory  score=0.78  (1,306 chars)  [semantic_memory]
+  [ab] strategy_mode=baseline activated=False score=0.000
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (12,163 chars)
+  [llm] Calling... OK (3,416 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (93 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE: GLOBAL TIMEOUT — simulator exceeded 60s
+   FIX: Add threading.Lock() to all balance-modifying methods.
+  [pytest] Running test_task4.py... 0 passed, 0 failed
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (7,629 chars)
+  [llm] Calling... OK (3,417 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (93 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE_DEADLOCK: OK
+   OK: PROBE_DEPOSITS, PROBE_CONSERVATION, PROBE_DEADLOCK
+   FIX: Deadlock in transfer(): acquire locks in SORTED order (sort account ids before locking both) to prevent circular waits.
+  [pytest] Running test_task4.py... ALL PASSED (16 tests)
+
+====================================================================
+  VICTORY on attempt 2/5
+  Tests passed: 16
+  Total time: 131.8s
+====================================================================
+
+  >> PASS in 2 attempts | strategy=OFF score=0.000 | hash=142c80a0
+
+--- Condition: NORMAL ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_04_race_condition
+  Language: PYTHON
+  Source: bank.py -> fixed_bank.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] Selected: self_profile     score=0.85  (202 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,620 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,911 chars)  [knowledge_base]
+  [gate] Dropped : semantic_memory  score=0.78  (1,306 chars)  [semantic_memory]
+  [gate] Selected: strategy         score=0.81  (662 chars)  [3 past strategies (avg_score=7.3)]
+  [ab] strategy_mode=normal activated=True score=0.806
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (11,518 chars)
+  [llm] Calling... OK (3,242 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (86 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE: GLOBAL TIMEOUT — simulator exceeded 60s
+   FIX: Add threading.Lock() to all balance-modifying methods.
+  [pytest] Running test_task4.py... 0 passed, 0 failed
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (7,455 chars)
+  [llm] Calling... OK (3,243 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (86 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE_DEADLOCK: OK
+   OK: PROBE_DEPOSITS, PROBE_CONSERVATION, PROBE_DEADLOCK
+   FIX: Deadlock in transfer(): acquire locks in SORTED order (sort account ids before locking both) to prevent circular waits.
+  [pytest] Running test_task4.py... ALL PASSED (16 tests)
+
+====================================================================
+  VICTORY on attempt 2/5
+  Tests passed: 16
+  Total time: 131.5s
+====================================================================
+
+  >> PASS in 2 attempts | strategy=ON score=0.806 | hash=07f3f9f4
+
+--- Condition: FORCED ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_04_race_condition
+  Language: PYTHON
+  Source: bank.py -> fixed_bank.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] forced: strategy in slot 1, 2 others fill slots 2-3
+  [gate] Selected: self_profile     score=0.85  (202 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,620 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,911 chars)  [knowledge_base]
+  [gate] Dropped : semantic_memory  score=0.78  (1,306 chars)  [semantic_memory]
+  [gate] Selected: strategy         score=0.81  (662 chars)  [3 past strategies (avg_score=7.3)]
+  [ab] strategy_mode=forced activated=True score=0.806
+  [golden] Existing solution passes 16 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 16 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (11,518 chars)
+  [llm] Calling... OK (3,242 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (86 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE: GLOBAL TIMEOUT — simulator exceeded 60s
+   FIX: Add threading.Lock() to all balance-modifying methods.
+  [pytest] Running test_task4.py... 0 passed, 0 failed
+
+--------------------------------------------------
+  Attempt 2/5  [SHARD FEEDBACK]
+--------------------------------------------------
+  [SHARD FEEDBACK] Correction prompt (7,455 chars)
+  [llm] Calling... OK (3,243 chars)
+  [syntax] Valid
+  [write] fixed_bank.py (86 lines)
+  [conc_sim] Probing thread safety... ISSUES DETECTED
+    [CONC_SIM] ISSUES DETECTED - Race conditions found:
+   >> PROBE_DEADLOCK: OK
+   OK: PROBE_DEPOSITS, PROBE_CONSERVATION, PROBE_DEADLOCK
+   FIX: Deadlock in transfer(): acquire locks in SORTED order (sort account ids before locking both) to prevent circular waits.
+  [pytest] Running test_task4.py... ALL PASSED (16 tests)
+
+====================================================================
+  VICTORY on attempt 2/5
+  Tests passed: 16
+  Total time: 132.5s
+====================================================================
+
+  >> PASS in 2 attempts | strategy=ON score=0.806 | hash=07f3f9f4
+
+====================================================================
+A/B TEST: task_12_note_tag
+====================================================================
+
+--- Condition: BASELINE ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_12_note_tag
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+  [gate] Selected: self_profile     score=0.85  (297 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,572 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (8,596 chars)  [knowledge_base]
+  [gate] Selected: semantic_memory  score=0.78  (1,288 chars)  [semantic_memory]
+  [ab] strategy_mode=baseline activated=False score=0.000
+  [golden] Existing solution passes 10 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 10 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (11,717 chars)
+  [llm] Calling... OK (1,176 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (36 lines)
+  [pytest] Running test_task12.py... ALL PASSED (10 tests)
+
+====================================================================
+  VICTORY on attempt 1/5
+  Tests passed: 10
+  Total time: 3.6s
+====================================================================
+
+  >> PASS in 1 attempts | strategy=OFF score=0.000 | hash=104e63b9
+
+--- Condition: NORMAL ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_12_note_tag
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] Selected: self_profile     score=0.85  (297 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,572 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (8,596 chars)  [knowledge_base]
+  [gate] Selected: semantic_memory  score=0.78  (1,288 chars)  [semantic_memory]
+  [gate] Dropped : strategy         score=0.71  (662 chars)  [3 past strategies (avg_score=6.4)]
+  [ab] strategy_mode=normal activated=False score=0.706
+  [golden] Existing solution passes 10 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 10 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (11,717 chars)
+  [llm] Calling... OK (1,058 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (31 lines)
+  [pytest] Running test_task12.py... ALL PASSED (10 tests)
+
+====================================================================
+  VICTORY on attempt 1/5
+  Tests passed: 10
+  Total time: 4.4s
+====================================================================
+
+  >> PASS in 1 attempts | strategy=OFF score=0.706 | hash=d38af6c3
+
+--- Condition: FORCED ---
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_12_note_tag
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (442 strategies stored)
+  [gate] forced: strategy in slot 1, 2 others fill slots 2-3
+  [gate] Selected: self_profile     score=0.85  (196 chars)  [self_profile]
+  [gate] Dropped : episodic         score=0.64  (1,572 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (8,596 chars)  [knowledge_base]
+  [gate] Dropped : semantic_memory  score=0.78  (1,288 chars)  [semantic_memory]
+  [gate] Selected: strategy         score=0.71  (662 chars)  [3 past strategies (avg_score=6.4)]
+  [ab] strategy_mode=forced activated=True score=0.706
+  [golden] Existing solution passes 10 test(s) — will protect on regression
+  [pivot] Skipped — golden solution already passes 10 test(s).
+
+--------------------------------------------------
+  Attempt 1/5  [LLM SOLO]
+--------------------------------------------------
+  [LLM SOLO] Initial prompt (10,989 chars)
+  [llm] Calling... OK (1,088 chars)
+  [syntax] Valid
+  [write] fixed_processor.py (31 lines)
+  [pytest] Running test_task12.py... ALL PASSED (10 tests)
+
+====================================================================
+  VICTORY on attempt 1/5
+  Tests passed: 10
+  Total time: 3.8s
+====================================================================
+
+  >> PASS in 1 attempts | strategy=ON score=0.706 | hash=2700d59c
+Traceback (most recent call last):
+  File "C:\Users\andre\desktop\shard_v1\backend\ab_test_runner.py", line 221, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\andre\desktop\shard_v1\backend\ab_test_runner.py", line 217, in main
+    asyncio.run(main_async(task_dirs, args.max_attempts, args.conditions))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\andre\desktop\shard_v1\backend\ab_test_runner.py", line 160, in main_async
+    print(f"Results saved \u2192 {_RESULTS_FILE}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andre\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2192' in position 14: character maps to <undefined>

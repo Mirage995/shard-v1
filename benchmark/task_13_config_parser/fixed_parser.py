@@ -1,22 +1,8 @@
-"""Config parser — parses multi-line key:value configuration text.
-
-Each line is a key:value pair. Supports:
-- Simple values: "host:localhost"
-- Nested values: "endpoint:http://api.example.com:8080"  (value contains colons)
-- Inline comments: "#" at start of line marks a comment
-- Blank lines are ignored
-
-Usage:
-    config = load_config(text)
-    host = get_setting(config, "host", default="localhost")
-"""
-
-
 def parse_line(line):
     """Parse a single 'key:value' line into (key, value) tuple."""
     parts = line.split(":", 1)
     key = parts[0].strip()
-    value = parts[1].strip()
+    value = parts[1].strip() if len(parts) > 1 else ''
     return key, value
 
 
@@ -31,7 +17,8 @@ def load_config(text):
     """
     config = {}
     for line in text.split("\n"):
-        if not line.strip() or line.strip().startswith("#"):
+        line = line.strip()
+        if not line or line.startswith("#"):
             continue
         k, v = parse_line(line)
         config[k] = v

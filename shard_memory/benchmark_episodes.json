@@ -1017,408 +1017,6 @@
   ],
   "task_02_ghost_bug": [
     {
-      "run_id": "d625c04d",
-      "timestamp": "2026-04-01T20:57:40",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000025E40799950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002334F549950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "38f92c09",
-      "timestamp": "2026-04-01T21:26:55",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002244BC69950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000023EE6229950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "cdd1b795",
-      "timestamp": "2026-04-01T21:50:51",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x00000230BEF69950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002BCA4CD9950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "f333f028",
-      "timestamp": "2026-04-01T22:13:09",
-      "success": true,
-      "total_attempts": 3,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001F5D2939950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002A4BEDC9950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
-    },
-    {
-      "run_id": "e9693fa2",
-      "timestamp": "2026-04-01T22:32:37",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": false,
-          "passed": [],
-          "failed": [],
-          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": false,
-          "passed": [],
-          "failed": [],
-          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": false,
-          "passed": [],
-          "failed": [],
-          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": false,
-          "passed": [],
-          "failed": [],
-          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": false,
-          "passed": [],
-          "failed": [],
-          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
-        }
-      ]
-    },
-    {
       "run_id": "5e9d999f",
       "timestamp": "2026-04-01T22:38:55",
       "success": false,
@@ -1667,185 +1265,411 @@
           "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
         }
       ]
+    },
+    {
+      "run_id": "f222a230",
+      "timestamp": "2026-04-02T11:00:18",
+      "success": false,
+      "total_attempts": 5,
+      "kb_used": true,
+      "kb_chars": 5451,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ', 'status': 'RESOURCE_EXHAUSTED'}}\n  Groq: Error code: 413 - {'error': {'message': 'Request too large for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per minu"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ', 'status': 'RESOURCE_EXHAUSTED'}}\n  Groq: Error code: 413 - {'error': {'message': 'Request too large for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per minu"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. ', 'status': 'RESOURCE_EXHAUSTED'}}\n  Groq: Error code: 413 - {'error': {'message': 'Request too large for model `llama-3.3-70b-versatile` in organization `org_01kj6aj5svfre8ftctb83ntxy2` service tier `on_demand` on tokens per minu"
+        },
+        {
+          "attempt": 4,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
+        },
+        {
+          "attempt": 5,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": false,
+          "passed": [],
+          "failed": [],
+          "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
+        }
+      ]
+    },
+    {
+      "run_id": "2adbb945",
+      "timestamp": "2026-04-02T11:10:54",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 5451,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages"
+          ],
+          "error_summary": "fresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800, 'offset': 2.0, ...}, 'temp_01': {'group': 'temperature', 'max': 120, 'min': -40, 'offset': -0.3, ...}, ...}\n\n    def test_invalid_readings_excluded_from_averages(self, fixed_module, fresh_readings, fresh_config):\n        \"\"\"Bug 3: Invalid readings must NOT be included in group averages.\"\"\"\n        report, anomalies, groups = fixed_module.run_pipeline(\n            fresh_readings, fresh_config\n        )\n    \n        # temp_02 has one valid (23.1) and"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001F9047C9950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+    },
+    {
+      "run_id": "03c16414",
+      "timestamp": "2026-04-02T11:18:45",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 5451,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000024CB2039950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001A065799950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+    },
+    {
+      "run_id": "d4b01266",
+      "timestamp": "2026-04-02T11:37:58",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 5451,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001F6655F9950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x000002AC49E19950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
+    },
+    {
+      "run_id": "783b3098",
+      "timestamp": "2026-04-02T11:44:22",
+      "success": true,
+      "total_attempts": 3,
+      "kb_used": true,
+      "kb_chars": 5451,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages"
+          ],
+          "error_summary": "fresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800, 'offset': 2.0, ...}, 'temp_01': {'group': 'temperature', 'max': 120, 'min': -40, 'offset': -0.3, ...}, ...}\n\n    def test_invalid_readings_excluded_from_averages(self, fixed_module, fresh_readings, fresh_config):\n        \"\"\"Bug 3: Invalid readings must NOT be included in group averages.\"\"\"\n        report, anomalies, groups = fixed_module.run_pipeline(\n            fresh_readings, fresh_config\n        )\n    \n        # temp_02 has one valid (23.1) and"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [
+            "test_calibration_idempotent"
+          ],
+          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000021311B29950>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
+        },
+        {
+          "attempt": 3,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_pipeline_runs",
+            "test_pipeline_returns_correct_types",
+            "test_buggy_pipeline_crashes",
+            "test_no_mutation_of_input",
+            "test_calibration_idempotent",
+            "test_invalid_readings_excluded_from_averages",
+            "test_detect_anomalies_correct_key",
+            "test_report_correct_keys",
+            "test_validation_counts",
+            "test_calibration_values",
+            "test_group_averages",
+            "test_three_groups_present",
+            "test_report_not_empty",
+            "test_idempotent_pipeline_runs",
+            "test_has_all_functions",
+            "test_no_try_except_suppression"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 3. Passing tests: test_pipeline_runs, test_pipeline_returns_correct_types, test_buggy_pipeline_crashes, test_no_mutation_of_input, test_calibration_idempotent, test_invalid_readings_excluded_from_averages"
     }
   ],
   "task_04_race_condition": [
-    {
-      "run_id": "087cb227",
-      "timestamp": "2026-04-01T20:34:47",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 7948,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [],
-          "error_summary": "DEADLOCK SUSPECTED: The test runner timed out -- no tests ran. This strongly indicates a threading deadlock in your code. Common cause: threading.Lock() used in a method that calls another method which also acquires the same lock (non-reentrant). FIX: Replace threading.Lock() with threading.RLock() in __init__. RLock is reentrant -- the same thread can acquire it multiple times."
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_create_and_balance",
-            "test_deposit",
-            "test_withdraw",
-            "test_transfer",
-            "test_insufficient_funds_withdraw",
-            "test_insufficient_funds_transfer",
-            "test_total_funds_conserved",
-            "test_duplicate_account_raises",
-            "test_unknown_account_raises",
-            "test_concurrent_deposits",
-            "test_concurrent_withdrawals_no_overdraft",
-            "test_concurrent_transfers_conserve_money",
-            "test_concurrent_mixed_operations",
-            "test_no_deadlock_bidirectional",
-            "test_has_required_methods",
-            "test_uses_threading_primitives"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
-    },
-    {
-      "run_id": "d63901eb",
-      "timestamp": "2026-04-01T21:01:03",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 7948,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [],
-          "error_summary": "DEADLOCK SUSPECTED: The test runner timed out -- no tests ran. This strongly indicates a threading deadlock in your code. Common cause: threading.Lock() used in a method that calls another method which also acquires the same lock (non-reentrant). FIX: Replace threading.Lock() with threading.RLock() in __init__. RLock is reentrant -- the same thread can acquire it multiple times."
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_create_and_balance",
-            "test_deposit",
-            "test_withdraw",
-            "test_transfer",
-            "test_insufficient_funds_withdraw",
-            "test_insufficient_funds_transfer",
-            "test_total_funds_conserved",
-            "test_duplicate_account_raises",
-            "test_unknown_account_raises",
-            "test_concurrent_deposits",
-            "test_concurrent_withdrawals_no_overdraft",
-            "test_concurrent_transfers_conserve_money",
-            "test_concurrent_mixed_operations",
-            "test_no_deadlock_bidirectional",
-            "test_has_required_methods",
-            "test_uses_threading_primitives"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
-    },
-    {
-      "run_id": "acd4b79d",
-      "timestamp": "2026-04-01T21:29:36",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 7948,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [],
-          "error_summary": "DEADLOCK SUSPECTED: The test runner timed out -- no tests ran. This strongly indicates a threading deadlock in your code. Common cause: threading.Lock() used in a method that calls another method which also acquires the same lock (non-reentrant). FIX: Replace threading.Lock() with threading.RLock() in __init__. RLock is reentrant -- the same thread can acquire it multiple times."
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_create_and_balance",
-            "test_deposit",
-            "test_withdraw",
-            "test_transfer",
-            "test_insufficient_funds_withdraw",
-            "test_insufficient_funds_transfer",
-            "test_total_funds_conserved",
-            "test_duplicate_account_raises",
-            "test_unknown_account_raises",
-            "test_concurrent_deposits",
-            "test_concurrent_withdrawals_no_overdraft",
-            "test_concurrent_transfers_conserve_money",
-            "test_concurrent_mixed_operations",
-            "test_no_deadlock_bidirectional",
-            "test_has_required_methods",
-            "test_uses_threading_primitives"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
-    },
-    {
-      "run_id": "d0de2157",
-      "timestamp": "2026-04-01T21:54:15",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 7948,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [],
-          "error_summary": "DEADLOCK SUSPECTED: The test runner timed out -- no tests ran. This strongly indicates a threading deadlock in your code. Common cause: threading.Lock() used in a method that calls another method which also acquires the same lock (non-reentrant). FIX: Replace threading.Lock() with threading.RLock() in __init__. RLock is reentrant -- the same thread can acquire it multiple times."
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_create_and_balance",
-            "test_deposit",
-            "test_withdraw",
-            "test_transfer",
-            "test_insufficient_funds_withdraw",
-            "test_insufficient_funds_transfer",
-            "test_total_funds_conserved",
-            "test_duplicate_account_raises",
-            "test_unknown_account_raises",
-            "test_concurrent_deposits",
-            "test_concurrent_withdrawals_no_overdraft",
-            "test_concurrent_transfers_conserve_money",
-            "test_concurrent_mixed_operations",
-            "test_no_deadlock_bidirectional",
-            "test_has_required_methods",
-            "test_uses_threading_primitives"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
-    },
     {
       "run_id": "d40758b0",
       "timestamp": "2026-04-01T22:16:25",
@@ -2139,6 +1963,177 @@
           "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
         }
       ]
+    },
+    {
+      "run_id": "175e55cd",
+      "timestamp": "2026-04-02T11:11:50",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 7948,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods"
+          ],
+          "failed": [
+            "test_concurrent_transfers_conserve_money",
+            "test_uses_threading_primitives",
+            "test_concurrent_transfers_conserve_money"
+          ],
+          "error_summary": "        diff = abs(final_total - initial_total)\n>       assert diff < 0.01, (\n            f\"Money conservation violated: started with {initial_total}, \"\n            f\"ended with {final_total} (diff: {diff:+.2f}).\"\n        )\nE       AssertionError: Money conservation violated: started with 10000.0, ended with 11519.679882120567 (diff: +1519.68).\nE       assert 1519.6798821205666 < 0.01\n\ntest_task4.py:193: AssertionError\n________________ TestStructure.test_uses_threading_primitives _________________\n\nself = <test_task4.TestStructure object at 0x000001A3F1AF9E50>\n\n    def test_uses_threading_prim"
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "1c6e4df7",
+      "timestamp": "2026-04-02T11:19:09",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 7948,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "2a689ae3",
+      "timestamp": "2026-04-02T11:38:31",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 7948,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
+    },
+    {
+      "run_id": "14da2107",
+      "timestamp": "2026-04-02T11:44:57",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 7948,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_create_and_balance",
+            "test_deposit",
+            "test_withdraw",
+            "test_transfer",
+            "test_insufficient_funds_withdraw",
+            "test_insufficient_funds_transfer",
+            "test_total_funds_conserved",
+            "test_duplicate_account_raises",
+            "test_unknown_account_raises",
+            "test_concurrent_deposits",
+            "test_concurrent_withdrawals_no_overdraft",
+            "test_concurrent_transfers_conserve_money",
+            "test_concurrent_mixed_operations",
+            "test_no_deadlock_bidirectional",
+            "test_has_required_methods",
+            "test_uses_threading_primitives"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
     }
   ],
   "task_01_html_trap": [
@@ -4573,446 +4568,6 @@
   ],
   "task_09_ghost_mutation": [
     {
-      "run_id": "8d5bea3b",
-      "timestamp": "2026-04-01T20:35:25",
-      "success": true,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "fixed_processor.py:10: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x00000274E09DD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        coords_copy = copy.deepcopy(coords)\n        if s:\n            lat, lon = coords_copy\n>           return"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000023EF1C3D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000023CE06DD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           lat, lon = coords[0], coords[1]\n                       ^^^^^^^"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001BD4BFFD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 5. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "0832d91f",
-      "timestamp": "2026-04-01T21:01:39",
-      "success": true,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "fixed_processor.py:10: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000002759B34D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        coords_copy = copy.deepcopy(coords)\n        if s:\n            lat, lon = coords_copy\n>           return"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001C8AF20D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000002C21C8DD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           lat, lon = coords[0], coords[1]\n                       ^^^^^^^"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001D9737CD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 5. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "d710bdeb",
-      "timestamp": "2026-04-01T21:30:13",
-      "success": true,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "fixed_processor.py:10: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x00000138BC07D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        coords_copy = copy.deepcopy(coords)\n        if s:\n            lat, lon = coords_copy\n>           return"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000002743DF5D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000028D253FD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           lat, lon = coords[0], coords[1]\n                       ^^^^^^^"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000020D5FE7D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 5. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
-    {
-      "run_id": "b08cd5cb",
-      "timestamp": "2026-04-01T21:54:51",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "fixed_processor.py:10: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001FEE45DD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        coords_copy = copy.deepcopy(coords)\n        if s:\n            lat, lon = coords_copy\n>           return"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001B32CEDD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x0000012C5A9FD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           lat, lon = coords[0], coords[1]\n                       ^^^^^^^"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001B50631D8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           return round(coords[0] + coords[1], 6)\n                       "
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05"
-          ],
-          "failed": [
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "error_summary": "E           KeyError: 0\n\nfixed_processor.py:7: KeyError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001E7F67ED8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        s = tick()\n        if s:\n>           lat, lon = coords[0], coords[1]\n                       ^^^^^^^"
-        }
-      ]
-    },
-    {
       "run_id": "c9e990d7",
       "timestamp": "2026-04-01T22:17:01",
       "success": false,
@@ -5371,6 +4926,146 @@
           "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
         }
       ]
+    },
+    {
+      "run_id": "f76e80c6",
+      "timestamp": "2026-04-02T11:12:16",
+      "success": true,
+      "total_attempts": 2,
+      "kb_used": true,
+      "kb_chars": 4985,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05"
+          ],
+          "failed": [
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "error_summary": "fixed_processor.py:9: TypeError\n___________________________ TestSequential.test_c10 ___________________________\n\nself = <test_task9.TestSequential object at 0x000001E669ECD8B0>\n\n>   def test_c10(self): assert _proc().process(COORDS) == EXPECTED\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n\ntest_task9.py:41: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ncoords = {'lat': 40.7128, 'lon': -74.006}\n\n    def process(coords):\n        coords_copy = copy.deepcopy(coords)\n        s = tick()\n        if s:\n            lat, lon = coords_copy\n>           return "
+        },
+        {
+          "attempt": 2,
+          "mode": "SHARD FEEDBACK",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 2. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "883a07f0",
+      "timestamp": "2026-04-02T11:19:26",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4985,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "65c2c5da",
+      "timestamp": "2026-04-02T11:38:53",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4985,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
+    },
+    {
+      "run_id": "90b8aec3",
+      "timestamp": "2026-04-02T11:45:16",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4985,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_c01",
+            "test_c02",
+            "test_c03",
+            "test_c04",
+            "test_c05",
+            "test_c06",
+            "test_c07",
+            "test_c08",
+            "test_c09",
+            "test_c10"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
     }
   ],
   "task_10_template_parser": [
@@ -9418,150 +9113,6 @@
   ],
   "task_13_config_parser": [
     {
-      "run_id": "42fc069b",
-      "timestamp": "2026-04-01T20:35:53",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 5585,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_key_value",
-            "test_multiple_lines",
-            "test_whitespace_stripped_from_key",
-            "test_whitespace_stripped_from_value",
-            "test_value_with_colon",
-            "test_value_with_multiple_colons",
-            "test_empty_lines_ignored",
-            "test_comment_lines_ignored",
-            "test_empty_string",
-            "test_existing_key",
-            "test_missing_key_returns_none",
-            "test_missing_key_returns_default",
-            "test_missing_key_default_false",
-            "test_merge_no_overlap",
-            "test_override_wins",
-            "test_base_unchanged"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
-    },
-    {
-      "run_id": "8a526a6a",
-      "timestamp": "2026-04-01T21:02:00",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 5527,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_key_value",
-            "test_multiple_lines",
-            "test_whitespace_stripped_from_key",
-            "test_whitespace_stripped_from_value",
-            "test_value_with_colon",
-            "test_value_with_multiple_colons",
-            "test_empty_lines_ignored",
-            "test_comment_lines_ignored",
-            "test_empty_string",
-            "test_existing_key",
-            "test_missing_key_returns_none",
-            "test_missing_key_returns_default",
-            "test_missing_key_default_false",
-            "test_merge_no_overlap",
-            "test_override_wins",
-            "test_base_unchanged"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
-    },
-    {
-      "run_id": "936eca68",
-      "timestamp": "2026-04-01T21:30:42",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 5527,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_key_value",
-            "test_multiple_lines",
-            "test_whitespace_stripped_from_key",
-            "test_whitespace_stripped_from_value",
-            "test_value_with_colon",
-            "test_value_with_multiple_colons",
-            "test_empty_lines_ignored",
-            "test_comment_lines_ignored",
-            "test_empty_string",
-            "test_existing_key",
-            "test_missing_key_returns_none",
-            "test_missing_key_returns_default",
-            "test_missing_key_default_false",
-            "test_merge_no_overlap",
-            "test_override_wins",
-            "test_base_unchanged"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
-    },
-    {
-      "run_id": "40a98bfc",
-      "timestamp": "2026-04-01T21:55:12",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 5398,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_key_value",
-            "test_multiple_lines",
-            "test_whitespace_stripped_from_key",
-            "test_whitespace_stripped_from_value",
-            "test_value_with_colon",
-            "test_value_with_multiple_colons",
-            "test_empty_lines_ignored",
-            "test_comment_lines_ignored",
-            "test_empty_string",
-            "test_existing_key",
-            "test_missing_key_returns_none",
-            "test_missing_key_returns_default",
-            "test_missing_key_default_false",
-            "test_merge_no_overlap",
-            "test_override_wins",
-            "test_base_unchanged"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
-    },
-    {
       "run_id": "5c363855",
       "timestamp": "2026-04-01T22:17:29",
       "success": true,
@@ -9846,6 +9397,150 @@
           "error_summary": "LLM call failed: [LLM_ROUTER] *** ALL PROVIDERS FAILED ***\n  Gemini: circuit breaker OPEN\n  Groq: circuit breaker OPEN\n  Claude: circuit breaker OPEN"
         }
       ]
+    },
+    {
+      "run_id": "3a602fe5",
+      "timestamp": "2026-04-02T11:12:41",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 5398,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_key_value",
+            "test_multiple_lines",
+            "test_whitespace_stripped_from_key",
+            "test_whitespace_stripped_from_value",
+            "test_value_with_colon",
+            "test_value_with_multiple_colons",
+            "test_empty_lines_ignored",
+            "test_comment_lines_ignored",
+            "test_empty_string",
+            "test_existing_key",
+            "test_missing_key_returns_none",
+            "test_missing_key_returns_default",
+            "test_missing_key_default_false",
+            "test_merge_no_overlap",
+            "test_override_wins",
+            "test_base_unchanged"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
+    },
+    {
+      "run_id": "8fc1f6f7",
+      "timestamp": "2026-04-02T11:19:45",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 5398,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_key_value",
+            "test_multiple_lines",
+            "test_whitespace_stripped_from_key",
+            "test_whitespace_stripped_from_value",
+            "test_value_with_colon",
+            "test_value_with_multiple_colons",
+            "test_empty_lines_ignored",
+            "test_comment_lines_ignored",
+            "test_empty_string",
+            "test_existing_key",
+            "test_missing_key_returns_none",
+            "test_missing_key_returns_default",
+            "test_missing_key_default_false",
+            "test_merge_no_overlap",
+            "test_override_wins",
+            "test_base_unchanged"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
+    },
+    {
+      "run_id": "32d3fe5e",
+      "timestamp": "2026-04-02T11:39:15",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 5398,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_key_value",
+            "test_multiple_lines",
+            "test_whitespace_stripped_from_key",
+            "test_whitespace_stripped_from_value",
+            "test_value_with_colon",
+            "test_value_with_multiple_colons",
+            "test_empty_lines_ignored",
+            "test_comment_lines_ignored",
+            "test_empty_string",
+            "test_existing_key",
+            "test_missing_key_returns_none",
+            "test_missing_key_returns_default",
+            "test_missing_key_default_false",
+            "test_merge_no_overlap",
+            "test_override_wins",
+            "test_base_unchanged"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
+    },
+    {
+      "run_id": "2f3fdab5",
+      "timestamp": "2026-04-02T11:45:35",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 5398,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_simple_key_value",
+            "test_multiple_lines",
+            "test_whitespace_stripped_from_key",
+            "test_whitespace_stripped_from_value",
+            "test_value_with_colon",
+            "test_value_with_multiple_colons",
+            "test_empty_lines_ignored",
+            "test_comment_lines_ignored",
+            "test_empty_string",
+            "test_existing_key",
+            "test_missing_key_returns_none",
+            "test_missing_key_returns_default",
+            "test_missing_key_default_false",
+            "test_merge_no_overlap",
+            "test_override_wins",
+            "test_base_unchanged"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
     }
   ],
   "task_14_boundary_check": [
