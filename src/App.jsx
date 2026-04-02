@@ -4,7 +4,6 @@ import io from 'socket.io-client';
 import Visualizer from './components/Visualizer';
 import TopAudioBar from './components/TopAudioBar';
 import CadWindow from './components/CadWindow';
-import StudyWidget from './components/StudyWidget';
 import BrowserWindow from './components/BrowserWindow';
 import ChatModule from './components/ChatModule';
 import ToolsModule from './components/ToolsModule';
@@ -16,15 +15,7 @@ import AuthLock from './components/AuthLock';
 import KasaWindow from './components/KasaWindow';
 import PrinterWindow from './components/PrinterWindow';
 import SettingsWindow from './components/SettingsWindow';
-import CircuitBackground from './components/CircuitBackground';
-import NightRecapWidget from './components/NightRecapWidget';
-import ClinicaWidget from './components/ClinicaWidget';
-import SkillRadarWidget from './components/SkillRadarWidget';
-import BrainGraphWidget from './components/BrainGraphWidget';
 import VoiceBroadcast from './components/VoiceBroadcast';
-import NightRunnerWidget from './components/NightRunnerWidget';
-import BenchmarkWidget from './components/BenchmarkWidget';
-import SystemStatsWidget from './components/SystemStatsWidget';
 
 
 const socket = io('http://localhost:8000');
@@ -1431,18 +1422,7 @@ function App() {
     return (
         <div className="h-screen w-screen bg-black text-cyan-100 font-mono overflow-hidden flex flex-col relative selection:bg-cyan-900 selection:text-white">
 
-             {/* CIRCUIT BACKGROUND — audio-reactive */}
-        <CircuitBackground socket={socket} />
         <VoiceBroadcast socket={socket} />
-        <NightRunnerWidget socket={socket} />
-        <BenchmarkWidget socket={socket} />
-
-             {/* DASHBOARD WIDGETS */}
-        <NightRecapWidget socket={socket} />
-        <ClinicaWidget socket={socket} />
-        <SkillRadarWidget socket={socket} />
-        <BrainGraphWidget socket={socket} />
-        <SystemStatsWidget />
 
         {/* SSJ4 Phase 3 — Proactive Patch Approval Card */}
         {pendingPatch && (
@@ -1923,7 +1903,6 @@ function App() {
                     onConfirm={handleConfirmTool}
                     onDeny={handleDenyTool}
                 />
-                <StudyWidget socket={socket} /> {/* <--- INCOLLA QUI */}
             </div>
         </div>
     );
