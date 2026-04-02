@@ -28,6 +28,11 @@ out/
 Thumbs.db
 .aider*
 
+# SHARD runtime logs
+shard_workspace/run_*.log
+shard_workspace/strategy_quarantine.json
+shard_workspace/swe_test/
+
 # ── SHARD: Generated sandbox scripts (auto-created by NightRunner) ────────────
 sandbox/
 backend/sandbox/
