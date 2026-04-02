@@ -35,9 +35,20 @@ export default function VoiceBroadcast({ socket }) {
     };
 
     useEffect(() => {
+        // Cancel any speech queued from previous sessions
+        synthRef.current?.cancel();
+        queueRef.current = [];
+        speakingRef.current = false;
+    }, []);
+
+    useEffect(() => {
         if (!socket) return;
 
+        // Ignore events for 3s after connect to avoid replaying cached backend events
+        const connectedAt = Date.now();
+
         const handler = (data) => {
+            if (Date.now() - connectedAt < 3000) return;
             const text = data?.text;
             if (!text) return;
             console.log(`[VOICE BROADCAST] Speaking (${data.priority}): ${text}`);

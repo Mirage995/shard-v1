@@ -1048,7 +1048,7 @@ async def groq_fallback(text: str):
         
         response = await asyncio.to_thread(_call_groq)
         reply = response.choices[0].message.content
-        await sio.emit('transcription', {'text': reply, 'sender': 'assistant'})
+        await sio.emit('transcription', {'text': reply, 'sender': 'SHARD'})
         await sio.emit('status', {'msg': '[GROQ MODE] Gemini offline'})
     except Exception as e:
         await sio.emit('error', {'msg': f'Groq fallback failed: {str(e)}'})

@@ -16,6 +16,8 @@ import KasaWindow from './components/KasaWindow';
 import PrinterWindow from './components/PrinterWindow';
 import SettingsWindow from './components/SettingsWindow';
 import VoiceBroadcast from './components/VoiceBroadcast';
+import CircuitBackground from './components/CircuitBackground';
+import SidebarPanel from './components/SidebarPanel';
 
 
 const socket = io('http://localhost:8000');
@@ -190,65 +192,27 @@ function App() {
             const width = window.innerWidth;
             const height = window.innerHeight;
 
-            // Calculate available vertical space
-            // Tools is fixed at bottom ~100px space
-            const toolsY = height - 100;
-            // ToolsModule uses translate(-50%, -50%). So its Center Y.
-            // Let's reserve bottom 140px for tools to be safe and float it nicely.
-            const toolsCenterY = height - 100;
-
-            const gap = 20;
-
-            // Chat: Anchor is Top-Center (translate(-50%, 0)).
-            // We want Chat Bottom to be above Tools Top.
-            // Tools Top = toolsCenterY - (ToolsHeight/2) approx 40 = height - 140;
-            const chatBottomLimit = height - 140;
-
-            // Dynamic Height Calculation to fit screen
-            // Standard Heights
-            let vizH = 400;
-            let chatH = 250;
             const topBarHeight = 60;
+            const bottomReserve = 70; // tools area
 
-            // Total needed: TopBar + Viz + Gap + Chat + Gap + Tools (140 reserved)
-            const totalNeeded = topBarHeight + vizH + gap + chatH + gap + 140;
-
-            if (height < totalNeeded) {
-                // Scale down
-                const available = height - topBarHeight - 140 - (gap * 2);
-                // Allocate 60% to Viz, 40% to Chat
-                vizH = available * 0.6;
-                chatH = available * 0.4;
-            }
-
-            // Positions
-            // Visualizer (Center Anchored)
-            // Top of Viz = TopBarHeight. Center = TopBarHeight + VizH/2
-            const vizY = topBarHeight + (vizH / 2); // Removed buffer
-
-            // Chat (Top Anchored)
-            // Top of Chat = TopBarHeight + VizH + Gap
-            const chatY = topBarHeight + vizH + gap;
+            // Chat fills the screen below the top bar
+            const chatW = Math.min(920, width - 32);
+            const chatH = height - topBarHeight - bottomReserve;
 
             setElementSizes(prev => ({
                 ...prev,
-                visualizer: { w: Math.min(600, width * 0.8), h: vizH },
-                chat: { w: Math.min(600, width * 0.9), h: chatH }
+                chat: { w: chatW, h: chatH }
             }));
 
             setElementPositions(prev => ({
                 ...prev,
-                visualizer: {
-                    x: width / 2,
-                    y: vizY
-                },
                 chat: {
                     x: width / 2,
-                    y: chatY
+                    y: topBarHeight + 8
                 },
                 tools: {
                     x: width / 2,
-                    y: toolsCenterY
+                    y: height - 35
                 }
             }));
         };
@@ -623,7 +587,6 @@ function App() {
                     numHands: 1
                 });
                 console.log("HandLandmarker initialized successfully!");
-                addMessage('System', 'Hand Tracking Ready');
 
             } catch (error) {
                 console.error("Failed to initialize HandLandmarker:", error);
@@ -1180,10 +1143,11 @@ function App() {
                 const textContent = event.target.result;
                 // Just send the text content directly
                 if (typeof textContent === 'string' && textContent.length > 0) {
-                    socket.emit('upload_memory', { memory: textContent });
-                    addMessage('System', 'Uploading memory...');
+                    const prompt = `[FILE: ${file.name}]\n\n${textContent}`;
+                    socket.emit('user_input', { text: prompt });
+                    addMessage('You', `📄 ${file.name}`);
                 } else {
-                    addMessage('System', 'Empty or invalid memory file');
+                    addMessage('System', 'Empty or invalid file');
                 }
             } catch (err) {
                 console.error("Error reading file:", err);
@@ -1420,9 +1384,17 @@ function App() {
 
 
     return (
-        <div className="h-screen w-screen bg-black text-cyan-100 font-mono overflow-hidden flex flex-col relative selection:bg-cyan-900 selection:text-white">
+        <div className="h-screen w-screen bg-[#020d1a] text-cyan-100 font-mono overflow-hidden flex flex-col relative selection:bg-cyan-900 selection:text-white">
 
         <VoiceBroadcast socket={socket} />
+
+        <SidebarPanel
+            mood={shardMood}
+            messages={messages}
+            isConnected={isConnected}
+            isMuted={isMuted}
+            socket={socket}
+        />
 
         {/* SSJ4 Phase 3 — Proactive Patch Approval Card */}
         {pendingPatch && (
@@ -1568,17 +1540,31 @@ function App() {
                 </div>
             )}
 
-            {/* Background Grid/Effects - ALIVE BACKGROUND (Fixed: Static opacity) */}
-            <div
-                className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black z-0 pointer-events-none"
-                style={{ opacity: 0.6 }}
-            ></div>
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 z-0 pointer-events-none mix-blend-overlay"></div>
+            {/* Background: Circuit traces converging to reactor */}
+            <CircuitBackground socket={socket} />
 
-            {/* Ambient Glow (Fixed: Static) */}
+            {/* Background: Arc Reactor centered, semi-transparent */}
             <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-900/10 rounded-full blur-[120px] pointer-events-none"
-            />
+                className="fixed pointer-events-none"
+                style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    opacity: 0.85,
+                    zIndex: 1,
+                    width: 480,
+                    height: 480,
+                }}
+            >
+                <Visualizer
+                    audioData={aiAudioData}
+                    isListening={isConnected && !isMuted}
+                    intensity={audioAmp}
+                    width={480}
+                    height={480}
+                    mood={shardMood}
+                />
+            </div>
 
             {/* Top Bar (Draggable) */}
             <div className="z-50 flex items-center justify-between p-2 border-b border-cyan-500/20 bg-black/40 backdrop-blur-md select-none sticky top-0" style={{ WebkitAppRegion: 'drag' }}>
@@ -1611,8 +1597,8 @@ function App() {
                     )}
                 </div>
 
-                {/* Top Visualizer (User Mic) */}
-                <div className="flex-1 flex justify-center mx-4">
+                {/* Top Visualizer (User Mic) - truly centered */}
+                <div className="absolute left-1/2 -translate-x-1/2">
                     <TopAudioBar audioData={micAudioData} />
                 </div>
 
@@ -1634,60 +1620,11 @@ function App() {
                 </div>
             </div>
 
-                {/* File Upload Widget */}
-                <div className="fixed top-12 left-4 z-30 w-48">
-                   <div className="border border-cyan-400/40 bg-black/60 backdrop-blur-md rounded-lg p-2 shadow-[0_0_15px_rgba(0,238,255,0.08)]">
-                       <div className="text-[10px] text-cyan-500/70 tracking-widest mb-2 font-mono">◈ FILE INPUT</div>
-                       <label className="flex flex-col items-center justify-center w-full h-16 border border-dashed border-cyan-500/40 rounded cursor-pointer hover:border-cyan-400/70 hover:bg-cyan-500/5 transition-all">
-                          <span className="text-[10px] text-cyan-500/50 font-mono">DRAG OR CLICK</span>
-                          <span className="text-[9px] text-cyan-700 font-mono mt-1">PDF · TXT · DOCX</span>
-                          <input type="file" className="hidden" accept=".pdf,.txt,.docx,.md"
-                              onChange={(e) => {
-                                  const file = e.target.files[0];
-                                  if (file) console.log('File selezionato:', file.name);
-                            }}
-                            />
-                    </label>
-                </div>
-            </div>
 
             {/* Main Content */}
             <div className="flex-1 relative z-10 flex flex-col items-center justify-center">
-                {/* Central Visualizer (AI Audio) */}
-                <div
-                    id="visualizer"
-                    className={`absolute flex items-center justify-center transition-all duration-200 
-                        backdrop-blur-xl bg-black/30 border border-white/10 shadow-2xl overflow-visible
-                        ${isModularMode ? (activeDragElement === 'visualizer' ? 'ring-2 ring-green-500 bg-green-500/10' : 'ring-1 ring-yellow-500/30 bg-yellow-500/5') + ' rounded-2xl pointer-events-auto' : 'rounded-2xl pointer-events-none'}
-                    `}
-                    style={{
-                        left: elementPositions.visualizer.x,
-                        top: elementPositions.visualizer.y,
-                        transform: 'translate(-50%, -50%)',
-                        width: elementSizes.visualizer.w,
-                        height: elementSizes.visualizer.h
-                    }}
-                    onMouseDown={(e) => handleMouseDown(e, 'visualizer')}
-                >
-                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay z-10"></div>
-                    <div className="relative z-20">
-                        <Visualizer
-                            audioData={aiAudioData}
-                            isListening={isConnected && !isMuted}
-                            intensity={audioAmp}
-                            width={elementSizes.visualizer.w}
-                            height={elementSizes.visualizer.h}
-                            mood={shardMood}
-                        />
-                    </div>
-                    {isModularMode && <div className={`absolute top-2 right-2 text-xs font-bold tracking-widest z-20 ${activeDragElement === 'visualizer' ? 'text-green-500' : 'text-yellow-500/50'}`}>VISUALIZER</div>}
-                </div>
 
                 {/* Video Feed Overlay */}
-                {/* Floating Project Label */}
-                <div className="absolute top-[70px] left-1/2 -translate-x-1/2 text-cyan-500 text-xs font-mono tracking-widest pointer-events-none z-50 bg-black/50 px-2 py-1 rounded backdrop-blur-sm border border-cyan-400/40 shadow-[0_0_15px_rgba(0,238,255,0.08)]">
-                    PROJECT: {currentProject?.toUpperCase()}
-                </div>
 
                 <div
                     id="video"
@@ -1826,6 +1763,7 @@ function App() {
                     width={elementSizes.chat.w}
                     height={elementSizes.chat.h}
                     onMouseDown={(e) => handleMouseDown(e, 'chat')}
+                    onFileUpload={handleFileUpload}
                 />
 
                 {/* Status Bar */}
