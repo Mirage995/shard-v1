@@ -56,6 +56,7 @@ _TIMEOUT: dict[str, float] = {
     "Claude": 90.0,
     "Groq":   25.0,
     "Gemini": 60.0,   # synthesis su testi lunghi richiede più tempo
+    "OpenAI": 60.0,
 }
 
 # ── Error classification ───────────────────────────────────────────────────────
@@ -137,12 +138,14 @@ _breakers: dict[str, _CircuitBreaker] = {
     "Claude": _CircuitBreaker("Claude"),
     "Groq":   _CircuitBreaker("Groq"),
     "Gemini": _CircuitBreaker("Gemini"),
+    "OpenAI": _CircuitBreaker("OpenAI"),
 }
 
 # ── Semaphores ────────────────────────────────────────────────────────────────
-_CLAUDE_SEMAPHORE = asyncio.Semaphore(3)
-_GROQ_SEMAPHORE  = asyncio.Semaphore(5)
-_GEMINI_SEMAPHORE = asyncio.Semaphore(5)
+_CLAUDE_SEMAPHORE  = asyncio.Semaphore(3)
+_GROQ_SEMAPHORE    = asyncio.Semaphore(5)
+_GEMINI_SEMAPHORE  = asyncio.Semaphore(5)
+_OPENAI_SEMAPHORE  = asyncio.Semaphore(3)
 
 
 # ── Retry + backoff core ───────────────────────────────────────────────────────
@@ -207,6 +210,7 @@ async def _call_with_backoff(
 _anthropic_client = None
 _groq_client      = None
 _gemini_client    = None
+_openai_client    = None
 
 
 def _get_anthropic():
@@ -233,6 +237,20 @@ def _get_groq():
             except ImportError:
                 logger.warning("[LLM_ROUTER] groq package not installed.")
     return _groq_client
+
+
+def _get_openai():
+    global _openai_client
+    if _openai_client is None:
+        key = os.getenv("OPENAI_API_KEY")
+        if key:
+            try:
+                from openai import OpenAI
+                _openai_client = OpenAI(api_key=key)
+                logger.info("[LLM_ROUTER] OpenAI client initialized OK.")
+            except ImportError:
+                logger.warning("[LLM_ROUTER] openai package not installed.")
+    return _openai_client
 
 
 def _get_gemini():
@@ -263,7 +281,7 @@ async def llm_complete(
     system: str = "You are a precise code repair assistant. Output only valid Python code, no markdown.",
     max_tokens: int = 4096,
     temperature: float = 0.1,
-    providers: list[str] = ["Gemini", "Groq", "Claude"]
+    providers: list[str] = ["OpenAI", "Gemini", "Groq", "Claude"]
 ) -> str:
     """Return a completion, trying the specified providers in order.
 
@@ -330,6 +348,36 @@ async def llm_complete(
             else:
                 logger.warning("[LLM_ROUTER] Groq circuit OPEN")
                 errors.append("Groq: circuit breaker OPEN")
+
+        elif provider == "OpenAI":
+            if _breakers["OpenAI"].is_available():
+                openai = _get_openai()
+                if openai:
+                    try:
+                        async def _openai_call():
+                            async with _OPENAI_SEMAPHORE:
+                                def _sync():
+                                    return openai.chat.completions.create(
+                                        model="gpt-4o-mini",
+                                        messages=[
+                                            {"role": "system", "content": system},
+                                            {"role": "user", "content": prompt},
+                                        ],
+                                        temperature=temperature,
+                                        max_tokens=max_tokens,
+                                    )
+                                resp = await asyncio.to_thread(_sync)
+                                return resp.choices[0].message.content.strip()
+
+                        result = await _call_with_backoff("OpenAI", _openai_call)
+                        logger.info("[LLM_ROUTER] OpenAI OK (%d chars)", len(result))
+                        return result
+                    except Exception as exc:
+                        logger.warning("[LLM_ROUTER] OpenAI exhausted -- falling through. Reason: %s", exc)
+                        errors.append(f"OpenAI: {exc}")
+            else:
+                logger.warning("[LLM_ROUTER] OpenAI circuit OPEN")
+                errors.append("OpenAI: circuit breaker OPEN")
 
         elif provider == "Gemini":
             if _breakers["Gemini"].is_available():

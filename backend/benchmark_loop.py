@@ -569,7 +569,7 @@ def _detect_stuck_tests(attempts: list, min_consecutive: int = 2) -> list:
 def _build_correction_prompt(
     source: str, tests: str, current_code: str, attempts: list, output_filename: str,
     stuck_tests: list = None, lang: str = "python", diagnostic: str = "",
-    task_dir: Path = None,
+    task_dir: Path = None, strategy_hint: str = "",
 ) -> str:
     # Full details for every attempt -- the LLM must see the complete history to avoid oscillating
     history_parts = []
@@ -662,6 +662,8 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
                     "rust": "Rust", "go": "Go", "java": "Java"}
     lang_label = _lang_labels.get(lang, lang.capitalize())
 
+    strategy_block = f"\n{strategy_hint}\n" if strategy_hint else ""
+
     return f"""Your previous attempt FAILED the tests. Study the FULL history below and fix ALL failing tests.
 
 === SOURCE CODE (reference) ===
@@ -672,7 +674,7 @@ These tests have NOT improved across {len(attempts)} attempt(s). You MUST change
 
 === FAILURE HISTORY (all attempts) ===
 {history}
-{regression_block}{stuck_block}{diagnostic}{causal_block}
+{regression_block}{stuck_block}{diagnostic}{causal_block}{strategy_block}
 === FIX INSTRUCTIONS ===
 1. Read the FULL history -- earlier attempts may have solved some problems you later broke.
 2. Fix EVERY currently failing test.
@@ -1258,7 +1260,11 @@ async def run_benchmark_loop(
                             print(f"  [strategy_compiler] signal below threshold, discarded")
                     except Exception as _comp_e:
                         logger.debug("[strategy_compiler] failed: %s", _comp_e)
-                if _strat_signal and strategy_mode == "normal":
+                # #22 v1.1: strategy injected on attempt 2+ ONLY
+                # Attempt 1 → model tries freely (no over-constraint)
+                # Attempt 2+ → model failed, now strategies activate
+                # (_strat_signal kept in scope for correction prompt injection below)
+                if _strat_signal and strategy_mode == "forced":
                     _signals.append(_strat_signal)
             except Exception as _strat_e:
                 logger.debug("[strategy] query failed: %s", _strat_e)
@@ -1439,10 +1445,12 @@ async def run_benchmark_loop(
                         print("  [diag] Named diagnostic injected")
             except Exception as _e:
                 logger.debug("[diagnostic_layer] classify_failure failed: %s", _e)
+            # #22 v1.1: inject strategy on attempt 2+ (after first failure)
+            _hint = _strat_signal.content if (_strat_signal and strategy_mode == "normal") else ""
             prompt = _build_correction_prompt(
                 source, tests, current_code, attempts, output_filename,
                 stuck_tests=stuck_tests, lang=lang, diagnostic=diagnostic,
-                task_dir=task_dir,
+                task_dir=task_dir, strategy_hint=_hint,
             )
             print(f"  [SHARD FEEDBACK] Correction prompt ({len(prompt):,} chars)")
 
