@@ -16,6 +16,7 @@ Phase list (in pipeline order):
   9. CertifyRetryGroup   -- VALIDATE -> EVALUATE -> BENCHMARK -> CERTIFY × N
  10. PostStudyPhase      -- meta-learning update, strategy tracking, episodic store (non-fatal)
 """
+import asyncio
 import json
 import re
 import sys
@@ -24,6 +25,7 @@ from datetime import datetime
 from study_pipeline import BasePhase
 from study_context import StudyContext
 from constants import SUCCESS_SCORE_THRESHOLD
+from backend.vlm_ingestion import describe_images
 
 # MAX_RETRY lives here (was a module-level constant in study_agent.py)
 MAX_RETRY = 3
@@ -114,6 +116,18 @@ class AggregatePhase(BasePhase):
         print("[AGGREGATE] Entering phase. Initializing browser...")
         sys.stdout.flush()
         ctx.raw_text = await ctx.agent.phase_aggregate(ctx.sources)
+
+        if ctx.image_paths:
+            await ctx.emit("AGGREGATE", 0, f"Describing {len(ctx.image_paths)} image(s)...")
+            try:
+                visual_text = await asyncio.to_thread(describe_images, ctx.image_paths, ctx.topic)
+            except Exception as e:
+                print(f"[VLM] Non-fatal visual ingestion error: {e}")
+                visual_text = ""
+            if visual_text.strip():
+                ctx.raw_text = "\n\n".join(part for part in [ctx.raw_text.strip(), visual_text.strip()] if part)
+                print(f"[VLM] Appended {len(visual_text)} chars of visual evidence.")
+
         print(f"[AGGREGATE] Phase completed. {len(ctx.raw_text)} chars scraped.")
 
         if not ctx.raw_text.strip():

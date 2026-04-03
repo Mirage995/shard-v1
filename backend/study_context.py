@@ -24,6 +24,7 @@ class StudyContext:
     agent: Any = None                          # back-reference to StudyAgent
     progress: Any = None                       # ProgressTracker instance
     previous_score: Optional[float] = None
+    image_paths: List[str] = field(default_factory=list)
 
     # ── Callbacks (set once at creation) ──────────────────────────────────────
     on_progress: Optional[Callable] = None
