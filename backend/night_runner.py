@@ -273,6 +273,7 @@ class NightRunner:
         # Priority -1: topics queued by ImprovementEngine (SSJ3 proactive self-improvement)
         self._background_mode: bool = False  # True when running alongside an audio session
         self._improvement_topics: list = []
+        self._knowledge_contradiction_detector = None
         self._state: SessionState = SessionState.INIT
 
         self.topic_filter_discards = 0
@@ -312,6 +313,115 @@ class NightRunner:
         
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+
+    def _query_knowledge_conflicts(self, topic: str) -> list[dict]:
+        """Fetch structured GraphRAG conflict rows for the operational detector."""
+        try:
+            from shard_db import query as _db_query
+            return _db_query(
+                """
+                SELECT source_concept, target_concept, relation_type, context, confidence
+                FROM knowledge_graph
+                WHERE relation_type='causes_conflict' AND confidence >= 0.6
+                ORDER BY confidence DESC
+                LIMIT 50
+                """
+            )
+        except Exception as _kg_err:
+            self.logger.debug("[KCD] graph query non-fatal: %s", _kg_err)
+            return []
+
+    def _get_knowledge_contradiction_detector(self):
+        """Lazy-build the operational contradiction detector for the current runner."""
+        if self._knowledge_contradiction_detector is not None:
+            return self._knowledge_contradiction_detector
+        try:
+            from shard_db import query as _db_query
+            from backend.knowledge_contradiction_detector import KnowledgeContradictionDetector
+            self._knowledge_contradiction_detector = KnowledgeContradictionDetector(
+                db_query_fn=_db_query,
+                graphrag_query_fn=self._query_knowledge_conflicts,
+                logger=self.logger,
+            )
+        except Exception as _kcd_err:
+            self.logger.warning("[KCD] Init non-fatal: %s", _kcd_err)
+            self._knowledge_contradiction_detector = None
+        return self._knowledge_contradiction_detector
+
+    def _defer_topic_for_future_cycle(self, topic: str) -> None:
+        """Re-queue a deferred topic without losing it."""
+        if not topic:
+            return
+        try:
+            from backend.improvement_engine import ImprovementEngine as _IE_defer
+            _ie_defer = _IE_defer()
+            _ie_defer.enqueue_topics([topic])
+            try:
+                self._improvement_topics = list(_ie_defer.peek_queue())
+            except Exception:
+                if topic not in self._improvement_topics:
+                    self._improvement_topics.append(topic)
+            self.logger.info("[KCD] Deferred topic re-queued: '%s'", topic)
+        except Exception as _defer_err:
+            self.logger.debug("[KCD] defer non-fatal: %s", _defer_err)
+            if topic not in self._improvement_topics:
+                self._improvement_topics.append(topic)
+
+    def _apply_knowledge_contradiction_analysis(
+        self,
+        analysis: dict | None,
+        topic: str,
+        source: str,
+        reason: str,
+        predicted_score: float | None,
+    ) -> tuple[str, str, str, float | None]:
+        """Apply detector output to the live cycle state.
+
+        MVP behavior:
+        - warn: log only
+        - lower_confidence: replace predicted score using detector metadata
+        - force_prerequisite: switch to prerequisite and defer the original topic
+        - skip_topic: reserved for future rules, not emitted by current MVP
+        """
+        if not analysis or not analysis.get("recommended_action"):
+            return topic, source, reason, predicted_score
+
+        _action = analysis.get("recommended_action")
+        _metadata = dict(analysis.get("metadata") or {})
+        _warning_block = analysis.get("warning_block", "")
+        if _warning_block:
+            self.logger.warning("%s", _warning_block)
+
+        if _action == "lower_confidence" and predicted_score is not None:
+            _adjusted = _metadata.get("adjusted_predicted_score")
+            if isinstance(_adjusted, (int, float)):
+                self.logger.info(
+                    "[KCD] Lowering predicted score for '%s': %.1f -> %.1f",
+                    topic, predicted_score, _adjusted,
+                )
+                predicted_score = float(_adjusted)
+            return topic, source, reason, predicted_score
+
+        if _action == "force_prerequisite":
+            _prereq = str(_metadata.get("prerequisite_topic") or "").strip()
+            if not _prereq:
+                self.logger.warning(
+                    "[KCD] force_prerequisite without prerequisite_topic for '%s' -- degrading to warn",
+                    topic,
+                )
+                return topic, source, reason, predicted_score
+
+            _deferred = str(_metadata.get("deferred_topic") or topic).strip()
+            if _deferred:
+                self._defer_topic_for_future_cycle(_deferred)
+            _defer_reason = str(_metadata.get("defer_reason") or f"pending prerequisite: {_prereq}")
+            self.logger.info(
+                "[KCD] Redirecting '%s' -> prerequisite '%s' and deferring original topic",
+                topic, _prereq,
+            )
+            return _prereq, "prerequisite", _defer_reason, predicted_score
+
+        return topic, source, reason, predicted_score
 
     def _transition(self, new_state: SessionState, detail: str = "") -> None:
         """Log a state transition and update _state."""
@@ -1328,6 +1438,30 @@ class NightRunner:
             else:
                 _cycle_features = {}
                 _predicted_score = None
+
+            # Operational contradiction gate -- runs after prediction, before persona/study.
+            try:
+                _kcd = self._get_knowledge_contradiction_detector()
+                if _kcd is not None:
+                    _analysis = _kcd.analyze(
+                        topic=topic,
+                        predicted_score=_predicted_score,
+                        category=cycle_data.get("source"),
+                        capability_graph=capability_graph,
+                    )
+                    topic, source, reason, _predicted_score = self._apply_knowledge_contradiction_analysis(
+                        _analysis,
+                        topic,
+                        source,
+                        reason,
+                        _predicted_score,
+                    )
+                    cycle_data["topic"] = topic
+                    cycle_data["source"] = source
+                    if _predicted_score is not None:
+                        self.logger.info("[KCD] Final predicted score for '%s': %.1f", topic, _predicted_score)
+            except Exception as _kcd_err:
+                self.logger.debug("[KCD] analyze/apply non-fatal: %s", _kcd_err)
 
             async def on_certify(t, s, e_data):
                 cycle_data["certified"] = True

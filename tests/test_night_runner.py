@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from night_runner import (
+    NightRunner,
     topic_quality,
     is_valid_topic,
     is_trivial_topic,
@@ -251,6 +252,86 @@ class TestSessionState:
     def test_done_is_last(self):
         states = list(SessionState)
         assert states[-1] == SessionState.DONE
+
+
+class TestKnowledgeContradictionHook:
+
+    def test_apply_warn_leaves_cycle_unchanged(self):
+        runner = NightRunner(1, 1, 1, 1)
+        analysis = {
+            "recommended_action": "warn",
+            "warning_block": "[CONTRADICTION WARNING]\nTopic: x",
+            "metadata": {},
+        }
+
+        topic, source, reason, predicted = runner._apply_knowledge_contradiction_analysis(
+            analysis, "topic-a", "curiosity", "original", 6.5
+        )
+
+        assert topic == "topic-a"
+        assert source == "curiosity"
+        assert reason == "original"
+        assert predicted == 6.5
+
+    def test_apply_lower_confidence_uses_adjusted_score(self):
+        runner = NightRunner(1, 1, 1, 1)
+        analysis = {
+            "recommended_action": "lower_confidence",
+            "warning_block": "",
+            "metadata": {"adjusted_predicted_score": 5.5},
+        }
+
+        topic, source, reason, predicted = runner._apply_knowledge_contradiction_analysis(
+            analysis, "topic-a", "curiosity", "original", 7.0
+        )
+
+        assert topic == "topic-a"
+        assert predicted == 5.5
+
+    def test_apply_force_prerequisite_defers_original_topic(self, monkeypatch):
+        runner = NightRunner(1, 1, 1, 1)
+        deferred = []
+        monkeypatch.setattr(runner, "_defer_topic_for_future_cycle", lambda topic: deferred.append(topic))
+        analysis = {
+            "recommended_action": "force_prerequisite",
+            "warning_block": "",
+            "metadata": {
+                "prerequisite_topic": "probability basics",
+                "deferred_topic": "integration of transformer attention and qft",
+                "defer_reason": "pending prerequisite: probability basics",
+            },
+        }
+
+        topic, source, reason, predicted = runner._apply_knowledge_contradiction_analysis(
+            analysis,
+            "integration of transformer attention and qft",
+            "curiosity",
+            "original",
+            6.8,
+        )
+
+        assert deferred == ["integration of transformer attention and qft"]
+        assert topic == "probability basics"
+        assert source == "prerequisite"
+        assert reason == "pending prerequisite: probability basics"
+        assert predicted == 6.8
+
+    def test_apply_force_prerequisite_without_topic_degrades_to_warn(self):
+        runner = NightRunner(1, 1, 1, 1)
+        analysis = {
+            "recommended_action": "force_prerequisite",
+            "warning_block": "",
+            "metadata": {},
+        }
+
+        topic, source, reason, predicted = runner._apply_knowledge_contradiction_analysis(
+            analysis, "topic-a", "curiosity", "original", 6.5
+        )
+
+        assert topic == "topic-a"
+        assert source == "curiosity"
+        assert reason == "original"
+        assert predicted == 6.5
 
 
 if __name__ == "__main__":
