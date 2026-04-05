@@ -1,6 +1,8 @@
 import re
 from typing import Optional
 
+from constants import PROVIDERS_FULL
+
 
 # ── Error pattern -> remediation topic mapping ─────────────────────────────────
 # Each entry: (regex_on_stderr, error_label, remediation_topic_template)
@@ -240,7 +242,7 @@ Be direct and concrete. Output 3-4 sentences maximum. This will be injected dire
                 ),
                 max_tokens=300,
                 temperature=0.4,
-                providers=["Gemini", "Groq", "Claude"],
+                providers=PROVIDERS_FULL,
             )
 
             mode_tag = "[SKEPTICAL]" if skeptical_mode else ""

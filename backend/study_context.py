@@ -25,6 +25,8 @@ class StudyContext:
     progress: Any = None                       # ProgressTracker instance
     previous_score: Optional[float] = None
     image_paths: List[str] = field(default_factory=list)
+    pdf_paths: List[str] = field(default_factory=list)
+    task_context: str = ""          # raw task files (README + code + tests) injected before study
 
     # ── Callbacks (set once at creation) ──────────────────────────────────────
     on_progress: Optional[Callable] = None
@@ -45,6 +47,7 @@ class StudyContext:
     score: float = 0.0
     certified: bool = False
     gaps: List[str] = field(default_factory=list)
+    benchmark_result: Optional[Dict] = None   # post-certify benchmark result (pass_rate, passed, total)
 
     # ── Strategy / meta hints (set by InitPhase) ─────────────────────────────
     best_strategy: Optional[str] = None

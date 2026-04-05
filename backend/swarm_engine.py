@@ -20,6 +20,8 @@ import logging
 import re
 from dataclasses import dataclass
 
+from constants import PROVIDERS_PRIMARY
+
 try:
     from llm_router import llm_complete
 except ImportError:
@@ -463,7 +465,7 @@ async def swarm_complete(
                         system=spec.system_prompt,
                         max_tokens=spec.max_tokens,
                         temperature=0.0,
-                        providers=["Gemini", "Groq"],
+                        providers=PROVIDERS_PRIMARY,
                     )
                 except ImportError:
                     result = await llm_complete(
@@ -471,7 +473,7 @@ async def swarm_complete(
                         system=spec.system_prompt,
                         max_tokens=spec.max_tokens,
                         temperature=0.0,
-                        providers=["Gemini", "Groq"],
+                        providers=PROVIDERS_PRIMARY,
                     )
                 return spec.name, result.strip()
             except Exception as exc:

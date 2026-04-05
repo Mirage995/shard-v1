@@ -60,6 +60,11 @@ class BenchmarkRunner:
         if not tests:
             return _unavailable("no tests in benchmark")
 
+        # Carry forward the dominant input_data type from the generator (or re-derive it).
+        dominant_input_type: str | None = benchmark.get("dominant_input_type")
+        if not dominant_input_type:
+            dominant_input_type = _infer_dominant_type(tests)
+
         if not implementation_code.strip():
             return _unavailable("no implementation code provided")
 
@@ -96,14 +101,15 @@ class BenchmarkRunner:
         )
 
         return {
-            "pass_rate":  pass_rate,
-            "passed":     passed,
-            "failed":     failed,
-            "discarded":  discarded,
-            "total":      total,
-            "details":    details,
-            "available":  True,
-            "success":    total > 0,
+            "pass_rate":           pass_rate,
+            "passed":              passed,
+            "failed":              failed,
+            "discarded":           discarded,
+            "total":               total,
+            "details":             details,
+            "available":           True,
+            "success":             total > 0,
+            "dominant_input_type": dominant_input_type,
         }
 
     # ── Internal helpers ───────────────────────────────────────────────────────
@@ -254,6 +260,26 @@ def _is_infrastructure_error(stderr: str) -> bool:
     """Return True if stderr indicates a Docker/infra failure rather than a code error."""
     low = stderr.lower()
     return any(pat in low for pat in _INFRASTRUCTURE_PATTERNS)
+
+
+def _infer_dominant_type(tests: list) -> str | None:
+    """Best-effort: execute each test's setup and return the type name of input_data."""
+    import ast as _ast
+    counts: dict = {}
+    for t in tests:
+        setup = (t.get("setup") or "").strip()
+        if not setup:
+            continue
+        try:
+            ns: dict = {}
+            exec(compile(_ast.parse(setup), "<setup>", "exec"), ns)
+            t_name = type(ns.get("input_data")).__name__
+            counts[t_name] = counts.get(t_name, 0) + 1
+        except Exception:
+            pass
+    if not counts:
+        return None
+    return max(counts, key=counts.__getitem__)
 
 
 def _is_test_fault(stderr: str, impl_line_count: int) -> bool:

@@ -19,6 +19,8 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from constants import PROVIDERS_PRIMARY
+
 logger = logging.getLogger("shard.prereq")
 
 # ── Tunables ──────────────────────────────────────────────────────────────────
@@ -186,7 +188,7 @@ def _ask_llm(topic: str) -> list[str]:
                 system="You are a computer science curriculum designer. Output only valid JSON arrays.",
                 max_tokens=150,
                 temperature=0.1,
-                providers=["Gemini", "Groq"],
+                providers=PROVIDERS_PRIMARY,
             )
             text = raw.strip()
             start = text.find("[")

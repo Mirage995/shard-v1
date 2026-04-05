@@ -24,7 +24,7 @@ from datetime import datetime
 
 from study_pipeline import BasePhase
 from study_context import StudyContext
-from constants import SUCCESS_SCORE_THRESHOLD
+from constants import SUCCESS_SCORE_THRESHOLD, PROVIDERS_PRIMARY
 from backend.vlm_ingestion import describe_images
 
 # MAX_RETRY lives here (was a module-level constant in study_agent.py)
@@ -90,6 +90,28 @@ class InitPhase(BasePhase):
         except Exception:
             pass  # world model is always non-fatal
 
+        # Principle layer: inject relevant cross-domain principles accumulated over time
+        try:
+            from principle_engine import inject_principles
+            _principles_ctx = inject_principles(ctx.topic)
+            if _principles_ctx:
+                ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _principles_ctx
+                print(f"[PRINCIPLES] Injected principle layer for '{ctx.topic}'")
+        except Exception:
+            pass  # principle layer is always non-fatal
+
+        # Task context: inject actual task files (README + code + tests) as primary signal
+        # This ensures MAP queries are grounded in what SHARD actually needs to solve,
+        # not in generic web results for the topic name.
+        if ctx.task_context:
+            ctx.episode_context = (
+                "[TASK CONTEXT — primary study material]\n"
+                + ctx.task_context
+                + "\n\n"
+                + (ctx.episode_context or "")
+            )
+            print(f"[TASK CONTEXT] Injected {len(ctx.task_context)} chars of task context for '{ctx.topic}'")
+
 
 # ── 2. MapPhase ──────────────────────────────────────────────────────────────
 
@@ -116,6 +138,33 @@ class AggregatePhase(BasePhase):
         print("[AGGREGATE] Entering phase. Initializing browser...")
         sys.stdout.flush()
         ctx.raw_text = await ctx.agent.phase_aggregate(ctx.sources)
+
+        # Prepend task_context as primary signal — overrides noisy web scraping
+        if ctx.task_context:
+            ctx.raw_text = (
+                "[TASK CONTEXT — authoritative source, prioritize over web results]\n"
+                + ctx.task_context
+                + "\n\n[WEB SOURCES]\n"
+                + ctx.raw_text
+            )
+            print(f"[TASK CONTEXT] Prepended to raw_text ({len(ctx.task_context)} chars)")
+
+        if ctx.pdf_paths:
+            await ctx.emit("AGGREGATE", 0, f"Extracting images from {len(ctx.pdf_paths)} PDF(s)...")
+            try:
+                from backend.pdf_extractor import extract_pdf_images, extract_pdf_text
+                import os
+                visual_input_dir = os.path.join(os.path.dirname(__file__), "..", "shard_workspace", "visual_input")
+                for pdf_path in ctx.pdf_paths:
+                    extracted = await asyncio.to_thread(extract_pdf_images, pdf_path, visual_input_dir)
+                    ctx.image_paths.extend(extracted)
+                    print(f"[PDF] Extracted {len(extracted)} images from {pdf_path}")
+                    pdf_text = await asyncio.to_thread(extract_pdf_text, pdf_path)
+                    if pdf_text.strip():
+                        ctx.raw_text = "\n\n".join(p for p in [ctx.raw_text.strip(), f"[PDF TEXT]\n{pdf_text[:8000]}"] if p)
+                        print(f"[PDF] Appended {len(pdf_text)} chars of PDF text.")
+            except Exception as e:
+                print(f"[PDF] Non-fatal PDF extraction error: {e}")
 
         if ctx.image_paths:
             await ctx.emit("AGGREGATE", 0, f"Describing {len(ctx.image_paths)} image(s)...")
@@ -234,6 +283,16 @@ class CrossPollinatePhase(BasePhase):
         )
         if ctx.integration_report:
             await ctx.emit("CROSS_POLLINATE", 0, f"Integration Report: {ctx.integration_report[:100]}...")
+
+        # Extract structured principles and persist to principles.json
+        try:
+            from principle_engine import extract_principles
+            added = extract_principles(ctx.integration_report, ctx.topic)
+            if added:
+                print(f"[PRINCIPLES] Extracted {len(added)} new principles from '{ctx.topic}'")
+        except Exception as _pe_err:
+            print(f"[PRINCIPLES] Non-fatal extraction error: {_pe_err}")
+
         print("[CROSS-POLLINATE] Phase completed.")
 
 
@@ -677,6 +736,10 @@ class CertifyRetryGroup(BasePhase):
                         "winning_code": ctx.codice_generato or "",
                     })
 
+                # Knowledge contradiction check -- fires at certification time
+                # Compares new knowledge against ChromaDB before it pollutes the KB
+                await self._check_knowledge_contradictions(ctx)
+
                 # Self-generated benchmarks post-certification
                 await self._post_certify_benchmarks(ctx)
 
@@ -774,36 +837,131 @@ class CertifyRetryGroup(BasePhase):
         except Exception as ext_err:
             print(f"[STRATEGY] Abstraction extraction error (non-fatal): {ext_err}")
 
-    async def _post_certify_benchmarks(self, ctx: StudyContext) -> None:
-        """Run self-generated benchmarks after certification."""
-        from skill_utils import normalize_capability_name
+    async def _check_knowledge_contradictions(self, ctx: StudyContext) -> None:
+        """Run CertContradictionChecker after certification (non-fatal).
+
+        Compares newly certified knowledge against ChromaDB.
+        Logs MEDIUM+ contradictions to self_inconsistencies.jsonl.
+        """
+        checker = getattr(ctx.agent, "cert_contradiction_checker", None)
+        if not checker:
+            return
         try:
-            capability_name = normalize_capability_name(ctx.topic)
+            result = await checker.check(
+                topic=ctx.topic,
+                structured=ctx.structured,
+            )
+            if result.get("has_contradiction"):
+                severity = result.get("severity", "?")
+                ctype    = result.get("contradiction_type", "?")
+                expl     = result.get("explanation", "")[:120]
+                res      = result.get("resolution", "PENDING")
+                print(
+                    f"[CERT_CONTRADICTION] ⚠️  {severity} {ctype} on '{ctx.topic}' "
+                    f"→ {res} | {expl}"
+                )
+            else:
+                print(f"[CERT_CONTRADICTION] ✓ No contradiction found for '{ctx.topic}'")
+        except Exception as e:
+            print(f"[CERT_CONTRADICTION] Non-fatal error: {e}")
 
-            # Get difficulty from capability graph if available
-            difficulty = 1
-            if ctx.agent.capability_graph and hasattr(ctx.agent.capability_graph, 'get_difficulty'):
+    async def _post_certify_benchmarks(self, ctx: StudyContext) -> None:
+        """Run self-generated benchmarks after certification using real async generator."""
+        try:
+            # Use the real async generate() — NOT the legacy stub
+            benchmark_data = await ctx.agent.benchmark_generator.generate(
+                topic=ctx.topic,
+                synthesized_code=ctx.codice_generato or "",
+                n_tests=3,
+            )
+
+            if not benchmark_data.get("available"):
+                print(f"[BENCHMARK] post-certify: generator unavailable for '{ctx.topic}'")
+                return
+
+            # Run via real async run_benchmark() — signature: (benchmark, implementation_code, topic)
+            result = await ctx.agent.benchmark_runner.run_benchmark(
+                benchmark=benchmark_data,
+                implementation_code=ctx.codice_generato or "",
+                topic=ctx.topic,
+            )
+
+            passed = result.get("passed", 0)
+            total = result.get("total", 0)
+            pass_rate = result.get("pass_rate", 0.0)
+            success = result.get("success", False)
+            status = "PASS" if success else "FAIL"
+            print(f"[BENCHMARK] post-certify '{ctx.topic}' | {passed}/{total} | {status}")
+            ctx.benchmark_result = {
+                "pass_rate":           pass_rate,
+                "passed":              passed,
+                "total":               total,
+                "success":             success,
+                "dominant_input_type": result.get("dominant_input_type"),
+            }
+
+            # Type-mismatch recovery: if 0% pass rate and we know the dominant type,
+            # regenerate the implementation with an explicit type constraint and retry once.
+            dominant_type = result.get("dominant_input_type")
+            if pass_rate == 0.0 and total > 0 and dominant_type:
+                print(
+                    f"[BENCHMARK] 0/{total} pass rate — dominant input_data type is '{dominant_type}'. "
+                    f"Attempting type-constrained regeneration..."
+                )
+                type_regen_prompt = f"""Rewrite a minimal executable Python script for: {ctx.topic}
+
+CRITICAL CONSTRAINT: The function solve(input_data) will be called with input_data of type '{dominant_type}'.
+Your implementation MUST handle {dominant_type} input correctly.
+Do NOT call dict methods (.items(), .keys(), .values()) on a list.
+Do NOT call list methods (.append(), indexing) on a dict.
+Match the actual type.
+
+Previous implementation for reference (type handling was wrong):
+{(ctx.codice_generato or '')[:800]}
+
+Rules:
+- valid Python, no markdown, no explanations, terminates automatically
+- only use: Python stdlib, numpy, math, random, itertools, collections, concurrent.futures
+- NO external APIs, NO pip installs, NO servers or infinite loops
+"""
                 try:
-                    difficulty = ctx.agent.capability_graph.get_difficulty(capability_name) or 1
-                except Exception:
-                    difficulty = 1
+                    new_code = await ctx.agent._think_fast(type_regen_prompt)
+                    if new_code and "```" in new_code:
+                        new_code = "\n".join(
+                            l for l in new_code.split("\n")
+                            if not l.strip().startswith("```")
+                        ).strip()
+                    if new_code and "def solve(" in new_code:
+                        ctx.codice_generato = new_code
+                        retry_result = await ctx.agent.benchmark_runner.run_benchmark(
+                            benchmark=benchmark_data,
+                            implementation_code=new_code,
+                            topic=ctx.topic,
+                        )
+                        r_passed = retry_result.get("passed", 0)
+                        r_total = retry_result.get("total", 0)
+                        print(
+                            f"[BENCHMARK] type-constrained retry '{ctx.topic}': "
+                            f"{r_passed}/{r_total} passed"
+                        )
+                        result = retry_result
+                        passed = r_passed
+                        total = r_total
+                        success = retry_result.get("success", False)
+                except Exception as regen_err:
+                    print(f"[BENCHMARK] type-constrained regen failed (non-fatal): {regen_err}")
 
-            benchmark = ctx.agent.benchmark_generator.generate_for_capability(capability_name, difficulty=difficulty)
-            result = ctx.agent.benchmark_runner.run(benchmark)
-
-            status = "PASS" if result["success"] else "FAIL"
-            print(f"[BENCHMARK] {capability_name} | diff={difficulty} | {status}")
-
-            if not result["success"]:
-                analysis = ctx.agent.critic_agent.analyze_failure(result)
-                print(f"[CRITIC] Failure analysis: {analysis}")
-                ctx.agent.critic_feedback_engine.process_feedback(analysis)
-
-                # Auto-debug with SWE Agent
+            if not success:
+                try:
+                    analysis = ctx.agent.critic_agent.analyze_failure(result)
+                    print(f"[CRITIC] Failure analysis: {analysis}")
+                    ctx.agent.critic_feedback_engine.process_feedback(analysis)
+                except Exception as critic_err:
+                    print(f"[BENCHMARK] critic analysis failed (non-fatal): {critic_err}")
                 await self._auto_debug(ctx, result)
 
         except Exception as bench_err:
-            print(f"[BENCHMARK] Non-fatal error during benchmark: {bench_err}")
+            print(f"[BENCHMARK] post-certify non-fatal error: {bench_err}")
 
     async def _auto_debug(self, ctx: StudyContext, result: dict) -> None:
         """SWE Agent auto-debug on benchmark failure (async, non-fatal)."""
@@ -882,6 +1040,96 @@ Please analyze the problem and propose a minimal patch.
 
         except Exception as e:
             print(f"[AUTO-DEBUG] SWEAgent failed: {e}")
+
+    async def _swarm_regen_code(self, ctx: StudyContext, regen_prompt: str) -> str | None:
+        """Architect→Coder swarm for retry attempt >= 2.
+
+        Architect analyzes why previous code failed and produces a strategy document.
+        Coder implements the strategy. Cheaper than the full benchmark_loop swarm —
+        no reviewer step, since we just need better code, not production-quality code.
+
+        Returns new code string or None if the swarm fails.
+        """
+        try:
+            from llm_router import llm_complete
+
+            # ── Architect prompt ─────────────────────────────────────────────
+            failed_code_snippet = (ctx.codice_generato or "")[:1200]
+            gap_list = "\n".join(f"  - {g}" for g in (ctx.gaps or [])[:6]) or "  (no gap info)"
+            critique_block = f"\n\nLLM critic's diagnosis:\n{ctx.critic_meta_critique}" if ctx.critic_meta_critique else ""
+
+            architect_prompt = f"""You are a software architect analyzing a FAILED study-pipeline code generation.
+
+Topic: {ctx.topic}
+Study attempt: {ctx.attempt}
+
+FAILED CODE (produced on last attempt):
+```python
+{failed_code_snippet}
+```
+
+IDENTIFIED GAPS (why the theory scored low):
+{gap_list}{critique_block}
+
+Produce a STRATEGY DOCUMENT (plain text, no code) answering:
+1. Root cause: why does the code fail to demonstrate the topic correctly?
+2. What is the single most important structural change needed?
+3. Concrete implementation plan: what functions/data-structures/algorithms to use.
+4. Anti-patterns to avoid (what keeps going wrong).
+
+Output ONLY the strategy document. No code. No markdown. Plain text. Max 400 words."""
+
+            strategy = await llm_complete(
+                architect_prompt,
+                system="You are a software architect. Output only a plain-text strategy document. No code.",
+                providers=PROVIDERS_PRIMARY,
+                max_tokens=600,
+                temperature=0.3,
+            )
+            if not strategy or len(strategy.strip()) < 50:
+                print("[SWARM] Architect produced empty strategy")
+                return None
+            print(f"[SWARM] Architect strategy ({len(strategy)} chars)")
+
+            # ── Coder prompt ─────────────────────────────────────────────────
+            coder_prompt = f"""You are a precise Python implementation agent.
+
+An Architect analyzed a failed attempt and produced this strategy:
+--- STRATEGY ---
+{strategy}
+--- END STRATEGY ---
+
+Now implement this strategy as a minimal executable Python script for: {ctx.topic}
+
+Rules:
+- Valid Python, no markdown fences, no explanations, terminates automatically
+- Only use: Python stdlib, numpy, math, random, itertools, collections, concurrent.futures
+- NO external APIs, NO pip installs, NO servers or infinite loops
+- MUST include assert statements testing actual behavior + print("OK All assertions passed")
+- Follow the Architect's strategy EXACTLY — do not fall back to the previous approach"""
+
+            code = await llm_complete(
+                coder_prompt,
+                system="You are a Python implementation agent. Output ONLY valid Python code. No markdown, no explanations.",
+                providers=PROVIDERS_PRIMARY,
+                max_tokens=2048,
+                temperature=0.1,
+            )
+
+            if not code:
+                return None
+
+            # Strip markdown fences if model ignores the instruction
+            if "```" in code:
+                lines = code.split("\n")
+                code = "\n".join(l for l in lines if not l.strip().startswith("```")).strip()
+
+            print(f"[SWARM] Coder produced {len(code)} chars")
+            return code if code.strip() else None
+
+        except Exception as swarm_err:
+            print(f"[SWARM] Architect→Coder failed (non-fatal): {swarm_err}")
+            return None
 
     async def _retry_gap_fill(self, ctx: StudyContext) -> None:
         """Re-synthesize theory with gap focus + regenerate sandbox code for retry."""
@@ -966,7 +1214,18 @@ Rules:
 """
         prev_sandbox_score = ctx.sandbox_result.get("score", 0.0) if ctx.sandbox_result else 0.0
         try:
-            ctx.codice_generato = await ctx.agent._think_fast(regen_prompt)
+            # On attempt >= 2: escalate to Architect→Coder swarm — simple retry has already failed
+            if ctx.attempt >= 2 and ctx.codice_generato:
+                print(f"[SWARM] Activating Architect→Coder pipeline (attempt {ctx.attempt})")
+                swarm_code = await self._swarm_regen_code(ctx, regen_prompt)
+                if swarm_code:
+                    ctx.codice_generato = swarm_code
+                else:
+                    # Swarm failed — fall back to standard single-shot regen
+                    print("[SWARM] Swarm produced no output — falling back to standard regen")
+                    ctx.codice_generato = await ctx.agent._think_fast(regen_prompt)
+            else:
+                ctx.codice_generato = await ctx.agent._think_fast(regen_prompt)
             if ctx.codice_generato and "```" in ctx.codice_generato:
                 lines = ctx.codice_generato.split("\n")
                 ctx.codice_generato = "\n".join(

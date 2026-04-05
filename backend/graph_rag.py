@@ -12,6 +12,8 @@ import json
 import logging
 from datetime import datetime
 
+from constants import PROVIDERS_PRIMARY
+
 logger = logging.getLogger("shard.graph_rag")
 
 _VALID_RELATION_TYPES = {
@@ -94,7 +96,7 @@ Example: [{{"source": "asyncio", "target": "threading", "relation_type": "causes
             system="You are a knowledge graph extractor. Output only valid JSON arrays, nothing else.",
             max_tokens=1000,
             temperature=0.1,
-            providers=["Gemini", "Groq"],
+            providers=PROVIDERS_PRIMARY,
         )
 
         # Parse response

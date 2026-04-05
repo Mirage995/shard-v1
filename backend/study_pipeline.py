@@ -72,8 +72,8 @@ class StudyPipeline:
     def __init__(self, phases: list):
         self.phases: list[BasePhase] = phases
 
-    async def execute(self, ctx: StudyContext) -> float:
-        """Run all phases in order. Returns the final score."""
+    async def execute(self, ctx: StudyContext) -> dict:
+        """Run all phases in order. Returns result dict with score and certified."""
         await ctx.emit("INIT", 0, f"Starting study of '{ctx.topic}'...")
 
         for phase in self.phases:
@@ -82,7 +82,7 @@ class StudyPipeline:
             except Exception as e:
                 if phase.fatal:
                     await ctx.report_crash(phase.name, e)
-                    return 0.0
+                    return {"score": 0.0, "certified": False, "topic": ctx.topic, "benchmark_result": None}
                 else:
                     print(f"[{phase.name}] Non-fatal error: {e}")
                     import traceback
@@ -90,4 +90,9 @@ class StudyPipeline:
                     if ctx.progress:
                         ctx.progress.complete_phase(phase.name)
 
-        return ctx.score
+        return {
+            "score":            ctx.score,
+            "certified":        ctx.certified,
+            "topic":            ctx.topic,
+            "benchmark_result": ctx.benchmark_result,
+        }

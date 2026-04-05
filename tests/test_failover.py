@@ -50,12 +50,12 @@ async def test_think_calls_llm_complete(agent):
 
 
 @pytest.mark.asyncio
-async def test_think_prefers_gemini_provider(agent):
-    """_think passes Gemini (free) as first provider."""
+async def test_think_prefers_groq_provider(agent):
+    """_think passes Groq as first provider (PROVIDERS_FULL order)."""
     with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
         await agent._think("task")
     providers = mock_lc.call_args.kwargs["providers"]
-    assert providers[0] == "Gemini"
+    assert providers[0] == "Groq"
 
 
 @pytest.mark.asyncio
@@ -87,12 +87,12 @@ async def test_think_fast_calls_llm_complete(agent):
 
 
 @pytest.mark.asyncio
-async def test_think_fast_prefers_gemini_provider(agent):
-    """_think_fast passes Gemini (free) as first provider."""
+async def test_think_fast_prefers_groq_provider(agent):
+    """_think_fast passes Groq as first provider (PROVIDERS_FULL order)."""
     with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
         await agent._think_fast("task")
     providers = mock_lc.call_args.kwargs["providers"]
-    assert providers[0] == "Gemini"
+    assert providers[0] == "Groq"
 
 
 @pytest.mark.asyncio
@@ -105,8 +105,8 @@ async def test_think_fast_json_mode(agent):
 
 
 @pytest.mark.asyncio
-async def test_think_and_think_fast_both_prefer_gemini(agent):
-    """Both _think and _think_fast use Gemini-first provider chain."""
+async def test_think_and_think_fast_both_prefer_groq(agent):
+    """Both _think and _think_fast use Groq-first provider chain (PROVIDERS_FULL order)."""
     with patch("study_agent.llm_complete", new_callable=AsyncMock, return_value="ok") as mock_lc:
         await agent._think("complex")
         think_providers = mock_lc.call_args.kwargs["providers"]
@@ -115,8 +115,8 @@ async def test_think_and_think_fast_both_prefer_gemini(agent):
         await agent._think_fast("quick")
         fast_providers = mock_lc.call_args.kwargs["providers"]
 
-    assert think_providers[0] == "Gemini"
-    assert fast_providers[0] == "Gemini"
+    assert think_providers[0] == "Groq"
+    assert fast_providers[0] == "Groq"
 
 
 if __name__ == "__main__":

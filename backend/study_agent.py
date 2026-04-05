@@ -27,6 +27,7 @@ from meta_learning import MetaLearning
 from critic_feedback_engine import CriticFeedbackEngine
 from benchmark_generator import BenchmarkGenerator
 from benchmark_runner import BenchmarkRunner
+from cert_contradiction_checker import CertContradictionChecker
 from skill_utils import normalize_capability_name
 from swe_agent import SWEAgent
 from cognition.simulation_engine import SimulationEngine
@@ -98,6 +99,8 @@ from constants import (
     BENCHMARK_ENABLED,
     BENCHMARK_PASS_THRESHOLD,
     BENCHMARK_WEIGHT,
+    PROVIDERS_PRIMARY,
+    PROVIDERS_FULL,
 )
 MAX_RETRY        = 3
 
@@ -216,8 +219,12 @@ class StudyAgent:
         # ── Benchmark system ──────────────────────────────────────────────────
         # think_fn and sandbox_runner are wired here so the real implementations
         # can call the LLM and Docker sandbox without circular dependencies.
-        self.benchmark_generator = BenchmarkGenerator(think_fn=self._think_fast)
-        self.benchmark_runner    = BenchmarkRunner(sandbox_runner=self.sandbox_runner)
+        self.benchmark_generator       = BenchmarkGenerator(think_fn=self._think_fast)
+        self.benchmark_runner          = BenchmarkRunner(sandbox_runner=self.sandbox_runner)
+        self.cert_contradiction_checker = CertContradictionChecker(
+            think_fn=self._think_fast,
+            kb=self.kb,
+        )
 
     # ── LLM REASONING ENGINES ────────────────────────────────────────────────
 
@@ -328,7 +335,7 @@ class StudyAgent:
             system=effective_system,
             max_tokens=2000,
             temperature=0.3,
-            providers=["Gemini", "Groq", "Claude"]
+            providers=PROVIDERS_FULL
         )
 
     async def _think_fast(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
@@ -351,7 +358,7 @@ class StudyAgent:
             system=effective_system,
             max_tokens=2000,
             temperature=0.3,
-            providers=["Gemini", "Groq", "Claude"]
+            providers=PROVIDERS_FULL
         )
 
     # ── PHASE 1: MAP ──────────────────────────────────────────────────────────
@@ -1325,23 +1332,27 @@ AUTO-EXAM (Questions and Answers):
 
     async def _cross_reference(self, topic: str, data: Dict) -> List[str]:
         """Search connections with existing knowledge in ChromaDB."""
-        try:
-            query = topic + " " + " ".join([c["name"] for c in data.get("concepts", [])[:5]])
-            results = self.kb.query(
-                query_texts=[query],
-                n_results=3,
-                where={"topic": {"$ne": topic}}
-            )
-            connections = []
-            if results["documents"]:
-                for doc_list in results["documents"]:
-                    connections.extend(doc_list)
-            if connections:
-                print(f"[CROSS-REF] Found {len(connections)} connections with existing knowledge")
-            return connections
-        except Exception as e:
-            print(f"[CROSS-REF] Error: {e}")
-            return []
+        query = topic + " " + " ".join([c["name"] for c in data.get("concepts", [])[:5]])
+        # Try with topic filter first, fall back to unfiltered if ChromaDB chokes on metadata
+        for attempt, kwargs in enumerate([
+            {"where": {"topic": {"$ne": topic}}},
+            {},
+        ]):
+            try:
+                results = self.kb.query(query_texts=[query], n_results=3, **kwargs)
+                connections = []
+                if results["documents"]:
+                    for doc_list in results["documents"]:
+                        connections.extend(doc_list)
+                if connections:
+                    print(f"[CROSS-REF] Found {len(connections)} connections with existing knowledge")
+                return connections
+            except Exception as e:
+                if attempt == 0:
+                    print(f"[CROSS-REF] Filter query failed ({e}), retrying without filter...")
+                else:
+                    print(f"[CROSS-REF] Error: {e}")
+        return []
 
     # ── MAIN STUDY LOOP ───────────────────────────────────────────────────────
 
@@ -1354,6 +1365,7 @@ AUTO-EXAM (Questions and Answers):
         on_web_data: Optional[Callable] = None,
         on_error: Optional[Callable] = None,
         previous_score: float = None,
+        task_context: str = "",
     ):
         """Complete study loop -- delegates to StudyPipeline.
 
@@ -1384,6 +1396,7 @@ AUTO-EXAM (Questions and Answers):
             on_certify=on_certify,
             on_error=on_error,
             on_web_data=on_web_data,
+            task_context=task_context,
         )
 
         pipeline = StudyPipeline([

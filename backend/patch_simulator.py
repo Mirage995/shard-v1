@@ -25,6 +25,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from constants import PROVIDERS_PRIMARY
+
 logger = logging.getLogger("shard.patch_simulator")
 
 try:
@@ -221,7 +223,7 @@ Be specific about what could break. No general statements."""
             system="You are a code impact analyst. Be concise and specific.",
             max_tokens=150,
             temperature=0.0,
-            providers=["Gemini", "Groq"],
+            providers=PROVIDERS_PRIMARY,
         )
         return result.strip()
     except Exception as e:

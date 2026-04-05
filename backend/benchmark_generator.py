@@ -42,6 +42,8 @@ Rules:
 - The function signature must ALWAYS be: def solve(input_data)
 - Each test must use ONLY Python builtins (no imports in setup or assert_expr)
 - 'setup' must define exactly the variables 'input_data' and 'expected'
+- 'input_data' must be a SINGLE value of a CONSISTENT type across ALL tests: int, float, str, list, or dict. NEVER a tuple unless every test uses a tuple.
+- The scaffold's solve() function must accept the SAME type as input_data. If input_data is a list, solve() must expect a list. If input_data is a str, solve() must expect a str. They must match.
 - 'expected' must ALWAYS be a plain Python literal (int, float, str, bool, list, tuple) -- NEVER a numpy array or other non-builtin object
 - Choose 'assert_expr' based on the output type:
     * exact match (int, bool, str, list of int/str, tuple): assert solve(input_data) == expected
@@ -99,7 +101,7 @@ class BenchmarkGenerator:
         try:
             raw = await self._think(prompt, _SYSTEM_PROMPT, json_mode=True)
         except Exception as e:
-            print(f"[BENCHMARK_GEN] ❌ LLM call failed: {e}")
+            print(f"[BENCHMARK_GEN] FAIL LLM call failed: {e}")
             return _unavailable(topic, str(e))
 
         data = _parse_json(raw)
@@ -110,7 +112,7 @@ class BenchmarkGenerator:
         raw_tests = data.get("tests", [])
 
         if not isinstance(raw_tests, list):
-            print("[BENCHMARK_GEN] [WARN]️ 'tests' is not a list -- discarding")
+            print("[BENCHMARK_GEN] [WARN] 'tests' is not a list -- discarding")
             return _unavailable(topic, "malformed 'tests' field")
 
         valid_tests: List[Dict[str, Any]] = []
@@ -123,18 +125,65 @@ class BenchmarkGenerator:
                     "assert_expr": t["assert_expr"].strip(),
                 })
             else:
-                print(f"[BENCHMARK_GEN] [WARN]️ Test {i} discarded: {verdict['reason']}")
+                print(f"[BENCHMARK_GEN] [WARN] Test {i} discarded: {verdict['reason']}")
+
+        # Runtime consistency check #1: run scaffold stub + each test
+        # Catches attribute/type errors that the stub exposes (e.g. input_data.split() on a list).
+        consistent_tests = []
+        for t in valid_tests:
+            try:
+                ns: dict = {}
+                exec(compile(ast.parse(scaffold), "<scaffold>", "exec"), ns)
+                exec(compile(ast.parse(t["setup"]), "<setup>", "exec"), ns)
+                exec(compile(ast.parse("result = solve(input_data)"), "<run>", "exec"), ns)
+                consistent_tests.append(t)
+            except (AttributeError, TypeError) as e:
+                print(f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded (stub type error): {e}")
+            except Exception:
+                consistent_tests.append(t)  # other errors are OK (NotImplemented, etc.)
+
+        if len(consistent_tests) < len(valid_tests):
+            print(f"[BENCHMARK_GEN] Runtime check: {len(valid_tests) - len(consistent_tests)} inconsistent tests dropped")
+
+        # Runtime consistency check #2: enforce same input_data type across all tests.
+        # The LLM sometimes generates mixed types (some tests pass str, others dict).
+        # This causes TypeError in the real implementation even though the stub passes.
+        type_checked: List[Dict[str, Any]] = []
+        dominant_type: type | None = None
+        for t in consistent_tests:
+            try:
+                ns: dict = {}
+                exec(compile(ast.parse(t["setup"]), "<setup>", "exec"), ns)
+                val = ns.get("input_data")
+                t_type = type(val)
+                if dominant_type is None:
+                    dominant_type = t_type
+                    type_checked.append(t)
+                elif t_type == dominant_type:
+                    type_checked.append(t)
+                else:
+                    print(
+                        f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded "
+                        f"(type mismatch: {t_type.__name__} vs dominant {dominant_type.__name__})"
+                    )
+            except Exception:
+                type_checked.append(t)  # if we can't eval setup, keep it
+
+        if len(type_checked) < len(consistent_tests):
+            print(f"[BENCHMARK_GEN] Type-homogeneity check: {len(consistent_tests) - len(type_checked)} tests dropped")
+        consistent_tests = type_checked
 
         print(
-            f"[BENCHMARK_GEN] ✅ {len(valid_tests)}/{len(raw_tests)} tests "
+            f"[BENCHMARK_GEN] OK {len(consistent_tests)}/{len(raw_tests)} tests "
             f"validated for '{topic}'"
         )
         return {
-            "scaffold":  scaffold,
-            "tests":     valid_tests,
-            "n_valid":   len(valid_tests),
-            "available": len(valid_tests) > 0,
-            "topic":     topic,
+            "scaffold":           scaffold,
+            "tests":              consistent_tests,
+            "n_valid":            len(consistent_tests),
+            "available":          len(consistent_tests) > 0,
+            "topic":              topic,
+            "dominant_input_type": dominant_type.__name__ if dominant_type is not None else None,
         }
 
     # ── Legacy stub API (keeps existing study_agent.py call sites working) ─────
@@ -153,12 +202,13 @@ class BenchmarkGenerator:
 
 def _unavailable(topic: str, reason: str) -> Dict[str, Any]:
     return {
-        "scaffold":  "",
-        "tests":     [],
-        "n_valid":   0,
-        "available": False,
-        "topic":     topic,
-        "reason":    reason,
+        "scaffold":           "",
+        "tests":              [],
+        "n_valid":            0,
+        "available":          False,
+        "topic":              topic,
+        "reason":             reason,
+        "dominant_input_type": None,
     }
 
 
@@ -176,7 +226,7 @@ def _parse_json(raw: Any) -> Optional[Dict]:
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        print(f"[BENCHMARK_GEN] ❌ JSON parse failed. Raw (first 200): {raw[:200]}")
+        print(f"[BENCHMARK_GEN] FAIL JSON parse failed. Raw (first 200): {raw[:200]}")
         return None
 
 

@@ -53,10 +53,11 @@ _BASE_DELAY        = 1.0   # seconds -- doubles each retry
 _MAX_DELAY         = 16.0  # backoff ceiling
 
 _TIMEOUT: dict[str, float] = {
-    "Claude": 90.0,
-    "Groq":   25.0,
-    "Gemini": 60.0,   # synthesis su testi lunghi richiede più tempo
-    "OpenAI": 60.0,
+    "Claude":      90.0,
+    "Groq":        25.0,
+    "Gemini":      60.0,
+    "OpenAI":      90.0,
+    "OpenRouter":  120.0,
 }
 
 # ── Error classification ───────────────────────────────────────────────────────
@@ -121,10 +122,14 @@ class _CircuitBreaker:
         self.failure_count = 0
 
     def record_failure(self):
+        was_half_open = self.state == _HALF_OPEN
         self.failure_count += 1
         self.last_failure_time = time.monotonic()
         prev = self.state
-        if self.failure_count >= self.failure_threshold or self.state == _HALF_OPEN:
+        if self.failure_count >= self.failure_threshold or was_half_open:
+            if was_half_open:
+                # probe failed: reset counter so next HALF_OPEN probe starts clean
+                self.failure_count = 0
             self.state = _OPEN
             if prev != _OPEN:
                 logger.critical(
@@ -135,17 +140,19 @@ class _CircuitBreaker:
 
 
 _breakers: dict[str, _CircuitBreaker] = {
-    "Claude": _CircuitBreaker("Claude"),
-    "Groq":   _CircuitBreaker("Groq"),
-    "Gemini": _CircuitBreaker("Gemini"),
-    "OpenAI": _CircuitBreaker("OpenAI"),
+    "Claude":     _CircuitBreaker("Claude"),
+    "Groq":       _CircuitBreaker("Groq"),
+    "Gemini":     _CircuitBreaker("Gemini"),
+    "OpenAI":     _CircuitBreaker("OpenAI"),
+    "OpenRouter": _CircuitBreaker("OpenRouter"),
 }
 
 # ── Semaphores ────────────────────────────────────────────────────────────────
-_CLAUDE_SEMAPHORE  = asyncio.Semaphore(3)
-_GROQ_SEMAPHORE    = asyncio.Semaphore(5)
-_GEMINI_SEMAPHORE  = asyncio.Semaphore(5)
-_OPENAI_SEMAPHORE  = asyncio.Semaphore(3)
+_CLAUDE_SEMAPHORE      = asyncio.Semaphore(3)
+_GROQ_SEMAPHORE        = asyncio.Semaphore(5)
+_GEMINI_SEMAPHORE      = asyncio.Semaphore(5)
+_OPENAI_SEMAPHORE      = asyncio.Semaphore(3)
+_OPENROUTER_SEMAPHORE  = asyncio.Semaphore(3)
 
 
 # ── Retry + backoff core ───────────────────────────────────────────────────────
@@ -207,10 +214,11 @@ async def _call_with_backoff(
 
 
 # ── Lazy singletons ────────────────────────────────────────────────────────────
-_anthropic_client = None
-_groq_client      = None
-_gemini_client    = None
-_openai_client    = None
+_anthropic_client   = None
+_groq_client        = None
+_gemini_client      = None
+_openai_client      = None
+_openrouter_client  = None
 
 
 def _get_anthropic():
@@ -253,6 +261,23 @@ def _get_openai():
     return _openai_client
 
 
+def _get_openrouter():
+    global _openrouter_client
+    if _openrouter_client is None:
+        key = os.getenv("OPENROUTER_API_KEY")
+        if key:
+            try:
+                from openai import OpenAI
+                _openrouter_client = OpenAI(
+                    api_key=key,
+                    base_url="https://openrouter.ai/api/v1",
+                )
+                logger.info("[LLM_ROUTER] OpenRouter client initialized OK.")
+            except ImportError:
+                logger.warning("[LLM_ROUTER] openai package not installed.")
+    return _openrouter_client
+
+
 def _get_gemini():
     global _gemini_client
     if _gemini_client is None:
@@ -281,7 +306,7 @@ async def llm_complete(
     system: str = "You are a precise code repair assistant. Output only valid Python code, no markdown.",
     max_tokens: int = 4096,
     temperature: float = 0.1,
-    providers: list[str] = ["OpenAI", "Gemini", "Groq", "Claude"]
+    providers: list[str] = ["Groq", "OpenAI", "Gemini", "Claude"]
 ) -> str:
     """Return a completion, trying the specified providers in order.
 
@@ -358,7 +383,7 @@ async def llm_complete(
                             async with _OPENAI_SEMAPHORE:
                                 def _sync():
                                     return openai.chat.completions.create(
-                                        model="gpt-4o-mini",
+                                        model="gpt-4.1-mini",
                                         messages=[
                                             {"role": "system", "content": system},
                                             {"role": "user", "content": prompt},
@@ -378,6 +403,51 @@ async def llm_complete(
             else:
                 logger.warning("[LLM_ROUTER] OpenAI circuit OPEN")
                 errors.append("OpenAI: circuit breaker OPEN")
+
+        elif provider == "OpenRouter":
+            if _breakers["OpenRouter"].is_available():
+                openrouter = _get_openrouter()
+                if openrouter:
+                    _or_models = [
+                        "nvidia/nemotron-3-super-120b-a12b:free",
+                        "arcee-ai/trinity-large-preview:free",
+                        "nvidia/nemotron-3-nano-30b-a3b:free",
+                        "openrouter/free",
+                    ]
+                    _or_success = False
+                    for _or_model in _or_models:
+                        try:
+                            async def _openrouter_call(_m=_or_model):
+                                async with _OPENROUTER_SEMAPHORE:
+                                    def _sync():
+                                        return openrouter.chat.completions.create(
+                                            model=_m,
+                                            messages=[
+                                                {"role": "system", "content": system},
+                                                {"role": "user", "content": prompt},
+                                            ],
+                                            temperature=temperature,
+                                            max_tokens=max_tokens,
+                                        )
+                                    resp = await asyncio.to_thread(_sync)
+                                    return resp.choices[0].message.content.strip()
+
+                            result = await _call_with_backoff("OpenRouter", _openrouter_call)
+                            logger.info("[LLM_ROUTER] OpenRouter OK model=%s (%d chars)", _or_model, len(result))
+                            _or_success = True
+                            return result
+                        except Exception as exc:
+                            if "404" in str(exc):
+                                logger.warning("[LLM_ROUTER] OpenRouter model %s not found, trying next", _or_model)
+                                continue
+                            logger.warning("[LLM_ROUTER] OpenRouter exhausted -- falling through. Reason: %s", exc)
+                            errors.append(f"OpenRouter: {exc}")
+                            break
+                    if not _or_success:
+                        errors.append("OpenRouter: all free models unavailable")
+            else:
+                logger.warning("[LLM_ROUTER] OpenRouter circuit OPEN")
+                errors.append("OpenRouter: circuit breaker OPEN")
 
         elif provider == "Gemini":
             if _breakers["Gemini"].is_available():
