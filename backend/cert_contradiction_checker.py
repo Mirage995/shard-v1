@@ -202,6 +202,12 @@ class CertContradictionChecker:
             "conflicting_chunk_id": conflicting_id,
             "confidence":           confidence,
             "existing_chunks_n":    len(filtered),
+            # Keep new_knowledge and conflicting_doc for auto-resolution
+            "_new_knowledge":       new_knowledge,
+            "_conflicting_doc":     next(
+                (doc for doc, _, cid in filtered if cid == conflicting_id),
+                None,
+            ) if conflicting_id else None,
         }
 
         if has_contradiction:
@@ -216,6 +222,149 @@ class CertContradictionChecker:
             logger.debug("[CERT_CONTRADICTION] No contradiction found for '%s'.", topic)
 
         return result
+
+    async def resolve(
+        self,
+        topic: str,
+        check_result: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Execute the suggested resolution against ChromaDB.
+
+        Acts on ``check_result["resolution"]``:
+          - KEEP_OLD:       delete the NEW knowledge chunk if it was already stored
+                            (caller should avoid storing it — this is a safety net)
+          - KEEP_NEW:       delete the conflicting OLD chunk from ChromaDB
+          - MERGE:          generate a unified chunk via LLM, replace old chunk with it
+          - DEPRECATE_BOTH: delete both old and new chunks
+          - PENDING:        no action — log and return
+
+        Args:
+            topic:        The topic just certified.
+            check_result: The dict returned by ``check()``.
+
+        Returns:
+            {
+              "resolved":   bool,
+              "action":     str,
+              "detail":     str,
+            }
+        """
+        if not check_result.get("has_contradiction"):
+            return {"resolved": False, "action": "none", "detail": "no contradiction to resolve"}
+
+        resolution     = check_result.get("resolution", "PENDING")
+        conflicting_id = check_result.get("conflicting_chunk_id")
+        new_knowledge  = check_result.get("_new_knowledge", "")
+        conflicting_doc = check_result.get("_conflicting_doc", "")
+        severity       = check_result.get("severity", "?")
+        explanation    = check_result.get("explanation", "")
+
+        if resolution == "PENDING":
+            logger.info("[CERT_RESOLUTION] PENDING — no action for '%s'", topic)
+            return {"resolved": False, "action": "pending", "detail": "resolution deferred to manual review"}
+
+        if resolution == "KEEP_OLD":
+            # The new knowledge is wrong — it shouldn't be stored.
+            # We can't delete it if it was never added, but log the intent.
+            logger.info(
+                "[CERT_RESOLUTION] KEEP_OLD for '%s' — new knowledge discarded. %s",
+                topic, explanation[:100],
+            )
+            _persist_resolution(topic, resolution, conflicting_id, explanation, "new_knowledge_not_stored")
+            return {"resolved": True, "action": "keep_old", "detail": "new knowledge flagged as incorrect — not persisted"}
+
+        if not self._kb:
+            return {"resolved": False, "action": "error", "detail": "no KB configured for resolution"}
+
+        if resolution == "KEEP_NEW":
+            if not conflicting_id:
+                return {"resolved": False, "action": "error", "detail": "KEEP_NEW but no conflicting_chunk_id"}
+            try:
+                self._kb.delete(ids=[conflicting_id])
+                logger.info(
+                    "[CERT_RESOLUTION] KEEP_NEW — deleted old chunk '%s' for topic '%s'",
+                    conflicting_id, topic,
+                )
+                _persist_resolution(topic, resolution, conflicting_id, explanation, f"deleted_chunk:{conflicting_id}")
+                return {"resolved": True, "action": "keep_new", "detail": f"old chunk {conflicting_id} deleted from KB"}
+            except Exception as exc:
+                logger.warning("[CERT_RESOLUTION] KEEP_NEW delete failed: %s", exc)
+                return {"resolved": False, "action": "error", "detail": str(exc)}
+
+        if resolution == "MERGE":
+            if not self._think or not conflicting_doc:
+                return {"resolved": False, "action": "error", "detail": "MERGE needs LLM + conflicting doc"}
+            merged = await self._generate_merged_chunk(topic, new_knowledge, conflicting_doc, explanation)
+            if not merged:
+                return {"resolved": False, "action": "error", "detail": "MERGE LLM call failed"}
+            try:
+                # Replace old chunk with the merged version
+                if conflicting_id:
+                    self._kb.delete(ids=[conflicting_id])
+                self._kb.add(
+                    documents=[merged],
+                    metadatas=[{"topic": topic, "source": "merge_resolution", "merged": True}],
+                    ids=[f"merged_{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}"],
+                )
+                logger.info("[CERT_RESOLUTION] MERGE — unified chunk stored for '%s'", topic)
+                _persist_resolution(topic, resolution, conflicting_id, explanation, "merged_chunk_stored")
+                return {"resolved": True, "action": "merge", "detail": "merged knowledge chunk stored in KB"}
+            except Exception as exc:
+                logger.warning("[CERT_RESOLUTION] MERGE store failed: %s", exc)
+                return {"resolved": False, "action": "error", "detail": str(exc)}
+
+        if resolution == "DEPRECATE_BOTH":
+            deleted = []
+            if conflicting_id:
+                try:
+                    self._kb.delete(ids=[conflicting_id])
+                    deleted.append(conflicting_id)
+                except Exception as exc:
+                    logger.warning("[CERT_RESOLUTION] DEPRECATE_BOTH old delete failed: %s", exc)
+            logger.info(
+                "[CERT_RESOLUTION] DEPRECATE_BOTH for '%s' — deleted %d chunk(s). New knowledge also discarded.",
+                topic, len(deleted),
+            )
+            _persist_resolution(topic, resolution, conflicting_id, explanation, f"deprecated:{','.join(deleted) or 'none'}")
+            return {
+                "resolved": True,
+                "action":   "deprecate_both",
+                "detail":   f"deleted {len(deleted)} old chunk(s); new knowledge not persisted",
+            }
+
+        return {"resolved": False, "action": "unknown", "detail": f"unknown resolution: {resolution}"}
+
+    # ── Internal helpers ───────────────────────────────────────────────────────
+
+    async def _generate_merged_chunk(
+        self,
+        topic: str,
+        new_knowledge: str,
+        old_knowledge: str,
+        conflict_explanation: str,
+    ) -> Optional[str]:
+        """Ask LLM to produce a single unified knowledge chunk from two conflicting ones."""
+        prompt = f"""Two knowledge chunks about '{topic}' conflict.
+Produce ONE unified, accurate knowledge chunk that resolves the conflict.
+Be precise and context-aware: if both are correct in different contexts, say so explicitly.
+
+CONFLICT: {conflict_explanation}
+
+CHUNK A (existing):
+{old_knowledge[:600]}
+
+CHUNK B (new):
+{new_knowledge[:600]}
+
+Write ONLY the unified knowledge chunk text (no JSON, no headers, no explanation).
+The chunk must be factually accurate, concise (max 200 words), and usable as a standalone reference.
+"""
+        try:
+            result = await self._think(prompt, "You are a precise technical knowledge editor.", json_mode=False)
+            return result.strip() if result and result.strip() else None
+        except Exception as exc:
+            logger.warning("[CERT_RESOLUTION] Merge LLM call failed: %s", exc)
+            return None
 
 
 # ── Module-level helpers ───────────────────────────────────────────────────────
@@ -293,6 +442,31 @@ def _no_check(reason: str) -> Dict[str, Any]:
         "existing_chunks_n":    0,
         "reason":               reason,
     }
+
+
+def _persist_resolution(
+    topic: str,
+    resolution: str,
+    conflicting_id: Optional[str],
+    explanation: str,
+    action_taken: str,
+) -> None:
+    """Append resolution record to self_inconsistencies.jsonl."""
+    try:
+        _MEMORY_DIR.mkdir(parents=True, exist_ok=True)
+        record = {
+            "timestamp":       datetime.now().isoformat(),
+            "event":           "resolution",
+            "topic":           topic,
+            "resolution":      resolution,
+            "conflicting_id":  conflicting_id,
+            "explanation":     explanation,
+            "action_taken":    action_taken,
+        }
+        with _INCONS_PATH.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        logger.warning("[CERT_RESOLUTION] Failed to persist resolution record: %s", exc)
 
 
 def _persist_inconsistency(topic: str, result: Dict[str, Any]) -> None:

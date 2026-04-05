@@ -860,6 +860,18 @@ class CertifyRetryGroup(BasePhase):
                     f"[CERT_CONTRADICTION] ⚠️  {severity} {ctype} on '{ctx.topic}' "
                     f"→ {res} | {expl}"
                 )
+                # Auto-resolve if severity is HIGH or CRITICAL and resolution is actionable
+                _AUTO_RESOLVE_MIN = {"HIGH", "CRITICAL"}
+                _AUTO_RESOLVE_OK  = {"KEEP_NEW", "KEEP_OLD", "MERGE", "DEPRECATE_BOTH"}
+                if severity in _AUTO_RESOLVE_MIN and res in _AUTO_RESOLVE_OK:
+                    print(f"[CERT_CONTRADICTION] Auto-resolving ({res})...")
+                    resolution_result = await checker.resolve(ctx.topic, result)
+                    action = resolution_result.get("action", "?")
+                    detail = resolution_result.get("detail", "")
+                    if resolution_result.get("resolved"):
+                        print(f"[CERT_CONTRADICTION] ✓ Resolved: {action} — {detail}")
+                    else:
+                        print(f"[CERT_CONTRADICTION] Resolution failed: {detail}")
             else:
                 print(f"[CERT_CONTRADICTION] ✓ No contradiction found for '{ctx.topic}'")
         except Exception as e:
