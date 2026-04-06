@@ -29,6 +29,7 @@ from benchmark_generator import BenchmarkGenerator
 from benchmark_runner import BenchmarkRunner
 from cert_contradiction_checker import CertContradictionChecker
 from memory_extractor import MemoryExtractor
+from derivation_engine import DerivationEngine
 from skill_utils import normalize_capability_name
 from swe_agent import SWEAgent
 from cognition.simulation_engine import SimulationEngine
@@ -226,7 +227,8 @@ class StudyAgent:
             think_fn=self._think_fast,
             kb=self.kb,
         )
-        self.memory_extractor = MemoryExtractor(think_fn=self._think_fast)
+        self.memory_extractor   = MemoryExtractor(think_fn=self._think_fast)
+        self.derivation_engine  = DerivationEngine(think_fn=self._think_fast)
 
     # ── LLM REASONING ENGINES ────────────────────────────────────────────────
 

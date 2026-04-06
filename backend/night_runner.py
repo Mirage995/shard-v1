@@ -2266,6 +2266,24 @@ class NightRunner:
         except Exception as _rw_err:
             self.logger.debug("[REWARD] Non-fatal: %s", _rw_err)
 
+        # ── MEMORY GC (episode decay + prune) ────────────────────────────────
+        try:
+            from episode_decay import run_gc
+            _gc = run_gc()
+            self.logger.info("[MEMORY_GC] %s", _gc)
+        except Exception as _gc_err:
+            self.logger.debug("[MEMORY_GC] Non-fatal: %s", _gc_err)
+
+        # ── DERIVATION ENGINE (infer new facts every session) ─────────────────
+        try:
+            _deriv_agent = getattr(self, "agent", None)
+            if _deriv_agent and hasattr(_deriv_agent, "derivation_engine"):
+                _saved = await _deriv_agent.derivation_engine.derive_and_save()
+                if _saved:
+                    self.logger.info("[DERIVATION] %d new memories derived this session", _saved)
+        except Exception as _deriv_err:
+            self.logger.debug("[DERIVATION] Non-fatal: %s", _deriv_err)
+
         self.logger.info("Session complete. Shutting down cleanly.")
 
     async def _run_benchmarks(self):
