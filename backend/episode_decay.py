@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from shard_db import execute, query
+from memory_quality import QualityResult, run_quality_prune
 
 logger = logging.getLogger("shard.episode_decay")
 
@@ -32,13 +33,16 @@ class GCResult:
     decayed:  int = 0   # EPISODE memories whose confidence was reduced
     deleted:  int = 0   # EPISODE memories deleted (confidence < min)
     pruned:   int = 0   # Old superseded memories hard-deleted
+    quality_junk:  int = 0   # Memories deleted by quality filter
+    quality_dedup: int = 0   # Memories deleted by dedup
     total_memories_before: int = 0
     total_memories_after:  int = 0
 
     def __str__(self) -> str:
         return (
             f"GC: expired={self.expired} decayed={self.decayed} "
-            f"deleted={self.deleted} pruned={self.pruned} | "
+            f"deleted={self.deleted} pruned={self.pruned} "
+            f"quality_junk={self.quality_junk} dedup={self.quality_dedup} | "
             f"memories: {self.total_memories_before} -> {self.total_memories_after}"
         )
 
@@ -47,6 +51,8 @@ def run_gc(
     half_life_days:   int   = HALF_LIFE_DAYS,
     min_confidence:   float = MIN_CONFIDENCE,
     prune_after_days: int   = PRUNE_AFTER_DAYS,
+    container_tag:    str   = "shard",
+    skip_quality:     bool  = False,
 ) -> GCResult:
     """Run all GC operations synchronously. Safe to call from any context.
 
@@ -130,6 +136,12 @@ def run_gc(
         )
         result.pruned = pruned[0]["n"]
         logger.info("[GC] Pruned %d old superseded memories", result.pruned)
+
+    # ── 4. QUALITY ───────────────────────────────────────────────────────────
+    if not skip_quality:
+        qr = run_quality_prune(container_tag=container_tag)
+        result.quality_junk  = qr.junk_deleted
+        result.quality_dedup = qr.dedup_deleted
 
     # Count after
     rows_after = query("SELECT COUNT(*) as n FROM memories", ())

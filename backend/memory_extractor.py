@@ -17,6 +17,7 @@ Usage:
 """
 import json
 import logging
+import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -338,6 +339,52 @@ class MemoryExtractor:
                WHERE source_ref=? AND is_latest=1
                ORDER BY confidence DESC""",
             (topic,),
+        )
+
+    @staticmethod
+    def search_for_prompt(
+        topic: str,
+        memory_types: Optional[List[str]] = None,
+        min_confidence: float = 0.50,
+        limit: int = 8,
+    ) -> List[Dict]:
+        """Keyword search on content + entities for prompt injection.
+
+        Splits the topic into tokens and matches memories whose content or
+        entities contain at least one token. Returns highest-confidence results.
+        """
+        # Build keyword tokens (≥4 chars to avoid noise like 'the', 'for')
+        tokens = [t for t in re.findall(r"[a-z0-9_]+", topic.lower()) if len(t) >= 4]
+        if not tokens:
+            return []
+
+        # Build OR conditions across tokens on content and entities columns
+        conditions = " OR ".join(
+            ["(LOWER(content) LIKE ? OR LOWER(entities) LIKE ?)"] * len(tokens)
+        )
+        params: list = []
+        for tok in tokens:
+            like = f"%{tok}%"
+            params += [like, like]
+
+        type_clause = ""
+        if memory_types:
+            placeholders = ",".join("?" * len(memory_types))
+            type_clause = f"AND memory_type IN ({placeholders})"
+            params += list(memory_types)
+
+        params += [min_confidence, limit]
+
+        return query(
+            f"""SELECT id, content, memory_type, entities, confidence
+                FROM memories
+                WHERE is_latest=1
+                AND ({conditions})
+                {type_clause}
+                AND confidence >= ?
+                ORDER BY confidence DESC
+                LIMIT ?""",
+            tuple(params),
         )
 
     @staticmethod

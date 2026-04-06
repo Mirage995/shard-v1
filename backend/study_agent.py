@@ -54,7 +54,7 @@ class TopicBudgetExceeded(Exception):
 
 
 # Default per-topic LLM call limit. Overridable via StudyAgent._topic_llm_budget.
-DEFAULT_TOPIC_LLM_BUDGET = 50
+DEFAULT_TOPIC_LLM_BUDGET = 200
 
 
 def _load_reliability_module(relative_path: str, module_name: str):
@@ -506,6 +506,37 @@ Example: ["query 1", "query 2", "query 3"]"""
         self.progress.complete_phase("AGGREGATE")
         return all_text
 
+    # ── MEMORY CONTEXT HELPER ─────────────────────────────────────────────────
+
+    @staticmethod
+    def _memory_context_block(
+        topic: str,
+        memory_types: Optional[List[str]] = None,
+        label: str = "SHARD MEMORY",
+        limit: int = 6,
+    ) -> str:
+        """Return a formatted block of relevant memories for prompt injection.
+
+        Returns empty string if no memories found or on any error.
+        """
+        try:
+            from memory_extractor import MemoryExtractor
+            mems = MemoryExtractor.search_for_prompt(
+                topic, memory_types=memory_types, limit=limit
+            )
+            if not mems:
+                return ""
+            lines = [f"[{label}]"]
+            for m in mems:
+                mtype = m.get("memory_type", "FACT")
+                conf  = m.get("confidence", 1.0)
+                content = m.get("content", "")
+                lines.append(f"  [{mtype}] ({conf:.2f}) {content}")
+            lines.append("")
+            return "\n".join(lines) + "\n"
+        except Exception:
+            return ""
+
     # ── PHASE 3: SYNTHESIZE ───────────────────────────────────────────────────
 
     async def phase_synthesize(self, topic: str, raw: str, strategy_hint: str = None,
@@ -546,8 +577,18 @@ Example: ["query 1", "query 2", "query 3"]"""
         except Exception:
             pass
 
+        # MEMORY: inject prior FACT/RELATION memories about this topic
+        memory_line = ""
+        _mem_block = self._memory_context_block(
+            topic, memory_types=["FACT", "RELATION"],
+            label="PRIOR KNOWLEDGE FROM SHARD MEMORY", limit=6,
+        )
+        if _mem_block:
+            memory_line = f"\n{_mem_block}Build on this prior knowledge — go deeper, correct, or extend it.\n"
+            print(f"[SYNTHESIZE] Memory injected {_mem_block.count(chr(10))} prior memories")
+
         prompt = f"""
-You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}
+You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}{memory_line}
 Return ONLY valid JSON.
 
 Do not include explanations.
@@ -880,12 +921,20 @@ Errori: {sandbox_result.get('stderr', '(nessuno)')[:500]}
         except Exception:
             pass
 
+        # MEMORY: inject past certification/failure episodes to guide Q&A depth
+        memory_validate_block = self._memory_context_block(
+            topic, memory_types=["EPISODE", "FACT"],
+            label="STORICO SHARD SU QUESTO TOPIC", limit=4,
+        )
+        if memory_validate_block:
+            print(f"[VALIDATE] Memory injected episode history")
+
         prompt = f"""
 Sei SHARD. Hai appena studiato "{topic}".
 
 TEORIA APPRESA:
 {teoria[:2000]}
-{sandbox_context}{causal_block}
+{sandbox_context}{causal_block}{memory_validate_block}
 GENERA ESATTAMENTE 2 DOMANDE COMPLESSE sull'argomento e rispondi a ciascuna.
 Le domande devono testare comprensione PROFONDA, non semplice recall.
 Le risposte devono essere dettagliate, pratiche, con esempi concreti.
@@ -1229,9 +1278,19 @@ AUTO-EXAM (Questions and Answers):
                 print(f"[BENCHMARK] GraphRAG injected {causal.count(chr(10)) + 1} causal warnings into impl prompt")
         except Exception:
             pass
+
+        # MEMORY: inject FACT memories as implementation hints
+        memory_impl_block = self._memory_context_block(
+            topic, memory_types=["FACT", "RELATION"],
+            label="KNOWN FACTS (apply in implementation)", limit=4,
+        )
+        if memory_impl_block:
+            print(f"[BENCHMARK] Memory injected {memory_impl_block.count(chr(10))} fact memories into impl prompt")
+
         impl_prompt = (
             f"You just studied: {topic}\n"
-            f"{causal_impl_block}\n"
+            f"{causal_impl_block}"
+            f"{memory_impl_block}\n"
             f"Implement this Python function to satisfy the benchmark tests:\n\n"
             f"{scaffold}\n\n"
             f"Return ONLY the complete Python function. No explanation, no markdown."
