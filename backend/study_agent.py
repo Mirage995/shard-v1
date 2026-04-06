@@ -28,6 +28,7 @@ from critic_feedback_engine import CriticFeedbackEngine
 from benchmark_generator import BenchmarkGenerator
 from benchmark_runner import BenchmarkRunner
 from cert_contradiction_checker import CertContradictionChecker
+from memory_extractor import MemoryExtractor
 from skill_utils import normalize_capability_name
 from swe_agent import SWEAgent
 from cognition.simulation_engine import SimulationEngine
@@ -225,6 +226,7 @@ class StudyAgent:
             think_fn=self._think_fast,
             kb=self.kb,
         )
+        self.memory_extractor = MemoryExtractor(think_fn=self._think_fast)
 
     # ── LLM REASONING ENGINES ────────────────────────────────────────────────
 

@@ -146,6 +146,37 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
         """)
         logger.info("[SHARD_DB] Migration v4 applied -- pivot_events table")
 
+    if current < 5:
+        conn.executescript("""
+            -- Typed memory store: facts extracted from study, sessions, connectors
+            CREATE TABLE IF NOT EXISTS memories (
+                id           TEXT PRIMARY KEY,          -- UUID
+                content      TEXT NOT NULL,             -- The fact in natural language
+                memory_type  TEXT NOT NULL,             -- FACT | PREFERENCE | EPISODE | GOAL | RELATION
+                entities     TEXT DEFAULT '[]',         -- JSON array of named entities
+                confidence   REAL DEFAULT 1.0,          -- 0.0-1.0
+                is_latest    INTEGER DEFAULT 1,         -- 0/1 — superseded memories set to 0
+                expires_at   TEXT,                      -- ISO 8601, NULL = never expires
+                updates      TEXT,                      -- ID of memory this supersedes (FK-like)
+                source_type  TEXT NOT NULL,             -- study | session_log | derivation | connector
+                source_ref   TEXT,                      -- topic name, session_id, etc.
+                container_tag TEXT NOT NULL DEFAULT 'shard', -- scoping (shard, andrea, project, etc.)
+                created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_mem_type      ON memories(memory_type);
+            CREATE INDEX IF NOT EXISTS idx_mem_latest    ON memories(is_latest);
+            CREATE INDEX IF NOT EXISTS idx_mem_container ON memories(container_tag);
+            CREATE INDEX IF NOT EXISTS idx_mem_source    ON memories(source_type, source_ref);
+            CREATE INDEX IF NOT EXISTS idx_mem_expires   ON memories(expires_at);
+            CREATE INDEX IF NOT EXISTS idx_mem_created   ON memories(created_at);
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (5, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v5 applied -- memories table")
+
 
 def get_db() -> sqlite3.Connection:
     """Return the singleton SQLite connection.

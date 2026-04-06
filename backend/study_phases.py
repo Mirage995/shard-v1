@@ -740,6 +740,9 @@ class CertifyRetryGroup(BasePhase):
                 # Compares new knowledge against ChromaDB before it pollutes the KB
                 await self._check_knowledge_contradictions(ctx)
 
+                # Extract typed memories from certified knowledge → shard.db memories table
+                await self._extract_and_store_memories(ctx)
+
                 # Self-generated benchmarks post-certification
                 await self._post_certify_benchmarks(ctx)
 
@@ -836,6 +839,33 @@ class CertifyRetryGroup(BasePhase):
                 await ctx.agent.strategy_memory.store_strategy_object_async(ctx.strategy_obj)
         except Exception as ext_err:
             print(f"[STRATEGY] Abstraction extraction error (non-fatal): {ext_err}")
+
+    async def _extract_and_store_memories(self, ctx: StudyContext) -> None:
+        """Extract typed memories from certified knowledge → shard.db memories table.
+
+        Runs post-certification (non-fatal). Extracts FACT/PREFERENCE/EPISODE/GOAL/RELATION
+        objects from ctx.structured and persists them with is_latest tracking.
+        """
+        extractor = getattr(ctx.agent, "memory_extractor", None)
+        if not extractor:
+            return
+        try:
+            memories = await extractor.extract_from_study(
+                topic=ctx.topic,
+                structured=ctx.structured,
+                score=ctx.score,
+                certified=ctx.certified,
+            )
+            if memories:
+                saved = extractor.save(memories)
+                print(
+                    f"[MEMORY] Extracted {saved}/{len(memories)} typed memories "
+                    f"for '{ctx.topic}'"
+                )
+            else:
+                print(f"[MEMORY] No memories extracted for '{ctx.topic}'")
+        except Exception as e:
+            print(f"[MEMORY] Non-fatal extraction error: {e}")
 
     async def _check_knowledge_contradictions(self, ctx: StudyContext) -> None:
         """Run CertContradictionChecker after certification (non-fatal).
