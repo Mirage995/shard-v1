@@ -1063,25 +1063,33 @@ Rules:
         connected_str = ", ".join(connected[:3])
         print(f"[XDOMAIN] Connected certified topics: {connected_str}")
 
-        # 2. Ask LLM to propose a concrete Python problem
+        # 2. Ask LLM to propose ONE concrete Python problem (single concept, no mixing)
         propose_prompt = (
             f"The topic '{topic}' is too abstract for a concrete benchmark.\n"
-            f"SHARD has already certified these related topics: {connected_str}.\n\n"
-            f"Propose ONE specific, concrete Python problem that:\n"
-            f"  - Can be implemented as def solve(input_data) -> result\n"
-            f"  - Directly demonstrates understanding of '{topic}'\n"
-            f"  - Uses concepts from the certified topics above\n\n"
-            f"Reply with ONLY the problem title (5-10 words). No explanation."
+            f"SHARD has certified one of these related topics: {connected_str}.\n\n"
+            f"Pick ONE of those certified topics and name a specific Python implementation task.\n"
+            f"Rules:\n"
+            f"  - Single concept only — do NOT combine multiple topics\n"
+            f"  - Must be implementable as: def solve(input_data) -> result\n"
+            f"  - 3-6 words maximum\n"
+            f"  - No 'and', no 'with', no conjunctions\n\n"
+            f"Reply with ONLY the task name. Example: 'binary search on sorted list'"
         )
         try:
             concrete_topic = await ctx.agent._think_fast(propose_prompt)
-            concrete_topic = concrete_topic.strip().strip('"').strip("'")[:80]
+            concrete_topic = concrete_topic.strip().strip('"').strip("'")[:60]
         except Exception as e:
             print(f"[XDOMAIN] LLM proposal failed: {e}")
             return None
 
+        # Reject if it looks like a multi-topic mashup
         if not concrete_topic or len(concrete_topic) < 5:
             return None
+        if any(w in concrete_topic.lower() for w in [" and ", " with ", " plus ", " & "]):
+            print(f"[XDOMAIN] Rejected multi-topic proposal: '{concrete_topic}'")
+            # Fall back to first connected topic directly
+            concrete_topic = connected[0]
+            print(f"[XDOMAIN] Using first certified topic as fallback: '{concrete_topic}'")
 
         print(f"[XDOMAIN] Concrete angle proposed: '{concrete_topic}'")
 
