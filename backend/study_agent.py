@@ -1287,12 +1287,25 @@ AUTO-EXAM (Questions and Answers):
         if memory_impl_block:
             print(f"[BENCHMARK] Memory injected {memory_impl_block.count(chr(10))} fact memories into impl prompt")
 
+        # Show the LLM the actual test cases so it knows exactly what input_data looks like
+        tests = benchmark.get("tests", [])
+        tests_preview = ""
+        if tests:
+            examples = "\n".join(
+                f"  # Test {i+1}: {t.get('setup', '')}"
+                for i, t in enumerate(tests[:3])
+            )
+            tests_preview = f"\nThese are the EXACT tests your function must pass:\n{examples}\n"
+
         impl_prompt = (
             f"You just studied: {topic}\n"
             f"{causal_impl_block}"
-            f"{memory_impl_block}\n"
-            f"Implement this Python function to satisfy the benchmark tests:\n\n"
+            f"{memory_impl_block}"
+            f"{tests_preview}\n"
+            f"Implement this Python function to satisfy ALL the tests above:\n\n"
             f"{scaffold}\n\n"
+            f"CRITICAL: study the test setup lines carefully — they show you exactly what type "
+            f"and structure input_data has. Match it precisely.\n"
             f"Return ONLY the complete Python function. No explanation, no markdown."
         )
         try:
