@@ -1543,9 +1543,11 @@ class NightRunner:
                         and not p.startswith("[PAST WORKING CODE")
                     ).strip()
                 study_agent.session_context = _ctx
-                if not cycle_data["certified"] and best_score:
-                    cycle_data["score"] = best_score
-                    _vb(f"Topic fallito: {topic}. Miglior score raggiunto: {round(best_score, 2)} su dieci.", priority="medium", event_type="cycle_failed")
+                # study_topic returns a dict {"score": float, "certified": bool, ...}
+                _study_score = best_score.get("score", 0.0) if isinstance(best_score, dict) else (best_score or 0.0)
+                if not cycle_data["certified"] and _study_score:
+                    cycle_data["score"] = _study_score
+                    _vb(f"Topic fallito: {topic}. Miglior score raggiunto: {round(_study_score, 2)} su dieci.", priority="medium", event_type="cycle_failed")
                 self.logger.info(f"Sandbox/Study result: {'success' if cycle_data['certified'] else 'failed'}")
 
                 # ── Strategy pivot -- chronic block detection ──────────────────
@@ -2498,7 +2500,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=MAX_RUNTIME_MINUTES_DEFAULT, help="Max runtime in minutes")
     parser.add_argument("--pause", type=int, default=PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT, help="Pause between cycles in minutes")
     parser.add_argument("--api-limit", type=int, default=MAX_API_CALLS_DEFAULT, help="Maximum API calls allowed")
-    parser.add_argument("--topic-budget", type=int, default=50, help="Max LLM calls per topic (default 50)")
+    parser.add_argument("--topic-budget", type=int, default=200, help="Max LLM calls per topic (default 200)")
     parser.add_argument("--no-core", action="store_true", help="Disable CognitionCore (lobotomy test)")
     parser.add_argument("--continuous", action="store_true", help="Loop sessions indefinitely (Ctrl+C to stop)")
     parser.add_argument("--session-gap", type=int, default=5, help="Seconds between sessions in continuous mode")
