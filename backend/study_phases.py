@@ -1097,7 +1097,7 @@ Rules:
         try:
             benchmark_data = await ctx.agent.benchmark_generator.generate(
                 topic=concrete_topic,
-                synthesized_code=ctx.codice_generato or "",
+                synthesized_code="",  # fresh — don't bias generator with abstract code
                 n_tests=3,
             )
             if not benchmark_data.get("available"):
@@ -1107,11 +1107,32 @@ Rules:
             print(f"[XDOMAIN] Benchmark generation failed: {e}")
             return None
 
-        # 4. Run the benchmark — standard pipeline
+        # 4. Regenerate implementation specifically for the concrete topic
+        # (ctx.codice_generato was written for the abstract topic — it will fail)
+        scaffold = benchmark_data.get("scaffold", "def solve(input_data):\n    pass")
+        impl_prompt = (
+            f"You understand '{ctx.topic}'. Demonstrate this by implementing:\n\n"
+            f"{scaffold}\n\n"
+            f"The function must solve: {concrete_topic}\n"
+            f"Return ONLY the complete Python function. No explanation, no markdown."
+        )
+        try:
+            import re as _re
+            impl_code = await ctx.agent._think_fast(impl_prompt)
+            impl_code = _re.sub(r"```(?:python)?|```", "", impl_code or "").strip()
+            if not impl_code or "def solve(" not in impl_code:
+                print(f"[XDOMAIN] Implementation generation failed — no solve() found")
+                return None
+            print(f"[XDOMAIN] Implementation generated ({len(impl_code)} chars)")
+        except Exception as e:
+            print(f"[XDOMAIN] Implementation generation failed: {e}")
+            return None
+
+        # 5. Run the benchmark — standard pipeline
         try:
             result = await ctx.agent.benchmark_runner.run_benchmark(
                 benchmark=benchmark_data,
-                implementation_code=ctx.codice_generato or "",
+                implementation_code=impl_code,
                 topic=concrete_topic,
             )
             passed = result.get("passed", 0)
