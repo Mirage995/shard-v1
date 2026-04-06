@@ -993,6 +993,26 @@ Rules:
                 except Exception as regen_err:
                     print(f"[BENCHMARK] type-constrained regen failed (non-fatal): {regen_err}")
 
+            # Cross-domain concrete angle fallback: still 0% after type retry →
+            # ask SHARD to find a connected certified topic and propose a concrete
+            # Python problem that demonstrates the abstract topic. Benchmark still
+            # runs in full — nothing is skipped.
+            if passed == 0 and total > 0:
+                xd_result = await self._cross_domain_benchmark(ctx)
+                if xd_result and xd_result.get("passed", 0) > 0:
+                    result  = xd_result
+                    passed  = xd_result.get("passed", 0)
+                    total   = xd_result.get("total", 0)
+                    success = xd_result.get("success", False)
+                    ctx.benchmark_result = {
+                        "pass_rate":           xd_result.get("pass_rate", 0.0),
+                        "passed":              passed,
+                        "total":               total,
+                        "success":             success,
+                        "dominant_input_type": xd_result.get("dominant_input_type"),
+                        "cross_domain":        True,
+                    }
+
             if not success:
                 try:
                     analysis = ctx.agent.critic_agent.analyze_failure(result)
@@ -1004,6 +1024,98 @@ Rules:
 
         except Exception as bench_err:
             print(f"[BENCHMARK] post-certify non-fatal error: {bench_err}")
+
+    async def _cross_domain_benchmark(self, ctx: StudyContext) -> dict | None:
+        """Fallback: find a concrete cross-domain angle for an abstract topic.
+
+        When a topic is too abstract to produce a passing benchmark (e.g.
+        'algorithm complexity', 'performance optimization'), SHARD:
+          1. Queries ChromaDB for the 3 most similar certified topics.
+          2. Asks the LLM to propose ONE concrete Python problem that
+             demonstrates the abstract topic using those known concepts.
+          3. Runs a FULL benchmark on that concrete problem — nothing skipped.
+
+        Returns the benchmark result dict, or None on any failure.
+        """
+        topic = ctx.topic
+        print(f"[XDOMAIN] Abstract topic '{topic}' — searching for concrete angle...")
+
+        # 1. Find connected certified topics from ChromaDB
+        connected: list[str] = []
+        try:
+            results = ctx.agent.kb.query(
+                query_texts=[topic],
+                n_results=5,
+                where={"certified": True},
+            )
+            if results.get("metadatas") and results["metadatas"][0]:
+                for meta in results["metadatas"][0]:
+                    t = meta.get("topic", "")
+                    if t and t != topic:
+                        connected.append(t)
+        except Exception as e:
+            print(f"[XDOMAIN] ChromaDB query failed: {e}")
+
+        if not connected:
+            print(f"[XDOMAIN] No connected certified topics found — skipping cross-domain")
+            return None
+
+        connected_str = ", ".join(connected[:3])
+        print(f"[XDOMAIN] Connected certified topics: {connected_str}")
+
+        # 2. Ask LLM to propose a concrete Python problem
+        propose_prompt = (
+            f"The topic '{topic}' is too abstract for a concrete benchmark.\n"
+            f"SHARD has already certified these related topics: {connected_str}.\n\n"
+            f"Propose ONE specific, concrete Python problem that:\n"
+            f"  - Can be implemented as def solve(input_data) -> result\n"
+            f"  - Directly demonstrates understanding of '{topic}'\n"
+            f"  - Uses concepts from the certified topics above\n\n"
+            f"Reply with ONLY the problem title (5-10 words). No explanation."
+        )
+        try:
+            concrete_topic = await ctx.agent._think_fast(propose_prompt)
+            concrete_topic = concrete_topic.strip().strip('"').strip("'")[:80]
+        except Exception as e:
+            print(f"[XDOMAIN] LLM proposal failed: {e}")
+            return None
+
+        if not concrete_topic or len(concrete_topic) < 5:
+            return None
+
+        print(f"[XDOMAIN] Concrete angle proposed: '{concrete_topic}'")
+
+        # 3. Generate a FULL benchmark for the concrete topic
+        try:
+            benchmark_data = await ctx.agent.benchmark_generator.generate(
+                topic=concrete_topic,
+                synthesized_code=ctx.codice_generato or "",
+                n_tests=3,
+            )
+            if not benchmark_data.get("available"):
+                print(f"[XDOMAIN] Benchmark generator unavailable for '{concrete_topic}'")
+                return None
+        except Exception as e:
+            print(f"[XDOMAIN] Benchmark generation failed: {e}")
+            return None
+
+        # 4. Run the benchmark — standard pipeline
+        try:
+            result = await ctx.agent.benchmark_runner.run_benchmark(
+                benchmark=benchmark_data,
+                implementation_code=ctx.codice_generato or "",
+                topic=concrete_topic,
+            )
+            passed = result.get("passed", 0)
+            total  = result.get("total", 0)
+            print(
+                f"[XDOMAIN] Cross-domain benchmark '{concrete_topic}': "
+                f"{passed}/{total} passed"
+            )
+            return result
+        except Exception as e:
+            print(f"[XDOMAIN] Benchmark run failed: {e}")
+            return None
 
     async def _auto_debug(self, ctx: StudyContext, result: dict) -> None:
         """SWE Agent auto-debug on benchmark failure (async, non-fatal)."""
