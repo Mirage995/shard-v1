@@ -324,32 +324,34 @@ def suggest_curriculum_topics(
         from shard_db import query as db_query
 
         # For each certified topic, find topics that require/extend it
+        # Note: knowledge_graph columns are source_concept/target_concept (concept-level)
+        # and topic_origin (the study topic that created the edge).
         placeholders = ",".join("?" * len(certified_topics))
         rows = db_query(
-            f"SELECT source, target, relation_type FROM knowledge_graph "
-            f"WHERE target IN ({placeholders}) "
+            f"SELECT source_concept, target_concept, topic_origin, relation_type FROM knowledge_graph "
+            f"WHERE topic_origin IN ({placeholders}) "
             f"AND relation_type IN ('extends','improves','depends_on','requires')",
             tuple(certified_topics),
         )
 
-        # Count how many certified prereqs each candidate has
+        # Count how many certified prereqs each candidate topic_origin has
         from collections import defaultdict
         prereq_count: dict[str, int] = defaultdict(int)
         for r in rows:
-            candidate = r["source"]  # candidate extends/requires a certified topic
-            if candidate not in certified_topics:
+            candidate = r["topic_origin"]
+            if candidate and candidate not in certified_topics:
                 prereq_count[candidate] += 1
 
-        # Also look at topics that extend certified ones (outward edges)
+        # Also look at outward edges from certified topic_origins
         rows2 = db_query(
-            f"SELECT source, target, relation_type FROM knowledge_graph "
-            f"WHERE source IN ({placeholders}) "
+            f"SELECT source_concept, target_concept, topic_origin, relation_type FROM knowledge_graph "
+            f"WHERE topic_origin IN ({placeholders}) "
             f"AND relation_type IN ('extends','improves')",
             tuple(certified_topics),
         )
         for r in rows2:
-            candidate = r["target"]
-            if candidate not in certified_topics:
+            candidate = r["topic_origin"]
+            if candidate and candidate not in certified_topics:
                 prereq_count[candidate] += 1
 
         if not prereq_count:

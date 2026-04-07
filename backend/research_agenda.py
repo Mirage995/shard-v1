@@ -102,8 +102,8 @@ class ResearchAgenda:
         # Priority 2: Goal gaps
         if not topic_data and goal_prereqs:
             try:
-                missing = self.capability_graph.get_missing_skills()
-                goal_missing = [s for s in missing if s in goal_prereqs]
+                _all_caps = {c.lower() for c in getattr(self.capability_graph, "capabilities", {}).keys()}
+                goal_missing = [s for s in goal_prereqs if s.lower() not in _all_caps]
                 if goal_missing:
                     skill = random.choice(goal_missing)
                     topic = self.learning_map.get(skill) or skill
@@ -140,16 +140,17 @@ class ResearchAgenda:
             except Exception as e:
                 print(f"[RESEARCH AGENDA] Frontier/Inventor skipped: {e}")
 
-        # Priority 4: Absolute Fallback (Random missing skill)
+        # Priority 4: Absolute Fallback (uncertified skills from learning_map)
         if not topic_data:
             try:
-                missing = self.capability_graph.get_missing_skills()
-                if missing:
-                    skill = random.choice(missing)
+                _all_caps = {c.lower() for c in getattr(self.capability_graph, "capabilities", {}).keys()}
+                _uncert = [s for s in self.learning_map if s.lower() not in _all_caps]
+                if _uncert:
+                    skill = random.choice(_uncert)
                     topic = self.learning_map.get(skill) or skill
                     topic_data = {"skill": skill, "topic": topic, "difficulty": 1}
             except Exception:
-                pass 
+                pass
 
         # --- VALIDAZIONE FINALE (L'Exit Gate) ---
         if topic_data:

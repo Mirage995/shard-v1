@@ -589,6 +589,16 @@ class NightRunner:
             _pool_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
             _pool = [l.strip() for l in _pool_file.read_text(encoding="utf-8").splitlines()
                      if l.strip() and not l.startswith("#")] if _pool_file.exists() else []
+            # Extend pool with knowledge_graph topic_origins (organic topics from past study)
+            try:
+                from shard_db import query as _kg_curr_q
+                _kg_pool = [r["topic_origin"] for r in _kg_curr_q(
+                    "SELECT DISTINCT topic_origin FROM knowledge_graph "
+                    "WHERE topic_origin IS NOT NULL LIMIT 60"
+                ) if r["topic_origin"]]
+                _pool = list({*_pool, *_kg_pool})
+            except Exception:
+                pass
             _curr_suggestions = _suggest_curr(_cert_set, _pool, top_n=5)
             _curr_suggestions = [
                 t for t in _curr_suggestions
@@ -736,21 +746,43 @@ class NightRunner:
             except Exception:
                 pass
 
-        # ── Agenda starvation fix #29: gap-based auto-population ─────────────
-        # Before hitting the hardcoded fallback, try to pull a topic from
-        # the capability graph's missing skills (world model gaps).
+        # ── Agenda starvation fix #29: dynamic pool ──────────────────────────
+        # Two reliable SQLite sources that need no missing method:
+        #   1. near-miss experiments (score 6.0-7.4, not certified) -- highest ROI
+        #   2. knowledge_graph topic_origins not yet in capabilities -- organic topics
         try:
-            _missing = capability_graph.get_missing_skills() if hasattr(capability_graph, "get_missing_skills") else []
-            _gap_candidates = [s for s in _missing if is_valid_topic(s, self.logger)
-                               and not self._is_on_cooldown(s)
-                               and not self._is_quarantined(s)
-                               and not self._is_avoided(s)]
-            if _gap_candidates:
-                _gap_topic = random.choice(_gap_candidates[:10])  # pick from top-10 gaps
-                self.logger.info("[AGENDA #29] Gap-based topic selected: %r", _gap_topic)
-                return _gap_topic, "gap_fill", "Agenda starvation fix: capability gap"
+            from shard_db import query as _dyn_q
+            # Source 1: near-miss topics SHARD almost certified
+            _near = _dyn_q("""
+                SELECT DISTINCT topic FROM experiments
+                WHERE certified=0 AND score >= 6.0 AND score < 7.5
+                AND LOWER(topic) NOT IN (SELECT LOWER(name) FROM capabilities)
+                ORDER BY score DESC LIMIT 20
+            """)
+            # Source 2: knowledge_graph topic_origins not yet certified
+            _origins = _dyn_q("""
+                SELECT DISTINCT topic_origin AS topic FROM knowledge_graph
+                WHERE topic_origin IS NOT NULL
+                AND LOWER(topic_origin) NOT IN (SELECT LOWER(name) FROM capabilities)
+                LIMIT 40
+            """)
+            _dyn_pool = []
+            for _r in (_near + _origins):
+                _t = _r["topic"]
+                if (_t not in _dyn_pool
+                        and is_valid_topic(_t, self.logger)
+                        and not is_trivial_topic(_t, self.logger)
+                        and topic_quality(_t)
+                        and not self._is_on_cooldown(_t)
+                        and not self._is_quarantined(_t)
+                        and not self._is_avoided(_t)):
+                    _dyn_pool.append(_t)
+            if _dyn_pool:
+                _dyn_topic = random.choice(_dyn_pool[:15])
+                self.logger.info("[AGENDA #29] Dynamic pool: %r (%d candidates)", _dyn_topic, len(_dyn_pool))
+                return _dyn_topic, "dynamic_pool", f"Dynamic pool ({len(_dyn_pool)} candidates)"
         except Exception as _gap_err:
-            self.logger.debug("[AGENDA #29] Gap fill failed: %s", _gap_err)
+            self.logger.debug("[AGENDA #29] Dynamic pool failed: %s", _gap_err)
 
         # ── Hard rule: block consecutive fallback (#29) ────────────────────────
         if self._last_topic == "python fundamentals review":

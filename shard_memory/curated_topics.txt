@@ -76,3 +76,93 @@ event driven architecture patterns python
 # Re-enable only with docker-compose multi-container setup
 redis data structures implementation python
 message queue design patterns python
+
+# ── Advanced Algorithms ─────────────────────────────────────────────────────
+dijkstra shortest path python
+topological sort kahns algorithm
+segment tree range queries python
+fenwick tree prefix sums python
+string matching kmp algorithm python
+minimum spanning tree kruskal python
+longest common subsequence dp
+rabin karp rolling hash python
+convex hull algorithm python
+network flow max flow algorithm python
+
+# ── Advanced Data Structures ────────────────────────────────────────────────
+avl tree self balancing python
+skip list probabilistic data structure
+bloom filter probabilistic membership python
+lru cache implementation python
+red black tree python
+
+# ── Python Internals ────────────────────────────────────────────────────────
+python bytecode and dis module
+python import system and hooks
+python abstract base classes abc
+python operator overloading dunder methods
+python weakref and finalize patterns
+python functools itertools mastery
+python contextlib advanced patterns
+python enum advanced patterns
+python datamodel reference complete
+
+# ── Concurrency Advanced ─────────────────────────────────────────────────────
+asyncio task groups and cancellation python
+asyncio streams reader writer python
+threading event and condition python
+concurrent futures threadpool processpool
+multiprocessing queue and pipe python
+async generator and async iterator python
+
+# ── Design Patterns Advanced ─────────────────────────────────────────────────
+command pattern undo redo python
+strategy pattern runtime behavior python
+state machine fsm python
+visitor pattern double dispatch python
+chain of responsibility pattern python
+template method pattern python
+composite pattern tree structures python
+flyweight pattern memory optimization python
+
+# ── Parsing and AST ──────────────────────────────────────────────────────────
+recursive descent parser python
+python ast module code analysis
+tokenizer lexer implementation python
+pratt parser expression evaluator python
+
+# ── Testing Advanced ─────────────────────────────────────────────────────────
+parametrize fixtures pytest advanced
+mocking and patching unittest mock
+fuzz testing hypothesis advanced
+benchmark testing timeit cprofile python
+
+# ── Functional Programming ───────────────────────────────────────────────────
+currying partial application python
+lazy evaluation generators advanced python
+immutable data structures python
+monadic error handling result type python
+
+# ── Compression and Encoding ─────────────────────────────────────────────────
+huffman coding python
+run length encoding rle python
+lz77 compression implementation python
+
+# ── Systems and IO ───────────────────────────────────────────────────────────
+mmap memory mapped files python
+signal handling unix python
+subprocess and process management python
+pipe and ipc patterns python
+
+# ── ML Advanced ──────────────────────────────────────────────────────────────
+support vector machine svm python
+random forest bagging ensemble python
+principal component analysis pca python
+naive bayes text classification python
+kmeans clustering implementation python
+
+# ── Software Architecture ────────────────────────────────────────────────────
+event sourcing pattern python
+cqrs command query separation python
+repository pattern python
+solid principles dependency inversion python
