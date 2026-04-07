@@ -143,10 +143,15 @@ class ResearchAgenda:
         # Priority 4: Absolute Fallback (uncertified skills from learning_map)
         if not topic_data:
             try:
-                _all_caps = {c.lower() for c in getattr(self.capability_graph, "capabilities", {}).keys()}
-                _uncert = [s for s in self.learning_map if s.lower() not in _all_caps]
-                if _uncert:
-                    skill = random.choice(_uncert)
+                # Prefer get_missing_skills() if available (mock-compatible),
+                # otherwise derive from capabilities dict (real CapabilityGraph).
+                if hasattr(self.capability_graph, "get_missing_skills"):
+                    missing = self.capability_graph.get_missing_skills()
+                else:
+                    _all_caps = {c.lower() for c in getattr(self.capability_graph, "capabilities", {}).keys()}
+                    missing = [s for s in self.learning_map if s.lower() not in _all_caps]
+                if missing:
+                    skill = random.choice(missing)
                     topic = self.learning_map.get(skill) or skill
                     topic_data = {"skill": skill, "topic": topic, "difficulty": 1}
             except Exception:

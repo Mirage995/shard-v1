@@ -449,11 +449,6 @@ class StrategyMemory:
         strategy = f"[{topic}] " + " | ".join(parts)
         outcome = "success" if verdict == "PASS" else "failure"
 
-        # Quality gate: reject log artefacts and non-actionable blobs
-        if StrategyMemory._is_noise(strategy) or not StrategyMemory._looks_actionable(strategy):
-            print(f"[STRATEGY] Rejected low-quality strategy (noise/not actionable): '{strategy[:80]}'")
-            return None
-
         return {
             "strategy": strategy[:1200],  # Cap to 1200 chars (same as memory gate)
             "outcome": outcome,
