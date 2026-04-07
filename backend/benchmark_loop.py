@@ -44,6 +44,17 @@ except ImportError:
     except ImportError:
         swarm_complete = None
 
+# -- Import scaffold_guardrail (optional -- degrades gracefully if absent) ------
+try:
+    from scaffold_guardrail import GuardrailGate, GuardrailHardBlock
+    _guardrail_available = True
+except ImportError:
+    try:
+        from backend.scaffold_guardrail import GuardrailGate, GuardrailHardBlock
+        _guardrail_available = True
+    except ImportError:
+        _guardrail_available = False
+
 # -- Import concurrency_simulator (optional -- degrades gracefully) -------------
 try:
     from concurrency_simulator import probe_concurrency, format_for_prompt, is_concurrency_task
@@ -76,6 +87,7 @@ def _push_benchmark_event(task_key, attempt, passed, failed, mode):
 
 # -- Config --------------------------------------------------------------------
 MAX_ATTEMPTS_DEFAULT = 5
+MAX_GUARDRAIL_RETRIES = 2   # max swarm regenerations when guardrail blocks output
 LLM_MAX_TOKENS = 8192
 LLM_TEMPERATURE = 0.05
 PYTEST_TIMEOUT = 60  # seconds
@@ -1476,26 +1488,61 @@ async def run_benchmark_loop(
             if _rollback_now and _best_state:
                 print(f"  [rollback] Modalita' chirurgica -- base: tentativo {_best_state.attempt} ({len(_best_state.tests_passed)} pass)")
             print("  [swarm] Calling... ", end="", flush=True)
-            try:
-                response = await swarm_complete(
-                    source=source,
-                    tests=tests,
-                    attempts=attempts,
-                    output_filename=output_filename,
-                    max_tokens=LLM_MAX_TOKENS,
-                    temperature=LLM_TEMPERATURE,
-                    stuck_tests=swarm_stuck if swarm_stuck else None,
-                    rollback_hint=_rollback_now,
-                    rollback_code=_best_state.code if (_rollback_now and _best_state) else None,
-                )
+            _guardrail_constraint: str | None = None
+            response = None
+            for _g_attempt in range(MAX_GUARDRAIL_RETRIES + 1):
+                try:
+                    response = await swarm_complete(
+                        source=source,
+                        tests=tests,
+                        attempts=attempts,
+                        output_filename=output_filename,
+                        max_tokens=LLM_MAX_TOKENS,
+                        temperature=LLM_TEMPERATURE,
+                        stuck_tests=swarm_stuck if swarm_stuck else None,
+                        rollback_hint=_rollback_now,
+                        rollback_code=_best_state.code if (_rollback_now and _best_state) else None,
+                        guardrail_constraint=_guardrail_constraint,
+                    )
+                except Exception as e:
+                    print(f"FAILED: {e}")
+                    attempts.append(AttemptRecord(
+                        attempt=attempt_num, code="", tests_passed=[], tests_failed=[],
+                        error_summary=f"Swarm call failed: {e}", raw_pytest="",
+                        syntax_valid=False, elapsed=time.time() - t_attempt,
+                    ))
+                    response = None
+                    break
+
+                if _guardrail_available:
+                    _gate = GuardrailGate(topic=task_key)
+                    _gresult = _gate.check(response)
+                    if not _gresult.ok:
+                        print(
+                            f"\n  [GUARDRAIL/{_gresult.level}] "
+                            f"{'; '.join(_gresult.violations[:2])}"
+                        )
+                        _guardrail_constraint = _gresult.rejection_reason
+                        if _g_attempt >= MAX_GUARDRAIL_RETRIES:
+                            print("  [GUARDRAIL] Hard block — treating as failed attempt")
+                            attempts.append(AttemptRecord(
+                                attempt=attempt_num, code=response, tests_passed=[], tests_failed=[],
+                                error_summary=f"Guardrail hard block: {_gresult.violations[0]}",
+                                raw_pytest="", syntax_valid=False,
+                                elapsed=time.time() - t_attempt,
+                            ))
+                            response = None
+                        else:
+                            print(
+                                f"  [GUARDRAIL] Retrying with constraint "
+                                f"({_g_attempt + 1}/{MAX_GUARDRAIL_RETRIES})..."
+                            )
+                        continue
+
                 print(f"OK ({len(response):,} chars)")
-            except Exception as e:
-                print(f"FAILED: {e}")
-                attempts.append(AttemptRecord(
-                    attempt=attempt_num, code="", tests_passed=[], tests_failed=[],
-                    error_summary=f"Swarm call failed: {e}", raw_pytest="",
-                    syntax_valid=False, elapsed=time.time() - t_attempt,
-                ))
+                break
+
+            if response is None:
                 continue
         else:
             print("  [llm] Calling... ", end="", flush=True)

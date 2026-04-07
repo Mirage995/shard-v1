@@ -17,8 +17,11 @@ Usage (via benchmark_loop):
 import ast
 import asyncio
 import logging
+import os
 import re
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
+from typing import List, Dict
 
 from constants import PROVIDERS_PRIMARY
 
@@ -28,6 +31,81 @@ except ImportError:
     from backend.llm_router import llm_complete
 
 logger = logging.getLogger("shard.swarm_engine")
+
+# ── MetaObserver ────────────────────────────────────────────────────────────────
+
+# Hard token budget for an entire swarm run.  Override with env var if needed.
+_MAX_SWARM_TOKENS: int = int(os.getenv("SHARD_SWARM_MAX_TOKENS", "25000"))
+
+
+class SwarmBudgetExceeded(RuntimeError):
+    """Raised when the swarm's cumulative token estimate exceeds the budget cap.
+
+    benchmark_loop can catch this and record it as a normal failed attempt
+    rather than letting it bubble up as an unhandled exception.
+    """
+
+
+class SwarmMetaObserver:
+    """Lightweight token tracker and health reporter for a single swarm run.
+
+    Token counting uses a character-based heuristic: (len(prompt) + len(response)) // 4.
+    This is an approximation (~±15 %).
+    # TODO: wire exact counts when llm_router exposes response.usage metadata.
+
+    Usage::
+        observer = SwarmMetaObserver()
+        observer.start()
+        ...
+        observer.record("architect", architect_prompt, strategy)
+        ...
+        observer.log_summary()
+    """
+
+    def __init__(self, budget: int = _MAX_SWARM_TOKENS) -> None:
+        self.budget: int = budget
+        self._phases: List[Dict] = []
+        self._total_tokens: int = 0
+        self._start: float = 0.0
+
+    def start(self) -> None:
+        self._start = time.monotonic()
+
+    def record(self, phase: str, prompt: str, response: str) -> None:
+        """Record one LLM call.  Raises SwarmBudgetExceeded if budget is exceeded."""
+        # TODO: replace heuristic with response.usage.total_tokens once llm_router exposes it
+        tokens = (len(prompt) + len(response)) // 4
+        self._total_tokens += tokens
+        self._phases.append({"phase": phase, "tokens": tokens, "cumulative": self._total_tokens})
+        logger.debug(
+            "[META] phase=%-22s  tokens=%5d  cumulative=%6d",
+            phase, tokens, self._total_tokens,
+        )
+        if self._total_tokens > self.budget:
+            logger.error(
+                "[META] Budget cap hit: %d > %d tokens (phase=%s)",
+                self._total_tokens, self.budget, phase,
+            )
+            raise SwarmBudgetExceeded(
+                f"Swarm token budget exceeded at phase '{phase}': "
+                f"{self._total_tokens} > {self.budget}"
+            )
+
+    def log_summary(self) -> None:
+        """Print a concise phase breakdown to logger + stdout."""
+        elapsed = time.monotonic() - self._start
+        lines = [f"[META] Swarm health report  ({elapsed:.1f}s):"]
+        for p in self._phases:
+            lines.append(f"  {p['phase']:<24s}  {p['tokens']:>6d} tok")
+        lines.append(f"  {'─' * 24}  {'──────'}")
+        lines.append(
+            f"  {'TOTAL':<24s}  {self._total_tokens:>6d} tok  "
+            f"(budget: {self.budget}, used: {self._total_tokens * 100 // self.budget}%)"
+        )
+        summary = "\n".join(lines)
+        logger.info(summary)
+        print(summary)
+
 
 # ── System prompts ──────────────────────────────────────────────────────────────
 
@@ -323,7 +401,8 @@ Produce your STRATEGY DOCUMENT now."""
 
 
 def _build_coder_prompt(
-    source: str, current_code: str, strategy: str, output_filename: str, attempts: list
+    source: str, current_code: str, strategy: str, output_filename: str, attempts: list,
+    guardrail_constraint: str | None = None,
 ) -> str:
     best = max(attempts, key=lambda a: len(a.tests_passed)) if attempts else None
     guard_block = ""
@@ -334,8 +413,16 @@ def _build_coder_prompt(
 {guard_list}
 """
 
-    return f"""Implement the Architect's strategy to produce a corrected {output_filename}.
+    constraint_block = ""
+    if guardrail_constraint:
+        constraint_block = (
+            f"\n=== GUARDRAIL CONSTRAINT (MANDATORY — previous output was blocked) ===\n"
+            f"{guardrail_constraint}\n"
+            f"You MUST fix this violation before producing the output.\n"
+        )
 
+    return f"""Implement the Architect's strategy to produce a corrected {output_filename}.
+{constraint_block}
 === ARCHITECT STRATEGY ===
 {strategy}
 
@@ -372,6 +459,7 @@ async def swarm_complete(
     stuck_tests: list = None,
     rollback_hint: bool = False,
     rollback_code: str = None,
+    guardrail_constraint: str | None = None,
 ) -> str:
     """Multi-agent pipeline: Architect -> Coder -> Multi-Reviewer -> (Coder patch if needed).
 
@@ -387,6 +475,9 @@ async def swarm_complete(
         temperature:     Forwarded to Coder calls only.
     """
     logger.info("[SWARM] Starting pipeline (%d prior attempts, rollback=%s)", len(attempts), rollback_hint)
+
+    observer = SwarmMetaObserver()
+    observer.start()
 
     # Rollback mode: start from the best known state, not the last (regressive) attempt
     if rollback_hint and rollback_code:
@@ -408,10 +499,12 @@ async def swarm_complete(
         temperature=0.1,
     )
     logger.info("[SWARM] Architect OK (%d chars)", len(strategy))
+    observer.record("architect", architect_prompt, strategy)
 
     # ── Step 2: Coder ────────────────────────────────────────────────────────
     coder_prompt = _build_coder_prompt(
-        source, current_code, strategy, output_filename, attempts
+        source, current_code, strategy, output_filename, attempts,
+        guardrail_constraint=guardrail_constraint,
     )
     coder_system = SYSTEM_PROMPT_CODER_SURGICAL if rollback_hint else SYSTEM_PROMPT_CODER
     raw_code = await llm_complete(
@@ -422,6 +515,7 @@ async def swarm_complete(
     )
     code = _extract_code(raw_code)
     logger.info("[SWARM] Coder OK (%d chars)", len(code))
+    observer.record("coder", coder_prompt, raw_code)
 
     # ── Step 3: Critic (baseline) ────────────────────────────────────────────
     critic_prompt = _build_critic_prompt(code, tests, output_filename)
@@ -432,6 +526,7 @@ async def swarm_complete(
         temperature=0.0,
     )
     logger.info("[SWARM] Critic verdict: %s", verdict[:80])
+    observer.record("critic", critic_prompt, verdict)
 
     # ── Step 4: Multi-reviewer (parallel specialized critics) ─────────────────
     # Focus Mode: if the same tests have been stuck for ≥2 consecutive rounds,
@@ -475,7 +570,11 @@ async def swarm_complete(
                         temperature=0.0,
                         providers=PROVIDERS_PRIMARY,
                     )
-                return spec.name, result.strip()
+                result = result.strip()
+                observer.record(f"reviewer_{spec.name.lower()}", prompt, result)
+                return spec.name, result
+            except SwarmBudgetExceeded:
+                raise  # budget exceeded -- must propagate, not fail-open
             except Exception as exc:
                 logger.warning("[SWARM] Reviewer '%s' failed: %s", spec.name, exc)
                 return spec.name, f"{spec.name.upper()}: APPROVED"  # fail-open
@@ -503,15 +602,19 @@ async def swarm_complete(
                 max_tokens=max_tokens,
                 temperature=temperature,
             )
+            observer.record("coder_patch", patch_prompt, patched_raw)
             patched_code = _extract_code(patched_raw)
             if patched_code and len(patched_code) > 50:
                 code = patched_code
                 logger.info("[SWARM] Coder patch applied (%d chars)", len(code))
             else:
                 logger.warning("[SWARM] Coder patch returned empty/short code -- keeping original")
+        except SwarmBudgetExceeded:
+            raise  # budget exceeded -- propagate cleanly
         except Exception as exc:
             logger.warning("[SWARM] Coder patch failed: %s -- keeping Coder output", exc)
     else:
         logger.info("[SWARM] All reviewers approved -- no patch needed")
 
+    observer.log_summary()
     return code

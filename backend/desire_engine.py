@@ -19,9 +19,10 @@ _ROOT         = Path(__file__).resolve().parents[1]
 _STATE_PATH   = _ROOT / "shard_memory" / "desire_state.json"
 
 # Weights for composite desire score
-_W_BASE        = 0.40   # world-model relevance / priority
-_W_FRUSTRATION = 0.35   # normalized frustration hits
-_W_CURIOSITY   = 0.25   # semantic adjacency pull from recent certs
+_W_BASE        = 0.35   # world-model relevance / priority
+_W_FRUSTRATION = 0.30   # normalized frustration hits
+_W_CURIOSITY   = 0.20   # semantic adjacency pull from recent certs
+_W_UNCERTAINTY = 0.15   # epistemic fragility of certified knowledge
 
 # Junk regex -- same logic as self_model, prevents frustration boost on nonsense
 _JUNK_RE = re.compile(
@@ -51,6 +52,7 @@ class DesireState:
         curiosity_pull: float = 0.0,
         engagement_scores: Optional[List[float]] = None,
         last_updated: Optional[str] = None,
+        uncertainty_signal: float = 0.0,
     ):
         self.topic = topic
         self.base_priority = base_priority
@@ -58,6 +60,7 @@ class DesireState:
         self.curiosity_pull = curiosity_pull
         self.engagement_scores: List[float] = engagement_scores or []
         self.last_updated = last_updated or _now()
+        self.uncertainty_signal: float = uncertainty_signal
 
     @property
     def avg_engagement(self) -> float:
@@ -66,12 +69,20 @@ class DesireState:
         return sum(self.engagement_scores[-5:]) / len(self.engagement_scores[-5:])
 
     def desire_score(self) -> float:
-        """Composite desire score 0–1."""
+        """Composite desire score 0–1.
+
+        Four signals:
+          base_priority    -- world-model relevance
+          frustration_norm -- how often this topic blocked SHARD
+          curiosity_pull   -- semantic adjacency from recent certifications
+          uncertainty      -- epistemic fragility (certified but shaky knowledge)
+        """
         frustration_norm = min(1.0, self.frustration_hits / 5.0)
         return round(
-            _W_BASE * self.base_priority
+            _W_BASE        * self.base_priority
             + _W_FRUSTRATION * frustration_norm
-            + _W_CURIOSITY * self.curiosity_pull,
+            + _W_CURIOSITY   * self.curiosity_pull
+            + _W_UNCERTAINTY * self.uncertainty_signal,
             4,
         )
 
@@ -83,6 +94,7 @@ class DesireState:
             "curiosity_pull": self.curiosity_pull,
             "engagement_scores": self.engagement_scores,
             "last_updated": self.last_updated,
+            "uncertainty_signal": self.uncertainty_signal,
         }
 
     @classmethod
@@ -94,6 +106,7 @@ class DesireState:
             curiosity_pull=d.get("curiosity_pull", 0.0),
             engagement_scores=d.get("engagement_scores", []),
             last_updated=d.get("last_updated"),
+            uncertainty_signal=d.get("uncertainty_signal", 0.0),
         )
 
 
@@ -131,7 +144,21 @@ class DesireEngine:
                 base = wm.relevance(topic)
             except Exception:
                 pass
-            self._state[topic] = DesireState(topic=topic, base_priority=base)
+            # Seed uncertainty_signal from UncertaintyTracker if topic is certified
+            uncertainty = 0.0
+            try:
+                try:
+                    from uncertainty_tracker import get_uncertainty
+                except ImportError:
+                    from backend.uncertainty_tracker import get_uncertainty
+                uncertainty = get_uncertainty(topic)
+            except Exception:
+                pass
+            self._state[topic] = DesireState(
+                topic=topic,
+                base_priority=base,
+                uncertainty_signal=uncertainty,
+            )
         return self._state[topic]
 
     # ── Frustration drive ──────────────────────────────────────────────────────
@@ -300,6 +327,17 @@ class DesireEngine:
             if topic:
                 self.clear_frustration(topic)
                 self.update_curiosity(topic)
+                # Refresh uncertainty: fresh certification should lower the signal
+                try:
+                    try:
+                        from uncertainty_tracker import get_uncertainty
+                    except ImportError:
+                        from backend.uncertainty_tracker import get_uncertainty
+                    ds = self._get_or_create(topic)
+                    ds.uncertainty_signal = get_uncertainty(topic)
+                    self._save()
+                except Exception:
+                    pass
 
         elif event_type == "skill_failed":
             # NightRunner already calls update_frustration() directly before broadcasting.

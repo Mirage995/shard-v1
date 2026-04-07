@@ -24,6 +24,51 @@ from typing import Optional
 
 logger = logging.getLogger("shard.cross_task_router")
 
+# ── Live near-miss cache (populated from DB at session start) ─────────────────
+# Module-level mutable set so refresh_near_miss_from_db() can update it.
+_live_near_miss: set[str] = set()
+
+
+def _get_db_safe():
+    """Return DB connection or None on import error (avoids circular deps)."""
+    try:
+        try:
+            from shard_db import get_db
+        except ImportError:
+            from backend.shard_db import get_db
+        return get_db()
+    except Exception:
+        return None
+
+
+def refresh_near_miss_from_db() -> None:
+    """Populate _live_near_miss from SQLite experiments table.
+
+    Queries topics that scored 6.0–7.4 (near cert threshold) but were never
+    certified. These get the 1.3x strategy boost at routing time.
+    Call once at session start (e.g. from night_runner or benchmark_loop init).
+    """
+    conn = _get_db_safe()
+    if conn is None:
+        logger.debug("[ROUTER] refresh_near_miss_from_db: DB unavailable, skipping")
+        return
+    try:
+        rows = conn.execute(
+            """SELECT DISTINCT topic FROM experiments
+               WHERE certified=0 AND score >= 6.0 AND score < 7.5
+               ORDER BY score DESC LIMIT 30"""
+        ).fetchall()
+        fresh: set[str] = set()
+        for row in rows:
+            t = row["topic"] if hasattr(row, "__getitem__") else row[0]
+            if t:
+                fresh.add(t.lower().strip())
+        _live_near_miss.clear()
+        _live_near_miss.update(fresh)
+        logger.info("[ROUTER] near-miss cache refreshed: %d live topics", len(_live_near_miss))
+    except Exception as e:
+        logger.debug("[ROUTER] refresh_near_miss_from_db failed: %s", e)
+
 # ── Micro-cluster taxonomy ─────────────────────────────────────────────────────
 
 MICRO_CLUSTERS: dict[str, list[str]] = {
@@ -150,7 +195,9 @@ def get_strategy_penalty(strategy_text: str) -> float:
 def _is_near_miss(topic: str) -> bool:
     """True if topic is in the near-miss registry (case-insensitive)."""
     tl = topic.lower().strip()
-    return any(nm in tl or tl in nm for nm in NEAR_MISS_TOPICS)
+    if not tl:
+        return False
+    return any(nm in tl or tl in nm for nm in NEAR_MISS_TOPICS | _live_near_miss)
 
 
 def apply_routing(
