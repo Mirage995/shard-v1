@@ -112,6 +112,23 @@ class InitPhase(BasePhase):
             )
             print(f"[TASK CONTEXT] Injected {len(ctx.task_context)} chars of task context for '{ctx.topic}'")
 
+        # Phase 0 memory: "what do I already know about this topic?"
+        # Queries SHARD.MEMORY for all memory types before any study begins.
+        # Prepended so it's the first context SYNTHESIZE sees — SHARD starts
+        # from known ground instead of from zero every session.
+        try:
+            _prior = ctx.agent._memory_context_block(
+                ctx.topic,
+                memory_types=None,   # all types: FACT, RELATION, EPISODE, GOAL, PREFERENCE
+                label="WHAT SHARD ALREADY KNOWS",
+                limit=8,
+            )
+            if _prior:
+                ctx.episode_context = _prior + "\n\n" + (ctx.episode_context or "")
+                print(f"[MEMORY P0] Prior knowledge injected ({_prior.count(chr(10))} lines) for '{ctx.topic}'")
+        except Exception:
+            pass  # always non-fatal
+
 
 # ── 2. MapPhase ──────────────────────────────────────────────────────────────
 
