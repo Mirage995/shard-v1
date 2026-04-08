@@ -3,6 +3,9 @@
 Replaces the legacy stub with a real LLM-powered test case generator.
 Each generated test is validated with ast.parse before being returned.
 Malformed tests are silently discarded -- they never penalise the agent.
+
+Network topics (#20): detected via is_network_topic() and routed to _USER_TEMPLATE_MOCK_NETWORK,
+which uses unittest.mock monkeypatching so tests run inside Docker --network none without error.
 """
 import ast
 import json
@@ -11,6 +14,25 @@ from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 
 DEFAULT_N_TESTS = 5
+
+# ── Network topic detection ────────────────────────────────────────────────────
+
+# Tight keyword set: only trigger on explicit networking terms.
+# Deliberately excludes "network" alone to avoid matching "neural network".
+_NETWORK_KEYWORDS = frozenset({
+    "socket", "tcp", "udp", "http", "https", "websocket",
+    "urllib", "requests", "aiohttp", "httpx", "http.client",
+    "ftp", "smtp", "pop3", "imap", "dns",
+})
+
+
+def is_network_topic(topic: str) -> bool:
+    """Return True if *topic* requires network I/O and should use mock-based benchmarks."""
+    tokens = set(topic.lower().replace("-", " ").replace("_", " ").split())
+    return bool(tokens & _NETWORK_KEYWORDS)
+
+
+# ── Prompt templates ───────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = (
     "You are a senior Python test engineer. "
@@ -55,6 +77,68 @@ Rules:
 - If the topic cannot be expressed as a callable function, return {{"scaffold": "", "tests": []}}\
 """
 
+_USER_TEMPLATE_MOCK_NETWORK = """\
+Generate exactly {n_tests} Python benchmark test cases for this NETWORK topic:
+
+TOPIC: {topic}
+
+The agent wrote this implementation (for reference -- do NOT copy it verbatim):
+{code_snippet}
+
+CRITICAL CONSTRAINT: The sandbox has NO real network access (Docker --network none).
+All tests MUST use only unittest.mock from the Python standard library to simulate network I/O.
+DO NOT use any external mock libraries (no pytest-mock, responses, httpretty, aioresponses, vcrpy, or any other third-party library).
+unittest.mock is the ONLY allowed mocking tool.
+
+Return a JSON object with EXACTLY this structure:
+{{
+  "scaffold": "import socket\\nimport unittest.mock\\n\\ndef solve(input_data):\\n    # implement network logic here\\n    pass",
+  "tests": [
+    {{
+      "description": "what this test checks",
+      "setup": "import socket\\nimport unittest.mock\\n_mock_sock = unittest.mock.MagicMock()\\n_mock_sock.recv.return_value = b'Hello'\\nsocket.socket = lambda *a, **kw: _mock_sock\\ninput_data = {{'host': 'localhost', 'port': 8080}}\\nexpected = b'Hello'",
+      "assert_expr": "assert solve(input_data) == expected"
+    }}
+  ]
+}}
+
+Monkeypatching rules (choose the right pattern for the topic):
+- socket topics:
+    import socket, unittest.mock
+    _mock_sock = unittest.mock.MagicMock()
+    _mock_sock.recv.return_value = b"<response bytes>"
+    socket.socket = lambda *a, **kw: _mock_sock
+- requests topics:
+    import requests, unittest.mock
+    _mock_resp = unittest.mock.MagicMock()
+    _mock_resp.status_code = 200
+    _mock_resp.json.return_value = {{"key": "value"}}
+    _mock_resp.text = '{{"key": "value"}}'
+    requests.get = lambda *a, **kw: _mock_resp
+- http.client topics:
+    import http.client, unittest.mock
+    _mock_conn = unittest.mock.MagicMock()
+    _mock_resp = unittest.mock.MagicMock()
+    _mock_resp.status = 200
+    _mock_resp.read.return_value = b"<body>"
+    _mock_conn.getresponse.return_value = _mock_resp
+    http.client.HTTPConnection = lambda *a, **kw: _mock_conn
+
+Additional rules:
+- The function signature must ALWAYS be: def solve(input_data)
+- solve() MUST use the real network API (socket.socket(), requests.get(), http.client.HTTPConnection(), etc.) -- the mock intercepts at runtime
+- 'input_data' must be a dict with connection parameters (host, port, url, path, method, data, etc.)
+- 'expected' must be a Python literal (bytes, str, int, dict, list, bool)
+- 'assert_expr' must be a simple one-liner: assert solve(input_data) == expected
+- Monkeypatching happens in 'setup', BEFORE solve() is called -- never inside assert_expr
+- Do NOT use with-statement patches or decorators -- only direct attribute replacement
+- Do NOT import anything outside of: socket, requests, http.client, urllib, urllib.request, urllib.parse, collections, unittest.mock
+- solve() must be synchronous (def, not async def) -- use asyncio.run() internally if the topic requires it
+- Tests must cover: basic success case, error/edge case, and a data variation
+- All values must be valid Python literals (no placeholders like '...' or <value>)
+- If the topic cannot be expressed as a callable function, return {{"scaffold": "", "tests": []}}\
+"""
+
 
 class BenchmarkGenerator:
     """Generates objective test cases for StudyAgent benchmark certification.
@@ -92,7 +176,10 @@ class BenchmarkGenerator:
             return _unavailable(topic, "no LLM callable configured")
 
         code_snippet = synthesized_code[:600].strip() or "(no implementation provided)"
-        prompt = _USER_TEMPLATE.format(
+        template = _USER_TEMPLATE_MOCK_NETWORK if is_network_topic(topic) else _USER_TEMPLATE
+        if is_network_topic(topic):
+            print(f"[BENCHMARK_GEN] Network topic detected -- using mock template for '{topic}'")
+        prompt = template.format(
             topic=topic,
             code_snippet=code_snippet,
             n_tests=n_tests,
@@ -127,6 +214,27 @@ class BenchmarkGenerator:
             else:
                 print(f"[BENCHMARK_GEN] [WARN] Test {i} discarded: {verdict['reason']}")
 
+        # ── Network topic guard: save/restore modules that setup code may monkeypatch ──
+        # In Docker (production), each test runs in an isolated process so global
+        # mutations are safe.  Here in the host process (validation), we must restore.
+        _net_guards: List[tuple] = []
+        if is_network_topic(topic):
+            import importlib as _il
+            for _mod_name in ("socket", "requests", "http.client", "urllib.request"):
+                try:
+                    _mod = _il.import_module(_mod_name)
+                    _net_guards.append((_mod, dict(vars(_mod))))
+                except Exception:
+                    pass
+
+        def _restore_net_guards() -> None:
+            for _mod, _snapshot in _net_guards:
+                for _k, _v in _snapshot.items():
+                    try:
+                        setattr(_mod, _k, _v)
+                    except Exception:
+                        pass
+
         # Runtime consistency check #1: run scaffold stub + each test
         # Catches attribute/type errors that the stub exposes (e.g. input_data.split() on a list).
         consistent_tests = []
@@ -141,6 +249,8 @@ class BenchmarkGenerator:
                 print(f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded (stub type error): {e}")
             except Exception:
                 consistent_tests.append(t)  # other errors are OK (NotImplemented, etc.)
+            finally:
+                _restore_net_guards()
 
         if len(consistent_tests) < len(valid_tests):
             print(f"[BENCHMARK_GEN] Runtime check: {len(valid_tests) - len(consistent_tests)} inconsistent tests dropped")
@@ -168,6 +278,8 @@ class BenchmarkGenerator:
                     )
             except Exception:
                 type_checked.append(t)  # if we can't eval setup, keep it
+            finally:
+                _restore_net_guards()
 
         if len(type_checked) < len(consistent_tests):
             print(f"[BENCHMARK_GEN] Type-homogeneity check: {len(consistent_tests) - len(type_checked)} tests dropped")

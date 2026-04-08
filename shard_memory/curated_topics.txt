@@ -23,15 +23,14 @@ sliding window technique
 two pointer technique
 
 # Systems & Networking
-# DISABLED — sandbox runs with --network none, socket/network code fails physically
-# http client implementation python
-# websocket protocol implementation
-# tcp socket programming python
-# async io with python selectors
-# dns resolution python
-# Re-enable only if sandbox gets loopback networking support
+# Mock-based networking enabled (#20) — unittest.mock patches network calls, no real internet needed
+http client implementation python
+tcp socket programming python
+# websocket protocol implementation  ← re-enable after mock networking is validated
+# async io with python selectors      ← selectors use real fds, keep disabled for now
+# dns resolution python               ← requires real socket.getaddrinfo, keep disabled
 
-# Systems & Networking (sandbox-safe alternatives)
+# Systems & Networking (sandbox-safe alternatives — still valid)
 http request parsing python
 socket concepts and protocols theory
 network protocol design patterns
