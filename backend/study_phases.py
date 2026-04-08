@@ -938,10 +938,36 @@ class CertifyRetryGroup(BasePhase):
                 print(f"[BENCHMARK] post-certify: generator unavailable for '{ctx.topic}'")
                 return
 
+            # Ensure implementation has def solve(input_data) signature.
+            # ctx.codice_generato is free-form code from the sandbox phase — it may
+            # use any function name.  benchmark_runner requires exactly def solve(.
+            impl_code = ctx.codice_generato or ""
+            if "def solve(" not in impl_code:
+                scaffold = benchmark_data.get("scaffold", "def solve(input_data):\n    pass")
+                import re as _re_pcb
+                solve_prompt = (
+                    f"You just studied and were certified on: '{ctx.topic}'.\n"
+                    f"Implement the following scaffold by applying what you know:\n\n"
+                    f"{scaffold}\n\n"
+                    f"Return ONLY the complete Python function. No explanation, no markdown."
+                )
+                try:
+                    new_impl = await ctx.agent._think_fast(solve_prompt)
+                    new_impl = _re_pcb.sub(r"```(?:python)?|```", "", new_impl or "").strip()
+                    if new_impl and "def solve(" in new_impl:
+                        impl_code = new_impl
+                        print(f"[BENCHMARK] post-certify: generated solve() impl ({len(impl_code)} chars)")
+                    else:
+                        print(f"[BENCHMARK] post-certify: solve() generation failed — skipping benchmark")
+                        return
+                except Exception as _e:
+                    print(f"[BENCHMARK] post-certify: solve() generation error: {_e} — skipping")
+                    return
+
             # Run via real async run_benchmark() — signature: (benchmark, implementation_code, topic)
             result = await ctx.agent.benchmark_runner.run_benchmark(
                 benchmark=benchmark_data,
-                implementation_code=ctx.codice_generato or "",
+                implementation_code=impl_code,
                 topic=ctx.topic,
             )
 
@@ -976,7 +1002,7 @@ Do NOT call list methods (.append(), indexing) on a dict.
 Match the actual type.
 
 Previous implementation for reference (type handling was wrong):
-{(ctx.codice_generato or '')[:800]}
+{impl_code[:800]}
 
 Rules:
 - valid Python, no markdown, no explanations, terminates automatically

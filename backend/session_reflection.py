@@ -149,7 +149,9 @@ class SessionReflection:
                 text = text[:_MAX_REFLECTION_CHARS] + "..."
             certified = rec.get("certified", [])
             certified_line = (
-                f"Certified: {', '.join(certified[:6])}" if certified else ""
+                f"Certified: {', '.join(certified[:6])}"
+                if isinstance(certified, list) and certified
+                else ""
             )
             parts.append(f"\n--- {ts} ---")
             if certified_line:
