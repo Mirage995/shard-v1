@@ -248,21 +248,19 @@ class SelfModelTracker:
         try:
             direction = "underconfident" if error > 0 else "overconfident"
             severity  = "severe" if abs(error) >= 4.0 else "significant"
-            record = {
-                "type":      "prediction_audit",
-                "ts":        datetime.now().isoformat(),
-                "topic":     topic,
-                "predicted": predicted,
-                "actual":    actual,
-                "error":     error,
-                "certified": certified,
-                "direction": direction,
-                "severity":  severity,
-            }
-            rpath = _MEM / "session_reflections.jsonl"
-            _MEM.mkdir(parents=True, exist_ok=True)
-            with rpath.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            text = (
+                f"[prediction_audit] {direction.upper()} on '{topic}': "
+                f"predicted={predicted:.1f} actual={actual:.1f} gap={error:+.1f} "
+                f"severity={severity} certified={certified}"
+            )
+            from shard_db import get_db
+            db = get_db()
+            db.execute(
+                """INSERT INTO session_reflections (session_id, ts, certified, failed, text)
+                   VALUES (?, ?, ?, ?, ?)""",
+                ("audit", datetime.now().isoformat(), 1 if certified else 0, 0, text),
+            )
+            db.commit()
             logger.warning(
                 "[AUDIT] %s prediction on '%s': predicted=%.1f actual=%.1f gap=%+.1f",
                 direction.upper(), topic, predicted, actual, error,
@@ -443,19 +441,58 @@ class SelfModelTracker:
 
     def _save_prediction(self, record: Dict) -> None:
         try:
-            _MEM.mkdir(parents=True, exist_ok=True)
-            with _PRED_PATH.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            from shard_db import get_db
+            db = get_db()
+            db.execute(
+                """INSERT INTO predictions
+                   (topic, predicted, actual, error, certified, features, context, ts)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    record.get("topic", ""),
+                    record.get("predicted"),
+                    record.get("actual"),
+                    record.get("error"),
+                    1 if record.get("certified") else 0,
+                    json.dumps(record.get("features") or {}),
+                    record.get("context", ""),
+                    record.get("timestamp", datetime.now().isoformat()),
+                ),
+            )
+            db.commit()
+            # TTL pruning: keep latest 500
+            db.execute(
+                "DELETE FROM predictions WHERE id <= "
+                "(SELECT id FROM predictions ORDER BY id DESC LIMIT 1 OFFSET 500)"
+            )
+            db.commit()
         except Exception as exc:
-            logger.warning("[SELF_MODEL] Failed to save prediction: %s", exc)
+            logger.warning("[SELF_MODEL] Failed to save prediction to SQLite: %s", exc)
 
     def _save_inconsistency(self, gap: Dict, topic: str, error: float) -> None:
         try:
-            _MEM.mkdir(parents=True, exist_ok=True)
-            ipath = _MEM / "self_inconsistencies.jsonl"
-            record = {**gap, "topic": topic, "error": error,
-                      "timestamp": datetime.now().isoformat()}
-            with ipath.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            from shard_db import get_db
+            db = get_db()
+            db.execute(
+                """INSERT INTO self_inconsistencies
+                   (topic, event_type, feature, context, global_w, contextual_w, gap, error, ts)
+                   VALUES (?, 'inconsistency', ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    topic,
+                    gap.get("feature", ""),
+                    gap.get("context", ""),
+                    gap.get("global_w"),
+                    gap.get("contextual_w"),
+                    gap.get("gap"),
+                    error,
+                    datetime.now().isoformat(),
+                ),
+            )
+            db.commit()
+            # TTL pruning: keep latest 500
+            db.execute(
+                "DELETE FROM self_inconsistencies WHERE id <= "
+                "(SELECT id FROM self_inconsistencies ORDER BY id DESC LIMIT 1 OFFSET 500)"
+            )
+            db.commit()
         except Exception as exc:
-            logger.warning("[SELF_MODEL] Failed to save inconsistency: %s", exc)
+            logger.warning("[SELF_MODEL] Failed to save inconsistency to SQLite: %s", exc)

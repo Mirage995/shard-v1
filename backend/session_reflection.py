@@ -3,7 +3,7 @@ session_reflection.py -- SHARD end-of-session LLM reflection.
 
 At the end of each NightRunner session, generates a structured LLM reflection
 that identifies patterns, connections, and surprises across the session's work.
-Stored in shard_memory/session_reflections.jsonl and injected as context into
+Stored in shard.db session_reflections table and injected as context into
 the next session's opening prompt.
 """
 
@@ -32,29 +32,81 @@ def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _append_jsonl(path: Path, record: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(record, ensure_ascii=False) + "\n")
-
-
-def _load_recent_reflections(path: Path, n: int) -> list[dict]:
+def _save_reflection(record: dict) -> None:
+    """Insert a reflection record into SQLite. Falls back to .jsonl on error."""
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-        records = []
-        for line in reversed(lines):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                records.append(json.loads(line))
-            except Exception:
-                continue
-            if len(records) >= n:
-                break
-        return list(reversed(records))
+        from shard_db import get_db
+        db = get_db()
+        certified = record.get("certified", [])
+        failed = record.get("failed", [])
+        db.execute(
+            """INSERT INTO session_reflections (session_id, ts, certified, failed, text)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                record.get("session_id", ""),
+                record.get("ts", ""),
+                json.dumps(certified) if isinstance(certified, list) else str(certified),
+                json.dumps(failed) if isinstance(failed, list) else str(failed),
+                record.get("text", ""),
+            ),
+        )
+        db.commit()
+        # TTL pruning: keep latest 200
+        db.execute(
+            "DELETE FROM session_reflections WHERE id <= "
+            "(SELECT id FROM session_reflections ORDER BY id DESC LIMIT 1 OFFSET 200)"
+        )
+        db.commit()
     except Exception:
-        return []
+        # Last-resort fallback
+        path = _REFLECTIONS_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def _load_recent_reflections(n: int) -> list[dict]:
+    """Load the N most recent session reflections from SQLite."""
+    try:
+        from shard_db import get_db
+        rows = get_db().execute(
+            "SELECT session_id, ts, certified, failed, text FROM session_reflections "
+            "ORDER BY id DESC LIMIT ?",
+            (n,),
+        ).fetchall()
+        result = []
+        for row in reversed(rows):
+            r = dict(row) if isinstance(row, dict) else {
+                "session_id": row[0], "ts": row[1],
+                "certified": row[2], "failed": row[3], "text": row[4],
+            }
+            # Deserialise JSON arrays stored as strings
+            for field in ("certified", "failed"):
+                if isinstance(r.get(field), str):
+                    try:
+                        r[field] = json.loads(r[field])
+                    except Exception:
+                        r[field] = []
+            result.append(r)
+        return result
+    except Exception:
+        # Fallback: read from .jsonl if SQLite unavailable
+        try:
+            lines = _REFLECTIONS_PATH.read_text(encoding="utf-8").splitlines()
+            records = []
+            for line in reversed(lines):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    records.append(json.loads(line))
+                except Exception:
+                    continue
+                if len(records) >= n:
+                    break
+            return list(reversed(records))
+        except Exception:
+            return []
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +174,7 @@ class SessionReflection:
             "text": reflection_text,
         }
         try:
-            _append_jsonl(self._path, record)
+            _save_reflection(record)
         except Exception:
             pass
 
@@ -137,7 +189,7 @@ class SessionReflection:
         Return a string block summarising the N most recent reflections.
         Suitable for injection at the top of NightRunner's session prompt.
         """
-        records = _load_recent_reflections(self._path, n)
+        records = _load_recent_reflections(n)
         if not records:
             return ""
 

@@ -177,6 +177,60 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
         """)
         logger.info("[SHARD_DB] Migration v5 applied -- memories table")
 
+    if current < 6:
+        conn.executescript("""
+            -- Predictions log (replaces predictions.jsonl)
+            CREATE TABLE IF NOT EXISTS predictions (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                topic      TEXT    NOT NULL,
+                predicted  REAL,
+                actual     REAL,
+                error      REAL,
+                certified  INTEGER DEFAULT 0,
+                features   TEXT,
+                context    TEXT,
+                ts         TEXT    NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_pred_topic ON predictions(topic);
+            CREATE INDEX IF NOT EXISTS idx_pred_ts    ON predictions(ts);
+
+            -- Self inconsistencies log (replaces self_inconsistencies.jsonl)
+            CREATE TABLE IF NOT EXISTS self_inconsistencies (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                topic      TEXT,
+                event_type TEXT    NOT NULL DEFAULT 'inconsistency',
+                feature    TEXT,
+                context    TEXT,
+                global_w   REAL,
+                contextual_w REAL,
+                gap        REAL,
+                error      REAL,
+                severity   TEXT,
+                resolution TEXT,
+                explanation TEXT,
+                extra      TEXT,
+                ts         TEXT    NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_incons_topic ON self_inconsistencies(topic);
+            CREATE INDEX IF NOT EXISTS idx_incons_ts    ON self_inconsistencies(ts);
+
+            -- Session reflections log (replaces session_reflections.jsonl)
+            CREATE TABLE IF NOT EXISTS session_reflections (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT,
+                ts         TEXT    NOT NULL DEFAULT (datetime('now')),
+                certified  TEXT    DEFAULT '[]',
+                failed     TEXT    DEFAULT '[]',
+                text       TEXT    NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_refl_session ON session_reflections(session_id);
+            CREATE INDEX IF NOT EXISTS idx_refl_ts      ON session_reflections(ts);
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (6, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v6 applied -- predictions + self_inconsistencies + session_reflections tables")
+
 
 def get_db() -> sqlite3.Connection:
     """Return the singleton SQLite connection.

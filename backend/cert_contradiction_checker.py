@@ -451,42 +451,50 @@ def _persist_resolution(
     explanation: str,
     action_taken: str,
 ) -> None:
-    """Append resolution record to self_inconsistencies.jsonl."""
+    """Persist resolution record to SQLite self_inconsistencies table."""
     try:
-        _MEMORY_DIR.mkdir(parents=True, exist_ok=True)
-        record = {
-            "timestamp":       datetime.now().isoformat(),
-            "event":           "resolution",
-            "topic":           topic,
-            "resolution":      resolution,
-            "conflicting_id":  conflicting_id,
-            "explanation":     explanation,
-            "action_taken":    action_taken,
-        }
-        with _INCONS_PATH.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        from shard_db import get_db
+        db = get_db()
+        db.execute(
+            """INSERT INTO self_inconsistencies
+               (topic, event_type, resolution, explanation, extra, ts)
+               VALUES (?, 'resolution', ?, ?, ?, ?)""",
+            (
+                topic,
+                resolution,
+                explanation,
+                json.dumps({"conflicting_id": conflicting_id, "action_taken": action_taken}),
+                datetime.now().isoformat(),
+            ),
+        )
+        db.commit()
     except Exception as exc:
         logger.warning("[CERT_RESOLUTION] Failed to persist resolution record: %s", exc)
 
 
 def _persist_inconsistency(topic: str, result: Dict[str, Any]) -> None:
-    """Append to self_inconsistencies.jsonl."""
+    """Persist inconsistency to SQLite self_inconsistencies table."""
     try:
-        _MEMORY_DIR.mkdir(parents=True, exist_ok=True)
-        record = {
-            "timestamp":         datetime.now().isoformat(),
-            "topic":             topic,
-            "contradiction_type": result.get("contradiction_type"),
-            "severity":          result.get("severity"),
-            "resolution":        result.get("resolution"),
-            "explanation":       result.get("explanation"),
-            "conflicting_chunk_id": result.get("conflicting_chunk_id"),
-            "confidence":        result.get("confidence"),
-        }
-        with _INCONS_PATH.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
-        logger.info(
-            "[CERT_CONTRADICTION] Inconsistency logged to self_inconsistencies.jsonl"
+        from shard_db import get_db
+        db = get_db()
+        db.execute(
+            """INSERT INTO self_inconsistencies
+               (topic, event_type, severity, resolution, explanation, extra, ts)
+               VALUES (?, 'contradiction', ?, ?, ?, ?, ?)""",
+            (
+                topic,
+                result.get("severity"),
+                result.get("resolution"),
+                result.get("explanation"),
+                json.dumps({
+                    "contradiction_type": result.get("contradiction_type"),
+                    "conflicting_chunk_id": result.get("conflicting_chunk_id"),
+                    "confidence": result.get("confidence"),
+                }),
+                datetime.now().isoformat(),
+            ),
         )
+        db.commit()
+        logger.info("[CERT_CONTRADICTION] Inconsistency logged to SQLite")
     except Exception as exc:
         logger.warning("[CERT_CONTRADICTION] Failed to persist inconsistency: %s", exc)

@@ -7,7 +7,7 @@ Four mechanisms that approximate "wanting" rather than pure optimization:
 3. Lateral curiosity  -- certification triggers semantic search for adjacent unexplored topics
 4. Process reward     -- engagement_score tracks session richness independent of certification
 
-State persisted in shard_memory/desire_state.json.
+State persisted in shard.db kv_store (key='desire_state'). Fallback to desire_state.json for first-run migration.
 """
 import json
 import re
@@ -120,19 +120,44 @@ class DesireEngine:
     # ── Persistence ────────────────────────────────────────────────────────────
 
     def _load(self):
+        # Primary: SQLite kv_store
+        try:
+            from shard_db import get_db
+            row = get_db().execute(
+                "SELECT value FROM kv_store WHERE key='desire_state'"
+            ).fetchone()
+            if row:
+                raw = json.loads(row[0] if isinstance(row, (list, tuple)) else row["value"])
+                for d in raw.values() if isinstance(raw, dict) else raw:
+                    ds = DesireState.from_dict(d)
+                    self._state[ds.topic] = ds
+                return
+        except Exception:
+            pass
+        # Fallback: JSON file (first-run migration path)
         if _STATE_PATH.exists():
             try:
                 raw = json.loads(_STATE_PATH.read_text(encoding="utf-8"))
                 for d in raw.values() if isinstance(raw, dict) else raw:
                     ds = DesireState.from_dict(d)
                     self._state[ds.topic] = ds
+                self._save()  # promote to SQLite immediately
             except Exception:
                 pass
 
     def _save(self):
-        _STATE_PATH.parent.mkdir(exist_ok=True)
         data = {k: v.dict() for k, v in self._state.items()}
-        _STATE_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        try:
+            from shard_db import get_db
+            get_db().execute(
+                "INSERT OR REPLACE INTO kv_store (key, value) VALUES ('desire_state', ?)",
+                (json.dumps(data),),
+            )
+            get_db().commit()
+        except Exception:
+            # Last-resort fallback to JSON if DB unavailable
+            _STATE_PATH.parent.mkdir(exist_ok=True)
+            _STATE_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     def _get_or_create(self, topic: str) -> DesireState:
         if topic not in self._state:
