@@ -263,20 +263,20 @@ def _is_infrastructure_error(stderr: str) -> bool:
 
 
 def _infer_dominant_type(tests: list) -> str | None:
-    """Best-effort: execute each test's setup and return the type name of input_data."""
-    import ast as _ast
+    """Best-effort: infer the dominant input_data type from test setups via AST.
+
+    Uses static AST analysis -- no exec(), no side effects.
+    """
+    from backend.benchmark_generator import _ast_infer_assignment
     counts: dict = {}
     for t in tests:
         setup = (t.get("setup") or "").strip()
         if not setup:
             continue
-        try:
-            ns: dict = {}
-            exec(compile(_ast.parse(setup), "<setup>", "exec"), ns)
-            t_name = type(ns.get("input_data")).__name__
+        t_type, _ = _ast_infer_assignment(setup, "input_data")
+        if t_type is not None:
+            t_name = t_type.__name__
             counts[t_name] = counts.get(t_name, 0) + 1
-        except Exception:
-            pass
     if not counts:
         return None
     return max(counts, key=counts.__getitem__)

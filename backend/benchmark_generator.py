@@ -228,10 +228,9 @@ class BenchmarkGenerator:
             print("[BENCHMARK_GEN] [WARN] 'tests' is not a list -- discarding")
             return _unavailable(topic, "malformed 'tests' field")
 
-        _is_net = is_network_topic(topic)
         valid_tests: List[Dict[str, Any]] = []
         for i, t in enumerate(raw_tests):
-            verdict = _validate_test(t, i, is_net=_is_net)
+            verdict = _validate_test(t, i)
             if verdict["ok"]:
                 valid_tests.append({
                     "description": str(t.get("description", f"test_{i}")),
@@ -241,83 +240,32 @@ class BenchmarkGenerator:
             else:
                 print(f"[BENCHMARK_GEN] [WARN] Test {i} discarded: {verdict['reason']}")
 
-        # ── Network topic guard: save/restore modules that setup code may monkeypatch ──
-        # In Docker (production), each test runs in an isolated process so global
-        # mutations are safe.  Here in the host process (validation), we must restore.
-        _net_guards: List[tuple] = []
-        if is_network_topic(topic):
-            import importlib as _il
-            for _mod_name in ("socket", "requests", "http.client", "urllib.request"):
-                try:
-                    _mod = _il.import_module(_mod_name)
-                    _net_guards.append((_mod, dict(vars(_mod))))
-                except Exception:
-                    pass
+        # No exec-based consistency checks: the scaffold stub always returns None,
+        # so running it catches nothing useful that AST + type-homogeneity check below
+        # doesn't already catch. The Docker sandbox is the real execution gate.
+        consistent_tests = valid_tests
+        dominant_type: type | None = dict if is_network_topic(topic) else None
 
-        def _restore_net_guards() -> None:
-            for _mod, _snapshot in _net_guards:
-                for _k, _v in _snapshot.items():
-                    try:
-                        setattr(_mod, _k, _v)
-                    except Exception:
-                        pass
-
-        # For network topics, skip exec-based runtime checks entirely.
-        # Mock setup code does `socket.socket = lambda *a, **kw: _mock_sock` which monkeypatches
-        # the global socket module. On Windows, the asyncio ProactorEventLoop asynchronously calls
-        # isinstance(conn, socket.socket) in _loop_self_reading -- if socket.socket is a lambda,
-        # this raises TypeError and crashes the event loop. Syntax validation from _validate_test()
-        # is sufficient for network topics; exec-based checks run only for non-network topics.
-        if is_network_topic(topic):
-            consistent_tests = valid_tests
-            dominant_type: type | None = dict  # network topics always use dict input_data
-            print(f"[BENCHMARK_GEN] Network topic: skipping exec-based checks (mock safety)")
-        else:
-            # Runtime consistency check #1: run scaffold stub + each test.
-            # Catches attribute/type errors that the stub exposes (e.g. input_data.split() on a list).
-            consistent_tests = []
-            for t in valid_tests:
-                try:
-                    ns: dict = {}
-                    exec(compile(ast.parse(scaffold), "<scaffold>", "exec"), ns)
-                    exec(compile(ast.parse(t["setup"]), "<setup>", "exec"), ns)
-                    exec(compile(ast.parse("result = solve(input_data)"), "<run>", "exec"), ns)
-                    consistent_tests.append(t)
-                except (AttributeError, TypeError) as e:
-                    print(f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded (stub type error): {e}")
-                except Exception:
-                    consistent_tests.append(t)  # other errors are OK (NotImplemented, etc.)
-                finally:
-                    _restore_net_guards()
-
-            if len(consistent_tests) < len(valid_tests):
-                print(f"[BENCHMARK_GEN] Runtime check: {len(valid_tests) - len(consistent_tests)} inconsistent tests dropped")
-
-            # Runtime consistency check #2: enforce same input_data type across all tests.
-            # The LLM sometimes generates mixed types (some tests pass str, others dict).
-            # This causes TypeError in the real implementation even though the stub passes.
+        # Type-homogeneity check: enforce same input_data type across all tests.
+        # The LLM sometimes generates mixed types (some tests pass str, others dict).
+        # Uses AST inference -- no exec(), no side effects.
+        if not is_network_topic(topic):
             type_checked: List[Dict[str, Any]] = []
-            dominant_type = None
             for t in consistent_tests:
-                try:
-                    ns: dict = {}
-                    exec(compile(ast.parse(t["setup"]), "<setup>", "exec"), ns)
-                    val = ns.get("input_data")
-                    t_type = type(val)
-                    if dominant_type is None:
-                        dominant_type = t_type
-                        type_checked.append(t)
-                    elif t_type == dominant_type:
-                        type_checked.append(t)
-                    else:
-                        print(
-                            f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded "
-                            f"(type mismatch: {t_type.__name__} vs dominant {dominant_type.__name__})"
-                        )
-                except Exception:
-                    type_checked.append(t)  # if we can't eval setup, keep it
-                finally:
-                    _restore_net_guards()
+                t_type, _ = _ast_infer_assignment(t["setup"], "input_data")
+                if t_type is None:
+                    type_checked.append(t)  # can't infer statically → keep it
+                    continue
+                if dominant_type is None:
+                    dominant_type = t_type
+                    type_checked.append(t)
+                elif t_type == dominant_type:
+                    type_checked.append(t)
+                else:
+                    print(
+                        f"[BENCHMARK_GEN] [WARN] Test '{t['description'][:40]}' discarded "
+                        f"(type mismatch: {t_type.__name__} vs dominant {dominant_type.__name__})"
+                    )
 
             if len(type_checked) < len(consistent_tests):
                 print(f"[BENCHMARK_GEN] Type-homogeneity check: {len(consistent_tests) - len(type_checked)} tests dropped")
@@ -350,6 +298,72 @@ class BenchmarkGenerator:
 
 # ── Module-level helpers ───────────────────────────────────────────────────────
 
+# AST node → Python type mapping for literal values
+_AST_TYPE_MAP = {
+    ast.Dict:      dict,
+    ast.List:      list,
+    ast.Tuple:     tuple,
+    ast.Set:       set,
+    ast.JoinedStr: str,   # f-string
+}
+
+
+def _ast_infer_assignment(source: str, name: str) -> "tuple[type | None, Any]":
+    """Parse *source* with AST and return (type, value) of the last assignment to *name*.
+
+    Returns (None, None) if the assignment cannot be statically determined.
+    Never executes any code -- pure AST walk, no side effects.
+
+    Handles:
+      - Literals: int, float, str, bytes, bool, None, list, dict, tuple, set
+      - Negative numeric literals: -1, -3.14
+    Does NOT handle:
+      - Dynamic values: function calls, comprehensions, variables
+      → returns (None, None) so callers fall through gracefully.
+    """
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return None, None
+
+    result_type: type | None = None
+    result_val: Any = None
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if not (isinstance(target, ast.Name) and target.id == name):
+                continue
+            val_node = node.value
+
+            # Unwrap unary minus: -1, -3.14
+            if (
+                isinstance(val_node, ast.UnaryOp)
+                and isinstance(val_node.op, ast.USub)
+                and isinstance(val_node.operand, ast.Constant)
+            ):
+                raw = val_node.operand.value
+                result_val = -raw
+                result_type = type(result_val)
+                continue
+
+            # Simple constant (int, float, str, bytes, bool, None)
+            if isinstance(val_node, ast.Constant):
+                result_val = val_node.value
+                result_type = type(result_val)
+                continue
+
+            # Compound literals: dict, list, tuple, set
+            for ast_cls, py_type in _AST_TYPE_MAP.items():
+                if isinstance(val_node, ast_cls):
+                    result_type = py_type
+                    result_val = None   # value not needed for type checks
+                    break
+
+    return result_type, result_val
+
+
 def _unavailable(topic: str, reason: str) -> Dict[str, Any]:
     return {
         "scaffold":           "",
@@ -380,7 +394,7 @@ def _parse_json(raw: Any) -> Optional[Dict]:
         return None
 
 
-def _validate_test(test: Any, idx: int, is_net: bool = False) -> Dict[str, Any]:
+def _validate_test(test: Any, idx: int) -> Dict[str, Any]:
     """Validate a single test-case dict.
 
     Checks performed:
@@ -388,13 +402,10 @@ def _validate_test(test: Any, idx: int, is_net: bool = False) -> Dict[str, Any]:
       2. 'assert_expr' starts with the ``assert`` keyword.
       3. No dangerous builtins in setup or assert.
       4. Combined code (setup + assert_expr) is syntactically valid Python (ast.parse).
-      5. (non-network only) Runtime type check: input_data must not be None/bool.
+      5. Static type check via AST: input_data must not be None/bool.
+      6. Auto-rewrite assert_expr for float expected values (numpy allclose guard).
 
-    Args:
-        is_net: If True, skip the exec()-based runtime type check. Network test setups
-                monkeypatch socket.socket = lambda..., which contaminates the global
-                socket module in the host process and can crash the asyncio event loop
-                on Windows (ProactorEventLoop isinstance check race condition).
+    Uses only AST analysis -- no exec(), no side effects, safe for all topic types.
     """
     if not isinstance(test, dict):
         return {"ok": False, "reason": "not a dict"}
@@ -420,42 +431,23 @@ def _validate_test(test: Any, idx: int, is_net: bool = False) -> Dict[str, Any]:
     except SyntaxError as e:
         return {"ok": False, "reason": f"SyntaxError: {e}"}
 
-    # Runtime type check -- reject only None and bare bool (almost always a generation mistake).
-    # int, float, dict, str, list, tuple, set are all valid input_data types depending on
-    # the function under test (e.g. profiling takes int size, json parsing takes dict).
-    # Also: auto-rewrite assert_expr for float/list-of-float expected values so that
-    # numpy outputs don't cause "ValueError: truth value of array is ambiguous".
-    #
-    # IMPORTANT: skip exec() entirely for network topics. Network test setups do:
-    #   socket.socket = lambda *a, **kw: _mock_sock
-    # This mutates the global socket module in the host process. On Windows the asyncio
-    # ProactorEventLoop calls isinstance(conn, socket.socket) asynchronously; if
-    # socket.socket is a lambda, isinstance() throws TypeError and crashes the event loop.
-    if not is_net:
-        try:
-            ns: dict = {}
-            exec(compile(ast.parse(setup), "<setup>", "exec"), ns)
-            val = ns.get("input_data")
-            if val is None or isinstance(val, bool):
-                return {"ok": False, "reason": f"input_data is {type(val).__name__} -- likely a generation mistake"}
+    # Static type check via AST -- no exec(), no side effects, works for all topics.
+    # Rejects input_data=None and input_data=bool (generation mistakes).
+    # Also auto-rewrites assert_expr for float expected values (numpy allclose guard).
+    input_type, _ = _ast_infer_assignment(setup, "input_data")
+    if input_type in (type(None), bool):
+        return {"ok": False, "reason": f"input_data is {input_type.__name__} -- likely a generation mistake"}
 
-            # Auto-rewrite assert for float/list-of-float expected values.
-            # This guards against "ValueError: truth value of array ambiguous" when
-            # solve() returns a numpy array and the LLM used == instead of allclose.
-            expected_val = ns.get("expected")
-            boilerplate = "assert solve(input_data) == expected"
-            if assert_expr == boilerplate:
-                if isinstance(expected_val, float):
-                    test["assert_expr"] = "assert abs(solve(input_data) - expected) < 1e-6"
-                elif (
-                    isinstance(expected_val, (list, tuple))
-                    and expected_val
-                    and all(isinstance(v, float) for v in expected_val)
-                ):
-                    test["assert_expr"] = (
-                        "assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))"
-                    )
-        except Exception:
-            pass  # if eval fails for any reason, let AST validation stand
+    # Auto-rewrite assert for float/list-of-float expected values.
+    # Prevents "ValueError: truth value of array ambiguous" when solve() returns numpy.
+    boilerplate = "assert solve(input_data) == expected"
+    if assert_expr == boilerplate:
+        exp_type, exp_val = _ast_infer_assignment(setup, "expected")
+        if exp_type is float:
+            test["assert_expr"] = "assert abs(solve(input_data) - expected) < 1e-6"
+        elif exp_type in (list, tuple) and exp_val is None:
+            # Can't inspect list contents statically without eval; leave as-is.
+            # The rare numpy array case is handled at runtime by Docker stderr.
+            pass
 
     return {"ok": True}
