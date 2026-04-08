@@ -1,0 +1,316 @@
+[PDF TEXT]
+[Page 1]
+AlphaFold3 in Drug Discovery: A Comprehensive Assessment of Capabilities, Limitations, and 
+Applications 
+Haiyang Zheng1,2, Hanfeng Lin1,2, Adebowale A. Alade1,2, Jingjing Chen1,2, Erika Y. Monroy1,2, Min 
+Zhang1,2, Jin Wang1,2,3  
+1Verna and Marrs McLean Department of Biochemistry and Molecular Pharmacology, Baylor College 
+of Medicine, Houston, Texas 77030, United States  
+2Center for NextGen Therapeutics, Baylor College of Medicine, Houston, Texas 77030, United States  
+3Department of Molecular and Cellular Biology, Baylor College of Medicine, Houston, Texas 77030, 
+United States  
+*Correspondence:  wangj@bcm.edu (J.W.)  
+ 
+ 
+.
+CC-BY-NC-ND 4.0 International license
+available under a
+was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made 
+The copyright holder for this preprint (which
+this version posted April 8, 2025. 
+; 
+https://doi.org/10.1101/2025.04.07.647682
+doi: 
+bioRxiv preprint
+
+[Page 2]
+Abstract 
+Accurate prediction of protein-ligand interactions remains a cornerstone challenge in drug discovery. 
+AlphaFold3 (AF3), a recent breakthrough Diffusion Transformer model, holds significant promise for 
+structural biology, but its performance across diverse pharmaceutical applications requires systematic 
+evaluation. In this study, we comprehensively benchmark AF3's capabilities using carefully curated 
+datasets, examining its performance in binary protein-ligand complexes, apo/holo structural variations, 
+GPCR-ligand conformations, ternary systems, and inhibitor affinity prediction. 
+Our analysis reveals that AF3 excels at predicting static protein-ligand interactions with minimal 
+conformational changes, significantly outperforming traditional docking methods in side-chain 
+orientation accuracy. However, we identify critical limitations: AF3 struggles with protein-ligand 
+complexes involving significant conformational changes (>5Å RMSD), demonstrates a persistent bias 
+toward active GPCR conformations regardless of ligand type, performs poorly on ternary complex 
+prediction, and lacks reliable affinity ranking capability. Notably, AF3's performance declined 
+significantly on structures released after its training cutoff date, suggesting potential memorization 
+rather than physical understanding of molecular interactions. 
+We explored AF3's practical utility through applications in chemoproteomics data interpretation, drug 
+resistance mutation prediction, and kinome profiling simulation. AF3 demonstrated value as a "true-hit 
+binary interaction modeler," capable of generating reliable structural models for experimentally 
+validated binding pairs. However, its ranking metrics showed minimal correlation with experimental 
+binding affinities and limited ability to differentiate across the kinome, highlighting the need for 
+integration with physics-based scoring methods. 
+Our findings indicate that while AF3 represents a significant advancement in protein-ligand structure 
+prediction, it requires complementary approaches to address its limitations in conformational 
+sampling, affinity ranking, and complex system modeling. Recent developments like YDS Ternoplex 
+suggest that enhanced sampling techniques can overcome some of these limitations. The optimal 
+strategy for leveraging AF3 in drug discovery likely involves its integration into hybrid computational 
+pipelines that combine AI-based prediction with physics-based refinement and experimental validation. 
+ 
+ 
+.
+CC-BY-NC-ND 4.0 International license
+available under a
+was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is made 
+The copyright holder for this preprint (which
+this version posted April 8, 2025. 
+; 
+https://doi.org/10.1101/2025.04.07.647682
+doi: 
+bioRxiv preprint
+
+[Page 3]
+Introduction 
+The accurate prediction of protein-ligand interactions represents a fundamental challenge at the 
+intersection of structural biology and drug discovery. These molecular recognition events underpin 
+virtually all biological processes and serve as the mechanistic foundation for therapeutic intervention. 
+Despite decades of methodological advancement, achieving high-fidelity predictions of these complex 
+interactions has remained elusive due to the inherent complexity of biomolecular systems, involving 
+intricate networks of weak non-covalent interactions, conformational dynamics, and solvation effects. 
+Traditional computational approaches to protein-ligand interaction prediction, primarily relying on 
+molecular docking algorithms, have provided valuable insights but suffer from significant limitations. 
+While these methods can generate reasonable binding poses in many cases, they frequently struggle 
+with accurate prediction of side-chain orientations—critical determinants of binding specificity and 
+affinity.1 This inaccuracy often results in low confidence predictions that can mislead structure-activity 
+relationship (SAR) efforts in medicinal chemistry campaigns. Furthermore, experimental structure 
+determination of protein-ligand complexes typically requires weeks or months of dedicated effort, 
+creating a substantial bottleneck in the drug discovery pipeline.2 
+The emergence of machine learning and artificial intelligence has catalyzed a paradigm shift in 
+structural biology. AlphaFold2 (AF2), introduced in 2021, demonstrated unprecedented accuracy in 
+protein structure prediction, effectively solving a 50-year scientific challenge and transforming the 
+field.3 This breakthrough spurred the development of numerous derivative tools and approaches 
+based on the underlying principles of AF2.4,5 Building upon this foundation, DeepMind recently 
+unveiled AlphaFold3 (AF3), representing a significant architectural evolution with its Diffusion 
+Transformer design. According to DeepMind's internal benchmarking, AF3 exhibits remarkable 
+accuracy in predicting protein-ligand int
+
+[VISUAL EVIDENCE]
+
+Image 1 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page005.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page005.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 2 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page006.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page006.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 3 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page007.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page007.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 4 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page008.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page008.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 5 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page010.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page010.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 6 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page011.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page011.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 7 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page013.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page013.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 8 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page014.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page014.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 9 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page015.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page015.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 10 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page016.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page016.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 11 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page017.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page017.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 12 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page018.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page018.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 13 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page019.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page019.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError
+
+Image 14 (C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page020.jpg):
+source: visual_ingestion
+image_path: C:\Users\andre\desktop\shard_v1\shard_workspace\visual_input\alphafold3_drug_discovery_page020.jpg
+provider: unavailable
+error: true
+Objects/Entities:
+analysis unavailable
+Readable Text:
+none confidently read
+Spatial Relations:
+unknown
+Meaning Relative To Topic:
+insufficient evidence due to provider failure
+Uncertainties:
+provider error: TimeoutError

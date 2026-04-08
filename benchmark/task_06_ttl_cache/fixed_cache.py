@@ -1,11 +1,4 @@
-"""cache.py — TTL-based in-memory cache.
-
-Used in production for caching expensive API responses.
-Some users report stale data being returned after the TTL expires,
-and the reported cache size being higher than expected.
-"""
 import time
-import copy
 
 
 class TTLCache:
@@ -30,7 +23,7 @@ class TTLCache:
         if time.time() > expires_at:
             del self._store[key]
             self._misses += 1
-            return None
+            return None          # Return None after expiry
         self._hits += 1
         return value
 
@@ -47,8 +40,7 @@ class TTLCache:
     @property
     def size(self):
         """Number of *live* entries currently in the cache."""
-        now = time.time()
-        return sum(1 for _, exp in self._store.values() if now <= exp)
+        return sum(1 for (_, exp) in self._store.values() if time.time() <= exp)
 
     @property
     def stats(self):

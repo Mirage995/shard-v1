@@ -1,0 +1,28 @@
+Scelgo la prima connessione, tra Machine learning (Diffusion Transformer architectures) e Algoritmi e complessità computazionale (sampling e ottimizzazione in spazi ad alta dimensionalità), perché offre un ambito concreto per migliorare l’efficienza computazionale e la qualità delle predizioni strutturali, con impatti diretti su AlphaFold3 e metodi simili.
+
+---
+
+1. IPOTESI:  
+L’uso di algoritmi di campionamento avanzati basati su metodi di diffusione stocastica combinati con meccanismi di attenzione Transformer in AlphaFold3 permette di ottenere una migliore copertura dello spazio conformazionale proteico, misurata come maggiore diversità e accuratezza delle strutture predette, rispetto a metodi di campionamento tradizionali (es. MCMC standard) con pari budget computazionale.
+
+2. PREDIZIONE:  
+Se l’ipotesi è vera, allora a parità di risorse computazionali (tempo di calcolo, numero di campioni generati), AlphaFold3 con Diffusion Transformer produrrà strutture proteiche con:  
+- maggiore varietà conformazionale (diversità misurata da RMSD tra strutture generate)  
+- migliore accuratezza media rispetto a strutture sperimentali di riferimento (es. RMSD medio più basso)  
+rispetto a una versione modificata che utilizza un campionamento MCMC tradizionale.
+
+3. ESPERIMENTO:  
+- Implementare o simulare un modulo di campionamento alternativo basato su MCMC tradizionale per la generazione di strutture proteiche, mantenendo invariati gli altri componenti di AlphaFold3.  
+- Eseguire predizioni su un set di proteine benchmark con entrambe le versioni (Diffusion Transformer vs MCMC) usando lo stesso budget computazionale (es. stesso numero di campioni o tempo di calcolo).  
+- Raccogliere le strutture generate da entrambi i metodi.
+
+4. METRICA:  
+- Diversità conformazionale: calcolare la distribuzione di RMSD tra tutte le coppie di strutture generate per ogni proteina; una maggiore media o varianza indica maggiore copertura dello spazio conformazionale.  
+- Accuratezza: calcolare RMSD medio tra le strutture generate e la struttura sperimentale nota.  
+- Efficienza computazionale: tempo di calcolo per campione o per predizione.  
+Il successo è definito come una combinazione di maggiore diversità e migliore accuratezza a pari costo computazionale.
+
+5. RISCHIO DI FALSIFICAZIONE:  
+- Se il campionamento MCMC tradizionale produce strutture con pari o migliore accuratezza e diversità rispetto al Diffusion Transformer a pari risorse, l’ipotesi è falsificata.  
+- Se la diversità aumenta ma l’accuratezza peggiora significativamente, o viceversa, l’ipotesi è parzialmente falsificata.  
+- Se la complessità computazionale del Diffusion Transformer è troppo alta per essere comparata equamente, i risultati potrebbero non essere interpretabili come supporto all’ipotesi.

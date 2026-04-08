@@ -6,12 +6,12 @@
   },
   "IDEMPOTENCY": {
     "weight": 2.0,
-    "success": 84,
+    "success": 88,
     "fail": 0
   },
   "OSCILLATION": {
-    "weight": 0.97,
+    "weight": 0.94,
     "success": 0,
-    "fail": 1
+    "fail": 2
   }
 }

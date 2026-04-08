@@ -6,7 +6,7 @@ class Bank:
     def __init__(self):
         self.accounts = {}
         self._audit_log = []
-        self.lock = threading.Lock()  # Lock for thread safety
+        self._lock = threading.Lock()
 
     def _audit(self, op, account_id, amount, balance_before):
         self._audit_log.append({
@@ -17,7 +17,7 @@ class Bank:
         })
 
     def create_account(self, account_id, initial_balance=0.0):
-        with self.lock:
+        with self._lock:
             if account_id in self.accounts:
                 raise ValueError(f"Account {account_id} already exists")
             if initial_balance < 0:
@@ -25,15 +25,15 @@ class Bank:
             self.accounts[account_id] = float(initial_balance)
 
     def get_balance(self, account_id):
-        with self.lock:
+        with self._lock:
             if account_id not in self.accounts:
                 raise KeyError(f"Account {account_id} not found")
             return self.accounts[account_id]
 
     def deposit(self, account_id, amount):
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
-        with self.lock:
+        with self._lock:
+            if amount <= 0:
+                raise ValueError("Amount must be positive")
             if account_id not in self.accounts:
                 raise KeyError(f"Account {account_id} not found")
             current = self.accounts[account_id]
@@ -42,9 +42,9 @@ class Bank:
             self.accounts[account_id] = new_balance
 
     def withdraw(self, account_id, amount):
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
-        with self.lock:
+        with self._lock:
+            if amount <= 0:
+                raise ValueError("Amount must be positive")
             if account_id not in self.accounts:
                 raise KeyError(f"Account {account_id} not found")
             current = self.accounts[account_id]
@@ -55,9 +55,9 @@ class Bank:
             self.accounts[account_id] = new_balance
 
     def transfer(self, from_id, to_id, amount):
-        if amount <= 0:
-            raise ValueError("Amount must be positive")
-        with self.lock:
+        with self._lock:
+            if amount <= 0:
+                raise ValueError("Amount must be positive")
             if from_id not in self.accounts:
                 raise KeyError(f"Account {from_id} not found")
             if to_id not in self.accounts:
@@ -77,9 +77,9 @@ class Bank:
             self.accounts[to_id] = to_balance + amount
 
     def total_funds(self):
-        with self.lock:
+        with self._lock:
             return sum(self.accounts.values())
 
     def get_audit_log(self):
-        with self.lock:
+        with self._lock:
             return list(self._audit_log)

@@ -1,8 +1,9 @@
-"""pipeline.py — Configurable data processing pipeline.
+"""fixed_pipeline.py — Configurable data processing pipeline.
 
 Transforms numeric values with a configurable multiplier,
 tracks processing history, and assigns sequential IDs.
 """
+
 
 import copy
 
@@ -20,7 +21,7 @@ class Pipeline:
     def set_multiplier(self, m):
         """Change the multiplier for future operations."""
         self._multiplier = float(m)
-        self._cache = {}
+        self._cache = {}  # Clear cache when multiplier changes
 
     def process(self, values):
         """Transform values by the current multiplier. Returns list of results.
@@ -29,11 +30,11 @@ class Pipeline:
         """
         results = []
         for v in values:
-            if v not in self._cache:
-                self._cache[v] = v * self._multiplier
-            results.append(self._cache[v])
+            if v not in self._cache or self._cache[v][1] != self._multiplier:
+                self._cache[v] = (v * self._multiplier, self._multiplier)
+            results.append(self._cache[v][0])
         self._processed_count += len(values)
-        self._history.append(copy.deepcopy(values))
+        self._history.append(copy.deepcopy(values))  # Create a deep copy of the input
         return results
 
     def next_id(self):
@@ -42,7 +43,7 @@ class Pipeline:
 
     def get_history(self):
         """Return list of all processed batches."""
-        return list(self._history)
+        return copy.deepcopy(self._history)  # Create a deep copy of the history
 
     def get_processed_count(self):
         """Return total number of individual values processed."""

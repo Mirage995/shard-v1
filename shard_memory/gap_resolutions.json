@@ -16,8 +16,8 @@
     "score": 8.5
   },
   "template parser handling and debugging": {
-    "resolved_at": "2026-04-01T21:33:01.118857",
-    "score": 8.8
+    "resolved_at": "2026-04-08T00:06:24.077422",
+    "score": 7.9
   },
   "note tag handling and debugging": {
     "resolved_at": "2026-03-26T14:23:10.698074",
@@ -38,5 +38,13 @@
   "caching strategies lru cache": {
     "resolved_at": "2026-03-31T14:35:37.256004",
     "score": 8.2
+  },
+  "python asyncio event loop internals": {
+    "resolved_at": "2026-04-08T11:42:44.080831",
+    "score": 7.9
+  },
+  "threading event and condition python": {
+    "resolved_at": "2026-04-09T00:33:56.119481",
+    "score": 9.1
   }
 }

@@ -1,0 +1,75 @@
+{
+  "task": "task_13_config_parser",
+  "topic": "Python config parser edge cases",
+  "runs_per_phase": 2,
+  "started_at": "2026-04-05T15:55:14.385286",
+  "baseline_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 16,
+      "elapsed_sec": 16.3,
+      "raw_output": "  (1,583 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (5,398 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,303 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (10,465 chars)\n  [llm] Calling... OK (1,412 chars)\n  [syntax] Valid\n  [write] fixed_parser.py (53 lines)\n  [pytest] Running test_task13.py... ALL PASSED (16 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 16\n  Total time: 14.9s\n====================================================================\n\n15:55:16 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:55:22 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:55:22 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:55:26 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:55:26 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:55:26 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:55:26 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:55:26 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_13_config_parser # Task 13 — Config Parser (O' cluster_boost=1.00 mult=1.364 confidence=1.000 (3 strategies)\n15:55:28 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:55:28 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1412 chars)\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 16,
+      "elapsed_sec": 16.0,
+      "raw_output": "  (1,583 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (5,398 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,303 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (10,465 chars)\n  [llm] Calling... OK (1,412 chars)\n  [syntax] Valid\n  [write] fixed_parser.py (53 lines)\n  [pytest] Running test_task13.py... ALL PASSED (16 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 16\n  Total time: 14.2s\n====================================================================\n\n15:55:32 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:55:38 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:55:38 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:55:42 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:55:42 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:55:42 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:55:42 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:55:42 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_13_config_parser # Task 13 — Config Parser (O' cluster_boost=1.00 mult=1.364 confidence=1.000 (3 strategies)\n15:55:44 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:55:44 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1412 chars)\n"
+    }
+  ],
+  "study_result": {
+    "topic": "Python config parser edge cases",
+    "score": 0,
+    "certified": false,
+    "elapsed_sec": 113.6
+  },
+  "post_study_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 16,
+      "elapsed_sec": 15.9,
+      "raw_output": "4  (1,583 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (4,142 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,303 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (9,209 chars)\n  [llm] Calling... OK (1,001 chars)\n  [syntax] Valid\n  [write] fixed_parser.py (39 lines)\n  [pytest] Running test_task13.py... ALL PASSED (16 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 16\n  Total time: 13.9s\n====================================================================\n\n15:57:43 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:57:49 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:57:49 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:57:53 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:57:53 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:57:53 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:57:54 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:57:54 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_13_config_parser # Task 13 — Config Parser (O' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n15:57:55 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:57:55 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1001 chars)\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 16,
+      "elapsed_sec": 15.8,
+      "raw_output": "4  (1,583 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (4,142 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,303 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (9,209 chars)\n  [llm] Calling... OK (1,001 chars)\n  [syntax] Valid\n  [write] fixed_parser.py (39 lines)\n  [pytest] Running test_task13.py... ALL PASSED (16 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 16\n  Total time: 14.1s\n====================================================================\n\n15:57:59 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:58:05 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:58:05 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:58:09 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:58:09 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:58:09 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:58:10 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:58:10 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_13_config_parser # Task 13 — Config Parser (O' cluster_boost=1.00 mult=1.364 confidence=1.000 (3 strategies)\n15:58:11 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:58:11 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1001 chars)\n"
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "n": 2,
+      "victories": 2,
+      "win_rate": 1.0,
+      "mean_attempts": 1.0,
+      "attempts_list": [
+        1,
+        1
+      ]
+    },
+    "post_study": {
+      "n": 2,
+      "victories": 2,
+      "win_rate": 1.0,
+      "mean_attempts": 1.0,
+      "attempts_list": [
+        1,
+        1
+      ]
+    },
+    "delta_win_rate": 0.0,
+    "delta_attempts": 0.0,
+    "verdict": "NO_CHANGE",
+    "interpretation": "No measurable difference. Topic may not be directly relevant to task mechanics."
+  },
+  "finished_at": "2026-04-05T15:58:13.799932"
+}

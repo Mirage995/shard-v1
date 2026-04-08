@@ -1,8 +1,8 @@
 # SHARD — Architecture Reference
 
 **System of Hybrid Autonomous Reasoning and Design**
-Version: SSJ22 (Cross-Task Transfer Layer — micro-cluster routing, activation triggering, strategy injection)
-Last updated: 2026-04-02
+Version: SSJ25 (Protocol filter + Variance-aware base_score + Stale lock recovery + Benchmark 14/14)
+Last updated: 2026-04-09
 
 ---
 
@@ -62,6 +62,11 @@ SHARD is a personal AI system built for Andrea ("Boss"). It combines:
 - **Longitudinal observability** — `session_snapshots.jsonl`: per-session metrics snapshot. `--continuous` flag for unattended long runs. `analyze_snapshots.py` for offline analysis of N sessions (SSJ20)
 - **65-session empirical analysis** — strategy win rates by cluster: exception_flow 87% (META-STRATEGY), concurrency 36% (FALSE NEGATIVE), mutation_state 63% (GOLD ZONE), bcrypt/argon2 11% (toxic). 55 certified skills, 1515 causal relations. Self-esteem +0.08 over 65 sessions (SSJ21)
 - **Cross-Task Transfer Layer** — `cross_task_router.py`: 11 micro-clusters, cluster-differentiated boosts (concurrency 1.40x FALSE NEGATIVE fix, mutation_state 1.25x, crypto 0.70x), cross-inject rules (mutation_state→exception_flow, concurrency→threading), NEAR_MISS boost 1.30x, strategy blacklist+penalties. Wired into signal_gate + strategy_memory.query(). Key insight: activation triggering, not knowledge transfer (SSJ22)
+- **AST De-Pythonizer** — strips `with socket.socket() as s:` patterns from agent-generated code before sandbox execution. Prevents UDP recvfrom mock failures on Windows. Session metrics counter: rewrites_applied / fast_exits / parse_errors. EvoScientist feedback loop closed: evolved strategy score written back post-cycle (SSJ23)
+- **Protocol Filter in StrategyMemory** — `_infer_protocol(text)` classifies topics as UDP/TCP/ANY via keyword lists. `query()` pre-filters strategies by protocol before ChromaDB similarity, with fallback chain same→ANY→all. Prevents TCP strategies (http, websocket) from polluting UDP study cycles. Validated: 4-session TCP bleed eliminated (SSJ24)
+- **Variance-aware base_score** — `self_model_tracker.py` implements 4-stage pipeline: `_blended_base()` (recency-weighted + plain mean blend controlled by variance), `_uncertainty_penalty()` (subtracts 0.2×var, max 2.0), `_bimodal_adjust()` (detects hi-lo>5.0 two-state domains, uses P(pass)*hi+P(fail)*lo), `_clamp_delta()` (caps jump vs last actual at +2.0/-3.0). Bimodal fix: UDP [9.1,9.1,2.6,9.1,8.5] → pred=7.80 (was 9.2, causing gap=-6.6). Dynamic LR: 0.12 for topics seen 5+ times (SSJ24)
+- **Stale lock recovery** — `shard_semaphore.py` now stores `reason|PID|timestamp` in lock file. `_is_stale()` checks PID alive via `os.kill(pid,0)` and age > 3h TTL. Auto-releases dead locks on startup. NightRunner log placement fix: "Session started" now emitted only after lock acquired (SSJ24)
+- **Golden fast-path** — `benchmark_loop.py`: if existing `fixed_*.py` passes all tests, returns `success=True attempts=0` immediately without LLM invocation. Benchmark now 14/14 at 0 attempts, avg <3s per task. `task_02_ghost_bug` and `task_10_template_parser` fixed (were always showing FAILED despite correct solutions) (SSJ25)
 - **Semantic memory** via ChromaDB triple-store
 - **Domain-specific agents**: CAD, web, smart home, 3D printing
 

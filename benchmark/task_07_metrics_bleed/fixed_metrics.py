@@ -1,11 +1,3 @@
-"""metrics.py — Application metrics collector.
-
-Used in production to track counters, gauges, and histograms.
-Some users report metric values from one collector bleeding into
-another, and percentile calculations returning inconsistent results.
-"""
-
-
 class Counter:
     """A monotonically increasing integer counter."""
 
@@ -36,19 +28,19 @@ class Histogram:
         self.name = name
         self.bucket_bounds = tuple(bucket_bounds)
         self.samples = []
-        self._buckets = [0] * (len(self.bucket_bounds) + 1)
+        self.buckets = [0] * (len(self.bucket_bounds) + 1)
 
     def observe(self, value):
         self.samples.append(value)
         for i, bound in enumerate(self.bucket_bounds):
             if value <= bound:
-                self._buckets[i] += 1
+                self.buckets[i] += 1
                 return
-        self._buckets[-1] += 1
+        self.buckets[-1] += 1
 
     def bucket_counts(self):
         """Return counts per bucket (including overflow)."""
-        return list(self._buckets)
+        return list(self.buckets)
 
     def percentile(self, p):
         """Return the p-th percentile of observed values (0-100)."""

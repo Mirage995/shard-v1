@@ -1,9 +1,9 @@
 {
-  "sessions_lived": 86,
+  "sessions_lived": 103,
   "narrative": "",
-  "total_attempts": 1253,
-  "total_certified": 790,
-  "cert_rate_overall": 0.6152,
+  "total_attempts": 1414,
+  "total_certified": 847,
+  "cert_rate_overall": 0.5867,
   "strong_domains": [
     "algorithms",
     "data",
@@ -32,7 +32,7 @@
     "dns resolution python",
     "message queue rabbitmq python"
   ],
-  "self_esteem": 0.3706,
+  "self_esteem": 0.3522,
   "trajectory": "stagnating",
-  "updated_at": "2026-04-01T23:01:07.806534"
+  "updated_at": "2026-04-09T00:42:24.210645"
 }

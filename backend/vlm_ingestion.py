@@ -26,7 +26,8 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_REFERER = os.getenv("OPENROUTER_HTTP_REFERER", "http://localhost")
 OPENROUTER_TITLE = os.getenv("OPENROUTER_X_TITLE", "SHARD Visual Ingestion")
 
-REQUEST_TIMEOUT_SEC = float(os.getenv("VLM_REQUEST_TIMEOUT_SEC", "45"))
+REQUEST_TIMEOUT_SEC = float(os.getenv("VLM_REQUEST_TIMEOUT_SEC", "30"))
+OPENROUTER_RETRIES = int(os.getenv("OPENROUTER_RETRIES", "2"))
 
 
 def _guess_media_type(image_path: str) -> str:
@@ -119,21 +120,29 @@ def _call_openrouter(image_path: str, topic: str) -> tuple[str, str]:
         "HTTP-Referer": OPENROUTER_REFERER,
         "X-Title": OPENROUTER_TITLE,
     }
-    data = _post_json(OPENROUTER_URL, payload, headers=headers)
-    choices = data.get("choices") or []
-    if not choices:
-        raise ValueError("Empty OpenRouter VLM response")
-    content = choices[0].get("message", {}).get("content", "").strip()
-    if not content:
-        raise ValueError("Empty OpenRouter content")
-    return content, f"openrouter:{OPENROUTER_MODEL}"
+    last_exc: Exception | None = None
+    for attempt in range(1, OPENROUTER_RETRIES + 1):
+        try:
+            data = _post_json(OPENROUTER_URL, payload, headers=headers)
+            choices = data.get("choices") or []
+            if not choices:
+                raise ValueError("Empty OpenRouter VLM response")
+            content = choices[0].get("message", {}).get("content", "").strip()
+            if not content:
+                raise ValueError("Empty OpenRouter content")
+            return content, f"openrouter:{OPENROUTER_MODEL}"
+        except Exception as exc:
+            last_exc = exc
+            if attempt == OPENROUTER_RETRIES:
+                raise
+    raise last_exc  # pragma: no cover
 
 
 def _describe_single_image(image_path: str, topic: str) -> tuple[str, str]:
     try:
-        return _call_ollama(image_path, topic)
-    except Exception:
         return _call_openrouter(image_path, topic)
+    except Exception:
+        return _call_ollama(image_path, topic)
 
 
 def describe_images(image_paths: list[str], topic: str) -> str:

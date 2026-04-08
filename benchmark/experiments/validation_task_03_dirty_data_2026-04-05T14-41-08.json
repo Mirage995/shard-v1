@@ -1,0 +1,93 @@
+{
+  "task": "task_03_dirty_data",
+  "topic": "Python defaultdict Counter comprehension optimization",
+  "runs_per_phase": 3,
+  "started_at": "2026-04-05T14:41:08.556501",
+  "baseline_runs": [
+    {
+      "run_id": 1,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 81.1,
+      "raw_output": "rategies)\n14:41:45 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:41:45 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:41:50 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:41:50 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6329 chars)\n14:41:50 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=4b2ce4f6bf52  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:41:50 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:41:57 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:41:57 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6353 chars)\n14:41:57 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:42:05 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:42:05 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6353 chars)\n14:42:05 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:42:14 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:42:14 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6582 chars)\n14:42:14 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:42:24 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:42:24 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6582 chars)\n14:42:24 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    },
+    {
+      "run_id": 2,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 53.3,
+      "raw_output": "rategies)\n14:42:42 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:42:42 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:42:46 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:42:46 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5704 chars)\n14:42:46 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=8298d5ef486e  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:42:46 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:42:53 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:42:53 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5980 chars)\n14:42:53 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:43:01 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:01 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6190 chars)\n14:43:01 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:43:09 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:09 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6190 chars)\n14:43:09 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:43:18 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:18 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6190 chars)\n14:43:18 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    },
+    {
+      "run_id": 3,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 53.9,
+      "raw_output": "rategies)\n14:43:34 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:43:34 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:43:38 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:38 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5968 chars)\n14:43:38 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=fff9080fe6f3  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:43:38 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:43:44 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:44 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5984 chars)\n14:43:44 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:43:54 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:43:54 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6222 chars)\n14:43:54 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:44:03 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:44:03 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6222 chars)\n14:44:03 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:44:12 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:44:12 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6222 chars)\n14:44:12 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    }
+  ],
+  "study_result": {
+    "topic": "Python defaultdict Counter comprehension optimization",
+    "score": 0,
+    "certified": false,
+    "elapsed_sec": 143.5
+  },
+  "post_study_runs": [
+    {
+      "run_id": 1,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 52.5,
+      "raw_output": "rategies)\n14:46:54 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:46:54 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:46:58 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:46:59 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6129 chars)\n14:46:59 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=4b2ce4f6bf52  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:46:59 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:47:05 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:05 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6145 chars)\n14:47:05 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:47:13 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:13 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6145 chars)\n14:47:13 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:47:21 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:21 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6145 chars)\n14:47:21 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:47:30 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:30 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (6145 chars)\n14:47:30 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    },
+    {
+      "run_id": 2,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 52.1,
+      "raw_output": "rategies)\n14:47:46 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:47:46 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:47:50 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:50 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5704 chars)\n14:47:50 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=8298d5ef486e  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:47:50 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:47:56 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:47:56 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5775 chars)\n14:47:56 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:48:04 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:04 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5775 chars)\n14:48:04 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:48:13 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:13 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5775 chars)\n14:48:13 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:48:22 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:22 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5775 chars)\n14:48:22 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    },
+    {
+      "run_id": 3,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 51.8,
+      "raw_output": "rategies)\n14:48:38 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_03_dirty_data'  reason=A:streak=-8  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n14:48:38 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n14:48:41 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:41 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5704 chars)\n14:48:41 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_03_dirty_data'  pre=EMPTY -> post=8298d5ef486e  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n14:48:41 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:48:48 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:48 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5848 chars)\n14:48:48 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:48:56 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:48:56 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5845 chars)\n14:48:56 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:49:04 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:49:04 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5845 chars)\n14:49:04 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n14:49:14 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:49:14 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (5845 chars)\n14:49:14 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on optimized_processor.py\n"
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "n": 3,
+      "victories": 0,
+      "win_rate": 0.0,
+      "mean_attempts": 5.0,
+      "attempts_list": [
+        5,
+        5,
+        5
+      ]
+    },
+    "post_study": {
+      "n": 3,
+      "victories": 0,
+      "win_rate": 0.0,
+      "mean_attempts": 5.0,
+      "attempts_list": [
+        5,
+        5,
+        5
+      ]
+    },
+    "delta_win_rate": 0.0,
+    "delta_attempts": 0.0,
+    "verdict": "NO_CHANGE",
+    "interpretation": "No measurable difference. Topic may not be directly relevant to task mechanics."
+  },
+  "finished_at": "2026-04-05T14:49:18.604220"
+}

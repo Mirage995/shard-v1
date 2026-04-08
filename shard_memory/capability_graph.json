@@ -2813,5 +2813,483 @@
     "requires": [],
     "acquired": "2026-04-01T18:52:11.169868",
     "source_topic": "Integration of ghost mutation handling and debugging and http client implementation python"
+  },
+  "lexical analysis": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-08T00:06:04.327184",
+    "source_topic": "template parser handling and debugging"
+  },
+  "syntax analysis": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-08T00:06:04.337380",
+    "source_topic": "template parser handling and debugging"
+  },
+  "template engine": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-08T00:06:04.345972",
+    "source_topic": "template parser handling and debugging"
+  },
+  "skip list probabilistic data structure": {
+    "requires": [],
+    "acquired": "2026-04-08T00:08:36.063326",
+    "source_topic": "skip list probabilistic data structure"
+  },
+  "skip list": {
+    "requires": [
+      "skip list probabilistic data structure"
+    ],
+    "acquired": "2026-04-08T00:08:36.072352",
+    "source_topic": "skip list probabilistic data structure"
+  },
+  "linked list": {
+    "requires": [
+      "skip list probabilistic data structure"
+    ],
+    "acquired": "2026-04-08T00:08:36.080938",
+    "source_topic": "skip list probabilistic data structure"
+  },
+  "probabilistic data structure": {
+    "requires": [
+      "skip list probabilistic data structure"
+    ],
+    "acquired": "2026-04-08T00:08:36.089954",
+    "source_topic": "skip list probabilistic data structure"
+  },
+  "python bytecode and dis module": {
+    "requires": [],
+    "acquired": "2026-04-08T00:11:27.895773",
+    "source_topic": "python bytecode and dis module"
+  },
+  "python bytecode": {
+    "requires": [
+      "python bytecode and dis module"
+    ],
+    "acquired": "2026-04-08T00:11:27.904308",
+    "source_topic": "python bytecode and dis module"
+  },
+  "dis module": {
+    "requires": [
+      "python bytecode and dis module"
+    ],
+    "acquired": "2026-04-08T00:11:27.912946",
+    "source_topic": "python bytecode and dis module"
+  },
+  "bytecode instructions": {
+    "requires": [
+      "python bytecode and dis module"
+    ],
+    "acquired": "2026-04-08T00:11:27.922004",
+    "source_topic": "python bytecode and dis module"
+  },
+  "code disassembly": {
+    "requires": [
+      "python bytecode and dis module"
+    ],
+    "acquired": "2026-04-08T00:11:27.931373",
+    "source_topic": "python bytecode and dis module"
+  },
+  "python import system and hooks": {
+    "requires": [],
+    "acquired": "2026-04-08T00:14:33.388670",
+    "source_topic": "python import system and hooks"
+  },
+  "import statement": {
+    "requires": [
+      "python import system and hooks"
+    ],
+    "acquired": "2026-04-08T00:14:33.397271",
+    "source_topic": "python import system and hooks"
+  },
+  "__import__": {
+    "requires": [
+      "python import system and hooks"
+    ],
+    "acquired": "2026-04-08T00:14:33.405337",
+    "source_topic": "python import system and hooks"
+  },
+  "import hooks": {
+    "requires": [
+      "python import system and hooks"
+    ],
+    "acquired": "2026-04-08T00:14:33.413854",
+    "source_topic": "python import system and hooks"
+  },
+  "sys.meta_path": {
+    "requires": [
+      "python import system and hooks"
+    ],
+    "acquired": "2026-04-08T00:14:33.422888",
+    "source_topic": "python import system and hooks"
+  },
+  "python weakref and finalize patterns": {
+    "requires": [],
+    "acquired": "2026-04-08T00:17:48.320336",
+    "source_topic": "python weakref and finalize patterns"
+  },
+  "python datamodel reference complete": {
+    "requires": [],
+    "acquired": "2026-04-08T11:35:13.190426",
+    "source_topic": "python datamodel reference complete"
+  },
+  "python data model": {
+    "requires": [
+      "python datamodel reference complete"
+    ],
+    "acquired": "2026-04-08T11:35:13.200874",
+    "source_topic": "python datamodel reference complete"
+  },
+  "object identity": {
+    "requires": [
+      "python datamodel reference complete"
+    ],
+    "acquired": "2026-04-08T11:35:13.211156",
+    "source_topic": "python datamodel reference complete"
+  },
+  "object type": {
+    "requires": [
+      "python datamodel reference complete"
+    ],
+    "acquired": "2026-04-08T11:35:13.220883",
+    "source_topic": "python datamodel reference complete"
+  },
+  "object value": {
+    "requires": [
+      "python datamodel reference complete"
+    ],
+    "acquired": "2026-04-08T11:35:13.230890",
+    "source_topic": "python datamodel reference complete"
+  },
+  "async programming basics": {
+    "requires": [],
+    "acquired": "2026-04-08T11:38:14.906202",
+    "source_topic": "async programming basics"
+  },
+  "async/await syntax": {
+    "requires": [
+      "async programming basics"
+    ],
+    "acquired": "2026-04-08T11:38:14.918069",
+    "source_topic": "async programming basics"
+  },
+  "asynchronous_programming": {
+    "requires": [
+      "async programming basics"
+    ],
+    "acquired": "2026-04-08T11:38:14.932306",
+    "source_topic": "async programming basics"
+  },
+  "event-driven architecture": {
+    "requires": [
+      "python asyncio event loop internals"
+    ],
+    "acquired": "2026-04-08T11:42:05.994301",
+    "source_topic": "python asyncio event loop internals"
+  },
+  "asyncio task groups and cancellation python": {
+    "requires": [],
+    "acquired": "2026-04-08T11:45:11.855147",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "asyncio taskgroup": {
+    "requires": [
+      "asyncio task groups and cancellation python"
+    ],
+    "acquired": "2026-04-08T11:45:11.868775",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "asyncio create_task": {
+    "requires": [
+      "asyncio task groups and cancellation python"
+    ],
+    "acquired": "2026-04-08T11:45:11.884666",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "asyncio wait_for": {
+    "requires": [
+      "asyncio task groups and cancellation python"
+    ],
+    "acquired": "2026-04-08T11:45:11.896264",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "cancellation semantics": {
+    "requires": [
+      "asyncio task groups and cancellation python"
+    ],
+    "acquired": "2026-04-08T11:45:11.912726",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "task cancellation": {
+    "requires": [
+      "asyncio task groups and cancellation python"
+    ],
+    "acquired": "2026-04-08T11:45:11.926126",
+    "source_topic": "asyncio task groups and cancellation python"
+  },
+  "python thread safety basics": {
+    "requires": [],
+    "acquired": "2026-04-08T11:48:13.796563",
+    "source_topic": "python thread safety basics"
+  },
+  "thread safety": {
+    "requires": [
+      "python thread safety basics"
+    ],
+    "acquired": "2026-04-08T11:48:13.808655",
+    "source_topic": "python thread safety basics"
+  },
+  "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)": {
+    "requires": [],
+    "acquired": "2026-04-08T15:41:10.260094",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "http persistent connection": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T15:41:10.270170",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "socket programming": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T15:41:10.279833",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "http request parsing": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T15:41:10.289455",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "keep-alive connections": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T15:41:10.299773",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "http server implementation": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T15:41:10.310065",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "http keep-alive": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T16:27:13.640265",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "tcp connections": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T16:27:13.651049",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "http protocol": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T16:27:13.662166",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "request/response cycle": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T16:27:13.673272",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "keep-alive header": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T17:29:19.841347",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "tcp/ip protocol": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T17:29:19.852937",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "raw sockets": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T17:45:01.710523",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "ip header structure": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T17:45:01.722909",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "tcp header structure": {
+    "requires": [
+      "custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)"
+    ],
+    "acquired": "2026-04-08T17:45:01.732807",
+    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)"
+  },
+  "implementation of a robust udp client with custom retry logic, packet timeout and checksum validation using binary structures": {
+    "requires": [],
+    "acquired": "2026-04-08T18:37:23.321251",
+    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures"
+  },
+  "custom udp protocol": {
+    "requires": [
+      "implementation of a robust udp client with custom retry logic, packet timeout and checksum validation using binary structures"
+    ],
+    "acquired": "2026-04-08T18:37:23.332801",
+    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures"
+  },
+  "retry policy": {
+    "requires": [
+      "implementation of a robust udp client with custom retry logic, packet timeout and checksum validation using binary structures"
+    ],
+    "acquired": "2026-04-08T18:37:23.342278",
+    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures"
+  },
+  "reliable telemetry": {
+    "requires": [
+      "implementation of a robust udp client with custom retry logic, packet timeout and checksum validation using binary structures"
+    ],
+    "acquired": "2026-04-08T18:37:23.351599",
+    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures"
+  },
+  "udp socket programming": {
+    "requires": [],
+    "acquired": "2026-04-08T22:08:11.089805",
+    "source_topic": "UDP socket programming"
+  },
+  "udp protocol": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:08:11.102437",
+    "source_topic": "UDP socket programming"
+  },
+  "non-blocking udp socket": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:08:11.115029",
+    "source_topic": "UDP socket programming"
+  },
+  "raw socket programming": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:08:11.130024",
+    "source_topic": "UDP socket programming"
+  },
+  "tcp socket programming": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:16:08.482713",
+    "source_topic": "UDP socket programming"
+  },
+  "socket apis": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:16:08.493271",
+    "source_topic": "UDP socket programming"
+  },
+  "asynchronous io": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:42:42.117282",
+    "source_topic": "UDP socket programming"
+  },
+  "non-blocking sockets": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:47:35.260027",
+    "source_topic": "UDP socket programming"
+  },
+  "custom headers": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T22:47:35.270788",
+    "source_topic": "UDP socket programming"
+  },
+  "network protocol": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T23:48:54.211874",
+    "source_topic": "UDP socket programming"
+  },
+  "connectionless protocol": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T23:56:43.646852",
+    "source_topic": "UDP socket programming"
+  },
+  "reliable data transfer": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T23:56:43.663474",
+    "source_topic": "UDP socket programming"
+  },
+  "transport layer protocol": {
+    "requires": [
+      "udp socket programming"
+    ],
+    "acquired": "2026-04-08T23:59:33.494825",
+    "source_topic": "UDP socket programming"
+  },
+  "threading event and condition python": {
+    "requires": [],
+    "acquired": "2026-04-09T00:27:45.297294",
+    "source_topic": "threading event and condition python"
+  },
+  "template metaprogramming": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-09T00:37:58.002203",
+    "source_topic": "template parser handling and debugging"
+  },
+  "template instantiation": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-09T00:37:58.015284",
+    "source_topic": "template parser handling and debugging"
+  },
+  "compile-time asserts": {
+    "requires": [
+      "template parser handling and debugging"
+    ],
+    "acquired": "2026-04-09T00:37:58.028761",
+    "source_topic": "template parser handling and debugging"
+  },
+  "multiprocessing queue and pipe python": {
+    "requires": [],
+    "acquired": "2026-04-09T00:41:56.019324",
+    "source_topic": "multiprocessing queue and pipe python"
   }
 }

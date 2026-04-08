@@ -91,9 +91,32 @@
       ],
       "status": "rejected",
       "rejected_at": "2026-03-26T20:48:17.621908"
+    },
+    {
+      "id": "f94892e8-4c5b-49ab-a447-5cb4da6f1491",
+      "timestamp": "2026-04-01T22:17:41.700488",
+      "type": "refactor",
+      "file": "backend/study_agent.py",
+      "description": "Avoids repeated calls to `datetime.now()` by storing the timestamp in a variable.",
+      "category": "performance",
+      "rationale": "Calling `datetime.now()` repeatedly creates multiple `datetime` objects, which is unnecessary. Storing the result in a variable and reusing it avoids this overhead.",
+      "philosophical_question": "",
+      "changes": [
+        {
+          "old": "            self.kb.upsert(\n                ids=[f\"{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}\"],\n                documents=[doc_text],\n                metadatas=[{\"topic\": topic, \"timestamp\": datetime.now().isoformat()}]\n            )",
+          "new": "            now = datetime.now()\n            self.kb.upsert(\n                ids=[f\"{topic}_{now.strftime('%Y%m%d%H%M%S')}\"],\n                documents=[doc_text],\n                metadatas=[{\"topic\": topic, \"timestamp\": now.isoformat()}]\n            )"
+        },
+        {
+          "old": "            report_id = f\"integration_{topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}\"\n            self.kb.upsert(\n                ids=[report_id],\n                documents=[f\"Integration Report -- {topic}:\\n{report}\"],\n                metadatas=[{\n                    \"topic\": topic,\n                    \"type\": \"deep_knowledge\",\n                    \"timestamp\": datetime.now().isoformat(),\n                    \"source\": \"cross_pollination\"\n                }]\n            )",
+          "new": "            now = datetime.now()\n            report_id = f\"integration_{topic}_{now.strftime('%Y%m%d%H%M%S')}\"\n            self.kb.upsert(\n                ids=[report_id],\n                documents=[f\"Integration Report -- {topic}:\\n{report}\"],\n                metadatas=[{\n                    \"topic\": topic,\n                    \"type\": \"deep_knowledge\",\n                    \"timestamp\": now.isoformat(),\n                    \"source\": \"cross_pollination\"\n                }]\n            )"
+        }
+      ],
+      "status": "applied",
+      "applied_at": "2026-04-02T15:27:46.542833",
+      "backup": "C:\\Users\\andre\\Desktop\\shard_v1\\backend\\study_agent.bak_20260402_152746"
     }
   ],
   "capability_queue": [],
-  "session_count": 79,
-  "consciousness_index": 2
+  "session_count": 93,
+  "consciousness_index": 7
 }

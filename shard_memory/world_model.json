@@ -1,6 +1,6 @@
 {
   "created_at": "2026-03-26T00:43:55.456004",
-  "updated_at": "2026-04-01T22:25:51.747327",
+  "updated_at": "2026-04-09T00:41:55.955595",
   "skills": {
     "asyncio and async patterns in python": {
       "relevance": 0.95,
@@ -154,7 +154,7 @@
       "domain": "cs_fundamentals",
       "xp_leverage": 1.4,
       "known": true,
-      "known_score": 9.2
+      "known_score": 9.3
     },
     "union find disjoint set": {
       "relevance": 0.75,
@@ -434,7 +434,7 @@
       "domain": "unknown",
       "xp_leverage": 1.0,
       "known": true,
-      "known_score": 8.8
+      "known_score": 7.9
     },
     "note tag handling and debugging": {
       "relevance": 0.5,
@@ -939,6 +939,97 @@
       "xp_leverage": 1.0,
       "known": true,
       "known_score": 8.25
+    },
+    "integration of weak reference and runtime exceptions": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.1
+    },
+    "skip list probabilistic data structure": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.1
+    },
+    "python bytecode and dis module": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.1
+    },
+    "python weakref and finalize patterns": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.6
+    },
+    "python datamodel reference complete": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.3
+    },
+    "async programming basics": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
+    },
+    "python asyncio event loop internals": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
+    },
+    "asyncio task groups and cancellation python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
+    },
+    "python thread safety basics": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
+    },
+    "implementation of a robust udp client with custom retry logic, packet timeout and checksum validation using binary structures": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.5
+    },
+    "udp socket programming": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 7.9
+    },
+    "threading event and condition python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 9.1
+    },
+    "multiprocessing queue and pipe python": {
+      "relevance": 0.5,
+      "domain": "unknown",
+      "xp_leverage": 1.0,
+      "known": true,
+      "known_score": 8.0
     }
   },
   "last_calibrated": "2026-03-26T14:57:50.720693"

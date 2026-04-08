@@ -1,0 +1,626 @@
+
+============================================================
+  SHARD Validation Protocol
+  Task:   task_07_metrics_bleed
+  Topic:  Python metrics isolation test independence
+  Runs:   3 per phase
+============================================================
+
+[PHASE 1/3] BASELINE (3 runs, no study)
+    Cleared fixed_metrics.py
+    Run 1: PASS | attempts=1 | tests=16 | 15.5s
+    Cleared fixed_metrics.py
+    Run 2: PASS | attempts=1 | tests=16 | 15.3s
+    Cleared fixed_metrics.py
+    Run 3: PASS | attempts=1 | tests=16 | 15.0s
+
+[PHASE 2/3] SHARD STUDY � 'Python metrics isolation test independence'
+
+  Studying topic: 'Python metrics isolation test independence'...
+  Task context: 9502 chars injected
+[DB] Loaded 431 capabilities from SQLite
+[STRATEGY] Memory initialized (231 strategies stored)
+[SKILL DISCOVERY] Initialized with 37 patterns
+[STRATEGY] Memory initialized (231 strategies stored)
+[RESEARCH AGENDA] Initialized with 31 skill->topic mappings
+[COGNITION CORE] Senso Interno initialized
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of 'Python metrics isolation test independence'...
+[PRINCIPLES] Injected principle layer for 'Python metrics isolation test independence'
+[TASK CONTEXT] Injected 9502 chars of task context for 'Python metrics isolation test independence'
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for 'Python metrics isolation test independence'...
+[MAP] Searching sources for: Python metrics isolation test independence (Tier 1)
+[MAP] Smart queries: ['Python metrics isolation test independence', 'python metrics isolation test independence tutorial', 'python unittest isolation documentation', 'advanced python testing patterns for isolation and metrics', 'real world examples of python test independence and metrics']
+[MAP] Found 15 unique sources (sorted by relevance)
+  [5] python - Methods to test independence in a non parametric se -- https://stackoverflow.com/questions/78499117/metho
+  [4] Test Independence Done Right: How to write truly isolated te -- https://dev.to/mmonfared/test-independence-done-ri
+  [3] 26.3. unittest — Unit testing framework — Python 3.4.10 docu -- https://docs.python.org/3.4/library/unittest.html
+  [3] unittest — Unit testing framework — Python v3.0.1 documentat -- https://docs.python.org/3.0/library/unittest.html
+  [3] Python Testing Patterns Implementation Playbook - GitHub -- https://github.com/mit-network/Antigravity-awesome
+  [2] 19. Test Isolation, and “Listening to Your Tests” - Test-Dri -- https://www.oreilly.com/library/view/test-driven-d
+  [2] What are the benefits and challenges of test isolation and i -- https://www.linkedin.com/advice/3/what-benefits-ch
+  [2] unittest — Unittestingframework —Python3.14.3 documentation -- https://docs.python.org/3/library/unittest.html
+[MAP] Phase completed. 15 sources found.
+[SHARD.STUDY] [ 10%] AGGREGATE | 0/10 | Scraping 15 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 6 sources...
+[COOKIES] Dismissed with: [id*='accept']
+[AGGREGATE] ✅ [1/6] python - Methods to test independence in a non par (9698 chars)
+[AGGREGATE] ✅ [2/6] Test Independence Done Right: How to write truly i (27621 chars)
+[AGGREGATE] ✅ [3/6] 26.3. unittest — Unit testing framework — Python 3 (68247 chars)
+[AGGREGATE] ✅ [4/6] unittest — Unit testing framework — Python v3.0.1  (32431 chars)
+[COOKIES] Dismissed with: [id*='accept']
+[AGGREGATE] ✅ [5/6] Python Testing Patterns Implementation Playbook -  (1125 chars)
+[AGGREGATE] ✅ [6/6] 19. Test Isolation, and “Listening to Your Tests”  (3449 chars)
+[AGGREGATE] Total raw text: 17216 chars
+[TASK CONTEXT] Prepended to raw_text (9502 chars)
+[AGGREGATE] Phase completed. 26801 chars scraped.
+[SHARD.STUDY] [ 30%] SYNTHESIZE | 0/10 | Building structured knowledge...
+[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: Python metrics isolation test independence
+[SYNTHESIZE] GraphRAG injected 6 causal warnings
+[SYNTHESIZE] JSON recovered successfully
+[SYNTHESIZE] JSON parsed successfully (4 concepts)
+[WORLD MODEL] entities: 4 edges: 0
+[WORLD MODEL] hub detected: Histogram (degree 0)
+[WORLD MODEL] hub detected: Counter (degree 0)
+[WORLD MODEL] hub detected: MetricsCollector (degree 0)
+[WORLD MODEL] hub detected: percentile (degree 0)
+[SYNTHESIZE] concepts extracted: 4 after semantic validation
+[SYNTHESIZE] Phase completed. 4 concepts extracted.
+[CROSS-REF] Filter query failed (Error executing plan: Internal error: Error finding id), retrying without filter...
+[CROSS-REF] Found 3 connections with existing knowledge
+[SHARD.STUDY] [ 45%] SYNTHESIZE | 0/10 | Found 3 connections with existing knowledge
+[SHARD.STUDY] [ 45%] STORE | 0/10 | Persisting to knowledge base...
+[STORE] Persisting knowledge for: Python metrics isolation test independence
+[STORE] ✅ Saved to ChromaDB
+[STORE] Phase completed.
+[SHARD.STUDY] [ 50%] CROSS_POLLINATE | 0/10 | Generating Integration Report...
+[CROSS-POLLINATE] Generating Integration Report for: Python metrics isolation test independence
+[CROSS-POLLINATE] ChromaDB query error: Error executing plan: Internal error: Error finding id
+[CROSS-POLLINATE] ✅ Integration Report generated (787 chars)
+[CROSS-POLLINATE] Report preview: Rapporto di Integrazione:
+
+Durante lo studio di "Python metrics isolation test independence", ho appreso concetti chiave come Histogram, Counter, MetricsCollector e Percentile. Questi concetti sono in...
+[CROSS-POLLINATE] ✅ Report saved to ChromaDB (type: deep_knowledge)
+[SHARD.STUDY] [ 60%] CROSS_POLLINATE | 0/10 | Integration Report: Rapporto di Integrazione:
+
+Durante lo studio di "Python metrics isolation test independence", ho app...
+[PRINCIPLES] +1 new principles saved (total: 13)
+[PRINCIPLES] Extracted 1 new principles from 'Python metrics isolation test independence'
+[CROSS-POLLINATE] Phase completed.
+[SHARD.STUDY] [ 60%] MATERIALIZE | 0/10 | Writing Cheat Sheet to filesystem...
+[MATERIALIZE] Creating Cheat Sheet for: Python metrics isolation test independence
+[MATERIALIZE] ✅ Cheat Sheet generated (2346 chars)
+[TOOL] write_file -> resolved workspace path: C:\Users\andre\Desktop\shard_v1\shard_workspace\knowledge_base\python_metrics_isolation_test_independence.md
+[MATERIALIZE] ✅ Cheat Sheet written to: shard_workspace/knowledge_base/python_metrics_isolation_test_independence.md
+[MATERIALIZE] Result: Success: file 'knowledge_base/python_metrics_isolation_test_independence.md' written (2386 bytes).
+[SHARD.STUDY] [ 70%] MATERIALIZE | 0/10 | Cheat Sheet saved to knowledge_base/
+[MATERIALIZE] Phase completed.
+[STRATEGY RETRIEVAL] Strategy found but out-of-context; discarding.
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Generating code independently from theory phase
+[SANDBOX] Generating code independently from theory phase
+[SANDBOX] applying library constraints
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Executing generated code
+[SANDBOX] Executing generated code
+[SANDBOX] Executing code in Docker container for: Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_3886eb22.py
+[SANDBOX] Code (1218 chars):
+import random
+import math
+
+def calculate_metrics(data):
+    if not data:
+        return {"mean": 0, "median": 0, "stddev": 0}
+    mean = sum(data) / len(data)
+    data.sort()
+    if len(data) % 2 == 0:
+        median = (data[len(data) // 2 - 1] + data[len(data) // 2]) / 2
+    else:
+        median = ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: OK All assertions passed
+[SHARD.STUDY] [ 80%] SANDBOX | 0/10 | Sandbox passed: Il codice funziona correttamente e dimostra una buona comprensione di Python e dei concetti di isola
+[SANDBOX] Execution completed
+[SHARD.STUDY] [ 80%] VALIDATE | 0/10 | Self-interrogation (attempt 1/3)...
+[VALIDATE] Self-interrogation on: Python metrics isolation test independence
+[VALIDATE] GraphRAG injected 6 causal warnings
+[VALIDATE] Q: Come si può applicare il concetto di test-driven development... -> answered
+[VALIDATE] Q: In che modo l'uso del Docker SDK per Python e del modulo jso... -> answered
+[SHARD.STUDY] [ 90%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+[EVALUATE] Scoring understanding of: Python metrics isolation test independence
+[EVALUATE] GraphRAG injected 6 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=8.0
+code=7.0
+sandbox=10.0
+synthesis=9.0
+total=8.5
+[STRATEGY] Rejected low-quality strategy (noise/not actionable): '[Python metrics isolation test independence] Concepts: Histogram, Counter, Metri'
+[BENCHMARK] Generating tests for 'Python metrics isolation test independence'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python metrics isolation test independence'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 6 causal warnings into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_d603845f.py
+[SANDBOX] Code (354 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 0 ---
+input_data = []
+expected = {'mean': 0, 'median':...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_d603845f.py", line 13, in <module>
+    assert solve(input_data) == expected
+  File "/app/study_d603845f.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list' object has no attribute 'items'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_7f32ee9e.py
+[SANDBOX] Code (355 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 1 ---
+input_data = [5]
+expected = {'mean': 5, 'median'...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_7f32ee9e.py", line 13, in <module>
+    assert solve(input_data) == expected
+  File "/app/study_7f32ee9e.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list' object has no attribute 'items'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_6cddd84c.py
+[SANDBOX] Code (440 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 2 ---
+input_data = [1, 2, 3, 4, 5]
+expected = {'mean':...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_6cddd84c.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_6cddd84c.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_4d8c1593.py
+[SANDBOX] Code (462 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 3 ---
+input_data = [1, 2, 2, 3, 3, 3]
+expected = {'mea...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_4d8c1593.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_4d8c1593.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_abd6eb0a.py
+[SANDBOX] Code (453 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 4 ---
+input_data = [i for i in range(100)]
+expected = ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_abd6eb0a.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_abd6eb0a.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[BENCHMARK_RUN] 'Python metrics isolation test independence': 0/5 passed (+0 discarded) -> pass_rate=0%
+[BENCHMARK] LLM=8.5 × 40%  +  bench=0.0 × 60%  =  final=3.4  (pass_rate=0%)
+[CERTIFY] ❌ 'Python metrics isolation test independence' FAILED -- score 3.4 < 7.5, pass_rate 0% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 95%] VALIDATE | 3.4/10 | Score 3.4/10 -- Retrying. Focus: Explore and discuss potential pitfalls of metrics isolation in the context of te
+[SHARD.STUDY] [ 80%] SANDBOX | 0/10 | Regenerating code (attempt 2/3, gaps: ['Limited discussion on potential pitfalls of metrics isolation', 'No mention of test-driven development in the context of iterative development'])...
+[SANDBOX] Executing code in Docker container for: Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_15c96603.py
+[SANDBOX] Code (1358 chars):
+import numpy as np
+import math
+import random
+import itertools
+import collections
+import concurrent.futures
+import unittest
+
+def calculate_metrics(data):
+    metrics = collections.defaultdict(list)
+    for item in data:
+        metrics['mean'].append(np.mean(item))
+        metrics['std'].append(np.st...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] stderr: ..
+----------------------------------------------------------------------
+Ran 2 tests in 0.860s
+
+OK
+[RETRY] Sandbox re-run: passed
+[SHARD.STUDY] [ 80%] VALIDATE | 0/10 | Self-interrogation (attempt 2/3)...
+[VALIDATE] Self-interrogation on: Python metrics isolation test independence
+[VALIDATE] GraphRAG injected 6 causal warnings
+[VALIDATE] Q: Come si può applicare il concetto di test-driven development... -> answered
+[VALIDATE] Q: In che modo si può utilizzare il modulo `json` di Python per... -> answered
+[SHARD.STUDY] [ 90%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+[EVALUATE] Scoring understanding of: Python metrics isolation test independence
+[EVALUATE] GraphRAG injected 6 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=8.0
+code=6.0
+sandbox=5.0
+synthesis=7.0
+total=6.5
+[STRATEGY] Rejected low-quality strategy (noise/not actionable): '[Python metrics isolation test independence] Concepts: Histogram, Counter, Metri'
+[CACHE] Registered failed experiment: 'Python metrics isolation test independence' (Skills at failure: 431)
+[BENCHMARK] Generating tests for 'Python metrics isolation test independence'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python metrics isolation test independence'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 6 causal warnings into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_70b07197.py
+[SANDBOX] Code (319 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 0 ---
+input_data = []
+expected = {}
+assert solve(input...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_70b07197.py", line 13, in <module>
+    assert solve(input_data) == expected
+  File "/app/study_70b07197.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list' object has no attribute 'items'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_ea9eede7.py
+[SANDBOX] Code (428 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 1 ---
+input_data = [[1.0, 2.0, 3.0]]
+expected = {'mean...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_ea9eede7.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_ea9eede7.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_6f9cad41.py
+[SANDBOX] Code (461 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 2 ---
+input_data = [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_6f9cad41.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_6f9cad41.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_d5c38778.py
+[SANDBOX] Code (447 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 3 ---
+input_data = [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_d5c38778.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_d5c38778.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_d0e65538.py
+[SANDBOX] Code (447 chars):
+def solve(input_data):
+    metrics = {}
+    for key, value in input_data.items():
+        if isinstance(value, dict):
+            metrics[key] = solve(value)
+        else:
+            metrics[key] = value
+    return metrics
+
+# --- benchmark test 4 ---
+input_data = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_d0e65538.py", line 13, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data).values(), expected.values()))
+  File "/app/study_d0e65538.py", line 3, in solve
+    for key, value in input_data.items():
+AttributeError: 'list'
+[BENCHMARK_RUN] 'Python metrics isolation test independence': 0/5 passed (+0 discarded) -> pass_rate=0%
+[BENCHMARK] LLM=6.5 × 40%  +  bench=0.0 × 60%  =  final=2.6  (pass_rate=0%)
+[CERTIFY] ❌ 'Python metrics isolation test independence' FAILED -- score 2.6 < 7.5, pass_rate 0% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 95%] VALIDATE | 2.6/10 | Score 2.6/10 -- Retrying. Focus: providing concrete code examples and discussing error handling and edge cases in
+[CRITIC-LLM][SKEPTICAL] Meta-critique for 'Python metrics isolation test independence' (attempt 2): SHARD consistently fails to provide concrete code examples and neglects error handling and edge cases, indicating a lack...
+[SHARD.STUDY] [ 95%] VALIDATE | 2.6/10 | [CRITIC] SHARD consistently fails to provide concrete code examples and neglects error handling and edge case...
+[CRITIC-LLM] Injecting meta-critique into retry prompt for 'Python metrics isolation test independence'
+[VETTORE 1+2] CognitionCore relational_context injected at attempt 2
+[SHARD.STUDY] [ 80%] SANDBOX | 0/10 | Regenerating code (attempt 3/3, gaps: ['lack of concrete code examples', 'limited discussion of error handling and edge cases'])...
+[SWARM] Activating Architect→Coder pipeline (attempt 2)
+[SWARM] Architect strategy (2169 chars)
+[SWARM] Coder produced 1583 chars
+[SANDBOX] Executing code in Docker container for: Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_b650eb4c.py
+[SANDBOX] Code (1583 chars):
+import numpy as np
+import math
+import random
+import itertools
+import collections
+import concurrent.futures
+
+def calculate_mean(data):
+    return np.mean(data)
+
+def calculate_std_dev(data):
+    return np.std(data)
+
+def metrics_isolation(data):
+    mean = calculate_mean(data)
+    std_dev = calculate_s...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: /usr/local/lib/python3.10/site-packages/numpy/_core/fromnumeric.py:3860: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/usr/local/lib/python3.10/site-packages/numpy/_core/_methods.py:145: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret
+[RETRY] Sandbox re-run: failed
+[SHADOW DIAGNOSTIC] [EMERGENCE HIT] -- topic='Python metrics isolation test independence' attempt=2
+[SHARD.STUDY] [ 80%] VALIDATE | 0/10 | Self-interrogation (attempt 3/3)...
+[VALIDATE] Self-interrogation on: Python metrics isolation test independence
+[VALIDATE] GraphRAG injected 6 causal warnings
+[VALIDATE] Q: Come posso applicare il concetto di test-driven development ... -> answered
+[VALIDATE] Q: In che modo posso utilizzare le relazioni causali apprese, c... -> answered
+[SHARD.STUDY] [ 90%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+[EVALUATE] Scoring understanding of: Python metrics isolation test independence
+[EVALUATE] GraphRAG injected 6 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=8.0
+code=0.0
+sandbox=0.0
+synthesis=6.0
+total=3.5
+[STRATEGY] Strategia scartata (score insufficiente: 3.5, FAIL)
+[CACHE] Registered failed experiment: 'Python metrics isolation test independence' (Skills at failure: 431)
+[BENCHMARK] Generating tests for 'Python metrics isolation test independence'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python metrics isolation test independence'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 6 causal warnings into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_cda6fff1.py
+[SANDBOX] Code (537 chars):
+def solve(input_data):
+    metrics = {}
+    for data in input_data:
+        for key, value in data.items():
+            if key not in metrics:
+                metrics[key] = []
+            metrics[key].append(value)
+    isolated_metrics = {}
+    for key, values in metrics.items():
+        isolated_m...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_cda6fff1.py", line 16, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))
+  File "/app/study_cda6fff1.py", line 4, in solve
+    for key, value in data.items():
+AttributeError: 'int' object has no attribute 
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_736936ef.py
+[SANDBOX] Code (510 chars):
+def solve(input_data):
+    metrics = {}
+    for data in input_data:
+        for key, value in data.items():
+            if key not in metrics:
+                metrics[key] = []
+            metrics[key].append(value)
+    isolated_metrics = {}
+    for key, values in metrics.items():
+        isolated_m...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_736936ef.py", line 16, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))
+  File "/app/study_736936ef.py", line 4, in solve
+    for key, value in data.items():
+AttributeError: 'int' object has no attribute 
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_88b53714.py
+[SANDBOX] Code (509 chars):
+def solve(input_data):
+    metrics = {}
+    for data in input_data:
+        for key, value in data.items():
+            if key not in metrics:
+                metrics[key] = []
+            metrics[key].append(value)
+    isolated_metrics = {}
+    for key, values in metrics.items():
+        isolated_m...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_da7793a6.py
+[SANDBOX] Code (551 chars):
+def solve(input_data):
+    metrics = {}
+    for data in input_data:
+        for key, value in data.items():
+            if key not in metrics:
+                metrics[key] = []
+            metrics[key].append(value)
+    isolated_metrics = {}
+    for key, values in metrics.items():
+        isolated_m...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_da7793a6.py", line 16, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))
+  File "/app/study_da7793a6.py", line 4, in solve
+    for key, value in data.items():
+AttributeError: 'int' object has no attribute 
+[SANDBOX] Executing code in Docker container for: benchmark:Python metrics isolation test independence
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\backend\sandbox\study_d2d1a895.py
+[SANDBOX] Code (522 chars):
+def solve(input_data):
+    metrics = {}
+    for data in input_data:
+        for key, value in data.items():
+            if key not in metrics:
+                metrics[key] = []
+            metrics[key].append(value)
+    isolated_metrics = {}
+    for key, values in metrics.items():
+        isolated_m...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_d2d1a895.py", line 16, in <module>
+    assert all(abs(a - b) < 1e-6 for a, b in zip(solve(input_data), expected))
+  File "/app/study_d2d1a895.py", line 4, in solve
+    for key, value in data.items():
+AttributeError: 'int' object has no attribute 
+[BENCHMARK_RUN] 'Python metrics isolation test independence': 1/5 passed (+0 discarded) -> pass_rate=20%
+[BENCHMARK] LLM=3.5 × 40%  +  bench=2.0 × 60%  =  final=2.6  (pass_rate=20%)
+[CERTIFY] ❌ 'Python metrics isolation test independence' FAILED -- score 2.6 < 7.5, sandbox 0.0 < 5, pass_rate 20% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 95%] VALIDATE | 2.6/10 | Score 2.6/10 -- Retrying. Focus: Implementing a working code solution that incorporates TDD, iterative developmen
+[SHARD.STUDY] [ 95%] FAILED | 2.6/10 | Could not certify 'Python metrics isolation test independence' after 3 attempts. Best: 2.6/10
+[EPISODIC] Episode stored for topic 'Python metrics isolation test independence'
+  Study complete: score=2.6/10 certified=False (143.2s)
+
+[PHASE 3/3] POST-STUDY (3 runs)
+    Cleared fixed_metrics.py
+    Run 1: PASS | attempts=1 | tests=16 | 14.1s
+    Cleared fixed_metrics.py
+    Run 2: PASS | attempts=1 | tests=16 | 14.1s
+    Cleared fixed_metrics.py
+    Run 3: PASS | attempts=1 | tests=16 | 14.1s
+
+============================================================
+  VALIDATION RESULT
+============================================================
+  Baseline:   win=100%  avg_attempts=1.0
+  Post-study: win=100%  avg_attempts=1.0
+  Delta win rate: +0%
+  Delta attempts: +0.0
+  VERDICT: NO_CHANGE
+  No measurable difference. Topic may not be directly relevant to task mechanics.
+============================================================

@@ -2,7 +2,7 @@ def parse_line(line):
     """Parse a single 'key:value' line into (key, value) tuple."""
     parts = line.split(":", 1)
     key = parts[0].strip()
-    value = parts[1].strip() if len(parts) > 1 else ''
+    value = parts[1].strip()
     return key, value
 
 
@@ -17,8 +17,7 @@ def load_config(text):
     """
     config = {}
     for line in text.split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#"):
+        if not line.strip() or line.strip().startswith("#"):
             continue
         k, v = parse_line(line)
         config[k] = v

@@ -1,0 +1,129 @@
+{
+  "task": "task_10_template_parser",
+  "topic": "task 10 template parser",
+  "runs_per_phase": 5,
+  "started_at": "2026-04-05T15:11:16.105872",
+  "baseline_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 2,
+      "tests_passed": 10,
+      "elapsed_sec": 18.0,
+      "raw_output": "/telemetry for more information.\n15:11:24 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:11:24 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:11:27 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:11:27 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:11:27 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:11:28 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:11:28 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.320 confidence=0.990 (3 strategies)\n15:11:28 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:11:28 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:11:30 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:11:30 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1133 chars)\n15:11:30 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:11:30 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:11:32 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:11:32 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1176 chars)\n15:11:32 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 2,
+      "tests_passed": 10,
+      "elapsed_sec": 17.5,
+      "raw_output": "/telemetry for more information.\n15:11:42 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:11:42 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:11:45 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:11:45 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:11:45 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:11:46 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:11:46 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.320 confidence=0.990 (3 strategies)\n15:11:46 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:11:46 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:11:47 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:11:47 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1062 chars)\n15:11:47 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:11:47 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:11:49 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:11:49 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1067 chars)\n15:11:49 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 3,
+      "victory": true,
+      "attempts": 3,
+      "tests_passed": 10,
+      "elapsed_sec": 21.7,
+      "raw_output": "PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:12:03 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:12:03 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:12:03 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:12:03 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.276 confidence=0.829 (3 strategies)\n15:12:03 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:12:03 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:12:05 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:05 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1045 chars)\n15:12:05 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:12:05 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:12:07 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:07 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1477 chars)\n15:12:07 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:12:10 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:10 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1478 chars)\n15:12:10 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 4,
+      "victory": true,
+      "attempts": 2,
+      "tests_passed": 10,
+      "elapsed_sec": 18.4,
+      "raw_output": "/telemetry for more information.\n15:12:21 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:12:21 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:12:24 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:12:24 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:12:24 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:12:25 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:12:25 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.320 confidence=0.990 (3 strategies)\n15:12:25 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:12:25 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:12:27 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:27 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1074 chars)\n15:12:27 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:12:27 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:12:28 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:28 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1222 chars)\n15:12:28 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 5,
+      "victory": true,
+      "attempts": 2,
+      "tests_passed": 10,
+      "elapsed_sec": 16.3,
+      "raw_output": "m/telemetry for more information.\n15:12:39 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:12:39 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:12:42 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:12:42 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:12:42 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:12:42 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:12:42 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.320 confidence=0.990 (3 strategies)\n15:12:42 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:12:42 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:12:44 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:44 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1133 chars)\n15:12:44 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:12:44 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:12:45 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:12:45 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (833 chars)\n15:12:46 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    }
+  ],
+  "study_result": {
+    "topic": "task 10 template parser",
+    "score": 0,
+    "certified": false,
+    "elapsed_sec": 142.2
+  },
+  "post_study_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 3,
+      "tests_passed": 10,
+      "elapsed_sec": 20.8,
+      "raw_output": "PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:15:23 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:15:23 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:15:23 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:15:23 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.269 confidence=0.803 (3 strategies)\n15:15:23 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:15:23 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:15:25 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:25 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1101 chars)\n15:15:25 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:15:25 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:15:27 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:27 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1526 chars)\n15:15:27 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:15:29 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:29 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1569 chars)\n15:15:29 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 4,
+      "tests_passed": 10,
+      "elapsed_sec": 23.0,
+      "raw_output": "strato. Totale client attivi: 1\n15:15:44 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:15:44 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.342 confidence=1.000 (3 strategies)\n15:15:44 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:15:44 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:15:46 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:46 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1046 chars)\n15:15:46 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:15:46 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:15:47 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:47 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1039 chars)\n15:15:47 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:15:50 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:50 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1039 chars)\n15:15:50 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:15:52 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:15:52 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1063 chars)\n15:15:52 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 3,
+      "victory": false,
+      "attempts": 5,
+      "tests_passed": 0,
+      "elapsed_sec": 22.6,
+      "raw_output": ".882 (3 strategies)\n15:16:06 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:16:06 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:16:08 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:08 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1076 chars)\n15:16:08 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:16:08 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:16:10 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:10 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1503 chars)\n15:16:10 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:16:12 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:12 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1503 chars)\n15:16:12 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:16:14 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:14 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1503 chars)\n15:16:14 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:16:16 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:16 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1503 chars)\n15:16:16 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 4,
+      "victory": true,
+      "attempts": 2,
+      "tests_passed": 10,
+      "elapsed_sec": 17.9,
+      "raw_output": "/telemetry for more information.\n15:16:26 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:16:26 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:16:29 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:16:29 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:16:29 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:16:29 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:16:29 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.342 confidence=1.000 (3 strategies)\n15:16:29 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:16:29 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:16:31 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:31 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1123 chars)\n15:16:31 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:16:31 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n15:16:34 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:34 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1564 chars)\n15:16:34 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    },
+    {
+      "run_id": 5,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 10,
+      "elapsed_sec": 14.9,
+      "raw_output": "===============================\n  VICTORY on attempt 1/5\n  Tests passed: 10\n  Total time: 13.4s\n====================================================================\n\n15:16:37 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:16:43 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:16:43 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:16:46 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:16:46 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:16:46 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:16:47 [shard.cross_task_router] INFO: [ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3\n15:16:47 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.298 confidence=0.909 (3 strategies)\n15:16:47 [shard.benchmark_pivot] WARNING: [BENCH PIVOT] task='task_10_template_parser'  reason=A:streak=-6  pre_fp=EMPTY  pre_strategies=[]  restored to original source.\n15:16:47 [shard.db] INFO: [SHARD_DB] Connection established: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\shard.db (WAL mode)\n15:16:49 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:16:49 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1075 chars)\n15:16:49 [shard.benchmark_pivot] WARNING: [POST-BENCH-PIVOT] task='task_10_template_parser'  pre=EMPTY -> post=43ad8701865c  agency_score=1.000  verdict=DIFFERENT (memory was active constraint)\n15:16:49 [shard.concurrency_simulator] INFO: [CONC_SIM] Concurrency task detected -- running probes on fixed_processor.py\n"
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "n": 5,
+      "victories": 5,
+      "win_rate": 1.0,
+      "mean_attempts": 2.2,
+      "attempts_list": [
+        2,
+        2,
+        3,
+        2,
+        2
+      ]
+    },
+    "post_study": {
+      "n": 5,
+      "victories": 4,
+      "win_rate": 0.8,
+      "mean_attempts": 3.0,
+      "attempts_list": [
+        3,
+        4,
+        5,
+        2,
+        1
+      ]
+    },
+    "delta_win_rate": -0.2,
+    "delta_attempts": -0.8,
+    "verdict": "REGRESSION",
+    "interpretation": "Post-study performance WORSE than baseline. Possible prompt pollution or noise."
+  },
+  "finished_at": "2026-04-05T15:16:51.025095"
+}

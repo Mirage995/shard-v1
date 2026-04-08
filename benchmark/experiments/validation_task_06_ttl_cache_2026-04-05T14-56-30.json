@@ -1,0 +1,93 @@
+{
+  "task": "task_06_ttl_cache",
+  "topic": "Python TTL cache expiration implementation",
+  "runs_per_phase": 3,
+  "started_at": "2026-04-05T14:56:30.574139",
+  "baseline_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 16.9,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (4,429 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (8,948 chars)\n  [llm] Calling... OK (1,729 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (56 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 15.1s\n====================================================================\n\n14:56:32 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:56:38 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n14:56:38 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n14:56:42 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n14:56:42 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:56:42 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n14:56:42 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n14:56:44 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:56:44 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1729 chars)\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 16.2,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (4,429 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (8,948 chars)\n  [llm] Calling... OK (1,837 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (60 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 14.8s\n====================================================================\n\n14:56:49 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:56:55 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n14:56:55 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n14:56:58 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n14:56:58 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:56:58 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n14:56:59 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n14:57:01 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:57:01 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1837 chars)\n"
+    },
+    {
+      "run_id": 3,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 16.4,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (4,429 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (8,948 chars)\n  [llm] Calling... OK (1,837 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (60 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 14.9s\n====================================================================\n\n14:57:05 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:57:11 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n14:57:11 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n14:57:15 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n14:57:15 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n14:57:15 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n14:57:15 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n14:57:17 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n14:57:17 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1837 chars)\n"
+    }
+  ],
+  "study_result": {
+    "topic": "Python TTL cache expiration implementation",
+    "score": 0,
+    "certified": false,
+    "elapsed_sec": 152.1
+  },
+  "post_study_runs": [
+    {
+      "run_id": 1,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 17.0,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (5,099 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (9,618 chars)\n  [llm] Calling... OK (1,711 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (55 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 15.5s\n====================================================================\n\n14:59:55 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:02 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:00:02 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:00:06 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:00:06 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:06 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:00:06 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n15:00:08 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:00:08 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1711 chars)\n"
+    },
+    {
+      "run_id": 2,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 16.7,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (5,099 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (9,618 chars)\n  [llm] Calling... OK (1,711 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (55 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 15.2s\n====================================================================\n\n15:00:12 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:19 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:00:19 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:00:22 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:00:22 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:23 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:00:23 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n15:00:25 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:00:25 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1711 chars)\n"
+    },
+    {
+      "run_id": 3,
+      "victory": true,
+      "attempts": 1,
+      "tests_passed": 17,
+      "elapsed_sec": 16.4,
+      "raw_output": "cted: self_profile     score=0.85  (197 chars)  [self_profile]\n  [gate] Dropped : episodic         score=0.64  (1,436 chars)  [10 past sessions]\n  [gate] Selected: kb               score=0.80  (5,099 chars)  [knowledge_base]\n  [gate] Selected: semantic_memory  score=0.78  (1,291 chars)  [semantic_memory]\n  [ab] strategy_mode=normal activated=False score=1.100\n\n--------------------------------------------------\n  Attempt 1/5  [LLM SOLO]\n--------------------------------------------------\n  [LLM SOLO] Initial prompt (9,618 chars)\n  [llm] Calling... OK (1,711 chars)\n  [syntax] Valid\n  [write] fixed_cache.py (55 lines)\n  [pytest] Running test_task6.py... ALL PASSED (17 tests)\n\n====================================================================\n  VICTORY on attempt 1/5\n  Tests passed: 17\n  Total time: 15.0s\n====================================================================\n\n15:00:29 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:35 [sentence_transformers.SentenceTransformer] INFO: Use pytorch device_name: cpu\n15:00:35 [sentence_transformers.SentenceTransformer] INFO: Load pretrained SentenceTransformer: all-MiniLM-L6-v2\n15:00:39 [shard.db_manager] INFO: [DB_MANAGER] Inizializzazione PersistentClient: C:\\Users\\andre\\Desktop\\shard_v1\\shard_memory\\strategy_db\n15:00:39 [chromadb.telemetry.product.posthog] INFO: Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.\n15:00:39 [shard.db_manager] INFO: [DB_MANAGER] Client registrato. Totale client attivi: 1\n15:00:39 [shard.signal_gate] INFO: [gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache\n\n#' cluster_boost=1.00 mult=1.386 confidence=1.000 (3 strategies)\n15:00:41 [httpx] INFO: HTTP Request: POST https://api.groq.com/openai/v1/chat/completions \"HTTP/1.1 200 OK\"\n15:00:41 [shard.llm_router] INFO: [LLM_ROUTER] Groq OK (1711 chars)\n"
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "n": 3,
+      "victories": 3,
+      "win_rate": 1.0,
+      "mean_attempts": 1.0,
+      "attempts_list": [
+        1,
+        1,
+        1
+      ]
+    },
+    "post_study": {
+      "n": 3,
+      "victories": 3,
+      "win_rate": 1.0,
+      "mean_attempts": 1.0,
+      "attempts_list": [
+        1,
+        1,
+        1
+      ]
+    },
+    "delta_win_rate": 0.0,
+    "delta_attempts": 0.0,
+    "verdict": "NO_CHANGE",
+    "interpretation": "No measurable difference. Topic may not be directly relevant to task mechanics."
+  },
+  "finished_at": "2026-04-05T15:00:44.110358"
+}

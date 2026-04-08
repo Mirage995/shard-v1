@@ -1,0 +1,57 @@
+Perfetto, questo cambia tutto. Fatemi mappare la realtà.
+
+  ---
+  Blueprint vs Realtà SHARD — Il vero delta
+
+  ┌───────────────────────────────────────────────────┬─────────────────────────────────────────────────────────────┐
+  │               Componente Blueprint                │                      Stato Reale SHARD                      │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ SQLite per facts/relations                        │ ✅ shard.db già esiste                                      │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ ChromaDB vector search                            │ ✅ 1347 entry già operative                                 │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Memory extraction via LLM                         │ ✅ study_phases estrae concepts + shard_opinion +           │
+  │                                                   │ critical_questions                                          │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Contradiction resolution                          │ ✅ costruito ieri — CertContradictionChecker                │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Profile engine (static + dynamic)                 │ ✅ identity_core.py                                         │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Hybrid search (semantic + relational)             │ ✅ graph_rag.py + ChromaDB                                  │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ GC / forgetting                                   │ ⚠️ parziale — session_reflections senza decay strutturato   │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Memory types                                      │ ❌ mancante                                                 │
+  │ (FACT/PREFERENCE/EPISODE/GOAL/RELATION)           │                                                             │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ is_latest tracking                                │ ❌ mancante                                                 │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ SessionLogConnector                               │ ❌ mancante — SHARD non si autoingesta                      │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Episode confidence decay (half-life)              │ ❌ mancante                                                 │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Derivation engine                                 │ ❌ mancante — nessuna inferenza da fatti esistenti          │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Multi-modal (PDF, video, immagini)                │ ⚠️ VLM esiste, non integrato nel memory loop                │
+  ├───────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Connector ecosystem (GitHub, Notion, Gmail)       │ ❌ non prioritario per ora                                  │
+  └───────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────┘
+
+  ---
+  Il vero lavoro: 5 pezzi, non 24 pagine
+
+  Il 60% del blueprint è già in SHARD. Il delta reale è questo:
+
+  1. MemoryExtractor — il LLM prompt che converte testo libero → Memory typed objects. È il cuore dell'innovazione,
+  ancora mancante.
+
+  2. memories table in shard.db — aggiunte: memory_type, entities, confidence, is_latest, expires_at, updates (FK). Non
+  un nuovo DB — stesso file.
+
+  3. SessionLogConnector — ROI più alto. Importa i log SSJ → MemoryExtractor → memories table. SHARD impara dalla
+  propria storia operativa.
+
+  4. Episode decay — half-life 7 giorni sugli EPISODE. GC periodico. Pulisce self_inconsistencies.jsonl e
+  session_reflections.jsonl.
+
+  5. Derivation engine — il pezzo più nuovo e più potente. LLM inferisce fatti impliciti da fatti esistenti.

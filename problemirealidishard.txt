@@ -1,0 +1,69 @@
+I PROBLEMI REALI DI SHARD — IN LINGUAGGIO UMANO
+
+  ---
+  CRITICI (rompono tutto)
+
+  1. Il "test automatico" durante lo studio è uno stub vuoto
+  Quando SHARD studia e deve verificare di aver capito, chiama una funzione chiamata generate_for_capability() che è
+  letteralmente un guscio vuoto — restituisce solo il nome del topic, nessun test reale. Il risultato: SHARD non viene
+  mai davvero testato dopo lo studio, e salva roba in memoria senza sapere se è buona o no.
+
+  2. Lo swarm non esiste nel pipeline di studio
+  Lo swarm multi-agente (Architect → Coder → Critic → Reviewer) esiste solo nel benchmark_loop.py. Lo studio
+  (study_phases.py) non lo chiama mai. Quando SHARD fatica a certificare un topic, ci riprova da solo 3 volte e basta —
+  nessun rinforzo.
+
+  3. La certification usa una soglia hardcoded in 3 posti diversi
+  Il voto minimo per certificare (7.5/10) è scritto a mano in 3 file diversi. Se cambi uno, gli altri restano sbagliati.
+
+  ---
+  GRAVI (causano comportamenti sbagliati)
+
+  4. Il circuit breaker dei provider non si riprende bene
+  Quando un provider LLM fallisce e entra in "OPEN" (disabilitato), il contatore di fallimenti non si azzera durante il
+  recupero. Può creare un loop dove il provider continua a fallire anche dopo essersi ripreso.
+
+  5. Provider chain inconsistente tra i moduli
+  study_agent usa [Groq, Gemini, Claude], swarm_engine usa [Groq, Gemini], il default usa [Groq, OpenAI, Gemini,
+  Claude]. Ogni modulo fa le sue scelte e non c'è un punto centrale di configurazione.
+
+  6. Errori silenziosi ovunque
+  diagnostic_layer, graph_rag, llm_cache, principle_engine — tutti falliscono silenziosamente con try/except che non
+  dicono niente. Quando qualcosa va storto non lo sai mai.
+
+  7. cad_agent.py usa un modello che non esiste
+  Hardcoded "gemini-3-pro-preview" — quel modello non esiste. Se viene chiamato, crasha.
+
+  ---
+  MEDI (degradano le performance)
+
+  8. Principe Engine fallisce senza rumore
+  Il nuovo principle_engine.py che abbiamo costruito ieri — se il salvataggio su disco fallisce, il codice continua
+  senza dirlo. I principi potrebbero non venire mai salvati.
+
+  9. Il rollback dello swarm usa una variabile globale
+  Se il processo crasha tra il momento in cui imposta il flag di rollback e il momento in cui lo usa, il flag si perde.
+  Race condition potenziale.
+
+  10. AttemptRecord non traccia quale modalità ha usato
+  Non c'è modo di sapere dall'output se un attempt ha usato LLM solo, Swarm, o feedback SHARD. Impossibile fare
+  debugging post-mortem.
+
+  ---
+  BRUTTO MA NON CRITICO
+
+  11. Log in italiano mescolati con inglese — impossibile fare grep consistente nel codice
+
+  12. generate_for_capability() è dead code che rimane come API pubblica ma è solo un guscio
+
+  13. MAX_RETRY = 3 hardcoded — non configurabile da fuori
+
+  ---
+  La priorità vera
+
+  Se dovessi mettere in ordine cosa fixare prima per avere dati di validazione reali:
+
+  1. Fix generate_for_capability() → chiama generate() async — senza questo la certification non funziona
+  2. Integra swarm nel CertifyRetryGroup — quando fallisce 2 volte, chiama swarm
+  3. Unifica provider chain in constants.py — un posto solo
+  4. Error logging non silenzioso — almeno WARNING, non DEBUG nascosto

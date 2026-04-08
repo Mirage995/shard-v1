@@ -1,33 +1,35 @@
 # algorithm complexity and performance optimization -- SHARD Cheat Sheet
 
 ## Key Concepts
-* Time Complexity: measures the time an algorithm takes to complete, relative to the size of the input
-* Space Complexity: measures the amount of memory an algorithm uses, relative to the size of the input
-* Big O Notation: a mathematical notation that describes the upper bound of an algorithm's time or space complexity
-* Asymptotic Analysis: the study of an algorithm's behavior as the input size approaches infinity
+* Big O notation: a measure of an algorithm's complexity, expressing its upper bound.
+* Time complexity: the amount of time an algorithm takes to complete, usually measured in terms of the size of the input.
+* Space complexity: the amount of memory an algorithm uses, usually measured in terms of the size of the input.
+* Dynamic programming: a method for solving complex problems by breaking them down into simpler subproblems.
+* Asymptotic notation: a way to describe the growth rate of an algorithm's complexity, including Big O, Big Ω, and Big Θ.
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
-| Improves algorithm efficiency | Can be challenging to optimize for both time and space complexity |
-| Enhances software performance | Requires a deep understanding of asymptotic notations and trade-offs |
-| Scalable solutions | May require significant code refactoring |
+| Improves algorithm efficiency | Can be complex to analyze and optimize |
+| Enhances scalability | May require significant code changes |
+| Reduces memory usage | Can be difficult to predict real-world performance |
 
 ## Practical Example
 ```python
-def binary_search(arr, target):
-    low, high = 0, len(arr) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            low = mid + 1
-        else:
-            high = mid - 1
-    return -1
+def fibonacci(n):
+    # Naive recursive implementation (high time complexity)
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+def fibonacci_optimized(n):
+    # Dynamic programming implementation (low time complexity)
+    fib = [0] * (n + 1)
+    fib[1] = 1
+    for i in range(2, n + 1):
+        fib[i] = fib[i-1] + fib[i-2]
+    return fib[n]
 ```
-This example demonstrates a binary search algorithm with a time complexity of O(log n), showcasing the importance of optimizing algorithms for efficient performance.
 
 ## SHARD's Take
-Mastering algorithm complexity is crucial for efficient software development, as it directly impacts the performance and scalability of applications. By understanding time and space complexity, developers can create optimized solutions that meet the demands of modern software systems. However, optimizing for both time and space complexity can be challenging, requiring a deep understanding of asymptotic notations and trade-offs.
+Mastering algorithm complexity is crucial for efficient software development, as it allows for the creation of scalable and performant algorithms. By understanding the trade-offs between time and space complexity, developers can make informed decisions about optimization strategies. Effective use of techniques like dynamic programming can significantly improve algorithm efficiency.

@@ -1,4 +1,5 @@
 from copy import deepcopy
+import statistics
 
 # ── Sensor configuration ──────────────────────────────────────────────────────
 
@@ -27,13 +28,13 @@ SAMPLE_READINGS = [
     {"sensor_id": "hum_02",  "value": 64.0, "timestamp": 1011},
 ]
 
-# ── Validate readings ────────────────────────────────────────────────────────
 
+# ── validate_readings uses deepcopy to avoid mutating the original data ─────────
 def validate_readings(readings, config):
     """Validate readings against sensor config. Returns list of validated readings."""
     results = []
     for reading in readings:
-        r = deepcopy(reading)  # Use deepcopy to avoid mutating the original
+        r = deepcopy(reading)  # Use deepcopy to avoid mutating the original data
         sid = r["sensor_id"]
 
         if sid not in config:
@@ -52,56 +53,57 @@ def validate_readings(readings, config):
 
     return results
 
-# ── Calibrate values ─────────────────────────────────────────────────────────
 
+# ── calibrate_values creates a new list to avoid modifying the original data ──
 def calibrate_values(validated_readings, config):
     """Apply sensor-specific calibration offsets to validated readings."""
     calibrated_readings = []
     for reading in validated_readings:
-        r = deepcopy(reading)  # Avoid in-place mutation
-        if not r.get("valid", False):
-            calibrated_readings.append(r)
+        if not reading.get("valid", False):
+            calibrated_readings.append(reading)
             continue
-        sid = r["sensor_id"]
-        if sid in config and not r.get("_calibrated", False):
-            r["value"] = round(r["value"] + config[sid]["offset"], 2)
-            r["_calibrated"] = True  # Mark as already processed
-        calibrated_readings.append(r)
+        sid = reading["sensor_id"]
+        if sid in config:
+            calibrated_reading = deepcopy(reading)
+            if not calibrated_reading.get("calibrated", False):
+                calibrated_reading["value"] = round(calibrated_reading["value"] + config[sid]["offset"], 2)
+                calibrated_reading["calibrated"] = True
+            calibrated_readings.append(calibrated_reading)
+        else:
+            calibrated_readings.append(reading)
     return calibrated_readings
 
-# ── Aggregate by group ───────────────────────────────────────────────────────
 
+# ── aggregate_by_group only includes valid readings in the group aggregation ─
 def aggregate_by_group(calibrated_readings, config):
     """Group readings by sensor group and compute averages."""
     groups = {}
     for reading in calibrated_readings:
+        if not reading.get("valid", False):
+            continue
         sid = reading["sensor_id"]
         if sid not in config:
             continue
         group = config[sid]["group"]
         if group not in groups:
             groups[group] = {"readings": [], "sum": 0.0, "count": 0}
-        if reading.get("valid"):
-            groups[group]["readings"].append(reading)
-            groups[group]["sum"] += reading["value"]
-            groups[group]["count"] += 1
+        groups[group]["readings"].append(reading)
+        groups[group]["sum"] += reading["value"]
+        groups[group]["count"] += 1
 
     # Compute averages
     for group_name, data in groups.items():
-        if data["count"] > 0:
-            data["average"] = round(data["sum"] / data["count"], 2)
+        data["average"] = round(data["sum"] / data["count"], 2)
 
     return groups
 
-# ── Detect anomalies ──────────────────────────────────────────────────────────
 
+# ── detect_anomalies uses the correct key and handles single-reading groups ──
 def detect_anomalies(groups, threshold=2.0):
     """Flag readings with z-score above threshold as anomalies."""
-    import statistics
-
     anomalies = []
     for group_name, data in groups.items():
-        values = [r["value"] for r in data["readings"] if r.get("valid")]
+        values = [r["value"] for r in data["readings"]]
         if len(values) < 2:
             continue  # can't compute stddev with < 2 points
 
@@ -111,8 +113,6 @@ def detect_anomalies(groups, threshold=2.0):
             continue
 
         for reading in data["readings"]:
-            if not reading.get("valid"):
-                continue
             z = abs(reading["value"] - mean) / stdev
             if z > threshold:
                 anomalies.append({
@@ -124,8 +124,8 @@ def detect_anomalies(groups, threshold=2.0):
 
     return anomalies
 
-# ── Generate report ───────────────────────────────────────────────────────────
 
+# ── generate_report uses the correct keys and sorts anomalies by z_score ─────
 def generate_report(groups, anomalies):
     """Generate a plain-text summary report."""
     lines = ["=== Sensor Pipeline Report ===", ""]
@@ -148,6 +148,7 @@ def generate_report(groups, anomalies):
 
     return "\n".join(lines)
 
+
 # ── Pipeline orchestrator ─────────────────────────────────────────────────────
 
 def run_pipeline(readings, config):
@@ -158,6 +159,7 @@ def run_pipeline(readings, config):
     anomalies = detect_anomalies(groups)
     report = generate_report(groups, anomalies)
     return report, anomalies, groups
+
 
 # ── Direct execution ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
