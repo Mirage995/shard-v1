@@ -272,6 +272,64 @@ class StrategyMemory:
         """Async wrapper -- non blocca l'event loop durante la query ChromaDB."""
         return await asyncio.to_thread(self.query, topic, k, cross_inject_queries)
 
+    def update_evolved_strategy_score(
+        self, topic: str, strategy_text: str, real_score: float, real_outcome: str
+    ) -> bool:
+        """Update the score and outcome of a previously stored 'evolved' strategy.
+
+        Called after a cycle completes to replace the placeholder score=5.0 with
+        the real outcome, closing the EvoScientist feedback loop.
+
+        Finds the record by matching topic + outcome='evolved' + strategy text.
+        Returns True if a record was updated, False otherwise.
+        """
+        try:
+            results = self.collection.get(where={"topic": topic})
+            if not results or not results.get("ids"):
+                return False
+
+            # Find the evolved record matching this strategy text
+            target_id: str | None = None
+            target_meta: dict | None = None
+            for rec_id, meta, doc in zip(
+                results["ids"],
+                results.get("metadatas", []),
+                results.get("documents", []),
+            ):
+                if meta.get("outcome") == "evolved" and doc.strip() == strategy_text.strip():
+                    target_id = rec_id
+                    target_meta = dict(meta)
+                    break
+
+            if target_id is None:
+                logger.debug(
+                    "[EVOSCI] update_evolved: no matching evolved record for topic='%s'", topic[:60]
+                )
+                return False
+
+            # Update metadata in-place: real score + outcome
+            target_meta["score"] = str(real_score)
+            target_meta["outcome"] = real_outcome
+            target_meta["evolved_real_score"] = str(real_score)   # audit trail
+            self.collection.update(ids=[target_id], metadatas=[target_meta])
+            logger.info(
+                "[EVOSCI] Updated evolved strategy '%s' → score=%.1f outcome=%s",
+                topic[:60], real_score, real_outcome,
+            )
+            return True
+        except Exception as exc:
+            logger.warning("[EVOSCI] update_evolved non-fatal: %s", exc)
+            return False
+
+    async def update_evolved_strategy_score_async(
+        self, topic: str, strategy_text: str, real_score: float, real_outcome: str
+    ) -> bool:
+        """Async-safe wrapper for update_evolved_strategy_score."""
+        async with self._lock:
+            return await asyncio.to_thread(
+                self.update_evolved_strategy_score, topic, strategy_text, real_score, real_outcome
+            )
+
     async def store_strategy_async(self, topic: str, strategy: str, outcome: str, score: float = 0.0):
         """Async-safe write -- serialises concurrent NightRunner/SessionOrchestrator calls."""
         async with self._lock:

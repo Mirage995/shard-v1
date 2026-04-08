@@ -1416,7 +1416,8 @@ class NightRunner:
                 "skills_before": len(capability_graph.capabilities),
                 "strategies_reused": []
             }
-            
+            _evolved_strategy: str | None = None   # set by EvoScientist if pivot fires this cycle
+
             strategy_memory = StrategyMemory()
             strategies = strategy_memory.query(topic, k=1)
             if strategies:
@@ -2019,6 +2020,29 @@ class NightRunner:
                             )
                 except Exception as _smt_err:
                     self.logger.debug("[SELF_MODEL] record_outcome non-fatal: %s", _smt_err)
+
+            # ── EVOSCI FEEDBACK LOOP: update evolved strategy with real score ──────
+            # Closes the loop: the evolved strategy stored with placeholder score=5.0
+            # is now updated with the actual outcome of the cycle it was used in.
+            if _evolved_strategy:
+                try:
+                    _real_score   = cycle_data["score"] or 0.0
+                    _real_outcome = "success" if cycle_data["certified"] else "failure"
+                    _updated = await strategy_memory.update_evolved_strategy_score_async(
+                        topic=topic,
+                        strategy_text=_evolved_strategy,
+                        real_score=_real_score,
+                        real_outcome=_real_outcome,
+                    )
+                    if _updated:
+                        self.logger.info(
+                            "[EVOSCI] Feedback loop closed: evolved strategy score updated "
+                            "%.1f (placeholder 5.0) → %.1f  outcome=%s",
+                            5.0, _real_score, _real_outcome,
+                        )
+                    _evolved_strategy = None   # consumed — reset for next cycle
+                except Exception as _evo_fb_err:
+                    self.logger.debug("[EVOSCI] feedback loop non-fatal: %s", _evo_fb_err)
 
             # ── ACTIVATION LOG -- sinapsi: salva segnali cittadini + outcome ──────
             # Sempre loggato -- indipendente da _self_tracker e _cycle_features.
