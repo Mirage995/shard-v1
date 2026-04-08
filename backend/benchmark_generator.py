@@ -107,6 +107,7 @@ Monkeypatching rules (choose the right pattern for the topic):
 SUCCESS CASE (normal response):
     import socket, unittest.mock
     _mock_sock = unittest.mock.MagicMock()
+    _mock_sock.__enter__.return_value = _mock_sock  # required if solve() uses 'with socket.socket(...) as s:'
     _mock_sock.recv.return_value = b"HTTP/1.1 200 OK\r\n\r\nHello"
     socket.socket = lambda *a, **kw: _mock_sock
     input_data = {{"host": "localhost", "port": 8080}}
@@ -117,6 +118,7 @@ ERROR CASE (exception raised by connect/send/recv):
     NOT on the mock object. NEVER use MagicMock(side_effect=...) for this.
     CORRECT pattern:
         _mock_sock = unittest.mock.MagicMock()
+        _mock_sock.__enter__.return_value = _mock_sock
         _mock_sock.connect.side_effect = ConnectionRefusedError  # on .connect, NOT on _mock_sock
         socket.socket = lambda *a, **kw: _mock_sock
         input_data = {{"host": "localhost", "port": 9999}}
@@ -151,6 +153,13 @@ Additional rules:
 - Do NOT use with-statement patches or decorators -- only direct attribute replacement
 - Do NOT import anything outside of: socket, requests, http.client, urllib, urllib.request, urllib.parse, collections, unittest.mock
 - solve() must be synchronous (def, not async def) -- use asyncio.run() internally if the topic requires it
+- solve() MUST NOT use 'with socket.socket(...) as s:' context manager syntax. Use:
+      sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      try:
+          ...
+      finally:
+          sock.close()
+  The 'with' pattern breaks monkeypatching because __enter__ returns a different object than the mock.
 - Tests must cover: basic success case, error/edge case (ConnectionRefusedError or similar), and a data variation
 - All values must be valid Python literals (no placeholders like '...' or <value>)
 - If the topic cannot be expressed as a callable function, return {{"scaffold": "", "tests": []}}\
