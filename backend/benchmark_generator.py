@@ -10,6 +10,7 @@ which uses unittest.mock monkeypatching so tests run inside Docker --network non
 import ast
 import json
 import re
+from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 
@@ -30,6 +31,21 @@ def is_network_topic(topic: str) -> bool:
     """Return True if *topic* requires network I/O and should use mock-based benchmarks."""
     tokens = set(topic.lower().replace("-", " ").replace("_", " ").split())
     return bool(tokens & _NETWORK_KEYWORDS)
+
+
+# ── Output schema ─────────────────────────────────────────────────────────────
+
+@dataclass
+class _TestCase:
+    description: str
+    setup: str
+    assert_expr: str
+
+
+@dataclass
+class _BenchmarkSpec:
+    scaffold: str
+    tests: list = field(default_factory=list)  # list[_TestCase]
 
 
 # ── Prompt templates ───────────────────────────────────────────────────────────
@@ -221,12 +237,18 @@ class BenchmarkGenerator:
         if data is None:
             return _unavailable(topic, "JSON parse error")
 
-        scaffold = str(data.get("scaffold") or "def solve(input_data):\n    pass")
-        raw_tests = data.get("tests", [])
+        net = is_network_topic(topic)
+        spec, schema_err = _validate_benchmark_json(data, is_network=net)
+        if spec is None:
+            print(f"[BENCHMARK_GEN] FAIL schema validation: {schema_err}")
+            return _unavailable(topic, f"schema error: {schema_err}")
 
-        if not isinstance(raw_tests, list):
-            print("[BENCHMARK_GEN] [WARN] 'tests' is not a list -- discarding")
-            return _unavailable(topic, "malformed 'tests' field")
+        scaffold = spec.scaffold or "def solve(input_data):\n    pass"
+        # Convert _TestCase list to raw dicts for the per-test validator below
+        raw_tests = [
+            {"description": tc.description, "setup": tc.setup, "assert_expr": tc.assert_expr}
+            for tc in spec.tests
+        ]
 
         valid_tests: List[Dict[str, Any]] = []
         for i, t in enumerate(raw_tests):
@@ -362,6 +384,145 @@ def _ast_infer_assignment(source: str, name: str) -> "tuple[type | None, Any]":
                     break
 
     return result_type, result_val
+
+
+# ── AST pattern detectors (network mock validation) ───────────────────────────
+
+def _ast_has_with_socket(source: str) -> bool:
+    """Return True if *source* contains 'with socket.socket(...) as ...' usage.
+
+    This pattern breaks monkeypatching: __enter__() returns a different MagicMock
+    than the one assigned to socket.socket, so recv/send return_values are lost.
+    Detected via AST -- no execution, no side effects.
+    """
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return False
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.With):
+            continue
+        for item in node.items:
+            expr = item.context_expr
+            if (
+                isinstance(expr, ast.Call)
+                and isinstance(expr.func, ast.Attribute)
+                and expr.func.attr == "socket"
+                and isinstance(expr.func.value, ast.Name)
+                and expr.func.value.id == "socket"
+            ):
+                return True
+    return False
+
+
+def _ast_has_magicmock_side_effect_on_root(source: str) -> bool:
+    """Return True if *source* creates MagicMock(side_effect=...) as the root mock.
+
+    The wrong pattern:  _mock = MagicMock(side_effect=ConnectionRefusedError)
+    side_effect fires when the mock itself is CALLED (i.e. socket.socket()), not
+    when its methods are called (.connect(), .recv(), ...).
+
+    The correct pattern: _mock.connect.side_effect = ConnectionRefusedError
+    Detected via AST: assignment whose RHS is a MagicMock call with 'side_effect' kwarg.
+    """
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return False
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        call = node.value
+        if not isinstance(call, ast.Call):
+            continue
+        func = call.func
+        is_magicmock = (
+            (isinstance(func, ast.Name) and func.id == "MagicMock")
+            or (isinstance(func, ast.Attribute) and func.attr == "MagicMock")
+        )
+        if not is_magicmock:
+            continue
+        for kw in call.keywords:
+            if kw.arg == "side_effect":
+                return True
+    return False
+
+
+def _validate_benchmark_json(
+    data: dict,
+    is_network: bool,
+) -> "tuple[_BenchmarkSpec | None, str]":
+    """Validate the LLM-generated benchmark JSON against the required schema.
+
+    Returns ``(_BenchmarkSpec, "")`` on success.
+    Returns ``(None, reason)`` on failure -- caller should discard the whole batch.
+
+    Checks performed:
+      1. Root is a dict with 'scaffold' (str) and 'tests' (list).
+      2. scaffold is syntactically valid Python (ast.parse).
+      3. [network only] scaffold must NOT use 'with socket.socket()' pattern.
+      4. Each test is a dict with non-empty 'setup' and 'assert_expr' strings.
+      5. [network only] setup must NOT use 'with socket.socket()' pattern (AST check).
+      6. [network only] setup must NOT use MagicMock(side_effect=...) on root (AST check).
+
+    No exec(), no side effects -- pure structural and AST analysis.
+    """
+    if not isinstance(data, dict):
+        return None, "root is not a dict"
+
+    scaffold = data.get("scaffold")
+    if not isinstance(scaffold, str):
+        return None, "missing or non-string 'scaffold'"
+
+    raw_tests = data.get("tests")
+    if not isinstance(raw_tests, list):
+        return None, "missing or non-list 'tests'"
+
+    # Scaffold syntax check
+    if scaffold.strip():
+        try:
+            ast.parse(scaffold)
+        except SyntaxError as e:
+            return None, f"scaffold SyntaxError: {e}"
+
+    # Network scaffold: ban 'with socket.socket()' context manager
+    if is_network and _ast_has_with_socket(scaffold):
+        return None, (
+            "scaffold uses forbidden 'with socket.socket()' pattern -- "
+            "use sock = socket.socket(...); try/finally/sock.close() instead"
+        )
+
+    test_cases: list = []
+    for i, t in enumerate(raw_tests):
+        if not isinstance(t, dict):
+            return None, f"test[{i}] is not a dict"
+        for key in ("setup", "assert_expr"):
+            if not isinstance(t.get(key), str) or not t[key].strip():
+                return None, f"test[{i}] missing or empty '{key}'"
+
+        setup = t["setup"].strip()
+
+        if is_network:
+            # Red-card #1: with socket.socket() in setup
+            if _ast_has_with_socket(setup):
+                return None, (
+                    f"test[{i}] setup uses forbidden 'with socket.socket()' pattern -- "
+                    "use sock = socket.socket(...); try/finally instead"
+                )
+            # Red-card #2: MagicMock(side_effect=...) on root mock
+            if _ast_has_magicmock_side_effect_on_root(setup):
+                return None, (
+                    f"test[{i}] setup uses MagicMock(side_effect=...) on root mock -- "
+                    "use _mock_sock.connect.side_effect = Error instead"
+                )
+
+        test_cases.append(_TestCase(
+            description=str(t.get("description", f"test_{i}")),
+            setup=setup,
+            assert_expr=t["assert_expr"].strip(),
+        ))
+
+    return _BenchmarkSpec(scaffold=scaffold, tests=test_cases), ""
 
 
 def _unavailable(topic: str, reason: str) -> Dict[str, Any]:
