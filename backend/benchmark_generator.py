@@ -103,19 +103,36 @@ Return a JSON object with EXACTLY this structure:
 }}
 
 Monkeypatching rules (choose the right pattern for the topic):
-- socket topics:
+
+SUCCESS CASE (normal response):
     import socket, unittest.mock
     _mock_sock = unittest.mock.MagicMock()
-    _mock_sock.recv.return_value = b"<response bytes>"
+    _mock_sock.recv.return_value = b"HTTP/1.1 200 OK\r\n\r\nHello"
     socket.socket = lambda *a, **kw: _mock_sock
-- requests topics:
+    input_data = {{"host": "localhost", "port": 8080}}
+    expected = b"HTTP/1.1 200 OK\r\n\r\nHello"
+
+ERROR CASE (exception raised by connect/send/recv):
+    CRITICAL RULE: to make connect() raise an exception, set side_effect on the METHOD,
+    NOT on the mock object. NEVER use MagicMock(side_effect=...) for this.
+    CORRECT pattern:
+        _mock_sock = unittest.mock.MagicMock()
+        _mock_sock.connect.side_effect = ConnectionRefusedError  # on .connect, NOT on _mock_sock
+        socket.socket = lambda *a, **kw: _mock_sock
+        input_data = {{"host": "localhost", "port": 9999}}
+        expected = None  # solve() must catch the exception and return None
+    WRONG pattern (DO NOT USE):
+        _mock_sock = unittest.mock.MagicMock(side_effect=ConnectionRefusedError)  # WRONG
+
+requests topics:
     import requests, unittest.mock
     _mock_resp = unittest.mock.MagicMock()
     _mock_resp.status_code = 200
     _mock_resp.json.return_value = {{"key": "value"}}
     _mock_resp.text = '{{"key": "value"}}'
     requests.get = lambda *a, **kw: _mock_resp
-- http.client topics:
+
+http.client topics:
     import http.client, unittest.mock
     _mock_conn = unittest.mock.MagicMock()
     _mock_resp = unittest.mock.MagicMock()
@@ -128,13 +145,13 @@ Additional rules:
 - The function signature must ALWAYS be: def solve(input_data)
 - solve() MUST use the real network API (socket.socket(), requests.get(), http.client.HTTPConnection(), etc.) -- the mock intercepts at runtime
 - 'input_data' must be a dict with connection parameters (host, port, url, path, method, data, etc.)
-- 'expected' must be a Python literal (bytes, str, int, dict, list, bool)
-- 'assert_expr' must be a simple one-liner: assert solve(input_data) == expected
+- 'expected' must be a Python literal (bytes, str, int, dict, list, bool, None)
+- 'assert_expr' must be a simple one-liner. Use 'is' for None: assert solve(input_data) is expected
 - Monkeypatching happens in 'setup', BEFORE solve() is called -- never inside assert_expr
 - Do NOT use with-statement patches or decorators -- only direct attribute replacement
 - Do NOT import anything outside of: socket, requests, http.client, urllib, urllib.request, urllib.parse, collections, unittest.mock
 - solve() must be synchronous (def, not async def) -- use asyncio.run() internally if the topic requires it
-- Tests must cover: basic success case, error/edge case, and a data variation
+- Tests must cover: basic success case, error/edge case (ConnectionRefusedError or similar), and a data variation
 - All values must be valid Python literals (no placeholders like '...' or <value>)
 - If the topic cannot be expressed as a callable function, return {{"scaffold": "", "tests": []}}\
 """
