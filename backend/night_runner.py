@@ -585,7 +585,17 @@ class NightRunner:
         # Priority 0.5: Curriculum suggestion -- topics that extend certified skills
         try:
             from backend.skill_library import suggest_curriculum_topics as _suggest_curr
-            _cert_set = set(capability_graph.capabilities.keys())
+            # Use certified study-topic names from experiments (matches knowledge_graph
+            # topic_origin), NOT capability_graph keys which are concept names.
+            try:
+                from shard_db import query as _cert_q
+                _cert_set = {
+                    r["topic"] for r in _cert_q(
+                        "SELECT DISTINCT topic FROM experiments WHERE certified=1"
+                    ) if r["topic"]
+                }
+            except Exception:
+                _cert_set = set()
             _pool_file = Path(__file__).resolve().parents[1] / "shard_memory" / "curated_topics.txt"
             _pool = [l.strip() for l in _pool_file.read_text(encoding="utf-8").splitlines()
                      if l.strip() and not l.startswith("#")] if _pool_file.exists() else []

@@ -309,12 +309,21 @@ def suggest_curriculum_topics(
     top_n: int = 5,
 ) -> list[str]:
     """
-    Proactive curriculum: propose next topics that directly extend already-
-    certified skills, following GraphRAG 'extends'/'improves' edges.
+    Proactive curriculum: propose next study topics that build on already-
+    certified knowledge, ranked by conceptual overlap with certified topics.
 
-    Returns up to `top_n` topic names not yet certified, ranked by how many
-    certified prerequisites they have (most-ready first).
+    Algorithm (2-step concept-overlap):
+      1. Collect every source/target concept from knowledge_graph edges whose
+         topic_origin is in certified_topics (study-topic names, NOT capability
+         keys).
+      2. Find non-certified topic_origins that share the most of those concepts.
+         More shared concepts → higher priority.
 
+    certified_topics must contain study-topic names as stored in the
+    experiments table and knowledge_graph.topic_origin (e.g. "binary search
+    algorithm"), NOT capability-graph concept keys.
+
+    Returns up to `top_n` topic names, preferring those already in curated_pool.
     Falls back to empty list silently on any error.
     """
     if not certified_topics:
@@ -322,51 +331,68 @@ def suggest_curriculum_topics(
 
     try:
         from shard_db import query as db_query
-
-        # For each certified topic, find topics that require/extend it
-        # Note: knowledge_graph columns are source_concept/target_concept (concept-level)
-        # and topic_origin (the study topic that created the edge).
-        placeholders = ",".join("?" * len(certified_topics))
-        rows = db_query(
-            f"SELECT source_concept, target_concept, topic_origin, relation_type FROM knowledge_graph "
-            f"WHERE topic_origin IN ({placeholders}) "
-            f"AND relation_type IN ('extends','improves','depends_on','requires')",
-            tuple(certified_topics),
-        )
-
-        # Count how many certified prereqs each candidate topic_origin has
         from collections import defaultdict
-        prereq_count: dict[str, int] = defaultdict(int)
-        for r in rows:
-            candidate = r["topic_origin"]
-            if candidate and candidate not in certified_topics:
-                prereq_count[candidate] += 1
 
-        # Also look at outward edges from certified topic_origins
-        rows2 = db_query(
-            f"SELECT source_concept, target_concept, topic_origin, relation_type FROM knowledge_graph "
+        # ── Step 1: collect concepts from certified sessions ──────────────────
+        cert_list = list(certified_topics)
+        # SQLite max variables = 999; cap to stay safe
+        cert_list = cert_list[:400]
+        placeholders = ",".join("?" * len(cert_list))
+
+        concept_rows = db_query(
+            f"SELECT source_concept, target_concept FROM knowledge_graph "
             f"WHERE topic_origin IN ({placeholders}) "
-            f"AND relation_type IN ('extends','improves')",
-            tuple(certified_topics),
+            f"AND source_concept IS NOT NULL",
+            tuple(cert_list),
         )
-        for r in rows2:
-            candidate = r["topic_origin"]
-            if candidate and candidate not in certified_topics:
-                prereq_count[candidate] += 1
+        known_concepts: set[str] = set()
+        for r in concept_rows:
+            if r["source_concept"]:
+                known_concepts.add(r["source_concept"])
+            if r["target_concept"]:
+                known_concepts.add(r["target_concept"])
 
-        if not prereq_count:
+        if not known_concepts:
+            logger.debug("[CURRICULUM] No concepts found for %d certified topics", len(cert_list))
             return []
 
-        # Sort by prereq_count desc, then filter to topics in curated pool if possible
+        # ── Step 2: find non-certified topic_origins sharing those concepts ───
+        concepts_list = list(known_concepts)[:400]  # cap for SQLite safety
+        c_ph = ",".join("?" * len(concepts_list))
+
+        overlap_rows = db_query(
+            f"SELECT topic_origin, COUNT(*) AS overlap "
+            f"FROM knowledge_graph "
+            f"WHERE (source_concept IN ({c_ph}) OR target_concept IN ({c_ph})) "
+            f"AND topic_origin IS NOT NULL "
+            f"AND topic_origin NOT IN ({placeholders}) "
+            f"GROUP BY topic_origin "
+            f"ORDER BY overlap DESC "
+            f"LIMIT 40",
+            tuple(concepts_list) + tuple(concepts_list) + tuple(cert_list),
+        )
+
+        prereq_count: dict[str, int] = defaultdict(int)
+        for r in overlap_rows:
+            topic = r["topic_origin"]
+            if topic:
+                prereq_count[topic] = int(r["overlap"])
+
+        if not prereq_count:
+            logger.debug("[CURRICULUM] No overlapping topics found")
+            return []
+
+        # ── Rank: prefer curated pool, then sort by overlap ───────────────────
         ranked = sorted(prereq_count.items(), key=lambda x: -x[1])
         curated_set = set(curated_pool)
+        in_pool  = [t for t, _ in ranked if t in curated_set]
+        out_pool = [t for t, _ in ranked if t not in curated_set]
+        result   = (in_pool + out_pool)[:top_n]
 
-        # Prefer topics that are in the curated pool
-        in_pool   = [t for t, _ in ranked if t in curated_set]
-        out_pool  = [t for t, _ in ranked if t not in curated_set]
-        result    = (in_pool + out_pool)[:top_n]
-
-        logger.info("[CURRICULUM] Suggested %d topic(s): %s", len(result), result)
+        logger.info(
+            "[CURRICULUM] Suggested %d topic(s) from %d concepts / %d candidates: %s",
+            len(result), len(known_concepts), len(prereq_count), result,
+        )
         return result
 
     except Exception as exc:
