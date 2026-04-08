@@ -436,29 +436,33 @@ The sandbox has NO network access.
         if _is_net_topic:
             prompt_codice += """
 
-SANDBOX CONSTRAINTS (NETWORK TOPIC):
+⚠️  SANDBOX CONSTRAINT — MANDATORY, NO EXCEPTIONS:
 
-The execution environment has NO real internet access (Docker --network none).
-You MUST simulate all network I/O using unittest.mock from the Python standard library.
-Do NOT use any external mock libraries (no pytest-mock, responses, httpretty, etc.).
+This sandbox has ZERO internet access (Docker --network none).
+ANY call to a real URL, hostname, or IP address will raise a connection error and your code will FAIL.
+Do NOT call httpbin.org, localhost, example.com, or any real server. They do not exist here.
 
-Pattern to follow:
-  import socket
-  import unittest.mock
+You MUST mock ALL network I/O using unittest.mock BEFORE any network call is made.
+No mock = connection error = immediate failure. There is no alternative.
 
-  # Monkeypatch the network module BEFORE any calls
+REQUIRED pattern for requests:
+  import requests, unittest.mock
+  _mock_resp = unittest.mock.MagicMock()
+  _mock_resp.status_code = 200
+  _mock_resp.json.return_value = {"key": "value"}
+  _mock_resp.raise_for_status = lambda: None
+  requests.get = lambda *a, **kw: _mock_resp
+  # now call requests.get() normally -- the mock intercepts it
+
+REQUIRED pattern for socket:
+  import socket, unittest.mock
   _mock_sock = unittest.mock.MagicMock()
   _mock_sock.recv.return_value = b"HTTP/1.1 200 OK\\r\\n\\r\\nHello"
   socket.socket = lambda *a, **kw: _mock_sock
-
-  # Now use the real API -- the mock intercepts
-  s = socket.socket()
-  s.connect(("example.com", 80))
-  data = s.recv(1024)
-  assert data == b"HTTP/1.1 200 OK\\r\\n\\r\\nHello"
-  print("All assertions passed")
+  # now call socket.socket() normally -- the mock intercepts it
 
 Allowed imports: socket, requests, http.client, urllib, urllib.request, urllib.parse, unittest.mock, collections, json, struct, base64, hashlib
+DO NOT use: pytest-mock, responses, httpretty, aioresponses, or any non-stdlib mock library.
 """
         else:
             prompt_codice += """
