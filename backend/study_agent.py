@@ -1409,13 +1409,25 @@ AUTO-EXAM (Questions and Answers):
     async def _cross_reference(self, topic: str, data: Dict) -> List[str]:
         """Search connections with existing knowledge in ChromaDB."""
         query = topic + " " + " ".join([c["name"] for c in data.get("concepts", [])[:5]])
-        # Try with topic filter first, fall back to unfiltered if ChromaDB chokes on metadata
+
+        # Guard: skip if collection is empty or unqueryable (avoids ChromaDB
+        # "Error finding id" on stale HNSW index entries).
+        try:
+            n_docs = self.kb.count()
+        except Exception:
+            return []
+        if n_docs < 1:
+            return []
+        n_results = min(3, n_docs)
+
+        # Try with topic filter first, fall back to unfiltered if ChromaDB
+        # chokes on metadata or has index inconsistencies.
         for attempt, kwargs in enumerate([
             {"where": {"topic": {"$ne": topic}}},
             {},
         ]):
             try:
-                results = self.kb.query(query_texts=[query], n_results=3, **kwargs)
+                results = self.kb.query(query_texts=[query], n_results=n_results, **kwargs)
                 connections = []
                 if results["documents"]:
                     for doc_list in results["documents"]:
