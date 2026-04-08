@@ -16,6 +16,21 @@ from db_manager import get_collection, DB_PATH_STRATEGY_DB
 
 logger = logging.getLogger("shard.strategy_memory")
 
+# ── Protocol inference ────────────────────────────────────────────────────────
+_UDP_KEYWORDS = ["udp", "datagram", "recvfrom", "sendto", "checksum", "packet loss"]
+_TCP_KEYWORDS = ["tcp", "http", "https", "ftp", "smtp", "websocket", "keep-alive",
+                 "web server", "sock_stream"]
+
+
+def _infer_protocol(text: str) -> str:
+    """Return 'UDP', 'TCP', or 'ANY' based on topic/strategy keywords."""
+    t = text.lower()
+    if any(kw in t for kw in _UDP_KEYWORDS):
+        return "UDP"
+    if any(kw in t for kw in _TCP_KEYWORDS):
+        return "TCP"
+    return "ANY"
+
 
 class StrategyMemory:
     def __init__(self):
@@ -77,6 +92,7 @@ class StrategyMemory:
                 "runs": runs,
                 "avg_score": avg_score,
                 "success_rate": success_rate,
+                "protocol": _infer_protocol(topic + " " + strategy),
             }],
             ids=[doc_id]
         )
@@ -196,6 +212,23 @@ class StrategyMemory:
         )
         print(f"  [strategy] Stored from diff: '{strategy_text}' (score={score})")
 
+    @staticmethod
+    def _filter_by_protocol(strategies: List[Dict], query_protocol: str) -> List[Dict]:
+        """Hard-filter strategies by protocol, with controlled fallback.
+
+        Priority:
+          1. Same protocol (e.g. UDP query → UDP strategies)
+          2. ANY (protocol-agnostic strategies)
+          3. Full list (fallback if nothing else matches — preserves recall)
+        """
+        if query_protocol == "ANY":
+            return strategies  # no constraint — return all
+        same = [s for s in strategies if s.get("protocol", "ANY") == query_protocol]
+        if same:
+            return same
+        any_ok = [s for s in strategies if s.get("protocol", "ANY") == "ANY"]
+        return any_ok if any_ok else strategies
+
     def query(
         self,
         topic: str,
@@ -213,6 +246,7 @@ class StrategyMemory:
         if self.collection.count() == 0:
             return []
 
+        query_protocol = _infer_protocol(topic)
         results = self.collection.query(
             query_texts=[topic],
             n_results=min(k, self.collection.count())
@@ -231,9 +265,18 @@ class StrategyMemory:
                     "topic": meta.get("topic", ""),
                     "outcome": meta.get("outcome", ""),
                     "score": float(meta.get("score", 0)),
+                    "protocol": meta.get("protocol", "ANY"),
                 })
                 if doc_id:
                     seen_ids.add(doc_id)
+
+        strategies = self._filter_by_protocol(strategies, query_protocol)
+        if query_protocol != "ANY":
+            logger.debug(
+                "[STRATEGY] protocol filter: query=%s → %d/%d candidates kept",
+                query_protocol, len(strategies),
+                results["documents"][0].__len__() if results and results["documents"] else 0,
+            )
 
         # #22 Cross-inject: fetch up to 2 results per extra query, deduplicate by id
         if cross_inject_queries:

@@ -164,7 +164,7 @@ class SelfModelTracker:
         error     = round(actual_score - predicted, 2)
 
         # Update weights
-        self._update_weights(features, context, error)
+        self._update_weights(features, context, error, topic=topic)
 
         # Detect inconsistencies in updated weights
         inconsistencies = self._detect_inconsistencies(features, context)
@@ -303,9 +303,24 @@ class SelfModelTracker:
 
     # ── Weight update ─────────────────────────────────────────────────────────
 
-    def _update_weights(self, features: Dict, context: str, error: float) -> None:
+    def _update_weights(self, features: Dict, context: str, error: float,
+                        topic: str = "") -> None:
         g = self._weights["global"]
         c = self._weights["contextual"]
+
+        # Dynamic learning rate: topics seen 5+ times get 1.5× faster convergence.
+        # This corrects stubborn miscalibration on frequently-studied topics.
+        lr = LEARNING_RATE
+        if topic:
+            try:
+                from shard_db import query as _lrq
+                n_seen = len(_lrq(
+                    "SELECT id FROM experiments WHERE topic=? LIMIT 10", (topic,)
+                ))
+                if n_seen >= 5:
+                    lr = round(LEARNING_RATE * 1.5, 4)
+            except Exception:
+                pass
 
         for key in FEATURE_KEYS:
             val = features.get(key, False)
@@ -317,7 +332,7 @@ class SelfModelTracker:
                 continue
 
             # Scale learning step by feature magnitude for continuous signals.
-            step = LEARNING_RATE * error * scale
+            step = lr * error * scale
 
             # Global weight update
             g[key] = round(g.get(key, 0.0) + step, 4)
@@ -382,6 +397,12 @@ class SelfModelTracker:
     # ── Base score ────────────────────────────────────────────────────────────
 
     def _base_score(self, topic: str) -> float:
+        """Recency-weighted average of last 5 scores.
+
+        Weights: [5,4,3,2,1] normalised — most recent experiment counts 5×
+        more than the oldest. Converges faster for topics with volatile history
+        (e.g. UDP: 2.6, 9.1, 9.1 → weighted base ≈ 8.5 vs simple mean 7.0).
+        """
         try:
             from shard_db import query as db_query
             rows = db_query(
@@ -390,7 +411,11 @@ class SelfModelTracker:
             )
             if rows:
                 scores = [r["score"] for r in rows if r["score"] is not None]
-                return round(sum(scores) / len(scores), 2) if scores else 5.0
+                if scores:
+                    weights = list(range(len(scores), 0, -1))  # [5,4,3,2,1] for 5 scores
+                    total_w = sum(weights)
+                    weighted = sum(s * w for s, w in zip(scores, weights)) / total_w
+                    return round(weighted, 2)
             global_row = db_query("SELECT avg_score FROM global_stats")
             if global_row and global_row[0].get("avg_score"):
                 return round(float(global_row[0]["avg_score"]), 2)

@@ -826,7 +826,6 @@ class NightRunner:
 
     async def run(self):
         self.start_time = time.time()
-        self.logger.info("Session started")
         _vb(f"Sessione notturna avviata. Studio autonomo in corso per un massimo di {self.max_cycles} cicli.", priority="medium", event_type="session_start")
 
         # ── Dual-layer session lock ──────────────────────────────────────────
@@ -866,6 +865,7 @@ class NightRunner:
                     return
                 acquire_file_lock("night_runner")
                 self.logger.info("[SESSION LOCK] Acquired by NightRunner.")
+                self.logger.info("Session started")
         except ImportError:
             self.logger.warning("[LOCK] shard_semaphore not available -- running without session lock.")
 
