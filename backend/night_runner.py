@@ -1356,6 +1356,44 @@ class NightRunner:
             except Exception as _prereq_err:
                 self.logger.debug("[PREREQ] non-fatal: %s", _prereq_err)
 
+            # ── AFFORDANCE GATE -- se il topic è fuori portata, decomponilo ──
+            try:
+                from backend.affordance_filter import check_affordance as _check_afford
+                _aff = _check_afford(topic, capability_graph)
+                if not _aff.feasible:
+                    _aff_original = topic
+                    _aff_sub = [
+                        _s for _s in _aff.sub_topics
+                        if (
+                            is_valid_topic(_s, self.logger)
+                            and not is_trivial_topic(_s, self.logger)
+                            and not self._is_quarantined(_s)
+                            and not self._is_avoided(_s)
+                        )
+                    ]
+                    if _aff_sub:
+                        self.logger.info(
+                            "[AFFORD] '%s' (feasibility=%.2f) out of reach -- decomposing into %r",
+                            _aff_original, _aff.feasibility, _aff_sub,
+                        )
+                        try:
+                            from backend.improvement_engine import ImprovementEngine as _IE_aff
+                            _ie_aff = _IE_aff()
+                            for _s in reversed(_aff_sub[1:] + [_aff_original]):
+                                _ie_aff.enqueue_topics([_s])
+                        except Exception:
+                            pass
+                        topic  = _aff_sub[0]
+                        source = "affordance"
+                        reason = f"Decomposed from '{_aff_original}' (feasibility={_aff.feasibility:.2f})"
+                    else:
+                        self.logger.debug(
+                            "[AFFORD] All sub-topics for '%s' are invalid/quarantined -- proceeding as-is",
+                            _aff_original,
+                        )
+            except Exception as _aff_err:
+                self.logger.debug("[AFFORD] non-fatal: %s", _aff_err)
+
             self.logger.info(f"=== Cycle {cycle}/{self.max_cycles} ===")
             self.logger.info(f"Topic selected: {topic}")
             self.logger.info(f"Source: {source}")

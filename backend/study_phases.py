@@ -436,7 +436,7 @@ The sandbox has NO network access.
         if _is_net_topic:
             prompt_codice += """
 
-⚠️  SANDBOX CONSTRAINT — MANDATORY, NO EXCEPTIONS:
+*** SANDBOX CONSTRAINT — MANDATORY, NO EXCEPTIONS ***
 
 This sandbox has ZERO internet access (Docker --network none).
 ANY call to a real URL, hostname, or IP address will raise a connection error and your code will FAIL.
