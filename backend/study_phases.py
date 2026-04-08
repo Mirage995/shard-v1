@@ -381,6 +381,9 @@ BAD:  assert my_function(2) is not None
 GOOD: assert my_function(2) == 4
 """
 
+        # ── Network topic flag (needed for both prompt and import ban below) ──
+        _is_net_topic = is_network_topic(ctx.topic)
+
         # ── Code generation ──────────────────────────────────────────────
         if strategy:
             await ctx.emit("SANDBOX", 0, "Using past strategy to guide code generation")
@@ -505,7 +508,6 @@ If the task would normally require such libraries, implement a simplified versio
         # ── Network import check (fail fast, skipped for mock-network topics) ──
         # For network topics (#20), socket/requests/etc. are allowed because
         # the code uses unittest.mock to patch them -- no real connection made.
-        _is_net_topic = is_network_topic(ctx.topic)
         if _is_net_topic:
             print(f"[SANDBOX] Network topic '{ctx.topic}' -- skipping import ban, expecting unittest.mock usage")
         else:
