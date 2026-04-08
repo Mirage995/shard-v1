@@ -154,6 +154,19 @@ class BenchmarkRunner:
             f"{assert_expr}\n"
         )
 
+        # ── Step 2b: patch missing recvfrom mock (UDP safety) ─────────────────
+        # LLMs often set recv.return_value but forget recvfrom.return_value.
+        # The AST patcher injects it deterministically when needed.
+        try:
+            from backend.code_cleaner import patch_recvfrom_mock as _patch_rfm
+            _patched = _patch_rfm(full_code)
+            if _patched != full_code:
+                print(f"[BENCHMARK_RUN] [CODE_CLEANER] Injected recvfrom mock for test {test_idx}")
+                full_code = _patched
+                impl_line_count = implementation.count("\n") + 1  # unchanged
+        except Exception:
+            pass  # patcher error — proceed with original code
+
         # ── Step 3: execute in sandbox ─────────────────────────────────────────
         try:
             sandbox_result = await self._sandbox.run(

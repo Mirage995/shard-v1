@@ -118,6 +118,116 @@ class _SocketWithRewriter(ast.NodeTransformer):
         return [assign, try_node]
 
 
+# ── RecvfromMockPatcher ───────────────────────────────────────────────────────
+
+class _RecvfromMockPatcher(ast.NodeTransformer):
+    """AST patcher that injects missing ``recvfrom.return_value`` into test harnesses.
+
+    Problem: LLMs generating UDP benchmark tests typically write:
+        _mock_sock.recv.return_value = b'data'
+    …but the solve() function calls ``sock.recvfrom(1024)`` which returns a
+    MagicMock (not a tuple), causing ``ValueError: not enough values to unpack``.
+
+    This patcher detects:
+      1. Any ``recvfrom(`` call anywhere in the file (inside solve or test)
+      2. A module-level ``<var>.recv.return_value = <expr>`` assignment
+      3. Absence of ``<var>.recvfrom.return_value`` assignment
+
+    When all three conditions hold it inserts:
+      ``<var>.recvfrom.return_value = (b'response_data', ('127.0.0.1', 12345))``
+    immediately after the ``recv.return_value`` assignment.
+    """
+
+    def __init__(self) -> None:
+        self.has_recvfrom_call: bool = False
+        self.has_recvfrom_mock: bool = False
+
+    # ── Pass 1: collect facts ──────────────────────────────────────────────────
+
+    def visit_Call(self, node: ast.Call) -> ast.Call:
+        if isinstance(node.func, ast.Attribute) and node.func.attr == "recvfrom":
+            self.has_recvfrom_call = True
+        return self.generic_visit(node)
+
+    def visit_Assign(self, node: ast.Assign) -> ast.Assign:
+        t = node.targets[0] if node.targets else None
+        if (
+            isinstance(t, ast.Attribute)
+            and t.attr == "return_value"
+            and isinstance(t.value, ast.Attribute)
+            and t.value.attr == "recvfrom"
+        ):
+            self.has_recvfrom_mock = True
+        return self.generic_visit(node)
+
+    # ── Pass 2: inject (module-level scan only) ────────────────────────────────
+
+    def finalize(self, tree: ast.Module) -> ast.Module:
+        """Insert recvfrom mock right after recv.return_value assignment if needed."""
+        if not self.has_recvfrom_call or self.has_recvfrom_mock:
+            return tree  # nothing to do
+
+        # Find the recv.return_value assignment at module level
+        insert_after: int = -1
+        mock_var: str = "_mock_sock"
+        for i, node in enumerate(tree.body):
+            if not isinstance(node, ast.Assign):
+                continue
+            t = node.targets[0] if node.targets else None
+            if (
+                isinstance(t, ast.Attribute)
+                and t.attr == "return_value"
+                and isinstance(t.value, ast.Attribute)
+                and t.value.attr == "recv"
+                and isinstance(t.value.value, ast.Name)
+            ):
+                insert_after = i
+                mock_var = t.value.value.id
+                break
+
+        if insert_after < 0:
+            return tree  # no recv.return_value at module level — leave as-is
+
+        inject_src = (
+            f"{mock_var}.recvfrom.return_value = "
+            f"(b'response_data', ('127.0.0.1', 12345))"
+        )
+        inject_node = ast.parse(inject_src).body[0]
+        ast.fix_missing_locations(inject_node)
+        tree.body.insert(insert_after + 1, inject_node)
+        return tree
+
+
+def patch_recvfrom_mock(source: str) -> str:
+    """Inject ``<mock>.recvfrom.return_value`` if recvfrom is called but not mocked.
+
+    Idempotent and fail-safe: returns original source on any parse/unparse error.
+
+    Args:
+        source: Python source code for a benchmark test harness.
+
+    Returns:
+        Patched source (or original if no patch needed / error).
+    """
+    if "recvfrom" not in source:
+        return source  # fast exit
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return source  # unparseable — leave as-is
+
+    patcher = _RecvfromMockPatcher()
+    patcher.visit(tree)
+    tree = patcher.finalize(tree)
+    ast.fix_missing_locations(tree)
+
+    try:
+        return ast.unparse(tree)
+    except Exception:
+        return source
+
+
 # ── Session metrics ───────────────────────────────────────────────────────────
 
 _SESSION_METRICS: dict = {

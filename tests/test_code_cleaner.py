@@ -3,7 +3,7 @@ import textwrap
 
 import pytest
 
-from backend.code_cleaner import clean_network_code
+from backend.code_cleaner import clean_network_code, patch_recvfrom_mock
 
 
 def _d(code: str) -> str:
@@ -123,3 +123,63 @@ class TestCleanNetworkCode:
         assert "s = socket.socket" in result
         # Inner 'with open' should remain as-is
         assert "with open" in result
+
+
+class TestPatchRecvfromMock:
+
+    _HARNESS_MISSING = _d("""
+        import socket, unittest.mock
+        def solve(input_data):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            data, addr = sock.recvfrom(1024)
+            return data
+        _mock_sock = unittest.mock.MagicMock()
+        _mock_sock.recv.return_value = b'World'
+        socket.socket = lambda *a, **kw: _mock_sock
+        input_data = {'host': 'localhost', 'port': 8080}
+        expected = b'World'
+        assert solve(input_data) == expected
+    """)
+
+    _HARNESS_ALREADY_SET = _d("""
+        import socket, unittest.mock
+        def solve(input_data):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            data, addr = sock.recvfrom(1024)
+            return data
+        _mock_sock = unittest.mock.MagicMock()
+        _mock_sock.recv.return_value = b'World'
+        _mock_sock.recvfrom.return_value = (b'World', ('127.0.0.1', 9000))
+        socket.socket = lambda *a, **kw: _mock_sock
+        input_data = {'host': 'localhost', 'port': 8080}
+        expected = b'World'
+        assert solve(input_data) == expected
+    """)
+
+    def test_injects_recvfrom_when_missing(self):
+        result = patch_recvfrom_mock(self._HARNESS_MISSING)
+        assert "recvfrom.return_value" in result
+
+    def test_injection_placed_after_recv_return_value(self):
+        result = patch_recvfrom_mock(self._HARNESS_MISSING)
+        recv_pos = result.index("recv.return_value")
+        rfrom_pos = result.index("recvfrom.return_value")
+        assert rfrom_pos > recv_pos
+
+    def test_no_double_injection_when_already_set(self):
+        result = patch_recvfrom_mock(self._HARNESS_ALREADY_SET)
+        assert result.count("recvfrom.return_value") == 1
+
+    def test_fast_exit_when_no_recvfrom(self):
+        code = "x = 1\n"
+        assert patch_recvfrom_mock(code) == code
+
+    def test_idempotent(self):
+        once = patch_recvfrom_mock(self._HARNESS_MISSING)
+        twice = patch_recvfrom_mock(once)
+        assert once == twice
+
+    def test_syntax_error_safe(self):
+        bad = "def solve(x\n    return x"
+        assert patch_recvfrom_mock(bad) == bad
+
