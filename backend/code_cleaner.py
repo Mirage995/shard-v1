@@ -118,6 +118,26 @@ class _SocketWithRewriter(ast.NodeTransformer):
         return [assign, try_node]
 
 
+# ── Session metrics ───────────────────────────────────────────────────────────
+
+_SESSION_METRICS: dict = {
+    "rewrites_applied": 0,   # times clean_network_code actually rewrote code
+    "fast_exits":       0,   # times source had no 'with socket.socket' → skipped
+    "parse_errors":     0,   # times ast.parse failed → returned original
+}
+
+
+def get_session_metrics() -> dict:
+    """Return a copy of the current session metrics."""
+    return dict(_SESSION_METRICS)
+
+
+def reset_session_metrics() -> None:
+    """Reset all counters to zero (call at session start)."""
+    for k in _SESSION_METRICS:
+        _SESSION_METRICS[k] = 0
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def clean_network_code(source: str) -> str:
@@ -135,6 +155,7 @@ def clean_network_code(source: str) -> str:
     """
     # Quick exit: no 'with socket.socket' in source → nothing to do (preserves original)
     if "with socket.socket" not in source:
+        _SESSION_METRICS["fast_exits"] += 1
         return source
 
     # Strip markdown fences if present (only when rewrite is needed)
@@ -148,6 +169,7 @@ def clean_network_code(source: str) -> str:
     try:
         tree = ast.parse(source)
     except SyntaxError:
+        _SESSION_METRICS["parse_errors"] += 1
         return source  # unparseable — leave as-is, sandbox will report the error
 
     rewriter = _SocketWithRewriter()
@@ -155,6 +177,9 @@ def clean_network_code(source: str) -> str:
     ast.fix_missing_locations(new_tree)
 
     try:
-        return ast.unparse(new_tree)
+        result = ast.unparse(new_tree)
+        if result != source:
+            _SESSION_METRICS["rewrites_applied"] += 1
+        return result
     except Exception:
         return source  # unparse failed — leave as-is

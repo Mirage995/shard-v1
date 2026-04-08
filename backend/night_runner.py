@@ -2169,6 +2169,17 @@ class NightRunner:
                 _env_summary["unauthorized_modifications"],
                 _env_summary["opportunities"],
             )
+        # ── CODE CLEANER METRICS -- session summary ───────────────────────────
+        try:
+            from backend.code_cleaner import get_session_metrics as _get_ccm
+            _ccm = _get_ccm()
+            self.logger.info(
+                "[CODE_CLEANER] Session metrics: rewrites_applied=%d  fast_exits=%d  parse_errors=%d",
+                _ccm["rewrites_applied"], _ccm["fast_exits"], _ccm["parse_errors"],
+            )
+        except Exception:
+            pass
+
         _vb(
             f"Sessione notturna completata. {total_cert} topic certificati su {len(self.session_data)}. "
             f"{total_skills} nuove skill acquisite in {total_runtime} minuti.",
