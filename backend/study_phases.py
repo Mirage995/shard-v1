@@ -458,8 +458,11 @@ REQUIRED pattern for socket:
   import socket, unittest.mock
   _mock_sock = unittest.mock.MagicMock()
   _mock_sock.recv.return_value = b"HTTP/1.1 200 OK\\r\\n\\r\\nHello"
+  _mock_sock.recvfrom.return_value = (b"response_data", ("127.0.0.1", 12345))
   socket.socket = lambda *a, **kw: _mock_sock
   # now call socket.socket() normally -- the mock intercepts it
+  # recvfrom() returns a (data, addr) tuple -- required for UDP patterns like:
+  #   data, addr = sock.recvfrom(1024)
 
 Allowed imports: socket, requests, http.client, urllib, urllib.request, urllib.parse, unittest.mock, collections, json, struct, base64, hashlib
 DO NOT use: pytest-mock, responses, httpretty, aioresponses, or any non-stdlib mock library.
