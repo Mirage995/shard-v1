@@ -1634,8 +1634,31 @@ class NightRunner:
                     _pre_strategies  = list(strategies)   # snapshot current strategies
                     _pre_fp          = _strategy_fingerprint(_pre_strategies)
                     _prev_count      = len(_pre_strategies)
+
+                    # ── EvoScientist: synthesise evolved strategy before wipe ──
+                    _evolved_strategy: str | None = None
+                    try:
+                        from backend.strategy_mutator import StrategyMutator as _SM
+                        _evolved_strategy = await _SM().evolve(
+                            _pre_strategies, topic, study_agent._think_fast
+                        )
+                    except Exception as _evo_err:
+                        self.logger.debug("[EVOSCI] non-fatal: %s", _evo_err)
+
                     try:
                         _cleared = strategy_memory.pivot_on_chronic_block(topic)
+                        # Store evolved strategy AFTER wipe so it is the only survivor
+                        if _evolved_strategy:
+                            await strategy_memory.store_strategy_async(
+                                topic=topic,
+                                strategy=_evolved_strategy,
+                                outcome="evolved",
+                                score=5.0,
+                            )
+                            self.logger.info(
+                                "[EVOSCI] Evolved strategy stored for '%s': '%s'",
+                                topic, _evolved_strategy[:80],
+                            )
                         self.logger.warning(
                             "[STRATEGY PIVOT] topic='%s'  reason=%s  "
                             "prev_strategies=%d  cleared=%s",
