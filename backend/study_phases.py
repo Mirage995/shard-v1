@@ -550,6 +550,17 @@ If the task would normally require such libraries, implement a simplified versio
                     print("[SANDBOX] Network import persists after retries -- aborting sandbox execution")
                     ctx.codice_generato = None
 
+        # ── Network code cleaner (AST rewrite before sandbox) ────────────
+        # Rewrites 'with socket.socket(...) as s:' → try/finally pattern so
+        # that unittest.mock monkeypatching works correctly in benchmarks.
+        # Silent, idempotent, fail-safe -- original code returned on any error.
+        if ctx.codice_generato and is_network_topic(ctx.topic):
+            from backend.code_cleaner import clean_network_code as _clean
+            _cleaned = _clean(ctx.codice_generato)
+            if _cleaned != ctx.codice_generato:
+                print(f"[CODE_CLEANER] Rewrote 'with socket.socket()' in solve() for '{ctx.topic}'")
+                ctx.codice_generato = _cleaned
+
         # ── Execution ────────────────────────────────────────────────────
         if ctx.codice_generato:
             try:

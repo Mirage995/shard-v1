@@ -256,13 +256,14 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = ""):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
         self.pause_minutes = pause
         self.max_api_calls = api_limit
         self.topic_budget = topic_budget
+        self._forced_topic: str = forced_topic.strip()
 
         self.start_time = None
         self.api_calls_used = 0
@@ -494,6 +495,11 @@ class NightRunner:
 
     async def _select_topic(self, capability_graph, config_context) -> tuple[str, str, str]:
         """Returns (topic, source, reason)"""
+
+        # Priority 0: --force-topic CLI override (bypasses all selection logic)
+        if self._forced_topic:
+            self.logger.info(f"[FORCE-TOPIC] Overriding selection with: '{self._forced_topic}'")
+            return self._forced_topic, "forced", "--force-topic CLI override"
 
         # Priority -1: ImprovementEngine queue (SSJ3 proactive self-improvement)
         # Fix A: validate every improvement topic -- SSJ3 can re-inject garbage topics
@@ -2607,6 +2613,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-core", action="store_true", help="Disable CognitionCore (lobotomy test)")
     parser.add_argument("--continuous", action="store_true", help="Loop sessions indefinitely (Ctrl+C to stop)")
     parser.add_argument("--session-gap", type=int, default=5, help="Seconds between sessions in continuous mode")
+    parser.add_argument("--force-topic", type=str, default="", help="Pin a specific topic, bypassing all selection logic")
 
     args = parser.parse_args()
 
@@ -2636,6 +2643,7 @@ if __name__ == "__main__":
                     pause=args.pause,
                     api_limit=args.api_limit,
                     topic_budget=args.topic_budget,
+                    forced_topic=args.force_topic,
                 )
                 asyncio.run(runner.run())
             except KeyboardInterrupt:
@@ -2651,6 +2659,7 @@ if __name__ == "__main__":
             pause=args.pause,
             api_limit=args.api_limit,
             topic_budget=args.topic_budget,
+            forced_topic=args.force_topic,
         )
         try:
             asyncio.run(runner.run())
