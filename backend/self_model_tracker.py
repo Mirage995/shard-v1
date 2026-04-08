@@ -396,12 +396,76 @@ class SelfModelTracker:
 
     # ── Base score ────────────────────────────────────────────────────────────
 
-    def _base_score(self, topic: str) -> float:
-        """Recency-weighted average of last 5 scores.
+    # Variance thresholds for blend gate (tuneable)
+    _VAR_LOW  = 1.0   # below this: pure recency
+    _VAR_HIGH = 9.0   # above this: pure mean
+    _CLAMP_MAX_UP   = 2.0   # max allowed upward jump from last actual
+    _CLAMP_MAX_DOWN = 3.0   # max allowed downward jump from last actual
 
-        Weights: [5,4,3,2,1] normalised — most recent experiment counts 5×
-        more than the oldest. Converges faster for topics with volatile history
-        (e.g. UDP: 2.6, 9.1, 9.1 → weighted base ≈ 8.5 vs simple mean 7.0).
+    @staticmethod
+    def _recency_weighted(scores: list) -> float:
+        """Weights [N, N-1, ..., 1] normalised — most recent (index 0) highest."""
+        weights = list(range(len(scores), 0, -1))
+        total_w = sum(weights)
+        return sum(s * w for s, w in zip(scores, weights)) / total_w
+
+    @staticmethod
+    def _variance(scores: list) -> float:
+        mean = sum(scores) / len(scores)
+        return sum((s - mean) ** 2 for s in scores) / len(scores)
+
+    @classmethod
+    def _blended_base(cls, scores: list) -> tuple:
+        """Variance-aware blend of recency and mean.
+
+        Returns (estimate, variance).
+        g≈1 (low variance) → recency dominates.
+        g≈0 (high variance) → mean dominates.
+        """
+        mean = sum(scores) / len(scores)
+        if len(scores) < 2:
+            return mean, 0.0
+        var = cls._variance(scores)
+        g = max(0.0, min(1.0, (cls._VAR_HIGH - var) / (cls._VAR_HIGH - cls._VAR_LOW)))
+        rec = cls._recency_weighted(scores)
+        return g * rec + (1 - g) * mean, var
+
+    @staticmethod
+    def _uncertainty_penalty(base: float, var: float) -> float:
+        """Penalise high-variance topics — cap at 2.0 to preserve signal."""
+        penalty = min(2.0, 0.2 * var)
+        return base - penalty
+
+    @staticmethod
+    def _bimodal_adjust(scores: list, base: float) -> float:
+        """If scores form two clearly separated clusters (hi-lo > 5.0),
+        replace estimate with probability-weighted cluster mean.
+        Requires ≥ 4 scores to avoid false positives.
+        """
+        if len(scores) < 4:
+            return base
+        lo, hi = min(scores), max(scores)
+        if hi - lo <= 5.0:
+            return base
+        p_success = sum(1 for s in scores if s > 6.0) / len(scores)
+        return p_success * hi + (1 - p_success) * lo
+
+    @classmethod
+    def _clamp_delta(cls, pred: float, last_actual: float) -> float:
+        """Prevent unrealistic jumps from the last observed score."""
+        delta = pred - last_actual
+        delta = max(-cls._CLAMP_MAX_DOWN, min(cls._CLAMP_MAX_UP, delta))
+        return last_actual + delta
+
+    def _base_score(self, topic: str) -> float:
+        """Variance-aware base score: blend recency+mean, penalise uncertainty,
+        detect bimodal distributions, clamp inter-cycle jumps.
+
+        Pipeline (per GPT + empirical validation 2026-04-09):
+          1. blended_base  — g=f(var): low var → recency, high var → mean
+          2. uncertainty_penalty — subtract 0.2*var (cap 2.0)
+          3. bimodal_adjust — if hi-lo>5 with 4+ scores, use P(success)*hi + ...
+          4. clamp_delta — max Δ from last actual: +2.0 / -3.0
         """
         try:
             from shard_db import query as db_query
@@ -412,10 +476,12 @@ class SelfModelTracker:
             if rows:
                 scores = [r["score"] for r in rows if r["score"] is not None]
                 if scores:
-                    weights = list(range(len(scores), 0, -1))  # [5,4,3,2,1] for 5 scores
-                    total_w = sum(weights)
-                    weighted = sum(s * w for s, w in zip(scores, weights)) / total_w
-                    return round(weighted, 2)
+                    last_actual = scores[0]  # most recent (DESC order)
+                    base, var = self._blended_base(scores)
+                    base = self._uncertainty_penalty(base, var)
+                    base = self._bimodal_adjust(scores, base)
+                    base = self._clamp_delta(base, last_actual)
+                    return round(max(0.0, min(10.0, base)), 2)
             global_row = db_query("SELECT avg_score FROM global_stats")
             if global_row and global_row[0].get("avg_score"):
                 return round(float(global_row[0]["avg_score"]), 2)
