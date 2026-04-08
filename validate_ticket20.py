@@ -103,7 +103,7 @@ async def main():
     score = 0.0
     certification_verdict = "UNKNOWN"
 
-    async def on_certify(topic, s, **kw):
+    async def on_certify(topic, s, data=None, **kw):
         nonlocal certified, score, certification_verdict
         certified = s >= 7.0
         score = s
