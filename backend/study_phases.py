@@ -891,6 +891,7 @@ class CertifyRetryGroup(BasePhase):
                     generated_code=ctx.codice_generato,
                 )
                 ctx.score = ctx.eval_data.get("score", 0)
+                ctx.best_score = max(ctx.best_score, ctx.score)
 
                 # Strategy extraction + storage
                 await self._extract_and_store_strategy(ctx)
@@ -912,6 +913,7 @@ class CertifyRetryGroup(BasePhase):
                 )
                 ctx.eval_data = {**ctx.eval_data, **bench_update}
                 ctx.score = ctx.eval_data.get("score", ctx.score)
+                ctx.best_score = max(ctx.best_score, ctx.score)
             except Exception as bench_phase_err:
                 print(f"[BENCHMARK] Non-fatal phase error -- skipping: {bench_phase_err}")
 
@@ -983,9 +985,11 @@ class CertifyRetryGroup(BasePhase):
                     await self._retry_gap_fill(ctx)
 
         if not ctx.certified:
-            await ctx.emit("FAILED", ctx.score, f"Could not certify '{ctx.topic}' after {MAX_RETRY} attempts. Best: {ctx.score}/10")
-            # #42 EPISODE_FAILURE: persist diagnostic failure memory
-            if ctx.score >= 3.0 and getattr(ctx, "classified_error_type", None):
+            _best = getattr(ctx, "best_score", ctx.score)
+            await ctx.emit("FAILED", ctx.score, f"Could not certify '{ctx.topic}' after {MAX_RETRY} attempts. Best: {_best}/10")
+            # #42 EPISODE_FAILURE: use best_score (last attempt can regress).
+            # Also fire for benchmark-only failures (classified_error_type may be None).
+            if _best >= 1.5:
                 await self._store_failure_memory(ctx)
 
     # ── Private helpers ──────────────────────────────────────────────────
@@ -1547,23 +1551,32 @@ Rules:
         """#42 — Persist EPISODE_FAILURE memory for diagnostically useful failures."""
         try:
             from memory_extractor import MemoryExtractor
-            error_type = str(ctx.classified_error_type) if ctx.classified_error_type else ""
-            # Build a short error message from the last sandbox stderr
+            # Prefer classified sandbox error; fall back to benchmark_failure for
+            # cases where sandbox passed but benchmark gate blocked certification.
+            error_type = str(ctx.classified_error_type) if ctx.classified_error_type else "benchmark_failure"
+            # Build error message: prefer sandbox stderr, else benchmark pass_rate summary
             stderr_raw = ""
             if ctx.sandbox_result:
                 stderr_raw = ctx.sandbox_result.get("stderr", "") or ""
-            error_msg = stderr_raw.strip().splitlines()[-1][:200] if stderr_raw.strip() else error_type
+            if stderr_raw.strip():
+                error_msg = stderr_raw.strip().splitlines()[-1][:200]
+            elif ctx.eval_data:
+                pass_rate = ctx.eval_data.get("pass_rate", 0)
+                error_msg = f"Benchmark pass_rate={pass_rate:.0%} — solution logic incorrect."
+            else:
+                error_msg = error_type
+            best = getattr(ctx, "best_score", ctx.score)
             saved = MemoryExtractor.save_failure_memory(
                 topic=ctx.topic,
                 error_type=error_type,
                 error_msg=error_msg,
-                score=ctx.score,
+                score=best,
                 attempt=ctx.attempt,
                 container_tag=getattr(ctx, "container_tag", "shard"),
             )
             if saved:
                 print(f"[MEMORY_FAIL] Stored EPISODE_FAILURE for '{ctx.topic}' "
-                      f"(score={ctx.score:.1f}, error={error_type})")
+                      f"(best_score={best:.1f}, error={error_type})")
         except Exception as _mf_err:
             print(f"[MEMORY_FAIL] Non-fatal store error: {_mf_err}")
 

@@ -65,6 +65,7 @@ class StudyContext:
     error_signature: Optional[str] = None
     files_modified: List[str] = field(default_factory=list)
     attempt: int = 0
+    best_score: float = 0.0          # max score seen across all retry attempts
     resolved_errors: set = field(default_factory=set)  # error_types fixed this session
 
     # ── Critical thinking -- LLM meta-critique on stuck topics ────────────────
