@@ -959,6 +959,9 @@ class NightRunner:
         self._vision_engine = None
         _session_reflection = None
         _bench_tracker     = None
+        # Session-level resolved errors: shared across all topics in this session.
+        # Passed by reference — mutations in CertifyRetryGroup propagate back here.
+        _session_resolved_errors: set = set()
         # create goal engine tied to the same capability graph
         storage = GoalStorage()
         self.goal_engine = GoalEngine(storage, capability_graph)
@@ -1646,6 +1649,7 @@ class NightRunner:
                     predicted_score=_predicted_score,
                     blind_spots=list(_self_model.blind_spots) if _self_model else [],
                     previous_attempts=_prev_attempts,
+                    resolved_errors=_session_resolved_errors,
                 )
 
                 # Restore session_context -- strip mood and skill lib prefixes

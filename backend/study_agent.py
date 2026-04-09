@@ -1457,6 +1457,7 @@ AUTO-EXAM (Questions and Answers):
         predicted_score: Optional[float] = None,
         blind_spots: Optional[list] = None,
         previous_attempts: int = 0,
+        resolved_errors: Optional[set] = None,
     ):
         """Complete study loop -- delegates to StudyPipeline.
 
@@ -1491,6 +1492,7 @@ AUTO-EXAM (Questions and Answers):
             predicted_score=predicted_score,
             blind_spots=blind_spots or [],
             previous_attempts=previous_attempts,
+            resolved_errors=resolved_errors if resolved_errors is not None else set(),
         )
 
         pipeline = StudyPipeline([
