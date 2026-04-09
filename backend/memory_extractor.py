@@ -29,7 +29,7 @@ logger = logging.getLogger("shard.memory_extractor")
 
 # ── Memory types ──────────────────────────────────────────────────────────────
 
-MEMORY_TYPES = {"FACT", "PREFERENCE", "EPISODE", "GOAL", "RELATION"}
+MEMORY_TYPES = {"FACT", "PREFERENCE", "EPISODE", "GOAL", "RELATION", "EPISODE_FAILURE"}
 
 # Episodes expire after 30 days by default (can be overridden)
 EPISODE_TTL_DAYS = 30
@@ -412,6 +412,95 @@ class MemoryExtractor:
             "by_type":    rows,
         }
 
+    @staticmethod
+    def save_failure_memory(
+        topic: str,
+        error_type: str,
+        error_msg: str,
+        score: float,
+        attempt: int,
+        container_tag: str = "shard",
+    ) -> bool:
+        """Save a compact EPISODE_FAILURE memory for a diagnostically useful failure.
+
+        Criteria (must ALL be true to save):
+          - score >= 3.0   (not garbage/env noise)
+          - error_type set (must be diagnostic)
+          - not already saved for this topic+error_type (dedup)
+
+        Args:
+            topic:         The topic that failed.
+            error_type:    Normalized error label (e.g. 'attribute_error').
+            error_msg:     Short error summary (≤200 chars).
+            score:         Final score (0.0–10.0).
+            attempt:       Number of attempts made.
+            container_tag: Memory scope.
+
+        Returns:
+            True if saved, False if skipped (dedup or criteria not met).
+        """
+        if score < 3.0 or not error_type or error_type == "other":
+            return False
+
+        # Dedup: skip if same topic+error_type already saved
+        existing = query(
+            """SELECT id FROM memories
+               WHERE memory_type='EPISODE_FAILURE'
+               AND source_ref=?
+               AND LOWER(content) LIKE ?
+               AND is_latest=1
+               LIMIT 1""",
+            (topic, f"%{error_type}%"),
+        )
+        if existing:
+            logger.debug("[MEMORY_FAIL] Dedup skip: %s / %s already recorded", topic[:40], error_type)
+            return False
+
+        content = (
+            f"SHARD failed '{topic}' with score {score:.1f}/10 after {attempt} attempt(s). "
+            f"Error type: {error_type}. "
+            f"Error: {error_msg[:150]}."
+        )
+        entities = _extract_topic_entities(topic)
+
+        mem = Memory(
+            content=content,
+            memory_type="EPISODE_FAILURE",
+            entities=entities,
+            confidence=0.9,
+            source_type="study_failure",
+            source_ref=topic,
+            container_tag=container_tag,
+        )
+
+        try:
+            execute(
+                """INSERT INTO memories
+                   (id, content, memory_type, entities, confidence, is_latest,
+                    expires_at, updates, source_type, source_ref, container_tag,
+                    created_at, updated_at)
+                   VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    mem.id, mem.content, mem.memory_type,
+                    json.dumps(mem.entities, ensure_ascii=False),
+                    mem.confidence, mem.expires_at, mem.updates,
+                    mem.source_type, mem.source_ref, mem.container_tag,
+                    mem.created_at, datetime.now().isoformat(),
+                ),
+            )
+            # Wire into cross-reference graph
+            try:
+                from link_builder import MemoryLinkBuilder
+                MemoryLinkBuilder.build_links(mem.id, mem.entities, container_tag)
+            except Exception:
+                pass
+            logger.info("[MEMORY_FAIL] Saved EPISODE_FAILURE: topic='%s' error=%s score=%.1f",
+                        topic[:50], error_type, score)
+            return True
+        except Exception as exc:
+            logger.warning("[MEMORY_FAIL] Failed to save: %s", exc)
+            return False
+
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     async def _call_llm(self, prompt: str) -> List[Dict]:
@@ -483,6 +572,27 @@ def _summarize_structured(topic: str, structured: Dict[str, Any]) -> str:
     if connections:
         parts.append(f"Connections: {', '.join(str(c) for c in connections[:4])}")
     return "\n".join(parts)
+
+
+def _extract_topic_entities(topic: str) -> List[str]:
+    """Extract entity tokens from a topic string for memory linking.
+
+    Splits on common separators, lowercases, deduplicates, and returns
+    tokens that look like real entities (length ≥ 3, not stop-words).
+    """
+    _STOP = {"the", "and", "with", "for", "from", "into", "using", "via",
+             "how", "why", "what", "when", "that", "this", "are", "not"}
+    raw_tokens = re.split(r"[\s\-_/]+", topic.lower())
+    seen: dict[str, None] = {}  # insertion-ordered dedup
+    for t in raw_tokens:
+        t = t.strip("()[].,:")
+        if len(t) >= 3 and t not in _STOP:
+            seen[t] = None
+    # Always include the full topic as a single entity
+    full = topic.strip().lower()
+    if full not in seen:
+        seen[full] = None
+    return list(seen.keys())
 
 
 def _parse_memory_list(raw: Any) -> List[Dict]:

@@ -69,9 +69,19 @@ class MemoryLinkBuilder:
         if not new_ent_set:
             return 0
 
+        # Look up memory_type of the new memory for failure-failure boost
+        new_type_rows = query(
+            "SELECT memory_type FROM memories WHERE id=? LIMIT 1",
+            (memory_id,),
+        )
+        new_is_failure = (
+            new_type_rows[0]["memory_type"] == "EPISODE_FAILURE"
+            if new_type_rows else False
+        )
+
         # Load recent is_latest memories from same container (excluding self)
         candidates = query(
-            """SELECT id, entities
+            """SELECT id, entities, memory_type
                FROM memories
                WHERE is_latest = 1
                AND container_tag = ?
@@ -97,9 +107,13 @@ class MemoryLinkBuilder:
             if overlap < cls.MIN_OVERLAP:
                 continue
 
+            # Failure-failure boost: two failure memories on same topic cluster tighter
+            both_are_failures = new_is_failure and cand.get("memory_type") == "EPISODE_FAILURE"
+            weight = float(overlap) + (1.0 if both_are_failures else 0.0)
+
             # Bidirectional: both directions, ON CONFLICT DO NOTHING via PK
-            rows.append((memory_id, cand["id"], "entity_overlap", float(overlap), now))
-            rows.append((cand["id"], memory_id, "entity_overlap", float(overlap), now))
+            rows.append((memory_id, cand["id"], "entity_overlap", weight, now))
+            rows.append((cand["id"], memory_id, "entity_overlap", weight, now))
 
         if not rows:
             return 0

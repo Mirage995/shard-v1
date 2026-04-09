@@ -918,6 +918,9 @@ class CertifyRetryGroup(BasePhase):
 
         if not ctx.certified:
             await ctx.emit("FAILED", ctx.score, f"Could not certify '{ctx.topic}' after {MAX_RETRY} attempts. Best: {ctx.score}/10")
+            # #42 EPISODE_FAILURE: persist diagnostic failure memory
+            if ctx.score >= 3.0 and getattr(ctx, "classified_error_type", None):
+                await self._store_failure_memory(ctx)
 
     # ── Private helpers ──────────────────────────────────────────────────
 
@@ -1473,6 +1476,30 @@ Rules:
         except Exception as swarm_err:
             print(f"[SWARM] Architect→Coder failed (non-fatal): {swarm_err}")
             return None
+
+    async def _store_failure_memory(self, ctx: StudyContext) -> None:
+        """#42 — Persist EPISODE_FAILURE memory for diagnostically useful failures."""
+        try:
+            from memory_extractor import MemoryExtractor
+            error_type = str(ctx.classified_error_type) if ctx.classified_error_type else ""
+            # Build a short error message from the last sandbox stderr
+            stderr_raw = ""
+            if ctx.sandbox_result:
+                stderr_raw = ctx.sandbox_result.get("stderr", "") or ""
+            error_msg = stderr_raw.strip().splitlines()[-1][:200] if stderr_raw.strip() else error_type
+            saved = MemoryExtractor.save_failure_memory(
+                topic=ctx.topic,
+                error_type=error_type,
+                error_msg=error_msg,
+                score=ctx.score,
+                attempt=ctx.attempt,
+                container_tag=getattr(ctx, "container_tag", "shard"),
+            )
+            if saved:
+                print(f"[MEMORY_FAIL] Stored EPISODE_FAILURE for '{ctx.topic}' "
+                      f"(score={ctx.score:.1f}, error={error_type})")
+        except Exception as _mf_err:
+            print(f"[MEMORY_FAIL] Non-fatal store error: {_mf_err}")
 
     async def _retry_gap_fill(self, ctx: StudyContext) -> None:
         """Re-synthesize theory with gap focus + regenerate sandbox code for retry."""
