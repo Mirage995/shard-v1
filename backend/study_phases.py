@@ -613,6 +613,19 @@ If the task would normally require such libraries, implement a simplified versio
                 print(f"[CODE_CLEANER] Rewrote 'with socket.socket()' in solve() for '{ctx.topic}'")
                 ctx.codice_generato = _cleaned
 
+        # ── Mock injection (external service deps) ───────────────────────
+        # Prepend minimal mocks for redis/requests/psycopg2/pymongo so that
+        # code exercising external services runs in the sandboxed Docker
+        # environment without a real server. Idempotent and fail-safe.
+        if ctx.codice_generato:
+            try:
+                from mock_injector import inject_mocks as _inject_mocks
+                _patched = _inject_mocks(ctx.codice_generato, ctx.topic)
+                if _patched != ctx.codice_generato:
+                    ctx.codice_generato = _patched
+            except Exception as _mi_err:
+                pass  # always non-fatal
+
         # ── Execution ────────────────────────────────────────────────────
         if ctx.codice_generato:
             try:
