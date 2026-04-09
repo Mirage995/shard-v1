@@ -1,14 +1,14 @@
 {
   "global": {
-    "had_episodic_context": 0.9944,
-    "strategy_reused": -0.5656,
-    "near_miss_history": 0.282,
+    "had_episodic_context": 0.8144,
+    "strategy_reused": -0.7456,
+    "near_miss_history": 0.102,
     "first_attempt": -1.696,
-    "graphrag_hits": 0.3356,
+    "graphrag_hits": 0.1556,
     "source_improvement": -1.5264,
-    "sig_difficulty": 8.777,
-    "sig_desire": 3.562,
-    "sig_graphrag": 0.4638
+    "sig_difficulty": 8.651,
+    "sig_desire": 3.5282,
+    "sig_graphrag": 0.2838
   },
   "contextual": {
     "had_episodic_context|unknown:debugging": -0.0616,
@@ -38,9 +38,9 @@
     "near_miss_history|unknown:general": 0.208,
     "had_episodic_context|unknown:ml": 0.764,
     "graphrag_hits|unknown:ml": -0.0952,
-    "strategy_reused|unknown:data": 0.674,
+    "strategy_reused|unknown:data": 0.494,
     "first_attempt|unknown:data": -0.1096,
-    "graphrag_hits|unknown:data": 0.674,
+    "graphrag_hits|unknown:data": 0.494,
     "near_miss_history|unknown:ml": -0.3608,
     "had_episodic_context|curated_list:concurrency": -0.696,
     "strategy_reused|curated_list:concurrency": -0.696,
@@ -56,10 +56,10 @@
     "sig_difficulty|unknown:concurrency": 0.7056,
     "sig_desire|unknown:concurrency": 0.2385,
     "sig_graphrag|unknown:concurrency": 0.4129,
-    "had_episodic_context|unknown:data": 0.7836,
-    "sig_difficulty|unknown:data": 0.6748,
-    "sig_desire|unknown:data": 0.2498,
-    "sig_graphrag|unknown:data": 0.4702,
+    "had_episodic_context|unknown:data": 0.6036,
+    "sig_difficulty|unknown:data": 0.5488,
+    "sig_desire|unknown:data": 0.216,
+    "sig_graphrag|unknown:data": 0.2902,
     "sig_difficulty|unknown:ml": 0.1212,
     "sig_desire|unknown:ml": 0.1408,
     "sig_graphrag|unknown:ml": -0.8785,
@@ -79,6 +79,6 @@
     "near_miss_history|unknown:algorithm": 0.1648,
     "source_improvement|unknown:algorithm": -0.1976,
     "source_improvement|unknown:concurrency": 0.3152,
-    "near_miss_history|unknown:data": 0.0804
+    "near_miss_history|unknown:data": -0.0996
   }
 }

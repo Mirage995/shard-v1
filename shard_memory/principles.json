@@ -865,5 +865,16 @@
     "source_topic": "Integration of json serialization and redis data structures python",
     "confidence": 0.65,
     "created_at": "2026-04-09T10:08:51.447142+00:00"
+  },
+  {
+    "id": "82cbaac8",
+    "name": "la_serializzazione_json_fondamentale_per",
+    "statement": "La serializzazione JSON è fondamentale per lo stoccaggio e il recupero dei dati, mentre Redis offre una soluzione efficiente per la gestione dei dati in memoria",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "Integration of json serialization and redis data structures python",
+    "confidence": 0.65,
+    "created_at": "2026-04-09T11:13:14.289970+00:00"
   }
 ]

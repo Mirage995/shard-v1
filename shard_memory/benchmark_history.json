@@ -1,86 +1,6 @@
 {
   "sessions": [
     {
-      "date": "2026-04-01T20:32:52.036240+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.1
-        },
-        "task_02_ghost_bug": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_03_dirty_data": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 2.9
-        },
-        "task_04_race_condition": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.1
-        },
-        "task_05_state_mutation": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_06_ttl_cache": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.5
-        },
-        "task_07_metrics_bleed": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 0.9
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_10_template_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_11_stream_decoder": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 0.9
-        }
-      },
-      "summary": {
-        "passed": 0,
-        "failed": 14,
-        "total": 14
-      }
-    },
-    {
       "date": "2026-04-01T20:39:07.807509+00:00",
       "results": {
         "task_01_html_trap": {
@@ -1592,6 +1512,86 @@
           "success": true,
           "attempts": 0,
           "elapsed": 0.9
+        }
+      },
+      "summary": {
+        "passed": 14,
+        "failed": 0,
+        "total": 14
+      }
+    },
+    {
+      "date": "2026-04-09T11:14:42.920605+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 3.1
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
         }
       },
       "summary": {

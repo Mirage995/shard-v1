@@ -1,50 +1,6 @@
 {
   "task_03_dirty_data": [
     {
-      "run_id": "c6755466",
-      "timestamp": "2026-04-08T11:51:13",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 4873,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_total_completed",
-            "test_avg_completed",
-            "test_by_category",
-            "test_by_month",
-            "test_unique_merchants",
-            "test_top_merchants",
-            "test_duplicate_ids",
-            "test_flagged_negative",
-            "test_currency_totals",
-            "test_return_type_and_keys",
-            "test_faster_than_legacy",
-            "test_scales_linearly",
-            "test_string_amount",
-            "test_missing_merchant",
-            "test_epoch_timestamp",
-            "test_whitespace_category",
-            "test_empty_category",
-            "test_negative_completed_flagged",
-            "test_duplicate_ids_detected",
-            "test_zero_amount_completed",
-            "test_unicode_merchant",
-            "test_has_process_transactions",
-            "test_no_excessive_try_except",
-            "test_uses_modern_patterns"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_total_completed, test_avg_completed, test_by_category, test_by_month, test_unique_merchants, test_top_merchants"
-    },
-    {
       "run_id": "62612149",
       "timestamp": "2026-04-08T18:38:50",
       "success": true,
@@ -337,149 +293,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "b5124aab",
+      "timestamp": "2026-04-09T13:14:29",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_02_ghost_bug": [
-    {
-      "run_id": "124e9bd5",
-      "timestamp": "2026-04-08T21:52:52",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 5451,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x0000026A38C29810>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_values"
-          ],
-          "error_summary": "test_task2.py::TestStructure::test_no_try_except_suppression PASSED      [100%]\n\n================================== FAILURES ===================================\n_______________ TestSemanticCorrectness.test_calibration_values _______________\n\nself = <test_task2.TestSemanticCorrectness object at 0x000002BD05979A90>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_calibration_values",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_idempotent"
-          ],
-          "error_summary": "self = <test_task2.TestBugFixes object at 0x000001582C3E9810>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01', 'timestamp': 1004, 'value': 1013.25}, {'sensor_id': 'temp_01', 'timestamp': 1005, 'value': 22.8}, ...]\nfresh_config = {'hum_01': {'group': 'humidity', 'max': 100, 'min': 0, 'offset': -1.2, ...}, 'hum_02': {'group': 'humidity', 'max': 10...'min': 800,"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_values"
-          ],
-          "error_summary": "test_task2.py::TestStructure::test_no_try_except_suppression PASSED      [100%]\n\n================================== FAILURES ===================================\n_______________ TestSemanticCorrectness.test_calibration_values _______________\n\nself = <test_task2.TestSemanticCorrectness object at 0x00000150A2BF9A90>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01"
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_pipeline_runs",
-            "test_pipeline_returns_correct_types",
-            "test_buggy_pipeline_crashes",
-            "test_no_mutation_of_input",
-            "test_calibration_idempotent",
-            "test_invalid_readings_excluded_from_averages",
-            "test_detect_anomalies_correct_key",
-            "test_report_correct_keys",
-            "test_validation_counts",
-            "test_group_averages",
-            "test_three_groups_present",
-            "test_report_not_empty",
-            "test_idempotent_pipeline_runs",
-            "test_has_all_functions",
-            "test_no_try_except_suppression"
-          ],
-          "failed": [
-            "test_calibration_values"
-          ],
-          "error_summary": "test_task2.py::TestStructure::test_no_try_except_suppression PASSED      [100%]\n\n================================== FAILURES ===================================\n_______________ TestSemanticCorrectness.test_calibration_values _______________\n\nself = <test_task2.TestSemanticCorrectness object at 0x000002547D039A90>\nfixed_module = <module 'fixed_pipeline' from 'C:\\\\Users\\\\andre\\\\Desktop\\\\shard_v1\\\\benchmark\\\\task_02_ghost_bug\\\\fixed_pipeline.py'>\nfresh_readings = [{'sensor_id': 'temp_01', 'timestamp': 1000, 'value': 22.5}, {'sensor_id': 'temp_02', 'timestamp': 1001, 'value': 23.1..._id': 'pres_01"
-        }
-      ]
-    },
     {
       "run_id": "214835e3",
       "timestamp": "2026-04-08T22:19:56",
@@ -959,45 +785,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "62f66ac0",
+      "timestamp": "2026-04-09T13:14:25",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_04_race_condition": [
-    {
-      "run_id": "fe70c73f",
-      "timestamp": "2026-04-08T11:51:17",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 7948,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_create_and_balance",
-            "test_deposit",
-            "test_withdraw",
-            "test_transfer",
-            "test_insufficient_funds_withdraw",
-            "test_insufficient_funds_transfer",
-            "test_total_funds_conserved",
-            "test_duplicate_account_raises",
-            "test_unknown_account_raises",
-            "test_concurrent_deposits",
-            "test_concurrent_withdrawals_no_overdraft",
-            "test_concurrent_transfers_conserve_money",
-            "test_concurrent_mixed_operations",
-            "test_no_deadlock_bidirectional",
-            "test_has_required_methods",
-            "test_uses_threading_primitives"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_create_and_balance, test_deposit, test_withdraw, test_transfer, test_insufficient_funds_withdraw, test_insufficient_funds_transfer"
-    },
     {
       "run_id": "5b042c3c",
       "timestamp": "2026-04-08T18:38:54",
@@ -1217,46 +1017,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "3f59b8b9",
+      "timestamp": "2026-04-09T13:14:30",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_01_html_trap": [
-    {
-      "run_id": "4d370d9a",
-      "timestamp": "2026-04-08T11:50:47",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 4137,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_html_identical",
-            "test_html_length",
-            "test_all_css_classes_present",
-            "test_all_menu_items_present",
-            "test_all_prices_present",
-            "test_dalle_placeholders_present",
-            "test_promo_code_present",
-            "test_daily_special_present",
-            "test_star_names_in_footer",
-            "test_has_multiple_functions_or_classes",
-            "test_has_data_processing_layer",
-            "test_has_render_layer",
-            "test_no_html_in_data_functions",
-            "test_generate_restaurant_page_is_thin",
-            "test_no_global_mutation",
-            "test_sample_menu_importable",
-            "test_works_with_different_data"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_html_identical, test_html_length, test_all_css_classes_present, test_all_menu_items_present, test_all_prices_present, test_dalle_placeholders_present"
-    },
     {
       "run_id": "c193ac24",
       "timestamp": "2026-04-08T18:38:30",
@@ -1481,81 +1254,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "3636a5ab",
+      "timestamp": "2026-04-09T13:14:24",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_05_state_mutation": [
-    {
-      "run_id": "e18e44fb",
-      "timestamp": "2026-04-08T11:51:25",
-      "success": true,
-      "total_attempts": 2,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [
-            "test_caller_mutation_does_not_affect_history"
-          ],
-          "error_summary": "        \"\"\"If the caller mutates the input list after process(),\n        the stored history must not change.\"\"\"\n        p = Pipeline()\n        data = [1, 2, 3]\n        p.process(data)\n    \n        data.append(999)\n        data[0] = -1\n    \n        h = p.get_history()\n>       assert h[0] == [1, 2, 3], (\n            f\"History was corrupted by caller mutation: {h[0]}. \"\n            f\"Pipeline should store a copy of the input, not a reference.\"\n        )\nE       AssertionError: History was corrupted by caller mutation: [-1, 2, 3, 999]. Pipeline should store a copy of the input, not a reference.\nE "
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic_multiply",
-            "test_default_multiplier",
-            "test_negative_values",
-            "test_empty_batch",
-            "test_multiplier_change_affects_cached_values",
-            "test_multiplier_change_mix_cached_and_new",
-            "test_many_multiplier_changes",
-            "test_records_batches",
-            "test_caller_mutation_does_not_affect_history",
-            "test_history_mutation_does_not_affect_pipeline",
-            "test_processed_count",
-            "test_clears_history",
-            "test_clears_count",
-            "test_clears_cache",
-            "test_resets_id_sequence",
-            "test_full_reset_cycle",
-            "test_sequential",
-            "test_ids_independent_of_processing",
-            "test_ids_across_resets",
-            "test_two_independent_pipelines",
-            "test_long_running_usage"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 2. Passing tests: test_basic_multiply, test_default_multiplier, test_negative_values, test_empty_batch, test_multiplier_change_affects_cached_values, test_multiplier_change_mix_cached_and_new"
-    },
     {
       "run_id": "a898ad48",
       "timestamp": "2026-04-08T18:38:59",
@@ -1955,45 +1666,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "6fd84db5",
+      "timestamp": "2026-04-09T13:14:32",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_07_metrics_bleed": [
-    {
-      "run_id": "8c4e6481",
-      "timestamp": "2026-04-08T11:51:34",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 4206,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_counter_basic",
-            "test_counter_reset",
-            "test_counter_invalid_increment",
-            "test_counters_are_independent",
-            "test_histograms_do_not_share_buckets",
-            "test_new_histogram_does_not_reset_existing",
-            "test_bucket_counts_correct",
-            "test_percentile_does_not_mutate_samples",
-            "test_percentile_values",
-            "test_percentile_empty",
-            "test_percentile_stable_across_calls",
-            "test_count_and_mean",
-            "test_collector_counter",
-            "test_collector_histogram",
-            "test_collector_snapshot",
-            "test_two_collectors_isolated"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_counter_basic, test_counter_reset, test_counter_invalid_increment, test_counters_are_independent, test_histograms_do_not_share_buckets, test_new_histogram_does_not_reset_existing"
-    },
     {
       "run_id": "7ddd883e",
       "timestamp": "2026-04-08T18:39:08",
@@ -2213,46 +1898,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "aea88ac1",
+      "timestamp": "2026-04-09T13:14:34",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_06_ttl_cache": [
-    {
-      "run_id": "c170ff07",
-      "timestamp": "2026-04-08T11:51:30",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 5099,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_set_and_get",
-            "test_get_missing_returns_none",
-            "test_overwrite",
-            "test_delete",
-            "test_delete_nonexistent_is_noop",
-            "test_clear",
-            "test_expired_entry_returns_none",
-            "test_expired_entry_counted_as_miss",
-            "test_non_expired_entry_still_accessible",
-            "test_multiple_keys_independent_ttl",
-            "test_size_excludes_expired_entries",
-            "test_size_live_only",
-            "test_size_after_clear",
-            "test_stats_hits_misses",
-            "test_stats_reset_on_clear",
-            "test_evict_expired_removes_stale",
-            "test_evict_expired_leaves_live_entries"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_set_and_get, test_get_missing_returns_none, test_overwrite, test_delete, test_delete_nonexistent_is_noop, test_clear"
-    },
     {
       "run_id": "9c27abad",
       "timestamp": "2026-04-08T18:39:05",
@@ -2477,39 +2135,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "0f8f8bb4",
+      "timestamp": "2026-04-09T13:14:33",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_08_multi_file_labyrinth": [
-    {
-      "run_id": "6b107fae",
-      "timestamp": "2026-04-08T11:51:37",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 7571,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_a1",
-            "test_a2",
-            "test_a3",
-            "test_a4",
-            "test_a5",
-            "test_b1",
-            "test_b2",
-            "test_b3",
-            "test_b4",
-            "test_b5"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_a1, test_a2, test_a3, test_a4, test_a5, test_b1"
-    },
     {
       "run_id": "2e76055d",
       "timestamp": "2026-04-08T18:39:11",
@@ -2699,39 +2337,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "bfa9ae81",
+      "timestamp": "2026-04-09T13:14:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_09_ghost_mutation": [
-    {
-      "run_id": "824510e9",
-      "timestamp": "2026-04-08T11:51:41",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 4985,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_c01",
-            "test_c02",
-            "test_c03",
-            "test_c04",
-            "test_c05",
-            "test_c06",
-            "test_c07",
-            "test_c08",
-            "test_c09",
-            "test_c10"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_c01, test_c02, test_c03, test_c04, test_c05, test_c06"
-    },
     {
       "run_id": "dcab74bf",
       "timestamp": "2026-04-08T18:39:14",
@@ -2921,119 +2539,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "1297e249",
+      "timestamp": "2026-04-09T13:14:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_10_template_parser": [
-    {
-      "run_id": "5e124c65",
-      "timestamp": "2026-04-08T11:52:05",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 3656,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_field",
-            "test_format_spec",
-            "test_multiple_fields",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_all_message_fields"
-          ],
-          "failed": [
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_format_spec_with_custom_braces"
-          ],
-          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_field",
-            "test_format_spec",
-            "test_multiple_fields",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_all_message_fields"
-          ],
-          "failed": [
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_format_spec_with_custom_braces"
-          ],
-          "error_summary": "[test_custom_braces_json_style]\ndef test_custom_braces_json_style():\n        \"\"\"{{ }} are escaped braces — should NOT be parsed as fields.\"\"\"\n        result = _proc().parse_template('{{ \"Category\": \"{category}\" }}')\n>       assert result == [\"category\"], f\"Got {result} — escaped braces must not be parsed as fields\"\nE       AssertionError: Got [] — escaped braces must not be parsed as fields\nE       assert [] == ['category']\nE         \nE         Right contains one more item: 'category'\nE         \nE         Full diff:\nE         \n... (truncated)\n\n[test_custom_braces_no_false_warnings]\ndef test_cu"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_field",
-            "test_multiple_fields",
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_all_message_fields"
-          ],
-          "failed": [
-            "test_format_spec",
-            "test_format_spec_with_custom_braces"
-          ],
-          "error_summary": "[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'line',\nE         - ]\n\ntest_task10.py:25: AssertionError\n\n[test_format_spec_with_custom_braces]\ndef test_format_spec_with_custom_braces():\n        \"\"\"Real-world template: JSON wrapper around formatted field.\"\"\"\n        result = _proc().parse_template('{{ \"line\": {line:d}, \"msg\": \"{msg}\" }}')\n>       assert resu"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_field",
-            "test_multiple_fields",
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_all_message_fields"
-          ],
-          "failed": [
-            "test_format_spec",
-            "test_format_spec_with_custom_braces"
-          ],
-          "error_summary": "[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'line',\nE         - ]\n\ntest_task10.py:25: AssertionError\n\n[test_format_spec_with_custom_braces]\ndef test_format_spec_with_custom_braces():\n        \"\"\"Real-world template: JSON wrapper around formatted field.\"\"\"\n        result = _proc().parse_template('{{ \"line\": {line:d}, \"msg\": \"{msg}\" }}')\n>       assert resu"
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_field",
-            "test_multiple_fields",
-            "test_custom_braces_json_style",
-            "test_custom_braces_no_false_warnings",
-            "test_unknown_field_warns",
-            "test_mixed_known_unknown",
-            "test_empty_template",
-            "test_all_message_fields"
-          ],
-          "failed": [
-            "test_format_spec",
-            "test_format_spec_with_custom_braces"
-          ],
-          "error_summary": "[test_format_spec]\ndef test_format_spec():\n>       assert _proc().parse_template(\"{line:03d}\") == [\"line\"]\nE       AssertionError: assert [] == ['line']\nE         \nE         Right contains one more item: 'line'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         -     'line',\nE         - ]\n\ntest_task10.py:25: AssertionError\n\n[test_format_spec_with_custom_braces]\ndef test_format_spec_with_custom_braces():\n        \"\"\"Real-world template: JSON wrapper around formatted field.\"\"\"\n        result = _proc().parse_template('{{ \"line\": {line:d}, \"msg\": \"{msg}\" }}')\n>       assert resu"
-        }
-      ]
-    },
     {
       "run_id": "f3cd5393",
       "timestamp": "2026-04-08T18:39:26",
@@ -3603,39 +3121,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "bef48d61",
+      "timestamp": "2026-04-09T13:14:38",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_11_stream_decoder": [
-    {
-      "run_id": "eb5990d9",
-      "timestamp": "2026-04-08T11:52:08",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 7571,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_utf8_encoding_returns_str",
-            "test_latin1_encoding_returns_str",
-            "test_none_encoding_uses_apparent",
-            "test_none_encoding_correct_content",
-            "test_none_encoding_apparent_latin1",
-            "test_explicit_encoding_multiline",
-            "test_empty_iterator",
-            "test_empty_iterator_none_encoding",
-            "test_single_chunk",
-            "test_unicode_chars_across_chunks"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_utf8_encoding_returns_str, test_latin1_encoding_returns_str, test_none_encoding_uses_apparent, test_none_encoding_correct_content, test_none_encoding_apparent_latin1, test_explicit_encoding_multiline"
-    },
     {
       "run_id": "2a172dd4",
       "timestamp": "2026-04-08T18:39:29",
@@ -3825,117 +3323,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "6f34e11c",
+      "timestamp": "2026-04-09T13:14:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_12_note_tag": [
-    {
-      "run_id": "4cd3d250",
-      "timestamp": "2026-04-08T11:52:27",
-      "success": false,
-      "total_attempts": 5,
-      "kb_used": true,
-      "kb_chars": 8597,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_tag_not_matched_mid_word",
-            "test_multiple_punctuation_tags",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
-          ],
-          "error_summary": "[test_alphanumeric_tag_found]\ndef test_alphanumeric_tag_found():\n>       tags = _proc().find_tags(\"a = 1  # TODO: fix this\", [\"TODO\"])\n               ^^^^^^^^^^^^^^^^^\nE       AttributeError: module 'fixed_processor' has no attribute 'find_tags'\n\ntest_task12.py:20: AttributeError\n\n[test_alphanumeric_tag_no_space]\ndef test_alphanumeric_tag_no_space():\n>       tags = _proc().find_tags(\"a = 1  #TODO: fix this\", [\"TODO\"])\n               ^^^^^^^^^^^^^^^^^\nE       AttributeError: module 'fixed_processor' has no attribute 'find_tags'\n\ntest_task12.py:25: AttributeError\n\n[test_punctuation_tag_found]\nde"
-        },
-        {
-          "attempt": 2,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_tag_not_matched_mid_word",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
-          ],
-          "failed": [
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_multiple_punctuation_tags"
-          ],
-          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
-        },
-        {
-          "attempt": 3,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [],
-          "failed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_tag_not_matched_mid_word",
-            "test_multiple_punctuation_tags",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
-          ],
-          "error_summary": "[test_alphanumeric_tag_found]\ndef test_alphanumeric_tag_found():\n>       tags = _proc().find_tags(\"a = 1  # TODO: fix this\", [\"TODO\"])\n               ^^^^^^^^^^^^^^^^^\nE       AttributeError: module 'fixed_processor' has no attribute 'find_tags'\n\ntest_task12.py:20: AttributeError\n\n[test_alphanumeric_tag_no_space]\ndef test_alphanumeric_tag_no_space():\n>       tags = _proc().find_tags(\"a = 1  #TODO: fix this\", [\"TODO\"])\n               ^^^^^^^^^^^^^^^^^\nE       AttributeError: module 'fixed_processor' has no attribute 'find_tags'\n\ntest_task12.py:25: AttributeError\n\n[test_punctuation_tag_found]\nde"
-        },
-        {
-          "attempt": 4,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_tag_not_matched_mid_word",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
-          ],
-          "failed": [
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_multiple_punctuation_tags"
-          ],
-          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
-        },
-        {
-          "attempt": 5,
-          "mode": "SHARD FEEDBACK",
-          "syntax_valid": true,
-          "passed": [
-            "test_alphanumeric_tag_found",
-            "test_alphanumeric_tag_no_space",
-            "test_tag_not_matched_mid_word",
-            "test_no_match_empty_source",
-            "test_case_insensitive"
-          ],
-          "failed": [
-            "test_punctuation_tag_found",
-            "test_punctuation_tag_no_space",
-            "test_punctuation_tag_end_of_line",
-            "test_mixed_tags",
-            "test_multiple_punctuation_tags"
-          ],
-          "error_summary": "[test_punctuation_tag_found]\ndef test_punctuation_tag_found():\n        \"\"\"Punctuation-only tags must be detected — \\\\b doesn't work after non-word chars.\"\"\"\n        tags = _proc().find_tags(\"a = 1  # ???: check this\", [\"???\"])\n>       assert tags == [\"???\"], f\"Punctuation tag '???' not found, got: {tags}\"\nE       AssertionError: Punctuation tag '???' not found, got: []\nE       assert [] == ['???']\nE         \nE         Right contains one more item: '???'\nE         \nE         Full diff:\nE         + []\nE         - [\nE         \n... (truncated)\n\n[test_punctuation_tag_no_space]\ndef test_punctuation_"
-        }
-      ]
-    },
     {
       "run_id": "6074d3eb",
       "timestamp": "2026-04-08T18:39:31",
@@ -4119,6 +3519,16 @@
     {
       "run_id": "5d4c0657",
       "timestamp": "2026-04-09T12:11:16",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "9c511960",
+      "timestamp": "2026-04-09T13:14:40",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -6646,42 +6056,6 @@
   ],
   "task_13_config_parser": [
     {
-      "run_id": "ce201407",
-      "timestamp": "2026-04-08T11:52:30",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 3993,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_simple_key_value",
-            "test_multiple_lines",
-            "test_whitespace_stripped_from_key",
-            "test_whitespace_stripped_from_value",
-            "test_value_with_colon",
-            "test_value_with_multiple_colons",
-            "test_empty_lines_ignored",
-            "test_comment_lines_ignored",
-            "test_empty_string",
-            "test_existing_key",
-            "test_missing_key_returns_none",
-            "test_missing_key_returns_default",
-            "test_missing_key_default_false",
-            "test_merge_no_overlap",
-            "test_override_wins",
-            "test_base_unchanged"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_simple_key_value, test_multiple_lines, test_whitespace_stripped_from_key, test_whitespace_stripped_from_value, test_value_with_colon, test_value_with_multiple_colons"
-    },
-    {
       "run_id": "cef3359a",
       "timestamp": "2026-04-08T18:39:34",
       "success": true,
@@ -6900,54 +6274,19 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "c10a15ce",
+      "timestamp": "2026-04-09T13:14:41",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_14_boundary_check": [
-    {
-      "run_id": "22a643b2",
-      "timestamp": "2026-04-08T11:52:33",
-      "success": true,
-      "total_attempts": 1,
-      "kb_used": true,
-      "kb_chars": 6330,
-      "attempts": [
-        {
-          "attempt": 1,
-          "mode": "LLM SOLO",
-          "syntax_valid": true,
-          "passed": [
-            "test_basic",
-            "test_single_element",
-            "test_empty",
-            "test_negative_changes",
-            "test_mixed",
-            "test_two_elements",
-            "test_all_equal",
-            "test_single_peak",
-            "test_multiple_peaks",
-            "test_no_peaks_flat",
-            "test_first_element_not_peak",
-            "test_last_element_not_peak",
-            "test_empty",
-            "test_two_elements",
-            "test_three_elements_middle_peak",
-            "test_valley_not_peak",
-            "test_basic",
-            "test_window_equals_length",
-            "test_window_one",
-            "test_empty",
-            "test_window_larger_than_data",
-            "test_basic",
-            "test_single_element",
-            "test_empty",
-            "test_decreasing"
-          ],
-          "failed": [],
-          "error_summary": ""
-        }
-      ],
-      "winning_hint": "Solved on attempt 1. Passing tests: test_basic, test_single_element, test_empty, test_negative_changes, test_mixed, test_two_elements"
-    },
     {
       "run_id": "6f0353c6",
       "timestamp": "2026-04-08T18:39:37",
@@ -7206,6 +6545,16 @@
     {
       "run_id": "5cde3a1e",
       "timestamp": "2026-04-09T12:11:18",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "d0179ec8",
+      "timestamp": "2026-04-09T13:14:42",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
