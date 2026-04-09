@@ -151,6 +151,11 @@ def is_valid_topic(topic: str, logger: logging.Logger) -> bool:
         logger.info(f"[TOPIC FILTER] Discarded markdown header topic: {topic}")
         return False
 
+    # Reject [missed_emergence] prefixed topics (CognitionCore internal label leaking into pool)
+    if t.startswith("[missed_emergence]") or t.startswith("[missed emergence]"):
+        logger.info(f"[TOPIC FILTER] Discarded missed_emergence topic: {topic}")
+        return False
+
     # Reject "Task XX" style strings (benchmark leftovers from improvement_engine)
     if _re.search(r"\btask\s*\d+\b", t):
         logger.info(f"[TOPIC FILTER] Discarded task-description topic: {topic}")
@@ -475,9 +480,30 @@ class NightRunner:
         return any(topic_l == a.lower().strip() or a.lower().strip() in topic_l for a in ve.avoid_domains)
 
     def _is_on_cooldown(self, topic: str) -> bool:
-        """True if topic appeared in the last 5 selections (agenda starvation fix #29)."""
-        recent_5 = list(self._recent_topics)[-5:]
-        return topic.lower().strip() in [t.lower().strip() for t in recent_5]
+        """True if topic appeared in the last 10 selections (agenda starvation fix #29).
+        Window raised from 5 → 10 to prevent recycling in small pools."""
+        recent_10 = list(self._recent_topics)[-10:]
+        return topic.lower().strip() in [t.lower().strip() for t in recent_10]
+
+    def _is_certified_recently(self, topic: str, hours: int = 24) -> bool:
+        """True if topic was certified within the last `hours` hours.
+
+        Provides a global horizontal filter independent of which agenda path
+        selected the topic — prevents re-studying freshly-certified material.
+        """
+        try:
+            from shard_db import query as _q
+            rows = _q(
+                """SELECT 1 FROM experiments
+                   WHERE LOWER(topic) = LOWER(?)
+                   AND certified = 1
+                   AND timestamp > datetime('now', ?)
+                   LIMIT 1""",
+                (topic.strip(), f"-{hours} hours"),
+            )
+            return bool(rows)
+        except Exception:
+            return False
 
     def _record_topic(self, topic: str, source: str) -> None:
         """Track selected topic for cooldown and fallback ratio (#29)."""
@@ -702,14 +728,14 @@ class NightRunner:
                 task = agenda.choose_next_topic()
                 if task and "topic" in task:
                     topic, reason = task["topic"], "Selezionato dall'agenda di ricerca."
-            
+
             if not topic:
                 continue
-                
+
             is_valid = is_valid_topic(topic, self.logger)
             is_trivial = is_trivial_topic(topic, self.logger)
             is_quality = topic_quality(topic)  # TASK 3: Topic quality check
-            
+
             if not is_valid or is_trivial or not is_quality:
                 reasons = []
                 if not is_valid:
@@ -730,6 +756,23 @@ class NightRunner:
                 continue
             if self._is_avoided(topic):
                 self.logger.info(f"[VISION] Skipping '{topic}' -- in avoid_domains (chronic failure)")
+                self.topic_filter_discards += 1
+                continue
+
+            # Global certified-recently filter — blocks freshly-certified topics
+            # regardless of which agenda path selected them (horizontal guardrail).
+            _in_caps = topic.lower().strip() in {
+                c.lower() for c in getattr(capability_graph, "capabilities", {}).keys()
+            }
+            _cert_recent = self._is_certified_recently(topic, hours=24)
+            self.logger.info(
+                "[AGENDA] source_path=%s topic='%s' in_capabilities=%s certified_recently=%s",
+                source, topic[:60], _in_caps, _cert_recent,
+            )
+            if _cert_recent:
+                self.logger.info(
+                    "[AGENDA] Skipping recently-certified topic '%s' (certified in last 24h)", topic[:60]
+                )
                 self.topic_filter_discards += 1
                 continue
 
