@@ -1450,9 +1450,16 @@ class NightRunner:
                                 _ie_aff.enqueue_topics([_s])
                         except Exception:
                             pass
-                        topic  = _aff_sub[0]
-                        source = "affordance"
-                        reason = f"Decomposed from '{_aff_original}' (feasibility={_aff.feasibility:.2f})"
+                        # Apply certified-recently guard to affordance sub-topic too
+                        if self._is_certified_recently(_aff_sub[0], hours=24):
+                            self.logger.info(
+                                "[AFFORD] Sub-topic '%s' certified recently — keeping original '%s'",
+                                _aff_sub[0], _aff_original,
+                            )
+                        else:
+                            topic  = _aff_sub[0]
+                            source = "affordance"
+                            reason = f"Decomposed from '{_aff_original}' (feasibility={_aff.feasibility:.2f})"
                     else:
                         self.logger.debug(
                             "[AFFORD] All sub-topics for '%s' are invalid/quarantined -- proceeding as-is",
