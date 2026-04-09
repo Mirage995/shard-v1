@@ -179,6 +179,33 @@ class InitPhase(BasePhase):
             except Exception:
                 pass  # always non-fatal
 
+        # [PREVIOUS FAILURES] injection — up to 3 recent failure memories for this topic
+        # or strongly linked failures (weight >= 2) from related topics.
+        try:
+            from shard_db import query as _db_query
+            _failures = _db_query(
+                """SELECT content FROM memories
+                   WHERE memory_type='EPISODE_FAILURE'
+                   AND (source_ref=? OR source_ref IN (
+                       SELECT m2.source_ref FROM memory_links ml
+                       JOIN memories m2 ON ml.target_id = m2.id
+                       WHERE ml.source_id IN (
+                           SELECT id FROM memories WHERE source_ref=? AND is_latest=1 LIMIT 5
+                       ) AND ml.weight >= 2 AND m2.is_latest=1
+                   ))
+                   AND is_latest=1
+                   ORDER BY created_at DESC
+                   LIMIT 3""",
+                (ctx.topic, ctx.topic),
+            )
+            if _failures:
+                _fail_lines = [f"  - {r['content'][:180]}" for r in _failures]
+                _fail_block = "[PREVIOUS FAILURES — avoid repeating these mistakes]\n" + "\n".join(_fail_lines)
+                ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _fail_block
+                print(f"[FAIL-REUSE] Injecting {len(_failures)} previous failure(s) for '{ctx.topic}'")
+        except Exception:
+            pass  # always non-fatal
+
 
 # ── 2. MapPhase ──────────────────────────────────────────────────────────────
 

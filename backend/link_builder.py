@@ -43,6 +43,10 @@ class MemoryLinkBuilder:
     # How many candidate memories to scan per new memory (performance guard).
     CANDIDATE_LIMIT: int = 200
 
+    # Max outgoing links per node — prevents high-degree "python" hubs.
+    # New links are only inserted if the node has fewer than this many already.
+    MAX_LINKS_PER_NODE: int = 20
+
     # ── Build API ─────────────────────────────────────────────────────────────
 
     @classmethod
@@ -117,6 +121,23 @@ class MemoryLinkBuilder:
 
         if not rows:
             return 0
+
+        # Degree cap: don't insert if this node already has MAX_LINKS_PER_NODE links.
+        # Check current degree first (one cheap COUNT query).
+        cur_degree_rows = query(
+            "SELECT COUNT(*) as n FROM memory_links WHERE source_id = ?",
+            (memory_id,),
+        )
+        cur_degree = cur_degree_rows[0]["n"] if cur_degree_rows else 0
+        if cur_degree >= cls.MAX_LINKS_PER_NODE:
+            # Keep only the highest-weight pairs not already present
+            rows.sort(key=lambda r: -r[3])  # sort by weight desc
+            cap_budget = cls.MAX_LINKS_PER_NODE - cur_degree
+            if cap_budget <= 0:
+                logger.debug("[LINKS] Degree cap reached for %s — skipping", memory_id[:8])
+                return 0
+            # Keep both directions for each pair; cap_budget counts pairs
+            rows = rows[: cap_budget * 2]
 
         executemany(
             """INSERT OR IGNORE INTO memory_links

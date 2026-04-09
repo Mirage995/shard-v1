@@ -37,6 +37,60 @@ EPISODE_TTL_DAYS = 30
 # Derivation penalty: derived memories get confidence * this factor
 DERIVATION_CONFIDENCE_PENALTY = 0.8
 
+# EPISODE_FAILURE dedup window: allow refresh after this many hours
+FAILURE_DEDUP_TTL_HOURS = 48
+
+# ── Error type normalisation map ─────────────────────────────────────────────
+# Maps Python exception class names (and common variants) to stable snake_case
+# labels used as dedup keys and content tags in EPISODE_FAILURE memories.
+_ERROR_TYPE_MAP: dict[str, str] = {
+    "attributeerror":         "attribute_error",
+    "typeerror":              "type_error",
+    "valueerror":             "value_error",
+    "keyerror":               "key_error",
+    "indexerror":             "index_error",
+    "connectionerror":        "connection_error",
+    "connectionrefusederror": "connection_error",
+    "timeouterror":           "timeout_error",
+    "asynciotimeouterror":    "timeout_error",
+    "jsondecodeerror":        "json_error",
+    "assertionerror":         "assertion_error",
+    "importerror":            "import_error",
+    "modulenotfounderror":    "import_error",
+    "nameerror":              "name_error",
+    "runtimeerror":           "runtime_error",
+    "stopiteration":          "stop_iteration",
+    "oserror":                "os_error",
+    "filenotfounderror":      "os_error",
+    "permissionerror":        "os_error",
+    "syntaxerror":            "syntax_error",
+    "indentationerror":       "syntax_error",
+    "zerodivisionerror":      "zero_division_error",
+    "overflowerror":          "overflow_error",
+    "memoryerror":            "memory_error",
+    "recursionerror":         "recursion_error",
+    "notimplementederror":    "not_implemented",
+    "generic_error":          "other",
+    "generic":                "other",
+    "unknown":                "other",
+}
+
+
+def normalize_error_type(raw: str) -> str:
+    """Normalise a raw error label to a stable snake_case key.
+
+    Handles:
+    - Python CamelCase exception names  (AttributeError → attribute_error)
+    - Dotted paths                       (json.decoder.JSONDecodeError → json_error)
+    - Already snake_case labels          (pass-through if not in map)
+    - Unknown/garbage inputs             → "other"
+    """
+    if not raw:
+        return "other"
+    # Strip module path prefix: "json.decoder.JSONDecodeError" → "JSONDecodeError"
+    base = raw.split(".")[-1].strip().lower()
+    return _ERROR_TYPE_MAP.get(base, base if base else "other")
+
 _SYSTEM_PROMPT = (
     "You are a memory extraction engine for an autonomous AI learning system called SHARD. "
     "Your job is to extract discrete, precise facts from content. "
@@ -439,21 +493,25 @@ class MemoryExtractor:
         Returns:
             True if saved, False if skipped (dedup or criteria not met).
         """
+        # Normalise to stable snake_case key before any dedup or storage
+        error_type = normalize_error_type(error_type)
+
         if score < 3.0 or not error_type or error_type == "other":
             return False
 
-        # Dedup: skip if same topic+error_type already saved
+        # Dedup with TTL: skip only if an identical record was saved within the last 48 h
         existing = query(
             """SELECT id FROM memories
                WHERE memory_type='EPISODE_FAILURE'
                AND source_ref=?
                AND LOWER(content) LIKE ?
                AND is_latest=1
+               AND created_at > datetime('now', ? )
                LIMIT 1""",
-            (topic, f"%{error_type}%"),
+            (topic, f"%{error_type}%", f"-{FAILURE_DEDUP_TTL_HOURS} hours"),
         )
         if existing:
-            logger.debug("[MEMORY_FAIL] Dedup skip: %s / %s already recorded", topic[:40], error_type)
+            logger.debug("[MEMORY_FAIL] Dedup skip (TTL %dh): %s / %s", FAILURE_DEDUP_TTL_HOURS, topic[:40], error_type)
             return False
 
         content = (
