@@ -87,5 +87,7 @@
   "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
   "UDP socket programming",
   "threading event and condition python",
-  "multiprocessing queue and pipe python"
+  "multiprocessing queue and pipe python",
+  "[missed_emergence] custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)",
+  "async generator and async iterator python"
 ]

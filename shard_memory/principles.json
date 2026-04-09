@@ -810,5 +810,60 @@
     "source_topic": "multiprocessing queue and pipe python",
     "confidence": 0.65,
     "created_at": "2026-04-08T22:40:54.097075+00:00"
+  },
+  {
+    "id": "65e5a093",
+    "name": "la_gestione_delle_connessioni_e",
+    "statement": "La gestione delle connessioni e l'implementazione dell'intestazione Keep-Alive richiedono una conoscenza approfondita del protocollo HTTP e dei socket TCP",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "[missed_emergence] custom http 1.1 web server with keep-alive implementation using raw sockets (af_inet, sock_stream)",
+    "confidence": 0.8,
+    "created_at": "2026-04-09T09:43:07.753429+00:00"
+  },
+  {
+    "id": "ff5694ce",
+    "name": "l_integrazione_di_questi_concetti",
+    "statement": "L'integrazione di questi concetti è cruciale per l'efficienza dello stoccaggio e del recupero dei dati, ma può essere complessa a causa della gestione delle strutture dati annidate e dei tipi speciali",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "Integration of json serialization and redis data structures python",
+    "confidence": 0.65,
+    "created_at": "2026-04-09T09:45:30.643975+00:00"
+  },
+  {
+    "id": "2c102b73",
+    "name": "collego_questi_concetti_tra_loro",
+    "statement": "Collego questi concetti tra loro come segue: le coroutine e l'event loop sono fondamentali per asyncio, che a sua volta è essenziale per gli asynchronous generator",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "async generator and async iterator python",
+    "confidence": 0.65,
+    "created_at": "2026-04-09T10:03:41.554082+00:00"
+  },
+  {
+    "id": "eb3a22dc",
+    "name": "la_combinazione_di_questi_strumenti",
+    "statement": "La combinazione di questi strumenti consente di gestire efficacemente le strutture dati in Redis e di serializzare i dati in formato JSON",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "Integration of json serialization and redis data structures python",
+    "confidence": 0.65,
+    "created_at": "2026-04-09T10:06:05.602269+00:00"
+  },
+  {
+    "id": "a1775e48",
+    "name": "in_sintesi_l_integrazione_di",
+    "statement": "In sintesi, l'integrazione di JSON serialization e Redis data structures è fondamentale per lo sviluppo di applicazioni efficienti e scalabili",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "Integration of json serialization and redis data structures python",
+    "confidence": 0.65,
+    "created_at": "2026-04-09T10:08:51.447142+00:00"
   }
 ]

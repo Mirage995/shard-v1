@@ -3291,5 +3291,17 @@
     "requires": [],
     "acquired": "2026-04-09T00:41:56.019324",
     "source_topic": "multiprocessing queue and pipe python"
+  },
+  "async generator and async iterator python": {
+    "requires": [],
+    "acquired": "2026-04-09T12:04:14.028871",
+    "source_topic": "async generator and async iterator python"
+  },
+  "asynchronous generator": {
+    "requires": [
+      "async generator and async iterator python"
+    ],
+    "acquired": "2026-04-09T12:04:14.041696",
+    "source_topic": "async generator and async iterator python"
   }
 }
