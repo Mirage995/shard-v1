@@ -496,7 +496,7 @@ class MemoryExtractor:
         # Normalise to stable snake_case key before any dedup or storage
         error_type = normalize_error_type(error_type)
 
-        if score < 3.0 or not error_type or error_type == "other":
+        if score < 1.5 or not error_type or error_type == "other":
             return False
 
         # Dedup with TTL: skip only if an identical record was saved within the last 48 h
