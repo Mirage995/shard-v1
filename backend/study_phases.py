@@ -179,30 +179,55 @@ class InitPhase(BasePhase):
             except Exception:
                 pass  # always non-fatal
 
-        # [PREVIOUS FAILURES] injection — up to 3 recent failure memories for this topic
-        # or strongly linked failures (weight >= 2) from related topics.
+        # [PREVIOUS FAILURES] injection — composite-ranked, deduped by error_type.
+        # UNION: same-topic failures get synthetic weight=3.0 (highest priority);
+        # cross-topic failures carry their actual link weight.
         try:
             from shard_db import query as _db_query
-            _failures = _db_query(
-                """SELECT content FROM memories
-                   WHERE memory_type='EPISODE_FAILURE'
-                   AND (source_ref=? OR source_ref IN (
-                       SELECT m2.source_ref FROM memory_links ml
-                       JOIN memories m2 ON ml.target_id = m2.id
-                       WHERE ml.source_id IN (
-                           SELECT id FROM memories WHERE source_ref=? AND is_latest=1 LIMIT 5
-                       ) AND ml.weight >= 2 AND m2.is_latest=1
-                   ))
-                   AND is_latest=1
-                   ORDER BY created_at DESC
-                   LIMIT 3""",
+            import re as _re
+            from datetime import datetime as _dt
+            _raw_failures = _db_query(
+                """SELECT m.content, m.created_at, 3.0 AS link_weight
+                   FROM memories m
+                   WHERE m.memory_type='EPISODE_FAILURE' AND m.source_ref=? AND m.is_latest=1
+                   UNION ALL
+                   SELECT m2.content, m2.created_at, ml.weight
+                   FROM memory_links ml
+                   JOIN memories m2 ON ml.target_id = m2.id
+                   WHERE ml.source_id IN (
+                       SELECT id FROM memories WHERE source_ref=? AND is_latest=1 LIMIT 5
+                   ) AND ml.weight >= 2 AND m2.is_latest=1 AND m2.memory_type='EPISODE_FAILURE'
+                   LIMIT 20""",
                 (ctx.topic, ctx.topic),
             )
-            if _failures:
-                _fail_lines = [f"  - {r['content'][:180]}" for r in _failures]
-                _fail_block = "[PREVIOUS FAILURES — avoid repeating these mistakes]\n" + "\n".join(_fail_lines)
-                ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _fail_block
-                print(f"[FAIL-REUSE] Injecting {len(_failures)} previous failure(s) for '{ctx.topic}'")
+            if _raw_failures:
+                _now = _dt.now()
+                def _fscore(r):
+                    try:
+                        _hrs = (_now - _dt.fromisoformat(r["created_at"])).total_seconds() / 3600
+                    except Exception:
+                        _hrs = 168
+                    return 0.6 * float(r["link_weight"]) + 0.4 / (1.0 + _hrs)
+
+                # Rank, then dedup by error_type (keep best-scored per type)
+                _ranked = sorted(_raw_failures, key=_fscore, reverse=True)
+                _seen_types: set = set()
+                _deduped = []
+                for _r in _ranked:
+                    _m = _re.search(r"Error type:\s*(\S+)", _r["content"])
+                    _etype = _m.group(1).rstrip(".") if _m else "unknown"
+                    if _etype not in _seen_types:
+                        _seen_types.add(_etype)
+                        _deduped.append(_r)
+                    if len(_deduped) == 3:
+                        break
+
+                if _deduped:
+                    _fail_lines = [f"  - {r['content'][:180]}" for r in _deduped]
+                    _fail_block = "[PREVIOUS FAILURES — avoid repeating these mistakes]\n" + "\n".join(_fail_lines)
+                    ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _fail_block
+                    print(f"[FAIL-REUSE] Injecting {len(_deduped)} previous failure(s) for '{ctx.topic}' "
+                          f"(types: {list(_seen_types)})")
         except Exception:
             pass  # always non-fatal
 
