@@ -294,6 +294,13 @@ class MemoryExtractor:
                     ),
                 )
                 saved += 1
+
+                # Build cross-reference links for this memory
+                try:
+                    from link_builder import MemoryLinkBuilder
+                    MemoryLinkBuilder.build_links(mem.id, mem.entities, mem.container_tag)
+                except Exception as _link_err:
+                    logger.debug("[LINKS] Non-fatal link build error: %s", _link_err)
             except Exception as exc:
                 logger.warning("[MEMORY] Failed to save memory: %s — %s", mem.content[:60], exc)
 

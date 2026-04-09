@@ -31,6 +31,10 @@ from backend.benchmark_generator import is_network_topic
 # MAX_RETRY lives here (was a module-level constant in study_agent.py)
 MAX_RETRY = 3
 
+# L3 context gate: predicted score below this threshold triggers deep context load
+# (cross-topic memory links). Set here for easy tuning.
+L3_THRESHOLD = 6.0
+
 
 # ── 1. InitPhase ─────────────────────────────────────────────────────────────
 
@@ -129,6 +133,51 @@ class InitPhase(BasePhase):
                 print(f"[MEMORY P0] Prior knowledge injected ({_prior.count(chr(10))} lines) for '{ctx.topic}'")
         except Exception:
             pass  # always non-fatal
+
+        # L3 gate: cross-topic memory links (from link_builder / #40)
+        # Only loaded when SHARD is likely to struggle:
+        #   - predicted score below L3_THRESHOLD, OR
+        #   - topic is a known blind spot, OR
+        #   - there are previous failures on this topic
+        _predicted    = getattr(ctx, "predicted_score", None)
+        _blind_spots  = getattr(ctx, "blind_spots", []) or []
+        _has_failures = getattr(ctx, "previous_attempts", 0) >= 1
+        _is_blind     = ctx.topic in _blind_spots or any(
+            bs.lower() in ctx.topic.lower() for bs in _blind_spots
+        )
+        _load_l3 = (
+            _predicted is None               # new topic: load to be safe
+            or _predicted < L3_THRESHOLD     # predicted struggle
+            or _is_blind                     # known blind spot
+            or _has_failures                 # past failures on this topic
+        )
+        _l3_reason = (
+            ("new_topic " if _predicted is None else "")
+            + (f"low_pred={_predicted:.1f} " if _predicted is not None and _predicted < L3_THRESHOLD else "")
+            + ("blind_spot " if _is_blind else "")
+            + ("retry " if _has_failures else "")
+        ).strip() or "n/a"
+        print(f"[L3] loaded={_load_l3} predicted={_predicted} attempts={getattr(ctx, 'previous_attempts', 0)} reason={_l3_reason}")
+
+        if _load_l3:
+            try:
+                from link_builder import MemoryLinkBuilder
+                _cross = MemoryLinkBuilder.get_cross_topic_links(
+                    ctx.topic, min_weight=2, limit=10
+                )
+                if _cross:
+                    _cross_lines = [
+                        f"  [{r['source_ref']}] {r['content']} (confidence={r['confidence']:.2f})"
+                        for r in _cross
+                    ]
+                    _cross_block = (
+                        "[CROSS-TOPIC MEMORY LINKS — related knowledge from other domains]\n"
+                        + "\n".join(_cross_lines)
+                    )
+                    ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _cross_block
+                    print(f"[L3] Injected {len(_cross)} cross-topic link(s) for '{ctx.topic}'")
+            except Exception:
+                pass  # always non-fatal
 
 
 # ── 2. MapPhase ──────────────────────────────────────────────────────────────

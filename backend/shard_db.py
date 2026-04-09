@@ -231,6 +231,26 @@ def _run_migrations(conn: sqlite3.Connection) -> None:
         """)
         logger.info("[SHARD_DB] Migration v6 applied -- predictions + self_inconsistencies + session_reflections tables")
 
+    if current < 7:
+        conn.executescript("""
+            -- Cross-reference graph: bidirectional entity-overlap links between memories
+            CREATE TABLE IF NOT EXISTS memory_links (
+                source_id  TEXT NOT NULL,
+                target_id  TEXT NOT NULL,
+                link_type  TEXT NOT NULL DEFAULT 'entity_overlap',
+                weight     REAL NOT NULL DEFAULT 1.0,   -- len(shared_entities)
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                PRIMARY KEY (source_id, target_id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_mlink_source ON memory_links(source_id);
+            CREATE INDEX IF NOT EXISTS idx_mlink_target ON memory_links(target_id);
+            CREATE INDEX IF NOT EXISTS idx_mlink_weight ON memory_links(weight);
+
+            INSERT OR REPLACE INTO schema_version (version, applied_at)
+            VALUES (7, datetime('now'));
+        """)
+        logger.info("[SHARD_DB] Migration v7 applied -- memory_links table")
+
 
 def get_db() -> sqlite3.Connection:
     """Return the singleton SQLite connection.

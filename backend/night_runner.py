@@ -1202,26 +1202,41 @@ class NightRunner:
         except Exception as _ve_err:
             self.logger.warning("[VISION] non-fatal: %s", _ve_err)
 
-        # ── SESSION REFLECTION -- inject past context ───────────────────────────
+        # ── SESSION REFLECTION -- inject past context (L1 gate) ────────────────
+        # Skip on early sessions (total_experiments <= 5) or 'early' momentum
+        # unless session count exceeds 15 (safety fallback to always load).
+        # This avoids injecting stale/noisy reflection when SHARD has little history.
         try:
-            from backend.session_reflection import make_session_reflection as _make_sr
-            _session_reflection = _make_sr(llm_call_fn=None)  # LLM attached at end of session
-            _sr_block = _session_reflection.get_context_block()
-            # Also inject open questions from SelfModelTracker (real prediction errors)
-            try:
-                from backend.self_model_tracker import SelfModelTracker as _SMT
-                _hypo_block = _SMT.get_context_block()
-            except Exception:
-                _hypo_block = ""
-            _full_context = "\n\n".join(b for b in [_sr_block, _hypo_block] if b)
-            if _full_context:
+            _total_exp = _self_model.total_experiments if _self_model else 0
+            _momentum  = _self_model.momentum if _self_model else "early"
+            _load_reflection = (
+                _total_exp > 15                              # always load after 15 experiments
+                or (_total_exp > 5 and _momentum != "early") # load if some history and not early
+            )
+            if not _load_reflection:
                 self.logger.info(
-                    "[REFLECTION] Past context loaded (%d chars) -- injecting into study_agent system prompt.",
-                    len(_full_context),
+                    "[REFLECTION] Skipped (L1 gate): experiments=%d momentum=%s -- too early for reflection.",
+                    _total_exp, _momentum,
                 )
-                study_agent.session_context = _full_context
             else:
-                self.logger.info("[REFLECTION] No past context -- first session.")
+                from backend.session_reflection import make_session_reflection as _make_sr
+                _session_reflection = _make_sr(llm_call_fn=None)  # LLM attached at end of session
+                _sr_block = _session_reflection.get_context_block()
+                # Also inject open questions from SelfModelTracker (real prediction errors)
+                try:
+                    from backend.self_model_tracker import SelfModelTracker as _SMT
+                    _hypo_block = _SMT.get_context_block()
+                except Exception:
+                    _hypo_block = ""
+                _full_context = "\n\n".join(b for b in [_sr_block, _hypo_block] if b)
+                if _full_context:
+                    self.logger.info(
+                        "[REFLECTION] Past context loaded (%d chars) -- injecting into study_agent system prompt.",
+                        len(_full_context),
+                    )
+                    study_agent.session_context = _full_context
+                else:
+                    self.logger.info("[REFLECTION] No past context -- first session.")
         except Exception as _sr_err:
             self.logger.warning("[REFLECTION] non-fatal: %s", _sr_err)
 
@@ -1609,11 +1624,28 @@ class NightRunner:
                     except Exception as _mi_err:
                         self.logger.debug("[MOOD] inject non-fatal: %s", _mi_err)
 
+                # Compute previous_attempts for L3 gate: failed experiments on this topic
+                _prev_attempts = 0
+                try:
+                    from shard_db import query as _q_prev
+                    _prev_attempts = len([
+                        r for r in _q_prev(
+                            "SELECT certified FROM experiments WHERE topic=? "
+                            "ORDER BY timestamp DESC LIMIT 10", (topic,)
+                        )
+                        if not r["certified"]
+                    ])
+                except Exception:
+                    pass
+
                 best_score = await study_agent.study_topic(
                     topic=topic,
                     tier=persona_cfg.tier,
                     on_certify=on_certify,
                     previous_score=prev_score,
+                    predicted_score=_predicted_score,
+                    blind_spots=list(_self_model.blind_spots) if _self_model else [],
+                    previous_attempts=_prev_attempts,
                 )
 
                 # Restore session_context -- strip mood and skill lib prefixes

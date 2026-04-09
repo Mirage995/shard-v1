@@ -55,6 +55,11 @@ class StudyContext:
     strategy_used: Optional[str] = None
     strategy_obj: Any = None
 
+    # ── L3 gate signals (set by NightRunner before study_topic()) ────────
+    predicted_score: Optional[float] = None   # self_model_tracker prediction for this topic
+    blind_spots: List[str] = field(default_factory=list)  # from SelfModel.blind_spots
+    previous_attempts: int = 0                # past failure count for this topic (from DB)
+
     # ── Reliability tracking ─────────────────────────────────────────────────
     classified_error_type: Optional[str] = None
     error_signature: Optional[str] = None

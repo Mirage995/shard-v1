@@ -1454,6 +1454,9 @@ AUTO-EXAM (Questions and Answers):
         on_error: Optional[Callable] = None,
         previous_score: float = None,
         task_context: str = "",
+        predicted_score: Optional[float] = None,
+        blind_spots: Optional[list] = None,
+        previous_attempts: int = 0,
     ):
         """Complete study loop -- delegates to StudyPipeline.
 
@@ -1485,6 +1488,9 @@ AUTO-EXAM (Questions and Answers):
             on_error=on_error,
             on_web_data=on_web_data,
             task_context=task_context,
+            predicted_score=predicted_score,
+            blind_spots=blind_spots or [],
+            previous_attempts=previous_attempts,
         )
 
         pipeline = StudyPipeline([
