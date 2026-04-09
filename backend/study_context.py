@@ -65,6 +65,7 @@ class StudyContext:
     error_signature: Optional[str] = None
     files_modified: List[str] = field(default_factory=list)
     attempt: int = 0
+    resolved_errors: set = field(default_factory=set)  # error_types fixed this session
 
     # ── Critical thinking -- LLM meta-critique on stuck topics ────────────────
     critic_meta_critique: Optional[str] = None  # set by CritAgent.analyze_with_llm on attempt>=2

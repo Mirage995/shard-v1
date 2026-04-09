@@ -35,6 +35,9 @@ MAX_RETRY = 3
 # (cross-topic memory links). Set here for easy tuning.
 L3_THRESHOLD = 6.0
 
+# Synthetic link_weight assigned to same-topic failures (beats cross-topic borderlines).
+SAME_TOPIC_BOOST = 3.5
+
 
 # ── 1. InitPhase ─────────────────────────────────────────────────────────────
 
@@ -186,8 +189,9 @@ class InitPhase(BasePhase):
             from shard_db import query as _db_query
             import re as _re
             from datetime import datetime as _dt
+            _resolved = getattr(ctx, "resolved_errors", set())
             _raw_failures = _db_query(
-                """SELECT m.content, m.created_at, 3.0 AS link_weight
+                """SELECT m.content, m.created_at, ? AS link_weight
                    FROM memories m
                    WHERE m.memory_type='EPISODE_FAILURE' AND m.source_ref=? AND m.is_latest=1
                    UNION ALL
@@ -198,7 +202,7 @@ class InitPhase(BasePhase):
                        SELECT id FROM memories WHERE source_ref=? AND is_latest=1 LIMIT 5
                    ) AND ml.weight >= 2 AND m2.is_latest=1 AND m2.memory_type='EPISODE_FAILURE'
                    LIMIT 20""",
-                (ctx.topic, ctx.topic),
+                (SAME_TOPIC_BOOST, ctx.topic, ctx.topic),
             )
             if _raw_failures:
                 _now = _dt.now()
@@ -207,7 +211,13 @@ class InitPhase(BasePhase):
                         _hrs = (_now - _dt.fromisoformat(r["created_at"])).total_seconds() / 3600
                     except Exception:
                         _hrs = 168
-                    return 0.6 * float(r["link_weight"]) + 0.4 / (1.0 + _hrs)
+                    _s = 0.6 * float(r["link_weight"]) + 0.4 / (1.0 + _hrs)
+                    # Penalise errors already resolved this session
+                    _m2 = _re.search(r"Error type:\s*(\S+)", r["content"])
+                    _et = _m2.group(1).rstrip(".") if _m2 else ""
+                    if _et and _et in _resolved:
+                        _s *= 0.5
+                    return _s
 
                 # Rank, then dedup by error_type (keep best-scored per type)
                 _ranked = sorted(_raw_failures, key=_fscore, reverse=True)
@@ -911,6 +921,10 @@ class CertifyRetryGroup(BasePhase):
             if ctx.certified:
                 await ctx.emit("CERTIFY", ctx.score, f"Topic certified! Score: {ctx.score}/10")
                 await ctx.emit("CERTIFY", ctx.score, f"SHARD stance: {ctx.eval_data.get('shard_stance', '')[:120]}")
+                # Mark any classified error from this attempt as resolved so
+                # the next topic's [PREVIOUS FAILURES] block won't over-warn.
+                if ctx.classified_error_type:
+                    ctx.resolved_errors.add(ctx.classified_error_type)
                 if ctx.on_certify:
                     await ctx.on_certify(ctx.topic, ctx.score, {
                         **ctx.eval_data,
