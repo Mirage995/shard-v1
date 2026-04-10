@@ -1,0 +1,16 @@
+{
+  "timestamp": "20260410_142745",
+  "max_attempts": 5,
+  "n_topics": 0,
+  "summary": {
+    "naked_cert": 0,
+    "shard_cert": 0,
+    "naked_wins": 0,
+    "shard_wins": 0,
+    "ties": 0,
+    "naked_avg_attempts": 0,
+    "shard_avg_attempts": 0,
+    "verdict": "PAREGGIO"
+  },
+  "results": []
+}

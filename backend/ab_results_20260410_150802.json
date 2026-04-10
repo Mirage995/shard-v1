@@ -1,0 +1,103 @@
+{
+  "timestamp": "20260410_150802",
+  "max_attempts": 5,
+  "n_topics": 1,
+  "summary": {
+    "naked_cert": 0,
+    "shard_cert": 0,
+    "naked_wins": 0,
+    "shard_wins": 0,
+    "ties": 1,
+    "naked_avg_attempts": 5.0,
+    "shard_avg_attempts": 5.0,
+    "verdict": "PAREGGIO"
+  },
+  "results": [
+    {
+      "topic": "dns resolution python",
+      "n_tests": 5,
+      "shard_ctx_chars": 1024,
+      "naked": {
+        "label": "NAKED",
+        "topic": "dns resolution python",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "dns resolution python",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.6,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          }
+        ],
+        "shard_ctx_chars": 1024
+      },
+      "winner": "SHARD_BETTER"
+    }
+  ]
+}

@@ -24,3 +24,6 @@ toml
 jsonpickle
 orjson
 marshmallow
+cryptography
+aiohttp
+tensorflow

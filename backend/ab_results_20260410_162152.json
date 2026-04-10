@@ -1,0 +1,2354 @@
+{
+  "timestamp": "20260410_162152",
+  "n_topics": 20,
+  "max_attempts": 5,
+  "gate_threshold": 6.5,
+  "summary": {
+    "naked": {
+      "cert": 0,
+      "pass_pct": 0.0,
+      "avg_att": 5.0,
+      "avg_time": null
+    },
+    "shard": {
+      "cert": 0,
+      "pass_pct": 0.0,
+      "avg_att": 5.0,
+      "avg_time": null
+    },
+    "gated": {
+      "cert": 0,
+      "pass_pct": 0.0,
+      "avg_att": 5.0,
+      "avg_time": null
+    },
+    "gated_wins": 0,
+    "naked_wins": 0,
+    "ties": 20,
+    "verdict": "PAREGGIO",
+    "hard_topics": 8,
+    "easy_topics": 12
+  },
+  "results": [
+    {
+      "topic": "network protocol design patterns",
+      "naked": {
+        "label": "NAKED",
+        "topic": "network protocol design patterns",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "network protocol design patterns",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 299,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "network protocol design patterns",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 8.3,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "Python metrics isolation test independence",
+      "naked": {
+        "label": "NAKED",
+        "topic": "Python metrics isolation test independence",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "Python metrics isolation test independence",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 242,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "Python metrics isolation test independence",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 242,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 2.6,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
+      "naked": {
+        "label": "NAKED",
+        "topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 366,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 366,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 6.1,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "profiling and optimization python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "profiling and optimization python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "profiling and optimization python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 309,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "profiling and optimization python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 309,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 6.47,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "trie data structure",
+      "naked": {
+        "label": "NAKED",
+        "topic": "trie data structure",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "trie data structure",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 281,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "trie data structure",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 8.43,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "algorithm complexity and performance optimization",
+      "naked": {
+        "label": "NAKED",
+        "topic": "algorithm complexity and performance optimization",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "algorithm complexity and performance optimization",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 324,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "algorithm complexity and performance optimization",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 8.34,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "password hashing bcrypt argon2",
+      "naked": {
+        "label": "NAKED",
+        "topic": "password hashing bcrypt argon2",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "password hashing bcrypt argon2",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 303,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "password hashing bcrypt argon2",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 303,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 5.34,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "python bytecode and dis module",
+      "naked": {
+        "label": "NAKED",
+        "topic": "python bytecode and dis module",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "python bytecode and dis module",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 337,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "python bytecode and dis module",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 9.1,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "redis data structures python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "redis data structures python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "redis data structures python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 447,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "redis data structures python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 447,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 1.4,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "circuit breaker pattern python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "circuit breaker pattern python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "circuit breaker pattern python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 303,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "circuit breaker pattern python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 7.2,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "redis data structures implementation python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "redis data structures implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "redis data structures implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 329,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "redis data structures implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 329,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 5.85,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "websocket protocol implementation",
+      "naked": {
+        "label": "NAKED",
+        "topic": "websocket protocol implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "websocket protocol implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 444,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "websocket protocol implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 444,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 1.4,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "convolutional neural network basics",
+      "naked": {
+        "label": "NAKED",
+        "topic": "convolutional neural network basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "convolutional neural network basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 466,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "convolutional neural network basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 466,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 3.0,
+        "use_shard": true,
+        "difficulty_bucket": "hard"
+      }
+    },
+    {
+      "topic": "decision tree implementation",
+      "naked": {
+        "label": "NAKED",
+        "topic": "decision tree implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "decision tree implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 300,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "decision tree implementation",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 9.0,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "python context managers and resource management",
+      "naked": {
+        "label": "NAKED",
+        "topic": "python context managers and resource management",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "python context managers and resource management",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 337,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "python context managers and resource management",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 9.3,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "http client implementation python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "http client implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "http client implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 308,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "http client implementation python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 8.87,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "neural network",
+      "naked": {
+        "label": "NAKED",
+        "topic": "neural network",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "neural network",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 463,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "neural network",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 8.0,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "random forest bagging ensemble python",
+      "naked": {
+        "label": "NAKED",
+        "topic": "random forest bagging ensemble python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "random forest bagging ensemble python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 330,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "random forest bagging ensemble python",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 9.1,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "python thread safety basics",
+      "naked": {
+        "label": "NAKED",
+        "topic": "python thread safety basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "python thread safety basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 341,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "python thread safety basics",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 7.9,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    },
+    {
+      "topic": "linear regression numpy",
+      "naked": {
+        "label": "NAKED",
+        "topic": "linear regression numpy",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "linear regression numpy",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 289,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "gated": {
+        "label": "GATED",
+        "topic": "linear regression numpy",
+        "certified": false,
+        "attempts_needed": 5,
+        "time_to_success": null,
+        "shard_ctx_chars": 0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 2,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 3,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 4,
+            "passed": false,
+            "elapsed": 0.0
+          },
+          {
+            "attempt": 5,
+            "passed": false,
+            "elapsed": 0.0
+          }
+        ]
+      },
+      "winner_naked_vs_shard": "TIE_FAIL",
+      "winner_naked_vs_gated": "TIE_FAIL",
+      "winner_gated_vs_shard": "TIE_FAIL",
+      "gated_meta": {
+        "predicted_score": 6.55,
+        "use_shard": false,
+        "difficulty_bucket": "easy"
+      }
+    }
+  ]
+}

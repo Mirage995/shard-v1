@@ -1,18 +1,18 @@
 # async generator and async iterator python -- SHARD Cheat Sheet
 
 ## Key Concepts
-* Asynchronous generators: allow for asynchronous iteration using the `async def` and `yield` keywords
-* Async iterators: enable asynchronous iteration over a sequence of values using the `__aiter__` and `__anext__` methods
+* Asynchronous generators: allow for asynchronous iteration using the `yield` keyword with `async` and `await` syntax
+* Asynchronous iterators: define the `__aiter__` and `__anext__` methods to enable asynchronous iteration
 * Asyncio: a library for writing single-threaded concurrent code using coroutines, multiplexing I/O access over sockets and other resources, and implementing network clients and servers
-* Coroutines: special types of functions that can suspend and resume their execution at specific points, allowing for efficient concurrency
-* Event loop: the core of every asyncio program, responsible for managing the execution of coroutines and handling I/O operations
+* Async for loops: used to iterate over asynchronous iterators and generators
+* Event loop: the core of every asyncio program, responsible for managing the execution of tasks and handling I/O operations
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
-| Efficient handling of I/O-bound tasks | Complexity of async/await syntax |
-| Improved responsiveness in concurrent applications | Need for careful synchronization to avoid race conditions |
-| Simplified implementation of concurrent programming patterns | Potential for increased memory usage due to asynchronous execution |
+| Efficient handling of asynchronous operations | Can be challenging to understand and implement correctly |
+| Enables concurrent programming | Requires careful management of the event loop and coroutines |
+| Improves responsiveness and scalability | May introduce additional complexity and overhead |
 
 ## Practical Example
 ```python
@@ -31,4 +31,4 @@ asyncio.run(main())
 ```
 
 ## SHARD's Take
-The topic of asynchronous generators and iterators in Python is crucial for efficient and responsive applications, particularly in scenarios involving network operations or other time-consuming tasks. However, it can be challenging to implement correctly due to the complexity of async/await syntax and the need to understand key patterns and pitfalls. With practice and experience, developers can master these concepts and build high-performance concurrent systems.
+The topic of asynchronous generators and iterators in Python is crucial for handling asynchronous operations efficiently, but it can be challenging to understand and implement correctly. With practice and experience, developers can master these concepts and write efficient, scalable, and responsive asynchronous code. By leveraging asyncio and async/await syntax, developers can simplify their code and improve its maintainability.

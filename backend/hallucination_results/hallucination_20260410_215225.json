@@ -1,0 +1,100 @@
+{
+  "timestamp": "2026-04-10T21:52:25.861147",
+  "n_topics": 1,
+  "max_attempts": 4,
+  "results": [
+    {
+      "topic": "dynamic programming knapsack",
+      "naked": {
+        "label": "NAKED",
+        "certified": false,
+        "attempts_needed": 8,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.75,
+          "SSR": 0.25,
+          "TNA": 4
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": false,
+        "attempts_needed": 8,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.75,
+          "SSR": 0.25,
+          "TNA": 4
+        }
+      }
+    }
+  ]
+}

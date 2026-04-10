@@ -46,5 +46,29 @@
   "threading event and condition python": {
     "resolved_at": "2026-04-09T00:33:56.119481",
     "score": 9.1
+  },
+  "mock object creation": {
+    "resolved_at": "2026-04-09T17:11:44.894361",
+    "score": 7.9
+  },
+  "mocking and patching unittest mock": {
+    "resolved_at": "2026-04-09T17:08:51.167634",
+    "score": 7.9
+  },
+  "python signal handling": {
+    "resolved_at": "2026-04-10T11:50:30.750728",
+    "score": 9.1
+  },
+  "random forest bagging ensemble python": {
+    "resolved_at": "2026-04-10T11:59:36.700777",
+    "score": 9.1
+  },
+  "signal handling unix python": {
+    "resolved_at": "2026-04-10T13:32:50.302889",
+    "score": 9.1
+  },
+  "unix signal basics": {
+    "resolved_at": "2026-04-10T13:35:44.380883",
+    "score": 9.1
   }
 }

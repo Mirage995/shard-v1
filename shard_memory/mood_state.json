@@ -1,10 +1,10 @@
 {
-  "mood_score": -0.125,
-  "label": "strained",
-  "updated_at": "2026-04-09T13:12:11.853211",
+  "mood_score": -0.08,
+  "label": "neutral",
+  "updated_at": "2026-04-10T17:23:00.801244",
   "components": {
-    "frustration": 0.6,
-    "cert_rate": 0.5,
+    "frustration": 0.66,
+    "cert_rate": 0.714,
     "momentum": 0.0
   }
 }

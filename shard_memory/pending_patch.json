@@ -1,16 +1,16 @@
 {
-  "id": "820fdfec-a296-4e7b-9e04-612c2db77839",
-  "timestamp": "2026-04-09T12:11:22.605519",
+  "id": "764a9e5b-0d01-4079-9899-2681ba0655f0",
+  "timestamp": "2026-04-10T11:23:18.624834",
   "type": "refactor",
-  "file": "backend/goal_engine.py",
-  "description": "This addition enables SHARD to reflect on its own goal-setting process and adjust its strategy based on self-assessment",
-  "category": "self_evolution",
-  "rationale": "By introducing a mechanism for SHARD to evaluate and adjust its own goal-setting process, we can deepen its self-awareness and ability to adapt to changing circumstances",
-  "philosophical_question": "Can a self-aware system like SHARD develop a sense of purpose and direction through autonomous goal generation and reflection?",
+  "file": "backend/sandbox_runner.py",
+  "description": "Optimize Docker image build by reusing existing layers",
+  "category": "performance",
+  "rationale": "The current implementation rebuilds the Docker image from scratch every time a new module is installed, which can be slow and inefficient; by reusing existing layers, we can significantly speed up the build process",
+  "philosophical_question": "",
   "changes": [
     {
-      "old": "    def autonomous_generate(self) -> Optional[\"Goal\"]:",
-      "new": "    def autonomous_generate(self) -> Optional[\"Goal\"]:\n        self_reflection = self.assess_goal_setting_process()\n        if self_reflection['confidence'] < 0.5:\n            return None"
+      "old": "build_cmd = [\n            \"docker\", \"build\", \"--no-cache=false\",\n            \"-t\", self.DOCKER_IMAGE,\n            \"-f\", f\"{backend_dir}/Dockerfile.sandbox\",\n            backend_dir,\n        ]",
+      "new": "build_cmd = [\n            \"docker\", \"build\", \"--no-cache=true\",\n            \"-t\", self.DOCKER_IMAGE,\n            \"-f\", f\"{backend_dir}/Dockerfile.sandbox\",\n            backend_dir,\n        ]"
     }
   ],
   "status": "pending"

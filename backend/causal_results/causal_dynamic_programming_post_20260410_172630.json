@@ -1,0 +1,84 @@
+{
+  "phase": "post",
+  "topic": "dynamic programming",
+  "timestamp": "2026-04-10T17:26:30.121812",
+  "naked": {
+    "label": "NAKED",
+    "certified": false,
+    "attempts_needed": 8,
+    "time_to_cert": null,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_9d3018a8.py\", line 33, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 2,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_fa7b6d5f.py\", line 38, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 3,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_591a5d1f.py\", line 33, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 4,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_767dad1f.py\", line 39, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      }
+    ]
+  },
+  "shard": {
+    "label": "SHARD",
+    "certified": false,
+    "attempts_needed": 8,
+    "time_to_cert": null,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_41ced32f.py\", line 33, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 2,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_b257fa8a.py\", line 39, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 3,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_e50ee99b.py\", line 39, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 4,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_2acfa165.py\", line 39, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      }
+    ]
+  },
+  "verdict": "TIE_FAIL",
+  "shard_state": {
+    "strategies": [
+      {
+        "topic": "dynamic programming",
+        "score": 8.5,
+        "preview": "[dynamic programming] Concepts: Optimal Substructure, Overlapping Subproblems, M"
+      },
+      {
+        "topic": "python functions",
+        "score": 7.75,
+        "preview": "[python functions] Concepts: Built-in Functions, Mathematical Functions, Functio"
+      },
+      {
+        "topic": "strategy pattern runtime behavior python",
+        "score": 7.75,
+        "preview": "[strategy pattern runtime behavior python] Concepts: Strategy Pattern, Context C"
+      }
+    ],
+    "kb_exists": false,
+    "episodic_failures": 0,
+    "context_chars": 943
+  }
+}

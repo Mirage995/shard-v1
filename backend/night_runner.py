@@ -2530,6 +2530,25 @@ class NightRunner:
         except Exception as _deriv_err:
             self.logger.debug("[DERIVATION] Non-fatal: %s", _deriv_err)
 
+        # ── BENCHMARK FORGE (generate hard tasks from certified topics) ───────
+        try:
+            from benchmark_forge import forge_from_session
+            _forge_certified = [c["topic"] for c in self.session_data if c.get("certified")]
+            if len(_forge_certified) >= 2:
+                _forge_tasks = await forge_from_session(_forge_certified)
+                if _forge_tasks:
+                    self.logger.info(
+                        "[FORGE] Generated %d new benchmark task(s): %s",
+                        len(_forge_tasks),
+                        [t.name for t in _forge_tasks],
+                    )
+                else:
+                    self.logger.info("[FORGE] No tasks generated this session")
+            else:
+                self.logger.debug("[FORGE] Need ≥2 certified topics to forge tasks (got %d)", len(_forge_certified))
+        except Exception as _forge_err:
+            self.logger.warning("[FORGE] Non-fatal: %s", _forge_err)
+
         self.logger.info("Session complete. Shutting down cleanly.")
 
     async def _run_benchmarks(self):

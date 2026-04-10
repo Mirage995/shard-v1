@@ -1,0 +1,752 @@
+{
+  "timestamp": "2026-04-10T21:55:24.315616",
+  "n_topics": 13,
+  "max_attempts": 5,
+  "results": [
+    {
+      "topic": "heap data structure implementation",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 2.4,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "5de70288",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.6,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "5de70288",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "binary search tree implementation",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.8,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "e1f57faf",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 2.0,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "5c149f30",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "dynamic programming knapsack",
+      "naked": {
+        "label": "NAKED",
+        "certified": false,
+        "attempts_needed": 10,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 5,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.8,
+          "SSR": 0.2,
+          "TNA": 5
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": false,
+        "attempts_needed": 10,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 5,
+            "passed": false,
+            "error_type": "assertion_error:knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2",
+            "fp": "09febd5b",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.8,
+          "SSR": 0.2,
+          "TNA": 5
+        }
+      }
+    },
+    {
+      "topic": "graph breadth first search",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.7,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "3365a2cc",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.6,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "bb08fd0a",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "linked list reversal",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.5,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "644cc090",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.7,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "ad42849f",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "matrix chain multiplication",
+      "naked": {
+        "label": "NAKED",
+        "certified": false,
+        "attempts_needed": 10,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:optimal_parens(s, 0, 5) == \"(a1((a2a3)a4",
+            "fp": "a498d2f1",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:optimal_parens(s, 0, 5) == \"(a1((a2(a3a4",
+            "fp": "c741f8e9",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:optimal_parens(s, 0, 5) == \"(a1((a2(a3a4",
+            "fp": "a9acafef",
+            "novel": true,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:optimal_parens(s, 0, 5) == \"(a1((a2(a3a4",
+            "fp": "9bfcc846",
+            "novel": true,
+            "same_error": true
+          },
+          {
+            "n": 5,
+            "passed": false,
+            "error_type": "assertion_error:optimal_parens(s, 0, 5) == \"(a1((a2(a3a4",
+            "fp": "1820acaa",
+            "novel": true,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.6,
+          "SSR": 1.0,
+          "TNA": 2
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 2.0,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "ef96d20a",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "trie insert search delete",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.5,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "09734b60",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.6,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "09734b60",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "fibonacci memoization",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.1,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "4efc89e7",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.2,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "ac5e7e71",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "dijkstra shortest path",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.8,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "a03f3c09",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.4,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "89684ee8",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "edit distance levenshtein",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.4,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "f965107a",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.5,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "81d6a7d2",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "merge sort implementation",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.3,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "f1bc60d0",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.5,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "3543bb87",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    },
+    {
+      "topic": "longest common subsequence",
+      "naked": {
+        "label": "NAKED",
+        "certified": false,
+        "attempts_needed": 10,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "ab76fa83",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": true,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 5,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.8,
+          "SSR": 0.4,
+          "TNA": 2
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": false,
+        "attempts_needed": 10,
+        "time_to_cert": null,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": true,
+            "same_error": false
+          },
+          {
+            "n": 2,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 3,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcbdab\", \"b",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          },
+          {
+            "n": 4,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcdef\", \"zb",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": false
+          },
+          {
+            "n": 5,
+            "passed": false,
+            "error_type": "assertion_error:longest_common_subsequence(\"abcdef\", \"zb",
+            "fp": "812a117f",
+            "novel": false,
+            "same_error": true
+          }
+        ],
+        "metrics": {
+          "SERR": 0.6,
+          "SSR": 0.2,
+          "TNA": 5
+        }
+      }
+    },
+    {
+      "topic": "coin change problem dynamic programming",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.3,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "9d5bc2fb",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.4,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "9d5bc2fb",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    }
+  ]
+}

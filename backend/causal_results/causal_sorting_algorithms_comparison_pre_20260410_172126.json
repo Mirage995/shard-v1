@@ -1,0 +1,54 @@
+{
+  "phase": "pre",
+  "topic": "sorting algorithms comparison",
+  "timestamp": "2026-04-10T17:21:26.262084",
+  "naked": {
+    "label": "NAKED",
+    "certified": true,
+    "attempts_needed": 1,
+    "time_to_cert": 3.9,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": true,
+        "error": ""
+      }
+    ]
+  },
+  "shard": {
+    "label": "SHARD",
+    "certified": true,
+    "attempts_needed": 1,
+    "time_to_cert": 2.0,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": true,
+        "error": ""
+      }
+    ]
+  },
+  "verdict": "TIE",
+  "shard_state": {
+    "strategies": [
+      {
+        "topic": "decision trees",
+        "score": 7.75,
+        "preview": "[decision trees] Concepts: Decision Trees, Ensemble Methods, Splitting Criteria "
+      },
+      {
+        "topic": "skip list probabilistic data structure",
+        "score": 7.75,
+        "preview": "[skip list probabilistic data structure] Concepts: Skip List, Linked List, Proba"
+      },
+      {
+        "topic": "decision trees",
+        "score": 7.75,
+        "preview": "[decision trees] Concepts: Decision Tree, Overfitting, Ensemble Methods | Sandbo"
+      }
+    ],
+    "kb_exists": false,
+    "episodic_failures": 0,
+    "context_chars": 1070
+  }
+}

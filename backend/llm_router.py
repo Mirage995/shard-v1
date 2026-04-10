@@ -23,7 +23,10 @@ import time
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    from pathlib import Path as _Path
+    # Load .env from project root (parent of backend/) regardless of cwd
+    _env_path = _Path(__file__).resolve().parent.parent / ".env"
+    load_dotenv(dotenv_path=_env_path)
 except ImportError:
     pass
 from dataclasses import dataclass, field

@@ -1,0 +1,693 @@
+{
+  "timestamp": "20260410_143709",
+  "max_attempts": 5,
+  "n_topics": 8,
+  "summary": {
+    "naked_cert": 0,
+    "shard_cert": 1,
+    "naked_wins": 0,
+    "shard_wins": 1,
+    "ties": 7,
+    "naked_avg_attempts": 5.0,
+    "shard_avg_attempts": 4.75,
+    "verdict": "SHARD WINS"
+  },
+  "results": [
+    {
+      "topic": "transformer attention mechanism",
+      "n_tests": 5,
+      "shard_ctx_chars": 472,
+      "naked": {
+        "label": "NAKED",
+        "topic": "transformer attention mechanism",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "transformer attention mechanism",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 472
+      },
+      "winner": "TIE"
+    },
+    {
+      "topic": "linear regression numpy",
+      "n_tests": 5,
+      "shard_ctx_chars": 647,
+      "naked": {
+        "label": "NAKED",
+        "topic": "linear regression numpy",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.2,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "linear regression numpy",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.2,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          }
+        ],
+        "shard_ctx_chars": 647
+      },
+      "winner": "TIE"
+    },
+    {
+      "topic": "race condition handling and debugging",
+      "n_tests": 5,
+      "shard_ctx_chars": 909,
+      "naked": {
+        "label": "NAKED",
+        "topic": "race condition handling and debugging",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "race condition handling and debugging",
+        "attempts_needed": 3,
+        "certified": true,
+        "final_pass_rate": 1.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 1.0,
+            "passed": 5,
+            "failed": 0
+          }
+        ],
+        "shard_ctx_chars": 909
+      },
+      "winner": "SHARD"
+    },
+    {
+      "topic": "template parser handling and debugging",
+      "n_tests": 5,
+      "shard_ctx_chars": 920,
+      "naked": {
+        "label": "NAKED",
+        "topic": "template parser handling and debugging",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "template parser handling and debugging",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 920
+      },
+      "winner": "TIE"
+    },
+    {
+      "topic": "async generator",
+      "n_tests": 5,
+      "shard_ctx_chars": 755,
+      "naked": {
+        "label": "NAKED",
+        "topic": "async generator",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "async generator",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 755
+      },
+      "winner": "TIE"
+    },
+    {
+      "topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
+      "n_tests": 5,
+      "shard_ctx_chars": 1000,
+      "naked": {
+        "label": "NAKED",
+        "topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.2,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.4,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.4,
+            "passed": 2,
+            "failed": 3
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.2,
+            "passed": 1,
+            "failed": 4
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.4,
+            "passed": 2,
+            "failed": 3
+          }
+        ],
+        "shard_ctx_chars": 1000
+      },
+      "winner": "SHARD_BETTER"
+    },
+    {
+      "topic": "async io with python selectors",
+      "n_tests": 4,
+      "shard_ctx_chars": 884,
+      "naked": {
+        "label": "NAKED",
+        "topic": "async io with python selectors",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "async io with python selectors",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 4
+          }
+        ],
+        "shard_ctx_chars": 884
+      },
+      "winner": "TIE"
+    },
+    {
+      "topic": "sql injection prevention and input sanitization",
+      "n_tests": 5,
+      "shard_ctx_chars": 518,
+      "naked": {
+        "label": "NAKED",
+        "topic": "sql injection prevention and input sanitization",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.6,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          }
+        ],
+        "shard_ctx_chars": 0
+      },
+      "shard": {
+        "label": "SHARD",
+        "topic": "sql injection prevention and input sanitization",
+        "attempts_needed": 5,
+        "certified": false,
+        "final_pass_rate": 0.0,
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass_rate": 0.6,
+            "passed": 3,
+            "failed": 2
+          },
+          {
+            "attempt": 2,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 3,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 4,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          },
+          {
+            "attempt": 5,
+            "pass_rate": 0.0,
+            "passed": 0,
+            "failed": 5
+          }
+        ],
+        "shard_ctx_chars": 518
+      },
+      "winner": "NAKED_BETTER"
+    }
+  ]
+}

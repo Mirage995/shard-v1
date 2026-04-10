@@ -1,38 +1,41 @@
-# sliding window technique — SHARD Cheat Sheet
+# sliding window technique -- SHARD Cheat Sheet
 
 ## Key Concepts
-* Sliding Window Technique: a method for solving problems by dividing the data into smaller sub-problems and solving each sub-problem only once.
-* Array: a data structure used to store collections of elements, often utilized in the sliding window technique.
-* Time Complexity: the measure of an algorithm's efficiency, crucial for optimizing algorithms using the sliding window technique.
-* String: a sequence of characters, often used in problems that apply the sliding window technique.
+* Sliding Window Technique: an algorithmic approach to optimize time complexity by dividing the data into subarrays or substrings and processing them in a window-like manner.
+* Fixed-Size Window: a type of sliding window with a fixed size, used to solve problems like finding the maximum sum of subarray with K elements.
+* Dynamic-Size Window: a type of sliding window with a variable size, used to solve problems like finding the longest substring with unique characters.
+* Window Boundaries: the start and end indices of the sliding window, which need to be carefully managed to handle edge cases.
 
 ## Pro & Contro
 | Pro | Contro |
 |-----|--------|
-| Optimizes algorithms by reducing the number of operations | Can be nuanced and require careful consideration of problem constraints |
-| Improves time complexity by avoiding redundant calculations | May increase space complexity due to the need for additional variables |
-| Applicable to various problems, including string and array manipulation | Can be difficult to implement for complex problems with multiple constraints |
+| Optimizes time complexity | Can be challenging to implement, especially for dynamic-size windows |
+| Reduces the need for redundant calculations | Requires careful management of window boundaries |
+| Can be applied to various problems, including array and string processing | May not be suitable for all types of problems, such as those with complex dependencies |
 
 ## Practical Example
 ```python
-def max_sum_k_consecutive(arr, k):
+def max_sum_subarray(arr, k):
     """
-    Find the maximum sum of k consecutive elements in an array.
+    Find the maximum sum of subarray with K elements using the sliding window technique.
     """
-    if len(arr) < k:
-        return None
-    max_sum = current_sum = sum(arr[:k])
+    if not arr or k == 0:
+        return 0
+    
+    window_sum = sum(arr[:k])
+    max_sum = window_sum
+    
     for i in range(k, len(arr)):
-        current_sum = current_sum - arr[i - k] + arr[i]
-        max_sum = max(max_sum, current_sum)
+        window_sum = window_sum - arr[i - k] + arr[i]
+        max_sum = max(max_sum, window_sum)
+    
     return max_sum
 
 # Example usage:
 arr = [1, 2, 3, 4, 5]
 k = 3
-result = max_sum_k_consecutive(arr, k)
-print(result)  # Output: 12
+print(max_sum_subarray(arr, k))  # Output: 12
 ```
 
 ## SHARD's Take
-The sliding window technique is a powerful tool for optimizing algorithms, but its application requires careful consideration of the problem's constraints and the trade-offs between time and space complexity. By mastering the sliding window technique, developers can significantly improve the efficiency of their algorithms. Effective use of this technique can lead to more scalable and performant solutions.
+The sliding window technique is a powerful algorithmic approach that can significantly optimize time complexity, but its implementation can be challenging due to the need to carefully manage the window boundaries and handle edge cases. By mastering the sliding window technique, developers can solve a wide range of problems efficiently and effectively. With practice and experience, the technique can become a valuable tool in any developer's toolkit.

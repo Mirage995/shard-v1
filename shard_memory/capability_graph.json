@@ -3303,5 +3303,403 @@
     ],
     "acquired": "2026-04-09T12:04:14.041696",
     "source_topic": "async generator and async iterator python"
+  },
+  "async generator": {
+    "requires": [
+      "async generator and async iterator python"
+    ],
+    "acquired": "2026-04-09T15:27:50.947342",
+    "source_topic": "async generator and async iterator python"
+  },
+  "async iterator": {
+    "requires": [
+      "async generator and async iterator python"
+    ],
+    "acquired": "2026-04-09T15:27:50.957318",
+    "source_topic": "async generator and async iterator python"
+  },
+  "asynchronous iterator": {
+    "requires": [
+      "async generator and async iterator python"
+    ],
+    "acquired": "2026-04-09T15:30:58.686001",
+    "source_topic": "async generator and async iterator python"
+  },
+  "command pattern undo redo python": {
+    "requires": [],
+    "acquired": "2026-04-09T15:36:58.622938",
+    "source_topic": "command pattern undo redo python"
+  },
+  "command pattern": {
+    "requires": [
+      "command pattern undo redo python"
+    ],
+    "acquired": "2026-04-09T15:36:58.637884",
+    "source_topic": "command pattern undo redo python"
+  },
+  "memento pattern": {
+    "requires": [
+      "command pattern undo redo python"
+    ],
+    "acquired": "2026-04-09T15:36:58.652731",
+    "source_topic": "command pattern undo redo python"
+  },
+  "stack data structure": {
+    "requires": [
+      "command pattern undo redo python"
+    ],
+    "acquired": "2026-04-09T15:36:58.669382",
+    "source_topic": "command pattern undo redo python"
+  },
+  "unit testing basics": {
+    "requires": [],
+    "acquired": "2026-04-09T15:40:16.325563",
+    "source_topic": "unit testing basics"
+  },
+  "mock object creation": {
+    "requires": [],
+    "acquired": "2026-04-09T15:58:20.689317",
+    "source_topic": "mock object creation"
+  },
+  "test-driven development": {
+    "requires": [
+      "unit testing basics"
+    ],
+    "acquired": "2026-04-09T16:00:42.960919",
+    "source_topic": "unit testing basics"
+  },
+  "test fixtures": {
+    "requires": [
+      "unit testing basics"
+    ],
+    "acquired": "2026-04-09T16:00:42.971428",
+    "source_topic": "unit testing basics"
+  },
+  "mock object": {
+    "requires": [
+      "mock object creation"
+    ],
+    "acquired": "2026-04-09T16:07:55.609723",
+    "source_topic": "mock object creation"
+  },
+  "mocking and patching unittest mock": {
+    "requires": [],
+    "acquired": "2026-04-09T17:08:19.318155",
+    "source_topic": "mocking and patching unittest mock"
+  },
+  "immutable data structures python": {
+    "requires": [],
+    "acquired": "2026-04-09T17:43:38.832701",
+    "source_topic": "immutable data structures python"
+  },
+  "immutable data structures": {
+    "requires": [
+      "immutable data structures python"
+    ],
+    "acquired": "2026-04-09T17:43:38.846524",
+    "source_topic": "immutable data structures python"
+  },
+  "monadic error handling result type python": {
+    "requires": [],
+    "acquired": "2026-04-09T17:46:32.095713",
+    "source_topic": "monadic error handling result type python"
+  },
+  "result type": {
+    "requires": [
+      "monadic error handling result type python"
+    ],
+    "acquired": "2026-04-09T17:46:32.108315",
+    "source_topic": "monadic error handling result type python"
+  },
+  "monadic error handling": {
+    "requires": [
+      "monadic error handling result type python"
+    ],
+    "acquired": "2026-04-09T17:46:32.121904",
+    "source_topic": "monadic error handling result type python"
+  },
+  "functional programming": {
+    "requires": [
+      "monadic error handling result type python"
+    ],
+    "acquired": "2026-04-09T17:46:32.138543",
+    "source_topic": "monadic error handling result type python"
+  },
+  "python exception handling": {
+    "requires": [],
+    "acquired": "2026-04-09T17:49:58.579634",
+    "source_topic": "python exception handling"
+  },
+  "runtime errors": {
+    "requires": [
+      "python exception handling"
+    ],
+    "acquired": "2026-04-09T17:49:58.590987",
+    "source_topic": "python exception handling"
+  },
+  "signal handling unix python": {
+    "requires": [],
+    "acquired": "2026-04-09T17:58:38.935715",
+    "source_topic": "signal handling unix python"
+  },
+  "signal handling": {
+    "requires": [
+      "signal handling unix python"
+    ],
+    "acquired": "2026-04-09T17:58:38.947043",
+    "source_topic": "signal handling unix python"
+  },
+  "signal module": {
+    "requires": [
+      "signal handling unix python"
+    ],
+    "acquired": "2026-04-09T17:58:38.959565",
+    "source_topic": "signal handling unix python"
+  },
+  "asynchronous system events": {
+    "requires": [
+      "signal handling unix python"
+    ],
+    "acquired": "2026-04-09T17:58:38.971833",
+    "source_topic": "signal handling unix python"
+  },
+  "subprocess and process management python": {
+    "requires": [],
+    "acquired": "2026-04-09T18:01:36.544862",
+    "source_topic": "subprocess and process management python"
+  },
+  "subprocess module": {
+    "requires": [
+      "subprocess and process management python"
+    ],
+    "acquired": "2026-04-09T18:01:36.558282",
+    "source_topic": "subprocess and process management python"
+  },
+  "process communication": {
+    "requires": [
+      "subprocess and process management python"
+    ],
+    "acquired": "2026-04-09T18:01:36.571116",
+    "source_topic": "subprocess and process management python"
+  },
+  "pipe and ipc patterns python": {
+    "requires": [],
+    "acquired": "2026-04-09T18:06:09.442012",
+    "source_topic": "pipe and ipc patterns python"
+  },
+  "file descriptor": {
+    "requires": [
+      "pipe and ipc patterns python"
+    ],
+    "acquired": "2026-04-09T18:06:09.452972",
+    "source_topic": "pipe and ipc patterns python"
+  },
+  "decision trees": {
+    "requires": [],
+    "acquired": "2026-04-10T11:14:09.154283",
+    "source_topic": "decision trees"
+  },
+  "ensemble methods": {
+    "requires": [
+      "decision trees"
+    ],
+    "acquired": "2026-04-10T11:14:09.178593",
+    "source_topic": "decision trees"
+  },
+  "random forests": {
+    "requires": [
+      "decision trees"
+    ],
+    "acquired": "2026-04-10T11:14:09.198700",
+    "source_topic": "decision trees"
+  },
+  "gradient boosting": {
+    "requires": [
+      "decision trees"
+    ],
+    "acquired": "2026-04-10T11:14:09.218562",
+    "source_topic": "decision trees"
+  },
+  "gini impurity": {
+    "requires": [
+      "decision trees"
+    ],
+    "acquired": "2026-04-10T11:14:09.237989",
+    "source_topic": "decision trees"
+  },
+  "splitting criteria": {
+    "requires": [
+      "decision trees"
+    ],
+    "acquired": "2026-04-10T11:21:47.761134",
+    "source_topic": "decision trees"
+  },
+  "python signal handling": {
+    "requires": [],
+    "acquired": "2026-04-10T11:49:40.008436",
+    "source_topic": "python signal handling"
+  },
+  "signal handlers": {
+    "requires": [
+      "python signal handling"
+    ],
+    "acquired": "2026-04-10T11:49:40.019486",
+    "source_topic": "python signal handling"
+  },
+  "random forest bagging ensemble python": {
+    "requires": [],
+    "acquired": "2026-04-10T11:58:29.315679",
+    "source_topic": "random forest bagging ensemble python"
+  },
+  "random forest": {
+    "requires": [
+      "random forest bagging ensemble python"
+    ],
+    "acquired": "2026-04-10T11:58:29.326668",
+    "source_topic": "random forest bagging ensemble python"
+  },
+  "bootstrap aggregation": {
+    "requires": [
+      "random forest bagging ensemble python"
+    ],
+    "acquired": "2026-04-10T11:58:29.354110",
+    "source_topic": "random forest bagging ensemble python"
+  },
+  "ensemble learning": {
+    "requires": [
+      "random forest bagging ensemble python"
+    ],
+    "acquired": "2026-04-10T11:58:29.366634",
+    "source_topic": "random forest bagging ensemble python"
+  },
+  "cqrs command query separation python": {
+    "requires": [],
+    "acquired": "2026-04-10T12:01:48.014802",
+    "source_topic": "cqrs command query separation python"
+  },
+  "command query separation": {
+    "requires": [
+      "cqrs command query separation python"
+    ],
+    "acquired": "2026-04-10T12:01:48.024925",
+    "source_topic": "cqrs command query separation python"
+  },
+  "cqrs pattern": {
+    "requires": [
+      "cqrs command query separation python"
+    ],
+    "acquired": "2026-04-10T12:01:48.035229",
+    "source_topic": "cqrs command query separation python"
+  },
+  "event sourcing": {
+    "requires": [
+      "cqrs command query separation python"
+    ],
+    "acquired": "2026-04-10T12:01:48.045610",
+    "source_topic": "cqrs command query separation python"
+  },
+  "signal registration": {
+    "requires": [
+      "signal handling unix python"
+    ],
+    "acquired": "2026-04-10T13:32:28.769621",
+    "source_topic": "signal handling unix python"
+  },
+  "unix signal basics": {
+    "requires": [],
+    "acquired": "2026-04-10T13:35:17.907194",
+    "source_topic": "unix signal basics"
+  },
+  "signal types": {
+    "requires": [
+      "unix signal basics"
+    ],
+    "acquired": "2026-04-10T13:35:17.916884",
+    "source_topic": "unix signal basics"
+  },
+  "signal actions": {
+    "requires": [
+      "unix signal basics"
+    ],
+    "acquired": "2026-04-10T13:35:17.926711",
+    "source_topic": "unix signal basics"
+  },
+  "recursive descent parser python": {
+    "requires": [],
+    "acquired": "2026-04-10T13:38:03.221898",
+    "source_topic": "recursive descent parser python"
+  },
+  "recursive descent parser": {
+    "requires": [
+      "recursive descent parser python"
+    ],
+    "acquired": "2026-04-10T13:38:03.231604",
+    "source_topic": "recursive descent parser python"
+  },
+  "ll(1) grammar": {
+    "requires": [
+      "recursive descent parser python"
+    ],
+    "acquired": "2026-04-10T13:38:03.240894",
+    "source_topic": "recursive descent parser python"
+  },
+  "strategy pattern runtime behavior python": {
+    "requires": [],
+    "acquired": "2026-04-10T13:40:36.955525",
+    "source_topic": "strategy pattern runtime behavior python"
+  },
+  "strategy pattern": {
+    "requires": [
+      "strategy pattern runtime behavior python"
+    ],
+    "acquired": "2026-04-10T13:40:36.965932",
+    "source_topic": "strategy pattern runtime behavior python"
+  },
+  "context class": {
+    "requires": [
+      "strategy pattern runtime behavior python"
+    ],
+    "acquired": "2026-04-10T13:40:36.975399",
+    "source_topic": "strategy pattern runtime behavior python"
+  },
+  "strategy object": {
+    "requires": [
+      "strategy pattern runtime behavior python"
+    ],
+    "acquired": "2026-04-10T13:40:36.985413",
+    "source_topic": "strategy pattern runtime behavior python"
+  },
+  "python functions": {
+    "requires": [],
+    "acquired": "2026-04-10T13:43:28.092211",
+    "source_topic": "python functions"
+  },
+  "built-in functions": {
+    "requires": [
+      "python functions"
+    ],
+    "acquired": "2026-04-10T13:43:28.102466",
+    "source_topic": "python functions"
+  },
+  "mathematical functions": {
+    "requires": [
+      "python functions"
+    ],
+    "acquired": "2026-04-10T13:43:28.112625",
+    "source_topic": "python functions"
+  },
+  "iterators and generators": {
+    "requires": [
+      "python functions"
+    ],
+    "acquired": "2026-04-10T13:43:28.122776",
+    "source_topic": "python functions"
+  },
+  "optimal substructure": {
+    "requires": [
+      "dynamic programming"
+    ],
+    "acquired": "2026-04-10T17:24:26.021116",
+    "source_topic": "dynamic programming"
   }
 }

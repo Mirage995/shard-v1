@@ -1,0 +1,64 @@
+{
+  "phase": "pre",
+  "topic": "dynamic programming",
+  "timestamp": "2026-04-10T17:22:32.193243",
+  "naked": {
+    "label": "NAKED",
+    "certified": true,
+    "attempts_needed": 3,
+    "time_to_cert": 5.8,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_e340e2e6.py\", line 33, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 2,
+        "passed": false,
+        "error": "Traceback (most recent call last):\n  File \"/app/study_cbcbeb9e.py\", line 38, in <module>\n    assert knapsack([1, 2, 4, 2, 5], [5, 3, 5, 3, 2], 10) == 14\nAssertionError\nmissing 'OK All assertions passe"
+      },
+      {
+        "n": 3,
+        "passed": true,
+        "error": ""
+      }
+    ]
+  },
+  "shard": {
+    "label": "SHARD",
+    "certified": true,
+    "attempts_needed": 1,
+    "time_to_cert": 1.6,
+    "attempts": [
+      {
+        "n": 1,
+        "passed": true,
+        "error": ""
+      }
+    ]
+  },
+  "verdict": "SHARD (fewer attempts)",
+  "shard_state": {
+    "strategies": [
+      {
+        "topic": "python functions",
+        "score": 7.75,
+        "preview": "[python functions] Concepts: Built-in Functions, Mathematical Functions, Functio"
+      },
+      {
+        "topic": "strategy pattern runtime behavior python",
+        "score": 7.75,
+        "preview": "[strategy pattern runtime behavior python] Concepts: Strategy Pattern, Context C"
+      },
+      {
+        "topic": "recursive descent parser python",
+        "score": 7.75,
+        "preview": "[recursive descent parser python] Concepts: Recursive Descent Parser, LL(1) gram"
+      }
+    ],
+    "kb_exists": false,
+    "episodic_failures": 0,
+    "context_chars": 1104
+  }
+}

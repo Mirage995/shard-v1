@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-04-10T21:53:42.962608",
+  "n_topics": 1,
+  "max_attempts": 5,
+  "results": [
+    {
+      "topic": "edit distance levenshtein",
+      "naked": {
+        "label": "NAKED",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 2.1,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "f965107a",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      },
+      "shard": {
+        "label": "SHARD",
+        "certified": true,
+        "attempts_needed": 1,
+        "time_to_cert": 1.6,
+        "attempts": [
+          {
+            "n": 1,
+            "passed": true,
+            "error_type": "",
+            "fp": "81d6a7d2",
+            "novel": true,
+            "same_error": false
+          }
+        ],
+        "metrics": {
+          "SERR": 0.0,
+          "SSR": 1.0,
+          "TNA": null
+        }
+      }
+    }
+  ]
+}

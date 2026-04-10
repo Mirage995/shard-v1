@@ -1,9 +1,9 @@
 {
-  "sessions_lived": 107,
+  "sessions_lived": 119,
   "narrative": "",
-  "total_attempts": 1426,
-  "total_certified": 851,
-  "cert_rate_overall": 0.5847,
+  "total_attempts": 1520,
+  "total_certified": 911,
+  "cert_rate_overall": 0.5878,
   "strong_domains": [
     "algorithms",
     "data",
@@ -13,12 +13,12 @@
   "peak_skills": [
     "Python decorators and metaclasses",
     "python descriptor protocol",
+    "dynamic programming",
     "python object oriented programming",
     "race condition handling and debugging",
     "json parsing and serialization python",
     "python context managers and resource management",
-    "python dataclasses and slots",
-    "two pointer technique"
+    "python dataclasses and slots"
   ],
   "chronic_blocks": [
     "convolutional neural networks (cnns) applied to sorting algorithm tier 1",
@@ -30,9 +30,9 @@
     "exception-driven control flow applied to perceptron",
     "web scraping with beautifulsoup applied to convolutional neural networks (cnns)",
     "dns resolution python",
-    "message queue rabbitmq python"
+    "sliding window technique"
   ],
-  "self_esteem": 0.3709,
-  "trajectory": "stagnating",
-  "updated_at": "2026-04-09T13:14:48.866478"
+  "self_esteem": 0.3827,
+  "trajectory": "growing",
+  "updated_at": "2026-04-10T17:25:21.258877"
 }
