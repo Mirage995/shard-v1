@@ -154,7 +154,26 @@ class BenchmarkRunner:
             f"{assert_expr}\n"
         )
 
-        # ── Step 2b: patch missing recvfrom mock (UDP safety) ─────────────────
+        # ── Step 2b: async solve() wrapper ────────────────────────────────────
+        # LLMs sometimes generate `async def solve()` for async topics despite
+        # the prompt saying to keep it synchronous.  Calling an async function
+        # without await returns a coroutine object, so every assert fails.
+        # Detect the pattern and inject a thin sync shim that calls asyncio.run().
+        if re.search(r"^\s*async\s+def\s+solve\s*\(", implementation, re.MULTILINE):
+            full_code = (
+                f"{implementation.rstrip()}\n\n"
+                f"# --- async solve() shim (auto-injected) ---\n"
+                f"import asyncio as _asyncio, inspect as _inspect\n"
+                f"_solve_orig = solve\n"
+                f"def solve(input_data):\n"
+                f"    return _asyncio.run(_solve_orig(input_data))\n\n"
+                f"# --- benchmark test {test_idx} ---\n"
+                f"{setup}\n"
+                f"{assert_expr}\n"
+            )
+            print(f"[BENCHMARK_RUN] [ASYNC_SHIM] Wrapped async solve() for test {test_idx}")
+
+        # ── Step 2d: patch missing recvfrom mock (UDP safety) ─────────────────
         # LLMs often set recv.return_value but forget recvfrom.return_value.
         # The AST patcher injects it deterministically when needed.
         try:
