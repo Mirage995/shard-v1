@@ -1556,7 +1556,12 @@ Rules:
             from memory_extractor import MemoryExtractor
             # Prefer classified sandbox error; fall back to benchmark_failure for
             # cases where sandbox passed but benchmark gate blocked certification.
-            error_type = str(ctx.classified_error_type) if ctx.classified_error_type else "benchmark_failure"
+            # Fall back to "benchmark_failure" when error is unclassifiable (None,
+            # "generic", "other", "unknown") — those normalise to "other" and would
+            # block the save silently.
+            _raw_et = str(ctx.classified_error_type) if ctx.classified_error_type else ""
+            _unclassifiable = {"", "generic", "other", "unknown", "generic_error"}
+            error_type = _raw_et if _raw_et not in _unclassifiable else "benchmark_failure"
             # Build error message: prefer sandbox stderr, else benchmark pass_rate summary
             stderr_raw = ""
             if ctx.sandbox_result:
@@ -1578,10 +1583,10 @@ Rules:
                 container_tag=getattr(ctx, "container_tag", "shard"),
             )
             if saved:
-                print(f"[MEMORY_FAIL] Stored EPISODE_FAILURE for '{ctx.topic}' "
-                      f"(best_score={best:.1f}, error={error_type})")
+                _logger.info("[MEMORY_FAIL] Stored EPISODE_FAILURE for '%s' (best_score=%.1f, error=%s)",
+                             ctx.topic, best, error_type)
         except Exception as _mf_err:
-            print(f"[MEMORY_FAIL] Non-fatal store error: {_mf_err}")
+            _logger.warning("[MEMORY_FAIL] Non-fatal store error: %s", _mf_err)
 
     async def _retry_gap_fill(self, ctx: StudyContext) -> None:
         """Re-synthesize theory with gap focus + regenerate sandbox code for retry."""
