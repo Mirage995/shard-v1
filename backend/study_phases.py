@@ -18,9 +18,12 @@ Phase list (in pipeline order):
 """
 import asyncio
 import json
+import logging
 import re
 import sys
 from datetime import datetime
+
+_logger = logging.getLogger("shard.study")
 
 from study_pipeline import BasePhase
 from study_context import StudyContext
@@ -236,8 +239,8 @@ class InitPhase(BasePhase):
                     _fail_lines = [f"  - {r['content'][:180]}" for r in _deduped]
                     _fail_block = "[PREVIOUS FAILURES — avoid repeating these mistakes]\n" + "\n".join(_fail_lines)
                     ctx.episode_context = (ctx.episode_context or "") + "\n\n" + _fail_block
-                    print(f"[FAIL-REUSE] Injecting {len(_deduped)} previous failure(s) for '{ctx.topic}' "
-                          f"(types: {list(_seen_types)})")
+                    _logger.info("[FAIL-REUSE] Injecting %d previous failure(s) for '%s' (types: %s)",
+                                 len(_deduped), ctx.topic, list(_seen_types))
         except Exception:
             pass  # always non-fatal
 

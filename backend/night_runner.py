@@ -320,6 +320,20 @@ class NightRunner:
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
+        # Wire all shard.* loggers (memory_extractor, meta_learning, study, …)
+        # to the same file so [MEMORY_FAIL] / [FAIL-REUSE] appear in the log.
+        shard_logger = logging.getLogger("shard")
+        shard_logger.setLevel(logging.INFO)
+        shard_fh = logging.FileHandler(log_file, encoding='utf-8')
+        shard_fh.setFormatter(logging.Formatter(
+            '[%(name)s] [%(asctime)s] %(message)s', datefmt='%H:%M'
+        ))
+        # Avoid duplicate handlers on repeated NightRunner instantiation
+        if not any(isinstance(h, logging.FileHandler) and
+                   getattr(h, 'baseFilename', None) == str(log_file)
+                   for h in shard_logger.handlers):
+            shard_logger.addHandler(shard_fh)
+
     def _query_knowledge_conflicts(self, topic: str) -> list[dict]:
         """Fetch structured GraphRAG conflict rows for the operational detector."""
         try:
