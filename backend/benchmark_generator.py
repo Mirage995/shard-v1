@@ -33,6 +33,32 @@ def is_network_topic(topic: str) -> bool:
     return bool(tokens & _NETWORK_KEYWORDS)
 
 
+# ── Architectural / design topic detection ─────────────────────────────────────
+
+# Multi-word phrases that signal design/principles topics.
+# These cannot be tested with exact input→output pairs -- use property-based tests.
+_ARCHITECTURAL_PHRASES = frozenset({
+    "design pattern", "design patterns",
+    "rest api", "restful api", "api design", "rest design",
+    "system design",
+    "solid principle", "solid principles",
+    "clean architecture",
+    "microservice",
+    "domain driven", "domain-driven",
+    "event sourcing", "event-sourcing",
+    "cqrs",
+    "dependency injection",
+    "hexagonal architecture",
+    "mvc pattern", "mvp pattern", "mvvm pattern",
+})
+
+
+def is_architectural_topic(topic: str) -> bool:
+    """Return True if *topic* is a design/principles topic requiring property-based tests."""
+    t = topic.lower()
+    return any(phrase in t for phrase in _ARCHITECTURAL_PHRASES)
+
+
 # ── Output schema ─────────────────────────────────────────────────────────────
 
 @dataclass
@@ -182,6 +208,75 @@ Additional rules:
 """
 
 
+_USER_TEMPLATE_ARCHITECTURAL = """\
+Generate exactly {n_tests} Python benchmark test cases for this ARCHITECTURAL/DESIGN topic:
+
+TOPIC: {topic}
+
+The agent wrote this implementation (for reference -- do NOT copy it verbatim):
+{code_snippet}
+
+IMPORTANT: This topic is about DESIGN PRINCIPLES, not a specific computation.
+Tests must verify BEHAVIORAL PROPERTIES of the implementation -- not exact output equality.
+Each test checks ONE specific property or invariant of the design.
+
+Return a JSON object with EXACTLY this structure:
+{{
+  "scaffold": "def solve(input_data):\\n    # implement here\\n    pass",
+  "tests": [
+    {{
+      "description": "what property this test checks",
+      "setup": "input_data = <spec_dict>\\nexpected = <specific_property_value>",
+      "assert_expr": "assert solve(input_data).get('key') == expected"
+    }}
+  ]
+}}
+
+PROPERTY PATTERNS by topic type — choose the most appropriate:
+
+REST API / API design:
+  setup:       input_data = {{"resource": "user", "action": "create"}}\\nexpected = "POST"
+  assert_expr: assert solve(input_data).get("method") == expected
+
+  setup:       input_data = {{"resource": "user", "action": "get_one", "id": 1}}\\nexpected = 200
+  assert_expr: assert solve(input_data).get("status_code") == expected
+
+  setup:       input_data = {{"action": "list_users"}}\\nexpected = True
+  assert_expr: assert "endpoint" in solve(input_data) == expected
+
+Design patterns (behavioral/structural):
+  # Singleton: always returns the same instance
+  setup:       input_data = {{"pattern": "singleton"}}\\nexpected = True
+  assert_expr: assert (lambda c: c() is c())(solve(input_data)) == expected
+
+  # Factory: creates correct type
+  setup:       input_data = {{"type": "circle", "radius": 5}}\\nexpected = "Circle"
+  assert_expr: assert type(solve(input_data)).__name__ == expected
+
+  # Observer: count of notified observers
+  setup:       input_data = {{"observers": 3, "event": "update"}}\\nexpected = 3
+  assert_expr: assert solve(input_data).get("notified") == expected
+
+System design:
+  setup:       input_data = {{"component": "cache", "operation": "get"}}\\nexpected = True
+  assert_expr: assert "hit_rate" in solve(input_data) == expected
+
+  setup:       input_data = {{"components": ["api", "db", "cache"]}}\\nexpected = 3
+  assert_expr: assert len(solve(input_data).get("components", [])) == expected
+
+Rules:
+- The function signature must ALWAYS be: def solve(input_data)
+- input_data must ALWAYS be a dict (architectural specs are naturally dicts)
+- expected must be a simple Python literal (str, int, bool) — ONE specific property to verify
+- assert_expr must be a single line starting with 'assert'
+- Test different properties/invariants — not the same property with different values
+- Each test must be self-contained (no shared state between tests)
+- Only use Python builtins in setup and assert_expr (no imports)
+- Do NOT test for the full output structure — only ONE property per test
+- If the topic cannot be expressed as a callable, return {{"scaffold": "", "tests": []}}\
+"""
+
+
 class BenchmarkGenerator:
     """Generates objective test cases for StudyAgent benchmark certification.
 
@@ -218,9 +313,14 @@ class BenchmarkGenerator:
             return _unavailable(topic, "no LLM callable configured")
 
         code_snippet = synthesized_code[:600].strip() or "(no implementation provided)"
-        template = _USER_TEMPLATE_MOCK_NETWORK if is_network_topic(topic) else _USER_TEMPLATE
         if is_network_topic(topic):
+            template = _USER_TEMPLATE_MOCK_NETWORK
             print(f"[BENCHMARK_GEN] Network topic detected -- using mock template for '{topic}'")
+        elif is_architectural_topic(topic):
+            template = _USER_TEMPLATE_ARCHITECTURAL
+            print(f"[BENCHMARK_GEN] Architectural topic detected -- using property-based template for '{topic}'")
+        else:
+            template = _USER_TEMPLATE
         prompt = template.format(
             topic=topic,
             code_snippet=code_snippet,
