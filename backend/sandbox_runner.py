@@ -319,11 +319,12 @@ class DockerSandboxRunner:
                 # ── Auto-install missing modules and retry once ───────────────
                 if not success:
                     _mod_match = re.search(
-                        r"ModuleNotFoundError: No module named '([A-Za-z0-9_]+)'",
+                        r"(?:ModuleNotFoundError|ImportError): No module named '([A-Za-z0-9_][A-Za-z0-9_.]*)'",
                         stderr
                     )
                     if _mod_match:
-                        _module = _mod_match.group(1)
+                        # Take only the top-level module (e.g. 'sklearn' from 'sklearn.tree')
+                        _module = _mod_match.group(1).split(".")[0]
                         rebuilt = await self._auto_install_module(_module)
                         if rebuilt:
                             # Retry with the freshly rebuilt image
