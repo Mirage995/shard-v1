@@ -376,6 +376,7 @@ class SynthesizePhase(BasePhase):
             previous_score=ctx.previous_score,
             episode_context=ctx.episode_context,
             pivot_directive=ctx.pivot_directive,
+            research_mode=ctx.research_mode,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
 

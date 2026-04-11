@@ -319,7 +319,7 @@ class StudyAgent:
 
         return None
 
-    async def _think(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False) -> str:
+    async def _think(self, prompt: str, system: str = "You are SHARD, an autonomous reasoning AI.", json_mode: bool = False, temperature: float = 0.3) -> str:
         """Core reasoning call using the global llm_router.
         Prefers Gemini (free) -> Groq -> Claude.
         """
@@ -338,7 +338,7 @@ class StudyAgent:
             prompt=prompt,
             system=effective_system,
             max_tokens=2000,
-            temperature=0.3,
+            temperature=temperature,
             providers=PROVIDERS_FULL
         )
 
@@ -573,7 +573,8 @@ Example: ["query 1", "query 2", "query 3"]"""
     async def phase_synthesize(self, topic: str, raw: str, strategy_hint: str = None,
                                previous_score: float = None,
                                episode_context: str = None,
-                               pivot_directive: str = None) -> Dict:
+                               pivot_directive: str = None,
+                               research_mode: bool = False) -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
@@ -618,8 +619,31 @@ Example: ["query 1", "query 2", "query 3"]"""
             memory_line = f"\n{_mem_block}Build on this prior knowledge — go deeper, correct, or extend it.\n"
             print(f"[SYNTHESIZE] Memory injected {_mem_block.count(chr(10))} prior memories")
 
+        # Research mode: extend prompt to ask for hypothesis field (#34)
+        hypothesis_instruction = ""
+        if research_mode:
+            hypothesis_instruction = """
+
+[RESEARCH MODE -- HYPOTHESIS GENERATION]
+In addition to the standard fields, generate a "hypothesis" field.
+A hypothesis is a NON-OBVIOUS connection between two concepts from the text.
+It must be falsifiable and testable with local resources (no lab required).
+
+"hypothesis": {
+  "statement": "one sentence -- the non-obvious connection",
+  "domain_from": "the source concept/domain",
+  "domain_to": "the target concept/domain",
+  "rationale": "why this connection is non-obvious (1-2 sentences)",
+  "falsifiable": true or false,
+  "minimum_experiment": "minimal test to validate this with local/free resources",
+  "confidence": 0.0 to 1.0
+}
+
+If you cannot generate a valid falsifiable hypothesis, set "hypothesis": null.
+"""
+
         prompt = f"""
-You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}{memory_line}
+You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}{memory_line}{hypothesis_instruction}
 Return ONLY valid JSON.
 
 Do not include explanations.
@@ -636,7 +660,7 @@ Required format:
 "dependencies": [],
 "applications": []
 }}
-]
+]{', "hypothesis": null' if research_mode else ''}
 }}
 
 Rules:
@@ -657,7 +681,8 @@ RAW CONTENT:
 """
         self.progress.set_phase("SYNTHESIZE", 0.5)
         prompt = "You MUST respond with valid JSON only.\n\n" + prompt
-        raw_json = await self._think(prompt, json_mode=True)
+        synth_temp = 0.85 if research_mode else 0.3
+        raw_json = await self._think(prompt, json_mode=True, temperature=synth_temp)
 
         data = safe_json_load(raw_json)
 
@@ -671,6 +696,16 @@ RAW CONTENT:
 
         if "concepts" not in data:
             data["concepts"] = []
+
+        # Research mode: validate hypothesis field, fall back to null if malformed (#34)
+        if research_mode:
+            hyp = data.get("hypothesis")
+            _required_keys = {"statement", "domain_from", "domain_to", "rationale", "falsifiable", "minimum_experiment", "confidence"}
+            if hyp is not None and isinstance(hyp, dict) and _required_keys.issubset(hyp.keys()):
+                print(f"[SYNTHESIZE] Hypothesis generated: '{str(hyp.get('statement',''))[:80]}...'")
+            else:
+                data["hypothesis"] = None
+                print("[SYNTHESIZE] Hypothesis missing or malformed -- set to null")
 
         if not data.get("concepts"):
             print("[SYNTHESIZE] LLM returned empty concepts list")
