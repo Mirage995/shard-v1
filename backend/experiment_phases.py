@@ -54,6 +54,7 @@ class ExperimentDesignPhase(BasePhase):
         if not hypothesis.get("falsifiable"):
             ctx.experiment_status = "SKIPPED"
             await ctx.emit("EXPERIMENT_DESIGN", 0, "Hypothesis not falsifiable -- skipped")
+            _persist_skipped(ctx, hypothesis, "SKIPPED")
             return
 
         confidence = float(hypothesis.get("confidence", 0.0))
@@ -63,6 +64,7 @@ class ExperimentDesignPhase(BasePhase):
                 "EXPERIMENT_DESIGN", 0,
                 f"Hypothesis confidence {confidence:.2f} < {_MIN_CONFIDENCE} -- skipped"
             )
+            _persist_skipped(ctx, hypothesis, "SKIPPED")
             return
 
         # ── Feasibility gate (#35 Gap 2) ──────────────────────────────────────
@@ -76,7 +78,8 @@ class ExperimentDesignPhase(BasePhase):
                 "EXPERIMENT_DESIGN", 0,
                 "Experiment requires real data/network/GPU -- SKIPPED_TOO_COMPLEX"
             )
-            print("[EXPERIMENT_DESIGN] SKIPPED_TOO_COMPLEX -- not sandbox-feasible")
+            print(f"[EXPERIMENT_DESIGN] SKIPPED_TOO_COMPLEX -- persisting hypothesis: '{hypothesis.get('statement','')[:80]}'")
+            _persist_skipped(ctx, hypothesis, "SKIPPED_TOO_COMPLEX")
             return
 
         # ── Generate code ─────────────────────────────────────────────────────
@@ -94,6 +97,35 @@ class ExperimentDesignPhase(BasePhase):
             ctx.experiment_status = "SKIPPED"
             logger.error("[EXPERIMENT_DESIGN] Code generation failed: %s", exc)
             await ctx.emit("EXPERIMENT_DESIGN", 0, f"Code generation failed: {exc} -- skipped")
+
+
+def _persist_skipped(ctx, hypothesis: dict, status: str) -> None:
+    """Persist a hypothesis that was skipped before sandbox execution.
+
+    Called for SKIPPED (not falsifiable / low confidence) and
+    SKIPPED_TOO_COMPLEX (needs external resources).
+    Non-fatal -- errors are logged and swallowed.
+    """
+    try:
+        from experiment_store import store_hypothesis, update_result
+        source_papers = [
+            {"title": s.get("title", ""), "year": s.get("year", ""), "url": s.get("url", "")}
+            for s in (ctx.sources or [])
+            if s.get("title")
+        ] if ctx.research_mode else None
+        hyp_id = store_hypothesis(ctx.topic, hypothesis, source_papers=source_papers)
+        if hyp_id:
+            update_result(
+                hypothesis_id=hyp_id,
+                status=status,
+                experiment_code=None,
+                experiment_result=None,
+                confidence_updated=hypothesis.get("confidence", 0.0),
+            )
+            ctx._experiment_hypothesis_id = hyp_id
+            print(f"[EXPERIMENT_DESIGN] Persisted id={hyp_id} status={status}")
+    except Exception as db_exc:
+        logger.error("[EXPERIMENT_DESIGN] DB persist failed (non-fatal): %s", db_exc)
 
 
 class ExperimentSandboxPhase(BasePhase):

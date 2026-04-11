@@ -203,3 +203,26 @@ def get_confirmed() -> List[Dict]:
     except Exception as exc:
         logger.error("[EXPERIMENT_STORE] get_confirmed failed: %s", exc)
         return []
+
+
+def get_skipped_complex() -> List[Dict]:
+    """Return hypotheses skipped because they need external resources.
+
+    These are candidates for testing outside the local sandbox:
+    cloud VMs, Colab, full training pipelines, etc.
+    Ordered by confidence_initial DESC -- most promising first.
+    """
+    try:
+        conn = _get_db()
+        _ensure_table()
+        rows = conn.execute(
+            """
+            SELECT * FROM research_hypotheses
+            WHERE status = 'SKIPPED_TOO_COMPLEX'
+            ORDER BY confidence_initial DESC, created_at DESC
+            """
+        ).fetchall()
+        return [_row_to_dict(r) for r in rows]
+    except Exception as exc:
+        logger.error("[EXPERIMENT_STORE] get_skipped_complex failed: %s", exc)
+        return []
