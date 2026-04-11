@@ -65,6 +65,20 @@ class ExperimentDesignPhase(BasePhase):
             )
             return
 
+        # ── Feasibility gate (#35 Gap 2) ──────────────────────────────────────
+        try:
+            feasible = await ctx.agent._is_experiment_feasible(hypothesis)
+        except Exception:
+            feasible = True  # non-fatal -- assume feasible on error
+        if not feasible:
+            ctx.experiment_status = "SKIPPED_TOO_COMPLEX"
+            await ctx.emit(
+                "EXPERIMENT_DESIGN", 0,
+                "Experiment requires real data/network/GPU -- SKIPPED_TOO_COMPLEX"
+            )
+            print("[EXPERIMENT_DESIGN] SKIPPED_TOO_COMPLEX -- not sandbox-feasible")
+            return
+
         # ── Generate code ─────────────────────────────────────────────────────
         await ctx.emit("EXPERIMENT_DESIGN", 0, f"Designing experiment for: '{hypothesis.get('statement','')[:60]}...'")
         try:

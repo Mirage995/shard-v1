@@ -521,6 +521,38 @@ Example: ["query 1", "query 2", "query 3"]"""
 
     # ── EXPERIMENT ENGINE (#35) ───────────────────────────────────────────────
 
+    async def _is_experiment_feasible(self, hypothesis: Dict) -> bool:
+        """Quick LLM gate: can minimum_experiment run in a headless Python sandbox?
+
+        Returns True (feasible) or False (too abstract / needs real data/GPU/network).
+        Temperature 0.1 -- binary decision, must be stable.
+        Defaults to True on any error to avoid false negatives.
+        """
+        minimum_exp = hypothesis.get("minimum_experiment", "")
+        statement   = hypothesis.get("statement", "")
+
+        if not minimum_exp.strip():
+            return False
+
+        system = (
+            "You are a feasibility judge for sandbox code experiments. "
+            "Answer YES if implementable under the constraints, NO otherwise."
+        )
+        prompt = (
+            f"Can the following experiment be implemented as a standalone Python script "
+            f"using ONLY: numpy, sklearn, torch (CPU), scipy, pandas?\n"
+            f"Constraints: no network, no downloads, all data synthetic inline, "
+            f"completes in <120s, no GPU, no file I/O.\n\n"
+            f"Hypothesis: {statement}\n"
+            f"Experiment: {minimum_exp}\n\n"
+            f"Answer with exactly one word: YES or NO."
+        )
+        try:
+            answer = await self._think(prompt, system=system, temperature=0.1)
+            return "YES" in answer.upper()
+        except Exception:
+            return True  # default feasible on error to avoid false negatives
+
     async def _generate_experiment_code(self, hypothesis: Dict) -> str:
         """Translate hypothesis.minimum_experiment into executable sandbox Python.
 
@@ -703,7 +735,8 @@ Return ONLY valid JSON:
                                episode_context: str = None,
                                pivot_directive: str = None,
                                research_mode: bool = False,
-                               sources: list = None) -> Dict:
+                               sources: list = None,
+                               empirical_context: str = "") -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
@@ -762,8 +795,17 @@ Return ONLY valid JSON:
                     lines.append(f"{i}. {title} ({year}) — {body}")
                 source_papers_block = "\n[SOURCE PAPERS]\n" + "\n".join(lines) + "\n"
 
+            # Empirical guardrail: inject REFUTED knowledge so LLM avoids dead ends
+            empirical_block = ""
+            if empirical_context:
+                empirical_block = (
+                    f"\n[EMPIRICAL KNOWLEDGE — DO NOT REPEAT]\n"
+                    f"{empirical_context}\n"
+                    f"Your hypothesis MUST explore a direction not already listed above as REFUTED.\n"
+                )
+
             hypothesis_instruction = f"""
-{source_papers_block}
+{source_papers_block}{empirical_block}
 [RESEARCH MODE -- HYPOTHESIS GENERATION]
 In addition to the standard fields, generate a "hypothesis" field.
 A hypothesis is a NON-OBVIOUS connection between two concepts from the text.
