@@ -519,6 +519,134 @@ Example: ["query 1", "query 2", "query 3"]"""
 
         return papers
 
+    # ── EXPERIMENT ENGINE (#35) ───────────────────────────────────────────────
+
+    async def _generate_experiment_code(self, hypothesis: Dict) -> str:
+        """Translate hypothesis.minimum_experiment into executable sandbox Python.
+
+        Called by ExperimentDesignPhase when research_mode=True.
+        Returns raw Python code string (no markdown, no explanation).
+        Temperature 0.4 -- deterministic enough for code, not 0.3 to allow
+        minor creative choices in synthetic data generation.
+        """
+        statement        = hypothesis.get("statement", "")
+        domain_from      = hypothesis.get("domain_from", "")
+        domain_to        = hypothesis.get("domain_to", "")
+        minimum_exp      = hypothesis.get("minimum_experiment", "")
+        confidence       = hypothesis.get("confidence", 0.0)
+
+        system = (
+            "Generate executable Python code to test a scientific hypothesis.\n"
+            "HARD CONSTRAINTS:\n"
+            "- Zero network calls, zero downloads, zero file I/O\n"
+            "- Allowed libraries ONLY: numpy, sklearn, torch (CPU), scipy, pandas\n"
+            "- Generate ALL data synthetically inline — no external datasets\n"
+            "- Simulate the hypothesis domain at toy scale (< 1000 samples)\n"
+            "- The FINAL line of code MUST be exactly:\n"
+            "    print('RESULT:', round(float(score), 4))\n"
+            "  where score is 0.0-1.0 measuring hypothesis validity\n"
+            "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
+            "- Code must complete in under 120 seconds\n"
+            "- No persistent processes, no while True, no server patterns\n"
+            "Return ONLY the Python code. No explanation, no markdown, no backticks."
+        )
+
+        prompt = f"""Hypothesis to test:
+Statement:          {statement}
+Domain from:        {domain_from}
+Domain to:          {domain_to}
+Initial confidence: {confidence}
+Experiment design:  {minimum_exp}
+
+Write Python code that tests whether this hypothesis holds at toy scale
+using only synthetic data. Measure the result as a score 0.0-1.0."""
+
+        print(f"[EXPERIMENT] Generating experiment code for: '{statement[:60]}...'")
+        code = await self._think(prompt, system=system, temperature=0.4)
+
+        # Strip accidental markdown fences if model ignores instructions
+        code = code.strip()
+        if code.startswith("```"):
+            lines = code.split("\n")
+            code = "\n".join(
+                l for l in lines
+                if not l.strip().startswith("```")
+            ).strip()
+
+        return code
+
+    async def _validate_experiment_result(
+        self, hypothesis: Dict, stdout: str, stderr: str
+    ) -> Dict:
+        """Ask LLM to interpret sandbox output and decide hypothesis verdict.
+
+        Called by ExperimentValidatePhase after sandbox execution.
+        Returns {status, confidence_updated, reasoning}.
+        Temperature 0.3 -- conservative, verdict must be stable.
+        """
+        import re as _re
+
+        statement   = hypothesis.get("statement", "")
+        domain_from = hypothesis.get("domain_from", "")
+        domain_to   = hypothesis.get("domain_to", "")
+        conf_init   = hypothesis.get("confidence", 0.0)
+
+        # Extract numeric RESULT if present
+        result_match = _re.search(r"RESULT:\s*([\d.]+)", stdout)
+        result_score = float(result_match.group(1)) if result_match else None
+        result_line  = f"Numeric RESULT extracted: {result_score}" if result_score is not None else "No RESULT line found in stdout."
+
+        prompt = f"""You are evaluating the outcome of a hypothesis experiment.
+
+Hypothesis:
+  Statement:   {statement}
+  Domain from: {domain_from}
+  Domain to:   {domain_to}
+  Initial confidence: {conf_init}
+
+Experiment output:
+  STDOUT: {stdout[:800] or '(empty)'}
+  STDERR: {stderr[:400] or '(none)'}
+  {result_line}
+
+Based on the experiment output, decide:
+1. status: CONFIRMED if result >= 0.65, REFUTED if result <= 0.35, INCONCLUSIVE otherwise.
+   If no RESULT line was found or execution failed, use INCONCLUSIVE.
+2. confidence_updated: revised confidence 0.0-1.0 based on actual result
+3. reasoning: one sentence explaining the verdict
+
+Return ONLY valid JSON:
+{{"status": "CONFIRMED|REFUTED|INCONCLUSIVE", "confidence_updated": 0.0, "reasoning": "..."}}"""
+
+        print(f"[EXPERIMENT] Validating result (result_score={result_score})...")
+        raw = await self._think(prompt, json_mode=True, temperature=0.3)
+
+        from study_utils import safe_json_load
+        data = safe_json_load(raw)
+
+        # Validate and sanitize
+        valid_statuses = {"CONFIRMED", "REFUTED", "INCONCLUSIVE"}
+        if not isinstance(data, dict) or data.get("status") not in valid_statuses:
+            # Fallback: derive from numeric score if available
+            if result_score is not None:
+                if result_score >= 0.65:
+                    status = "CONFIRMED"
+                elif result_score <= 0.35:
+                    status = "REFUTED"
+                else:
+                    status = "INCONCLUSIVE"
+                return {
+                    "status": status,
+                    "confidence_updated": result_score,
+                    "reasoning": f"Derived from RESULT score {result_score} (LLM parse failed).",
+                }
+            return {"status": "INCONCLUSIVE", "confidence_updated": conf_init, "reasoning": "Could not parse LLM verdict."}
+
+        # Clamp confidence to valid range
+        conf = float(data.get("confidence_updated", conf_init))
+        data["confidence_updated"] = max(0.0, min(1.0, conf))
+        return data
+
     # ── PHASE 2: AGGREGATE ────────────────────────────────────────────────────
 
     async def phase_aggregate(self, sources: List[Dict]) -> str:
