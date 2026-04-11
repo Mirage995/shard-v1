@@ -535,21 +535,26 @@ Example: ["query 1", "query 2", "query 3"]"""
             return False
 
         system = (
-            "You are a feasibility judge for sandbox code experiments. "
-            "Answer YES if implementable under the constraints, NO otherwise."
+            "You are a strict sandbox feasibility checker. "
+            "A sandbox has: numpy, sklearn, torch CPU, scipy, pandas. "
+            "NO internet, NO downloads, NO GPU, NO file I/O. "
+            "Be conservative: if in doubt, answer YES (needs real resources)."
         )
         prompt = (
-            f"Can the following experiment be implemented as a standalone Python script "
-            f"using ONLY: numpy, sklearn, torch (CPU), scipy, pandas?\n"
-            f"Constraints: no network, no downloads, all data synthetic inline, "
-            f"completes in <120s, no GPU, no file I/O.\n\n"
+            f"Does this experiment REQUIRE any of the following?\n"
+            f"- Real datasets (ImageNet, CIFAR, etc.)\n"
+            f"- Network access or downloads\n"
+            f"- GPU or significant compute (>120s on CPU)\n"
+            f"- Pre-trained model weights from external sources\n"
+            f"- Complex architectures impossible to simulate at toy scale\n\n"
             f"Hypothesis: {statement}\n"
             f"Experiment: {minimum_exp}\n\n"
-            f"Answer with exactly one word: YES or NO."
+            f"Answer with exactly one word: YES (needs real resources) "
+            f"or NO (can run with synthetic data on CPU)."
         )
         try:
             answer = await self._think(prompt, system=system, temperature=0.1)
-            return "YES" in answer.upper()
+            return "NO" in answer.upper()  # NO = non serve niente di esterno = feasible
         except Exception:
             return True  # default feasible on error to avoid false negatives
 
