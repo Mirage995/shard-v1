@@ -50,6 +50,12 @@ class StudyContext:
     gaps: List[str] = field(default_factory=list)
     benchmark_result: Optional[Dict] = None   # post-certify benchmark result (pass_rate, passed, total)
 
+    # ── Experiment Engine (#35) -- research_mode only ─────────────────────────
+    experiment_code: Optional[str] = None                    # generated code for hypothesis test
+    experiment_result: Optional[Dict] = None                 # {stdout, stderr, exit_code, success}
+    experiment_status: Optional[str] = None                  # CONFIRMED/REFUTED/INCONCLUSIVE/SKIPPED
+    hypothesis_confidence_updated: Optional[float] = None    # empirical confidence post-test
+
     # ── Strategy / meta hints (set by InitPhase) ─────────────────────────────
     best_strategy: Optional[str] = None
     episode_context: Optional[str] = None
