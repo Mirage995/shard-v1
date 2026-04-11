@@ -1682,6 +1682,9 @@ AUTO-EXAM (Questions and Answers):
             StorePhase, CrossPollinatePhase, MaterializePhase,
             SandboxPhase, CertifyRetryGroup, PostStudyPhase,
         )
+        from experiment_phases import (
+            ExperimentDesignPhase, ExperimentSandboxPhase, ExperimentValidatePhase,
+        )
 
         self.is_running = True
         self._topic_llm_calls = 0  # reset per-topic budget counter
@@ -1707,16 +1710,19 @@ AUTO-EXAM (Questions and Answers):
         )
 
         pipeline = StudyPipeline([
-            InitPhase(),            # meta-learning hint + episodic memory
-            MapPhase(),             # search sources
-            AggregatePhase(),       # scrape web pages
-            SynthesizePhase(),      # LLM synthesis + cross-reference
-            StorePhase(),           # persist to ChromaDB
-            CrossPollinatePhase(),  # integration report        (non-fatal)
-            MaterializePhase(),     # cheat sheet to filesystem (non-fatal)
-            SandboxPhase(),         # code gen + Docker exec    (non-fatal)
-            CertifyRetryGroup(),    # VALIDATE->EVALUATE->BENCHMARK->CERTIFY × N
-            PostStudyPhase(),       # meta-learning + episodic  (non-fatal)
+            InitPhase(),                  # meta-learning hint + episodic memory
+            MapPhase(),                   # search sources
+            AggregatePhase(),             # scrape web pages
+            SynthesizePhase(),            # LLM synthesis + cross-reference
+            ExperimentDesignPhase(),      # [research_mode] codegen for hypothesis  (non-fatal)
+            ExperimentSandboxPhase(),     # [research_mode] run in Docker sandbox   (non-fatal)
+            ExperimentValidatePhase(),    # [research_mode] verdict + DB persist    (non-fatal)
+            StorePhase(),                 # persist to ChromaDB
+            CrossPollinatePhase(),        # integration report        (non-fatal)
+            MaterializePhase(),           # cheat sheet to filesystem (non-fatal)
+            SandboxPhase(),               # code gen + Docker exec    (non-fatal)
+            CertifyRetryGroup(),          # VALIDATE->EVALUATE->BENCHMARK->CERTIFY × N
+            PostStudyPhase(),             # meta-learning + episodic  (non-fatal)
         ])
 
         try:

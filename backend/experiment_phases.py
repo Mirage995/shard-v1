@@ -43,7 +43,8 @@ class ExperimentDesignPhase(BasePhase):
         hypothesis = (ctx.structured or {}).get("hypothesis") if ctx.structured else None
 
         if not ctx.research_mode:
-            return  # normal mode -- silent skip, no status write needed
+            print("[EXPERIMENT_DESIGN] SKIPPED (research_mode=False)")
+            return
 
         if not hypothesis:
             ctx.experiment_status = "SKIPPED"
@@ -97,6 +98,7 @@ class ExperimentSandboxPhase(BasePhase):
     async def run(self, ctx: "StudyContext") -> None:
         # ── Gate ─────────────────────────────────────────────────────────────
         if not ctx.research_mode:
+            print("[EXPERIMENT_SANDBOX] SKIPPED (research_mode=False)")
             return
 
         if ctx.experiment_status == "SKIPPED" or not ctx.experiment_code:
@@ -151,6 +153,7 @@ class ExperimentValidatePhase(BasePhase):
     async def run(self, ctx: "StudyContext") -> None:
         # ── Gate ─────────────────────────────────────────────────────────────
         if not ctx.research_mode:
+            print("[EXPERIMENT_VALIDATE] SKIPPED (research_mode=False)")
             return
 
         if ctx.experiment_result is None:
