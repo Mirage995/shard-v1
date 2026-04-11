@@ -377,6 +377,7 @@ class SynthesizePhase(BasePhase):
             episode_context=ctx.episode_context,
             pivot_directive=ctx.pivot_directive,
             research_mode=ctx.research_mode,
+            sources=ctx.sources if ctx.research_mode else None,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
 

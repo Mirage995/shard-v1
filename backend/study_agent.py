@@ -574,7 +574,8 @@ Example: ["query 1", "query 2", "query 3"]"""
                                previous_score: float = None,
                                episode_context: str = None,
                                pivot_directive: str = None,
-                               research_mode: bool = False) -> Dict:
+                               research_mode: bool = False,
+                               sources: list = None) -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
@@ -622,14 +623,28 @@ Example: ["query 1", "query 2", "query 3"]"""
         # Research mode: extend prompt to ask for hypothesis field (#34)
         hypothesis_instruction = ""
         if research_mode:
-            hypothesis_instruction = """
+            # Build [SOURCE PAPERS] block from sources list if available
+            source_papers_block = ""
+            if sources:
+                lines = []
+                for i, s in enumerate(sources[:5], 1):
+                    title = s.get("title", "").strip()
+                    year  = s.get("year", "")
+                    body  = s.get("body", "").strip()[:300]
+                    lines.append(f"{i}. {title} ({year}) — {body}")
+                source_papers_block = "\n[SOURCE PAPERS]\n" + "\n".join(lines) + "\n"
 
+            hypothesis_instruction = f"""
+{source_papers_block}
 [RESEARCH MODE -- HYPOTHESIS GENERATION]
 In addition to the standard fields, generate a "hypothesis" field.
 A hypothesis is a NON-OBVIOUS connection between two concepts from the text.
 It must be falsifiable and testable with local resources (no lab required).
 
-"hypothesis": {
+Your hypothesis MUST draw a connection between concepts explicitly present in the source papers above.
+Do not invent connections not supported by the sources.
+
+"hypothesis": {{
   "statement": "one sentence -- the non-obvious connection",
   "domain_from": "the source concept/domain",
   "domain_to": "the target concept/domain",
@@ -637,7 +652,7 @@ It must be falsifiable and testable with local resources (no lab required).
   "falsifiable": true or false,
   "minimum_experiment": "minimal test to validate this with local/free resources",
   "confidence": 0.0 to 1.0
-}
+}}
 
 If you cannot generate a valid falsifiable hypothesis, set "hypothesis": null.
 """
