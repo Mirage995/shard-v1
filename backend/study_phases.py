@@ -370,6 +370,13 @@ class SynthesizePhase(BasePhase):
             except Exception as _ce:
                 pass  # non-fatal
 
+        empirical_context = ""
+        if ctx.research_mode:
+            try:
+                empirical_context = ctx.agent.cognition_core.query_empirical(ctx.topic)
+            except Exception:
+                pass  # non-fatal
+
         ctx.structured = await ctx.agent.phase_synthesize(
             ctx.topic, ctx.raw_text,
             strategy_hint=ctx.best_strategy,
@@ -378,6 +385,7 @@ class SynthesizePhase(BasePhase):
             pivot_directive=ctx.pivot_directive,
             research_mode=ctx.research_mode,
             sources=ctx.sources if ctx.research_mode else None,
+            empirical_context=empirical_context,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
 
