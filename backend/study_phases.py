@@ -1616,7 +1616,7 @@ Rules:
         core = getattr(ctx.agent, "cognition_core", None)
         if core is not None and ctx.attempt >= 2:
             try:
-                ctx.core_relational_ctx = core.relational_context(ctx.topic)
+                ctx.core_relational_ctx = core.relational_context(ctx.topic, research_mode=ctx.research_mode)
                 core_block = f"\n\n[COGNITION CORE -- INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
                 print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
             except Exception as _cre:
