@@ -508,13 +508,14 @@ class CognitionCore:
 
     # ── Relational Context -- composite view with tensions ─────────────────────
 
-    def relational_context(self, topic: str) -> str:
+    def relational_context(self, topic: str, research_mode: bool = False) -> str:
         """Compose all relevant layers into a tension-aware context string.
 
         This is the key CognitionCore output: not raw data, but TENSIONS
         between layers. Target: ~500 tokens max.
 
         Used by: CertifyRetryGroup (attempt >= 2), phase_synthesize.
+        research_mode=True adds Layer E (EMPIRICAL) from ExperimentStore.
         """
         lines = [f"[COGNITION CORE] Topic: {topic}"]
 
@@ -627,7 +628,54 @@ class CognitionCore:
             for t in tensions:
                 lines.append(f"  >> {t}")
 
+        # Layer E: EMPIRICAL -- only in research_mode, ~50 tokens max
+        if research_mode:
+            empirical = self.query_empirical(topic)
+            if empirical:
+                lines.append("")
+                lines.append(empirical)
+
         return "\n".join(lines)
+
+    # ── Layer E -- EMPIRICAL (Experiment Engine) ──────────────────────────────
+
+    def query_empirical(self, topic: str) -> str:
+        """Layer E: return empirically tested hypotheses for this topic.
+
+        Reads from ExperimentStore -- only CONFIRMED or REFUTED results.
+        PENDING and INCONCLUSIVE are excluded (not yet reliable).
+        Returns formatted string max ~50 tokens, or empty string if none.
+
+        Called only when research_mode=True -- never affects normal pipeline.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from experiment_store import get_by_topic
+
+            rows = get_by_topic(topic)
+            actionable = [
+                r for r in rows
+                if r.get("status") in ("CONFIRMED", "REFUTED")
+            ]
+            if not actionable:
+                return ""
+
+            lines = ["[EMPIRICAL KNOWLEDGE]"]
+            for r in actionable[:3]:   # cap at 3 to stay within ~50 token budget
+                status    = r["status"]
+                statement = (r.get("statement") or "")[:120]
+                conf      = r.get("confidence_updated") or r.get("confidence_initial") or 0.0
+                if status == "CONFIRMED":
+                    lines.append(f"  CONFIRMED: {statement} (confidence: {conf:.2f})")
+                else:
+                    lines.append(f"  REFUTED: {statement} — avoid this direction")
+
+            return "\n".join(lines)
+
+        except Exception as exc:
+            logger.debug("[LAYER E] query_empirical failed (non-fatal): %s", exc)
+            return ""
 
     # ── Layer W -- WORLD MODEL ─────────────────────────────────────────────────
 
