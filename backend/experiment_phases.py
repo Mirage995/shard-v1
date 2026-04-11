@@ -107,9 +107,11 @@ class ExperimentSandboxPhase(BasePhase):
         # ── Execute ───────────────────────────────────────────────────────────
         await ctx.emit("EXPERIMENT_SANDBOX", 0, "Running experiment in Docker sandbox...")
         try:
+            import os as _os
             from sandbox_runner import DockerSandboxRunner
+            _sandbox_dir = getattr(ctx.agent, "sandbox_dir", None) or _os.path.join(_os.getcwd(), "sandbox")
             runner = DockerSandboxRunner(
-                sandbox_dir=ctx.agent.sandbox_dir,
+                sandbox_dir=_sandbox_dir,
                 analysis_fn=None,   # no LLM analysis -- ExperimentValidatePhase handles it
             )
             result = await runner.run(
