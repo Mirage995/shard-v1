@@ -261,7 +261,7 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = ""):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
@@ -269,6 +269,7 @@ class NightRunner:
         self.max_api_calls = api_limit
         self.topic_budget = topic_budget
         self._forced_topic: str = forced_topic.strip()
+        self._research_mode: bool = research_mode
 
         self.start_time = None
         self.api_calls_used = 0
@@ -1714,6 +1715,7 @@ class NightRunner:
                     blind_spots=list(_self_model.blind_spots) if _self_model else [],
                     previous_attempts=_prev_attempts,
                     resolved_errors=_session_resolved_errors,
+                    research_mode=self._research_mode,
                 )
 
                 # Restore session_context -- strip mood and skill lib prefixes
@@ -2768,6 +2770,7 @@ if __name__ == "__main__":
     parser.add_argument("--continuous", action="store_true", help="Loop sessions indefinitely (Ctrl+C to stop)")
     parser.add_argument("--session-gap", type=int, default=5, help="Seconds between sessions in continuous mode")
     parser.add_argument("--force-topic", type=str, default="", help="Pin a specific topic, bypassing all selection logic")
+    parser.add_argument("--research", action="store_true", default=False, help="Use arxiv instead of DuckDuckGo for sources (#34)")
 
     args = parser.parse_args()
 
@@ -2798,6 +2801,7 @@ if __name__ == "__main__":
                     api_limit=args.api_limit,
                     topic_budget=args.topic_budget,
                     forced_topic=args.force_topic,
+                    research_mode=args.research,
                 )
                 asyncio.run(runner.run())
             except KeyboardInterrupt:
@@ -2814,6 +2818,7 @@ if __name__ == "__main__":
             api_limit=args.api_limit,
             topic_budget=args.topic_budget,
             forced_topic=args.force_topic,
+            research_mode=args.research,
         )
         try:
             asyncio.run(runner.run())

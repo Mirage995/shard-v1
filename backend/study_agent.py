@@ -488,6 +488,37 @@ Example: ["query 1", "query 2", "query 3"]"""
         self.progress.complete_phase("MAP")
         return sources
 
+    # ── PHASE MAP (research mode) — arxiv fetcher (#34) ──────────────────────
+
+    async def _fetch_arxiv_phase(self, topic: str) -> List[Dict]:
+        """Fetch papers from arxiv and return in phase_map-compatible format.
+
+        Called by MapPhase.run() when ctx.research_mode=True.
+        Returns List[Dict] with keys {url, title, body} — same as phase_map.
+        Extra keys {authors, year} are passed through for future use.
+        """
+        try:
+            from arxiv_fetcher import fetch_arxiv
+        except ImportError:
+            try:
+                from backend.arxiv_fetcher import fetch_arxiv
+            except ImportError:
+                print("[ARXIV] arxiv_fetcher not found — falling back to DuckDuckGo")
+                return await self.phase_map(topic, tier=1)
+
+        papers = await asyncio.to_thread(fetch_arxiv, topic, 5)
+        print(f"[RESEARCH MODE] Fetched {len(papers)} papers from arxiv for '{topic}'")
+
+        # Inject relevance score so downstream sorting doesn't crash
+        topic_words = set(topic.lower().split())
+        for p in papers:
+            title_words = set(p["title"].lower().split())
+            p["relevance"] = len(topic_words & title_words)
+            p.setdefault("query", topic)
+            p.setdefault("tier", 1)
+
+        return papers
+
     # ── PHASE 2: AGGREGATE ────────────────────────────────────────────────────
 
     async def phase_aggregate(self, sources: List[Dict]) -> str:
@@ -1458,6 +1489,7 @@ AUTO-EXAM (Questions and Answers):
         blind_spots: Optional[list] = None,
         previous_attempts: int = 0,
         resolved_errors: Optional[set] = None,
+        research_mode: bool = False,
     ):
         """Complete study loop -- delegates to StudyPipeline.
 
@@ -1493,6 +1525,7 @@ AUTO-EXAM (Questions and Answers):
             blind_spots=blind_spots or [],
             previous_attempts=previous_attempts,
             resolved_errors=resolved_errors if resolved_errors is not None else set(),
+            research_mode=research_mode,
         )
 
         pipeline = StudyPipeline([

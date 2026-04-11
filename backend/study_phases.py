@@ -254,7 +254,10 @@ class MapPhase(BasePhase):
 
     async def run(self, ctx: StudyContext) -> None:
         await ctx.emit("MAP", 0, f"Searching sources for '{ctx.topic}'...")
-        ctx.sources = await ctx.agent.phase_map(ctx.topic, ctx.tier)
+        if ctx.research_mode:
+            ctx.sources = await ctx.agent._fetch_arxiv_phase(ctx.topic)
+        else:
+            ctx.sources = await ctx.agent.phase_map(ctx.topic, ctx.tier)
         print(f"[MAP] Phase completed. {len(ctx.sources)} sources found.")
 
 

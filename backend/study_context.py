@@ -27,6 +27,7 @@ class StudyContext:
     image_paths: List[str] = field(default_factory=list)
     pdf_paths: List[str] = field(default_factory=list)
     task_context: str = ""          # raw task files (README + code + tests) injected before study
+    research_mode: bool = False     # if True: fetch from arxiv instead of DuckDuckGo (#34)
 
     # ── Callbacks (set once at creation) ──────────────────────────────────────
     on_progress: Optional[Callable] = None
