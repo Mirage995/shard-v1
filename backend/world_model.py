@@ -61,7 +61,7 @@ _SEED: dict[str, dict] = {
 
     # Security
     "sql injection prevention and input sanitization": {"relevance": 0.92, "domain": "security", "xp_leverage": 1.3},
-    "password hashing bcrypt argon2":               {"relevance": 0.90, "domain": "security", "xp_leverage": 1.1},
+    "password hashing bcrypt argon2":               {"relevance": 0.10, "domain": "security", "xp_leverage": 0.3},  # sandbox-incompatible, filtered by is_valid_topic
     "http client implementation python":            {"relevance": 0.85, "domain": "networking", "xp_leverage": 1.2},
 
     # Data structures & algorithms

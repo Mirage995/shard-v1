@@ -104,8 +104,6 @@ from constants import (
     PROVIDERS_PRIMARY,
     PROVIDERS_FULL,
 )
-MAX_RETRY        = 3
-
 os.makedirs(SANDBOX_DIR, exist_ok=True)
 
 

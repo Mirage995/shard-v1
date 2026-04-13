@@ -107,7 +107,7 @@ STRATEGY_BLACKLIST: set[str] = {
 # ── Strategy penalties (win_rate < 0.70 -- noisy) ─────────────────────────────
 # Maps strategy name substring -> penalty multiplier
 STRATEGY_PENALTIES: dict[str, float] = {
-    "swe_repair": 0.70,           # 61% win, 67 misfires -- noisy fallback
+    "swe_repair": 0.50,           # 61% win, 67 misfires -- noisy fallback, penalty raised
     "rest api design patterns": 0.60,  # benchmark invalidi (#28)
 }
 

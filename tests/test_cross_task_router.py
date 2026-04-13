@@ -100,7 +100,7 @@ class TestGetStrategyPenalty:
         self.fn = get_strategy_penalty
 
     def test_swe_repair_penalized(self):
-        assert self.fn("swe_repair fallback approach") == 0.70
+        assert self.fn("swe_repair fallback approach") == 0.50
 
     def test_rest_api_penalized(self):
         assert self.fn("rest api design patterns for crud") == 0.60
@@ -130,7 +130,7 @@ class TestApplyRouting:
     def test_penalized_strategy_score_reduced(self):
         strats = self._make_strategies([("swe_repair fallback approach", 8.0)])
         filtered, _ = self.fn(strats, "some topic")
-        assert filtered[0]["score"] == pytest.approx(8.0 * 0.70, abs=0.01)
+        assert filtered[0]["score"] == pytest.approx(8.0 * 0.50, abs=0.01)
 
     def test_boost_returned_for_concurrency(self):
         _, boost = self.fn([], "asyncio race condition bug")

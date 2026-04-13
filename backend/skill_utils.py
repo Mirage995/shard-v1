@@ -79,4 +79,12 @@ def is_valid_topic(topic: str) -> bool:
     if re.search(r"\btask\s*\d+\b", lowered):
         return False
 
+    # Reject [missed_emergence] prefixed topics (CognitionCore internal label leaking into pool)
+    if t.startswith("[missed_emergence]") or t.startswith("[missed emergence]"):
+        return False
+
+    # Reject bcrypt/argon2 -- sandbox can't implement, 11% win rate
+    if "bcrypt" in lowered or "argon2" in lowered:
+        return False
+
     return True
