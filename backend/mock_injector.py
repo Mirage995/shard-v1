@@ -22,6 +22,7 @@ Supported:
     requests    → _MockRequests (get/post/put/delete → MockResponse)
     psycopg2    → _MockPsycopg2 (connect/cursor/execute/fetchall/fetchone/commit/close)
     pymongo     → _MockPyMongo (MongoClient → fake collection with insert/find/update/delete)
+    signal      → _MockSignal (signal/getsignal/SIG* constants — prevents Docker container crash)
 """
 
 import re
@@ -37,6 +38,7 @@ _EXT_LIBS: dict[str, str] = {
     "psycopg2": "postgres",
     "pymongo":  "mongodb",
     "requests": "http",
+    "signal":   "signal",
 }
 
 # ── Mock patches ──────────────────────────────────────────────────────────────
@@ -176,11 +178,61 @@ except Exception:
     pass
 '''
 
+_SIGNAL_PATCH = '''\
+import sys as _sys
+
+class _MockSignal:
+    """No-op signal mock — prevents Docker container crash from signal.signal()+sys.exit().
+
+    Problem: signal.signal(SIGINT, handler) + sys.exit() inside a handler kills the
+    Docker container before tests run, producing exit code 1 with no useful output.
+    Solution: intercept signal registration so handlers are stored but never fire,
+    and sys.exit() is replaced with a safe no-op raise.
+    """
+    SIGINT  = 2
+    SIGTERM = 15
+    SIGHUP  = 1
+    SIGALRM = 14
+    SIGUSR1 = 10
+    SIGUSR2 = 12
+    SIG_DFL = 0
+    SIG_IGN = 1
+    _handlers: dict = {}
+
+    @classmethod
+    def signal(cls, signum, handler):
+        """Register handler without activating it."""
+        prev = cls._handlers.get(signum, cls.SIG_DFL)
+        cls._handlers[signum] = handler
+        return prev
+
+    @classmethod
+    def getsignal(cls, signum):
+        return cls._handlers.get(signum, cls.SIG_DFL)
+
+    @classmethod
+    def raise_signal(cls, signum):
+        """Simulate signal delivery (calls handler if registered)."""
+        handler = cls._handlers.get(signum)
+        if callable(handler):
+            handler(signum, None)
+
+try:
+    import signal as _signal_mod
+    _signal_mod.signal    = _MockSignal.signal
+    _signal_mod.getsignal = _MockSignal.getsignal
+    for _attr in ("SIGINT","SIGTERM","SIGHUP","SIGALRM","SIGUSR1","SIGUSR2","SIG_DFL","SIG_IGN"):
+        setattr(_signal_mod, _attr, getattr(_MockSignal, _attr))
+except Exception:
+    pass
+'''
+
 _PATCHES: dict[str, str] = {
     "redis":    _REDIS_PATCH,
     "http":     _REQUESTS_PATCH,
     "postgres": _PSYCOPG2_PATCH,
     "mongodb":  _PYMONGO_PATCH,
+    "signal":   _SIGNAL_PATCH,
 }
 
 # Sentinel strings to detect already-injected mocks (idempotency guard)
@@ -189,6 +241,7 @@ _SENTINELS: dict[str, str] = {
     "http":     "class _MockRequests",
     "postgres": "class _MockPsycopg2Conn",
     "mongodb":  "class _MockMongoClient",
+    "signal":   "class _MockSignal",
 }
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -198,13 +251,25 @@ def detect_deps(code: str) -> Set[str]:
 
     Scans for import statements and direct usage patterns.
     Returns values from _EXT_LIBS (e.g. 'redis', 'http', 'postgres', 'mongodb').
+
+    Special case for 'signal': requires an actual import statement or signal.*()
+    call — avoids false positives from the word 'signal' in comments/strings.
     """
     deps: Set[str] = set()
     code_lower = code.lower()
     for lib, service in _EXT_LIBS.items():
-        # Match: import redis / from redis import / redis.Redis(
-        if re.search(rf"\b{re.escape(lib)}\b", code_lower):
-            deps.add(service)
+        if lib == "signal":
+            # Require explicit import or signal.signal()/signal.SIG* usage
+            if re.search(r"^\s*import\s+signal\b", code, re.MULTILINE):
+                deps.add(service)
+            elif re.search(r"^\s*from\s+signal\s+import\b", code, re.MULTILINE):
+                deps.add(service)
+            elif re.search(r"\bsignal\.signal\s*\(", code):
+                deps.add(service)
+        else:
+            # Match: import redis / from redis import / redis.Redis(
+            if re.search(rf"\b{re.escape(lib)}\b", code_lower):
+                deps.add(service)
     return deps
 
 
