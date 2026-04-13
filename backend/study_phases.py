@@ -389,6 +389,38 @@ class SynthesizePhase(BasePhase):
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
 
+        # ── Novelty gate for research mode hypotheses (#48) ───────────────────
+        # If hypothesis is already a well-known established finding, retry once
+        # with an explicit "avoid this known connection" instruction injected.
+        if ctx.research_mode and ctx.structured and ctx.structured.get("hypothesis"):
+            try:
+                _hyp = ctx.structured["hypothesis"]
+                _is_novel, _novelty_reason = await ctx.agent._check_hypothesis_novelty(_hyp)
+                if not _is_novel:
+                    print(
+                        f"[NOVELTY] Hypothesis already well-known ({_novelty_reason}) -- "
+                        f"retrying synthesis: '{_hyp.get('statement', '')[:70]}'"
+                    )
+                    _known_block = (
+                        f"\n[NOVELTY BLOCK — AVOID]\n"
+                        f"This hypothesis is already a well-established finding and must NOT be repeated:\n"
+                        f"  '{_hyp.get('statement', '')}'\n"
+                        f"Generate a DIFFERENT, more original hypothesis that has NOT been widely studied.\n"
+                    )
+                    ctx.structured = await ctx.agent.phase_synthesize(
+                        ctx.topic, ctx.raw_text,
+                        strategy_hint=ctx.best_strategy,
+                        previous_score=ctx.previous_score,
+                        episode_context=ctx.episode_context,
+                        pivot_directive=ctx.pivot_directive,
+                        research_mode=ctx.research_mode,
+                        sources=ctx.sources if ctx.research_mode else None,
+                        empirical_context=empirical_context + _known_block,
+                    )
+                    print(f"[NOVELTY] Retry complete. New hypothesis: '{(ctx.structured or {}).get('hypothesis', {}).get('statement', 'none')[:70]}'")
+            except Exception as _nv_err:
+                pass  # non-fatal
+
         # Cross-referencing with existing knowledge
         try:
             ctx.connections = await ctx.agent._cross_reference(ctx.topic, ctx.structured)

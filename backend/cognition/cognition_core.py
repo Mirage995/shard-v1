@@ -656,7 +656,7 @@ class CognitionCore:
             rows = get_by_topic(topic)
             actionable = [
                 r for r in rows
-                if r.get("status") in ("CONFIRMED", "REFUTED")
+                if r.get("status") in ("CONFIRMED", "REFUTED", "SKIPPED_TOO_COMPLEX", "SKIPPED_KNOWN")
             ]
             if not actionable:
                 return ""
@@ -668,8 +668,12 @@ class CognitionCore:
                 conf      = r.get("confidence_updated") or r.get("confidence_initial") or 0.0
                 if status == "CONFIRMED":
                     lines.append(f"  CONFIRMED: {statement} (confidence: {conf:.2f})")
-                else:
+                elif status == "REFUTED":
                     lines.append(f"  REFUTED: {statement} — avoid this direction")
+                elif status == "SKIPPED_KNOWN":
+                    lines.append(f"  ALREADY KNOWN (well-established field, not original): {statement}")
+                else:  # SKIPPED_TOO_COMPLEX
+                    lines.append(f"  PROPOSED (untested, needs external resources): {statement}")
 
             return "\n".join(lines)
 

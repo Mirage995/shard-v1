@@ -556,6 +556,49 @@ Example: ["query 1", "query 2", "query 3"]"""
         except Exception:
             return True  # default feasible on error to avoid false negatives
 
+    async def _check_hypothesis_novelty(self, hypothesis: Dict) -> tuple[bool, str]:
+        """LLM novelty gate: is this hypothesis already a well-known established finding?
+
+        Returns (is_novel, reason).
+        - is_novel=True  → proceed (hypothesis is original or understudied)
+        - is_novel=False → regenerate (well-known for 5+ years with many papers)
+
+        Defaults to (True, "check failed") on any error to avoid blocking valid hypotheses.
+        Temperature 0.0 -- binary decision.
+        """
+        statement   = hypothesis.get("statement", "")
+        domain_from = hypothesis.get("domain_from", "")
+        domain_to   = hypothesis.get("domain_to", "")
+        if not statement:
+            return True, "no statement"
+
+        prompt = (
+            f"Is this scientific hypothesis a well-known, already extensively studied connection "
+            f"(i.e. published in many papers for 5+ years with established results)? "
+            f"Or is it a novel / understudied idea worth exploring?\n\n"
+            f"Hypothesis: {statement}\n"
+            f"Domain transfer: {domain_from} → {domain_to}\n\n"
+            f"Answer with exactly one word: KNOWN (if widely established) or NOVEL (if understudied)."
+        )
+        try:
+            from llm_router import llm_complete
+        except ImportError:
+            from backend.llm_router import llm_complete
+        try:
+            answer = await llm_complete(
+                prompt=prompt,
+                system="You are a scientific literature expert. Answer with exactly one word: KNOWN or NOVEL.",
+                max_tokens=10,
+                temperature=0.0,
+                providers=PROVIDERS_PRIMARY,
+            )
+            is_novel = "NOVEL" in answer.upper()
+            logger.info("[NOVELTY] '%s' -> %s ('%s')", statement[:60], "NOVEL" if is_novel else "KNOWN", answer.strip())
+            return is_novel, answer.strip()
+        except Exception as e:
+            logger.debug("[NOVELTY] check failed (defaulting to novel): %s", e)
+            return True, "check failed"
+
     async def _generate_experiment_code(self, hypothesis: Dict) -> str:
         """Translate hypothesis.minimum_experiment into executable sandbox Python.
 
