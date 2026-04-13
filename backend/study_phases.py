@@ -1652,15 +1652,18 @@ Rules:
 
         # Vettore 1+2 -- CognitionCore relational_context on attempt >= 2
         # Full tension-aware context: Identity vs Experience vs Knowledge
+        # Skipped when ctx.no_l3 is True (#45 A/B gate)
         core_block = ""
         core = getattr(ctx.agent, "cognition_core", None)
-        if core is not None and ctx.attempt >= 2:
+        if core is not None and ctx.attempt >= 2 and not ctx.no_l3:
             try:
                 ctx.core_relational_ctx = core.relational_context(ctx.topic, research_mode=ctx.research_mode)
                 core_block = f"\n\n[COGNITION CORE -- INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
                 print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
             except Exception as _cre:
                 pass  # non-fatal
+        elif ctx.no_l3 and ctx.attempt >= 2:
+            print(f"[NO-L3] relational_context skipped at attempt {ctx.attempt} (#45 A/B baseline)")
 
         # Track previous strategy for audit_emergence
         prev_strategy = ctx.strategy_used

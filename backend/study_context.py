@@ -28,6 +28,7 @@ class StudyContext:
     pdf_paths: List[str] = field(default_factory=list)
     task_context: str = ""          # raw task files (README + code + tests) injected before study
     research_mode: bool = False     # if True: fetch from arxiv instead of DuckDuckGo (#34)
+    no_l3: bool = False             # if True: skip relational_context injection (#45 A/B gate)
 
     # ── Callbacks (set once at creation) ──────────────────────────────────────
     on_progress: Optional[Callable] = None

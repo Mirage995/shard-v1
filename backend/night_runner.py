@@ -261,7 +261,7 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
@@ -270,6 +270,7 @@ class NightRunner:
         self.topic_budget = topic_budget
         self._forced_topic: str = forced_topic.strip()
         self._research_mode: bool = research_mode
+        self._no_l3: bool = no_l3
 
         self.start_time = None
         self.api_calls_used = 0
@@ -1740,6 +1741,7 @@ class NightRunner:
                     previous_attempts=_prev_attempts,
                     resolved_errors=_session_resolved_errors,
                     research_mode=self._research_mode,
+                    no_l3=self._no_l3,
                 )
 
                 # Restore session_context -- strip mood and skill lib prefixes
@@ -2795,6 +2797,7 @@ if __name__ == "__main__":
     parser.add_argument("--session-gap", type=int, default=5, help="Seconds between sessions in continuous mode")
     parser.add_argument("--force-topic", type=str, default="", help="Pin a specific topic, bypassing all selection logic")
     parser.add_argument("--research", action="store_true", default=False, help="Use arxiv instead of DuckDuckGo for sources (#34)")
+    parser.add_argument("--no-l3", action="store_true", default=False, help="Disable L3 relational_context injection -- A/B baseline (#45)")
 
     args = parser.parse_args()
 
@@ -2826,6 +2829,7 @@ if __name__ == "__main__":
                     topic_budget=args.topic_budget,
                     forced_topic=args.force_topic,
                     research_mode=args.research,
+                    no_l3=args.no_l3,
                 )
                 asyncio.run(runner.run())
             except KeyboardInterrupt:
@@ -2843,6 +2847,7 @@ if __name__ == "__main__":
             topic_budget=args.topic_budget,
             forced_topic=args.force_topic,
             research_mode=args.research,
+            no_l3=args.no_l3,
         )
         try:
             asyncio.run(runner.run())

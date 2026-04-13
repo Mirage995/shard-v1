@@ -1756,6 +1756,7 @@ AUTO-EXAM (Questions and Answers):
         previous_attempts: int = 0,
         resolved_errors: Optional[set] = None,
         research_mode: bool = False,
+        no_l3: bool = False,
     ):
         """Complete study loop -- delegates to StudyPipeline.
 
@@ -1795,6 +1796,7 @@ AUTO-EXAM (Questions and Answers):
             previous_attempts=previous_attempts,
             resolved_errors=resolved_errors if resolved_errors is not None else set(),
             research_mode=research_mode,
+            no_l3=no_l3,
         )
 
         pipeline = StudyPipeline([
