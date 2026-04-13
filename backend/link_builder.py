@@ -33,6 +33,17 @@ from shard_db import execute, executemany, query
 logger = logging.getLogger("shard.link_builder")
 
 
+def _domain_of(source_ref: str) -> str:
+    """Return the domain for a topic via WorldModel. Fails silently → 'unknown'."""
+    if not source_ref:
+        return "unknown"
+    try:
+        from world_model import WorldModel  # noqa: PLC0415
+        return WorldModel.load_or_default().domain_of(source_ref) or "unknown"
+    except Exception:
+        return "unknown"
+
+
 class MemoryLinkBuilder:
     """Builds and queries cross-reference links between memories."""
 
@@ -83,9 +94,17 @@ class MemoryLinkBuilder:
             if new_type_rows else False
         )
 
+        # Look up source_ref + domain of the new memory for co-occurrence boost (#44)
+        new_src_rows = query(
+            "SELECT source_ref FROM memories WHERE id=? LIMIT 1",
+            (memory_id,),
+        )
+        new_source_ref = new_src_rows[0]["source_ref"] if new_src_rows else ""
+        new_domain = _domain_of(new_source_ref)
+
         # Load recent is_latest memories from same container (excluding self)
         candidates = query(
-            """SELECT id, entities, memory_type
+            """SELECT id, entities, memory_type, source_ref
                FROM memories
                WHERE is_latest = 1
                AND container_tag = ?
@@ -113,7 +132,13 @@ class MemoryLinkBuilder:
 
             # Failure-failure boost: two failure memories on same topic cluster tighter
             both_are_failures = new_is_failure and cand.get("memory_type") == "EPISODE_FAILURE"
-            weight = float(overlap) + (1.0 if both_are_failures else 0.0)
+
+            # Domain co-occurrence boost (#44): same domain → +0.5
+            cand_domain = _domain_of(cand.get("source_ref", ""))
+            same_domain = new_domain != "unknown" and new_domain == cand_domain
+            domain_bonus = 0.5 if same_domain else 0.0
+
+            weight = float(overlap) + (1.0 if both_are_failures else 0.0) + domain_bonus
 
             # Bidirectional: both directions, ON CONFLICT DO NOTHING via PK
             rows.append((memory_id, cand["id"], "entity_overlap", weight, now))
