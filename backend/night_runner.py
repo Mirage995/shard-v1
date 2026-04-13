@@ -500,6 +500,29 @@ class NightRunner:
         recent_10 = list(self._recent_topics)[-10:]
         return topic.lower().strip() in [t.lower().strip() for t in recent_10]
 
+    def _prereq_is_stuck(self, topic: str, max_fails: int = 3) -> bool:
+        """True if topic has >= max_fails uncertified attempts (#46 goal cooldown).
+
+        Prevents redirect loops where a near-miss prerequisite (score 6.0–7.4)
+        never certifies but keeps being injected as a gate for harder topics.
+        Distinct from quarantine (which only fires for hard fails < 6.0).
+        """
+        try:
+            from shard_db import query_one as _qone
+            row = _qone(
+                "SELECT COUNT(*) AS n FROM experiments WHERE LOWER(topic)=LOWER(?) AND certified=0",
+                (topic.strip(),),
+            )
+            stuck = bool(row and row["n"] >= max_fails)
+            if stuck:
+                self.logger.info(
+                    "[PREREQ] '%s' is stuck (%d uncertified attempts) -- skipping as prerequisite",
+                    topic, row["n"],
+                )
+            return stuck
+        except Exception:
+            return False
+
     def _is_certified_recently(self, topic: str, hours: int = 24) -> bool:
         """True if topic was certified within the last `hours` hours.
 
@@ -1411,6 +1434,7 @@ class NightRunner:
                             and not is_trivial_topic(_p, self.logger)
                             and not self._is_quarantined(_p)
                             and not self._is_avoided(_p)
+                            and not self._prereq_is_stuck(_p)  # #46 goal cooldown
                         )
                     ]
                     if _safe_prereqs:
