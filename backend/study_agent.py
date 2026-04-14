@@ -540,15 +540,19 @@ Example: ["query 1", "query 2", "query 3"]"""
         )
         prompt = (
             f"Does this experiment REQUIRE any of the following?\n"
-            f"- Real datasets (ImageNet, CIFAR, etc.)\n"
-            f"- Network access or downloads\n"
+            f"- Large external datasets (ImageNet, CIFAR-10, etc.) that must be downloaded\n"
+            f"- Network access or downloads during execution\n"
             f"- GPU or significant compute (>120s on CPU)\n"
             f"- Pre-trained model weights from external sources\n"
             f"- Complex architectures impossible to simulate at toy scale\n\n"
+            f"NOTE: The sandbox already has these available WITHOUT downloading:\n"
+            f"  sklearn.datasets.load_digits() -- 1797 real digit images\n"
+            f"  sklearn.datasets.load_breast_cancer() -- 569 real samples\n"
+            f"  numpy, torch (CPU), sklearn, scipy, pandas\n\n"
             f"Hypothesis: {statement}\n"
             f"Experiment: {minimum_exp}\n\n"
-            f"Answer with exactly one word: YES (needs real resources) "
-            f"or NO (can run with synthetic data on CPU)."
+            f"Answer with exactly one word: YES (needs unavailable resources) "
+            f"or NO (can run in the described sandbox)."
         )
         try:
             answer = await self._think(prompt, system=system, temperature=0.1)
@@ -557,14 +561,17 @@ Example: ["query 1", "query 2", "query 3"]"""
             return True  # default feasible on error to avoid false negatives
 
     async def _check_hypothesis_novelty(self, hypothesis: Dict) -> tuple[bool, str]:
-        """LLM novelty gate: is this hypothesis already a well-known established finding?
+        """Novelty gate: arxiv search + LLM judge.
+
+        Two-stage check:
+        1. Search arxiv for the hypothesis statement. If 5+ directly relevant
+           papers are found with high title overlap, mark as KNOWN immediately.
+        2. Otherwise, ask the LLM with the arxiv evidence as context.
 
         Returns (is_novel, reason).
-        - is_novel=True  → proceed (hypothesis is original or understudied)
-        - is_novel=False → regenerate (well-known for 5+ years with many papers)
-
-        Defaults to (True, "check failed") on any error to avoid blocking valid hypotheses.
-        Temperature 0.0 -- binary decision.
+        - is_novel=True  → proceed
+        - is_novel=False → regenerate
+        Defaults to (True, "check failed") on any error.
         """
         statement   = hypothesis.get("statement", "")
         domain_from = hypothesis.get("domain_from", "")
@@ -572,12 +579,50 @@ Example: ["query 1", "query 2", "query 3"]"""
         if not statement:
             return True, "no statement"
 
+        # ── Stage 1: arxiv search ─────────────────────────────────────────────
+        arxiv_summary = ""
+        arxiv_hit_count = 0
+        try:
+            import arxiv as _arxiv
+            import asyncio as _asyncio
+            # Build a compact query from key terms in the statement
+            query_terms = " ".join(statement.split()[:12])
+            client = _arxiv.Client()
+            results = list(client.results(_arxiv.Search(
+                query=query_terms, max_results=5,
+                sort_by=_arxiv.SortCriterion.Relevance,
+            )))
+            if results:
+                lines = []
+                for r in results:
+                    lines.append(f"- {r.title} ({r.published.year if r.published else '?'})")
+                arxiv_summary = "Related arxiv papers found:\n" + "\n".join(lines)
+                arxiv_hit_count = len(results)
+                print(f"[NOVELTY] arxiv: {arxiv_hit_count} results for '{query_terms[:50]}'")
+                print(f"[NOVELTY] Top hit: {results[0].title}")
+
+                # Fast-path: if top-3 titles are very similar to statement → KNOWN
+                stmt_words = set(statement.lower().split())
+                for r in results[:3]:
+                    title_words = set(r.title.lower().split())
+                    overlap = len(stmt_words & title_words) / (len(stmt_words) + 1e-8)
+                    if overlap > 0.35:
+                        reason = f"KNOWN (arxiv match: '{r.title}')"
+                        logger.info("[NOVELTY] Fast-path KNOWN: overlap=%.2f '%s'", overlap, r.title)
+                        return False, reason
+        except Exception as _e:
+            logger.debug("[NOVELTY] arxiv search failed: %s", _e)
+            arxiv_summary = ""
+
+        # ── Stage 2: LLM judge with arxiv evidence ────────────────────────────
+        arxiv_block = f"\n\n{arxiv_summary}\n" if arxiv_summary else ""
         prompt = (
             f"Is this scientific hypothesis a well-known, already extensively studied connection "
-            f"(i.e. published in many papers for 5+ years with established results)? "
+            f"(published in many papers for 5+ years with established results)? "
             f"Or is it a novel / understudied idea worth exploring?\n\n"
             f"Hypothesis: {statement}\n"
-            f"Domain transfer: {domain_from} → {domain_to}\n\n"
+            f"Domain transfer: {domain_from} → {domain_to}"
+            f"{arxiv_block}\n"
             f"Answer with exactly one word: KNOWN (if widely established) or NOVEL (if understudied)."
         )
         try:
@@ -609,11 +654,22 @@ Example: ["query 1", "query 2", "query 3"]"""
         "sequential task", "lifelong learning",
     ])
 
+    _CLASSIFICATION_KEYWORDS = frozenset([
+        "classification", "classifier", "accuracy", "digits", "mnist",
+        "breast cancer", "load_digits", "load_breast", "overfitting",
+        "generalization", "regularization", "dropout", "weight decay",
+        "feature selection", "dimensionality", "svm", "random forest",
+        "logistic regression", "neural network classification",
+    ])
+
     def _detect_domain(self, statement: str, minimum_exp: str) -> str:
         """Return a domain tag used to select the experiment scaffold."""
         combined = (statement + " " + minimum_exp).lower()
+        # Continual learning takes precedence
         if any(kw in combined for kw in self._CONTINUAL_LEARNING_KEYWORDS):
             return "continual_learning"
+        if any(kw in combined for kw in self._CLASSIFICATION_KEYWORDS):
+            return "classification"
         return "generic"
 
     async def _generate_experiment_code(self, hypothesis: Dict) -> str:
@@ -690,6 +746,47 @@ CRITICAL RULES:
 - CPU only — no .cuda() calls.
 - Total epochs: 200+200 = 400 max. Should complete in under 60 seconds.
 """
+        elif domain_tag == "classification":
+            scaffold_note = """
+EXPERIMENT DOMAIN: classification on a REAL benchmark dataset.
+
+Use sklearn.datasets.load_digits() — already installed, no download needed.
+It provides 1797 samples of 8x8 handwritten digit images, 10 classes.
+Alternatively use load_breast_cancer() for binary classification (569 samples).
+
+REQUIRED STRUCTURE:
+1. Load the dataset:
+   from sklearn.datasets import load_digits
+   data = load_digits()
+   X, y = data.data, data.target
+   Normalize: X = X / 16.0  (pixel values 0-16)
+
+2. Split into train/test (stratified, test_size=0.3, random_state=42):
+   from sklearn.model_selection import train_test_split
+   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
+
+3. Implement the TECHNIQUE from the hypothesis (e.g. a novel regularization, architecture
+   variant, gradient modification, data augmentation strategy, etc.).
+
+4. Implement a BASELINE — the standard approach without the technique.
+
+5. Train BOTH on X_train, evaluate on X_test.
+   Measure: accuracy_technique and accuracy_baseline.
+
+6. score = (accuracy_technique - accuracy_baseline) / (1.0 - accuracy_baseline + 1e-8)
+   (normalized improvement over baseline; positive = technique wins)
+
+7. Assertions + RESULT:
+   assert accuracy_baseline >= 0.70, f"Baseline too weak to be meaningful: {accuracy_baseline}"
+   assert 0 <= accuracy_technique <= 1.0
+   print('OK All assertions passed')
+   print('RESULT:', round(min(max(float(score), 0.0), 1.0), 4))
+
+CRITICAL:
+- Use real load_digits() data — NOT synthetic random data.
+- Technique and baseline must be DIFFERENT (not the same model with a flag).
+- Score measures how much the technique outperforms baseline on a real dataset.
+"""
         else:
             scaffold_note = """
 REQUIRED STRUCTURE:
@@ -708,7 +805,7 @@ REQUIRED STRUCTURE:
             "HARD CONSTRAINTS:\n"
             "- Zero network calls, zero downloads, zero file I/O\n"
             "- Allowed libraries ONLY: numpy, sklearn, torch (CPU), scipy, pandas\n"
-            "- Generate ALL data synthetically inline — no external datasets\n"
+            "- sklearn.datasets.load_digits() and load_breast_cancer() ARE available (pre-bundled in sklearn)\n"
             "- Code must complete in under 120 seconds\n"
             "- No persistent processes, no while True, no server patterns\n"
             "- print('OK All assertions passed') MUST appear before the RESULT line\n"
@@ -944,23 +1041,44 @@ Return ONLY valid JSON:
 {source_papers_block}{empirical_block}
 [RESEARCH MODE -- HYPOTHESIS GENERATION]
 In addition to the standard fields, generate a "hypothesis" field.
-A hypothesis is a NON-OBVIOUS connection between two concepts from the text.
-It must be falsifiable and testable with local resources (no lab required).
 
-Your hypothesis MUST draw a connection between concepts explicitly present in the source papers above.
-Do not invent connections not supported by the sources.
+WHAT MAKES A GOOD HYPOTHESIS:
+- A CROSS-DOMAIN transfer: take a technique from domain A and apply it to solve a
+  problem in domain B where it has NOT been systematically tested.
+- A COMBINATION of two techniques that are normally used independently — hypothesize
+  that their interaction produces an emergent effect.
+- A PARAMETER REGIME claim: "technique X underperforms at scale Y but dominates at
+  scale Z" — something specific about when/where a known technique breaks.
+
+WHAT TO AVOID (these are already known, do not repeat them):
+- "dropout prevents overfitting" (Srivastava 2014)
+- "batch normalization accelerates training" (Ioffe 2015)
+- "residual connections improve gradient flow" (He 2016)
+- Any single well-known technique described in isolation.
+- Any hypothesis whose statement could appear verbatim in a textbook.
+
+SANDBOX RESOURCES AVAILABLE FOR minimum_experiment:
+- sklearn.datasets.load_digits() → 1797 real 8x8 digit images, 10 classes, no download
+- sklearn.datasets.load_breast_cancer() → 569 real samples, binary classification
+- numpy, torch (CPU), sklearn, scipy, pandas
+- NO internet, NO GPU, NO external files
+
+Your hypothesis MUST be testable using ONLY these resources.
+For minimum_experiment: describe the exact comparison (technique vs baseline on
+load_digits or load_breast_cancer), what metric to measure, and expected direction.
 
 "hypothesis": {{
-  "statement": "one sentence -- the non-obvious connection",
-  "domain_from": "the source concept/domain",
-  "domain_to": "the target concept/domain",
-  "rationale": "why this connection is non-obvious (1-2 sentences)",
+  "statement": "one sentence — the specific, non-obvious cross-domain claim",
+  "domain_from": "source domain/technique",
+  "domain_to": "target domain/problem where it is applied",
+  "rationale": "why this transfer is non-obvious and has NOT been widely studied (cite what IS known, explain the gap)",
   "falsifiable": true or false,
-  "minimum_experiment": "minimal test to validate this with local/free resources",
+  "minimum_experiment": "exact test: dataset=load_digits/load_breast_cancer, metric=accuracy/forgetting/variance, comparison=technique_A vs baseline_B",
   "confidence": 0.0 to 1.0
 }}
 
-If you cannot generate a valid falsifiable hypothesis, set "hypothesis": null.
+If you cannot generate a novel, falsifiable, cross-domain hypothesis, set "hypothesis": null.
+Do NOT set "falsifiable": true for vague claims that cannot be measured numerically.
 """
 
         prompt = f"""
