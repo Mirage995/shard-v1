@@ -599,6 +599,23 @@ Example: ["query 1", "query 2", "query 3"]"""
             logger.debug("[NOVELTY] check failed (defaulting to novel): %s", e)
             return True, "check failed"
 
+    # ------------------------------------------------------------------ #
+    # Domain classifiers for experiment scaffolding                      #
+    # ------------------------------------------------------------------ #
+    _CONTINUAL_LEARNING_KEYWORDS = frozenset([
+        "catastrophic forgetting", "continual learning", "forgetting",
+        "task 1", "task 2", "task1", "task2", "ogd", "ewc", "orthogonal gradient",
+        "elastic weight", "neural variability", "anv", "retain", "plasticity",
+        "sequential task", "lifelong learning",
+    ])
+
+    def _detect_domain(self, statement: str, minimum_exp: str) -> str:
+        """Return a domain tag used to select the experiment scaffold."""
+        combined = (statement + " " + minimum_exp).lower()
+        if any(kw in combined for kw in self._CONTINUAL_LEARNING_KEYWORDS):
+            return "continual_learning"
+        return "generic"
+
     async def _generate_experiment_code(self, hypothesis: Dict) -> str:
         """Translate hypothesis.minimum_experiment into executable sandbox Python.
 
@@ -613,19 +630,69 @@ Example: ["query 1", "query 2", "query 3"]"""
         minimum_exp      = hypothesis.get("minimum_experiment", "")
         confidence       = hypothesis.get("confidence", 0.0)
 
+        domain_tag = self._detect_domain(statement, minimum_exp)
+
+        # -------------------------------------------------------------- #
+        # Domain-specific scaffolds inject precise structural requirements #
+        # -------------------------------------------------------------- #
+        if domain_tag == "continual_learning":
+            scaffold_note = """
+EXPERIMENT DOMAIN: continual learning / catastrophic forgetting.
+
+REQUIRED STRUCTURE — follow this exact pattern:
+1. Create a small MLP (e.g., 2-3 layers, 64 units) using numpy or torch.
+2. Generate Task 1 data (e.g., class 0 vs class 1, binary XOR or linearly separable, ~200 samples).
+3. Train the model on Task 1. Record accuracy_task1_before (must be >= 0.75 to pass guard).
+4. Generate Task 2 data (different distribution / different classes, ~200 samples).
+5. Implement the technique stated in the hypothesis (OGD, ANV, EWC, etc.) — NOT vanilla SGD.
+   Also implement a BASELINE without the technique (plain SGD) for comparison.
+6. Train BOTH models on Task 2.
+7. Measure accuracy on Task 1 AFTER Task 2 training:
+   - technique_task1_after  (the hypothesis model)
+   - baseline_task1_after   (plain SGD)
+8. forgetting_baseline  = accuracy_task1_before - baseline_task1_after
+   forgetting_technique = accuracy_task1_before - technique_task1_after
+   score = (forgetting_baseline - forgetting_technique) / (forgetting_baseline + 1e-8)
+   (positive score means technique reduced forgetting vs baseline)
+9. ASSERTIONS (all must pass before RESULT line):
+   assert accuracy_task1_before >= 0.55, f"Task 1 pre-training accuracy too low: {accuracy_task1_before}"
+   assert 0.0 <= score <= 2.0, f"Score out of range: {score}"
+   print('OK All assertions passed')
+10. FINAL line: print('RESULT:', round(min(max(float(score), 0.0), 1.0), 4))
+
+IMPORTANT:
+- Do NOT use random.random() as your score. Compute it from actual accuracy measurements.
+- If torch is used, use CPU only (no .cuda()). Keep epochs <= 50 to stay under 120s.
+- If the technique is OGD, project gradients to be orthogonal to gradients from Task 1.
+- If the technique is ANV, add small Gaussian noise to weights during Task 2 training.
+- If the technique is EWC, add a quadratic penalty on important weights.
+"""
+        else:
+            scaffold_note = """
+REQUIRED STRUCTURE:
+1. Generate ALL data synthetically inline (< 500 samples).
+2. Implement the core mechanism of the hypothesis.
+3. Also implement a simple baseline for comparison.
+4. Add at least 2 assertions that verify meaningful output values (not trivially true):
+   assert <condition>, "<description>"
+   print('OK All assertions passed')
+5. Compute score = how much the technique outperforms baseline (0.0-1.0 scale).
+6. FINAL line: print('RESULT:', round(float(score), 4))
+"""
+
         system = (
             "Generate executable Python code to test a scientific hypothesis.\n"
             "HARD CONSTRAINTS:\n"
             "- Zero network calls, zero downloads, zero file I/O\n"
             "- Allowed libraries ONLY: numpy, sklearn, torch (CPU), scipy, pandas\n"
             "- Generate ALL data synthetically inline — no external datasets\n"
-            "- Simulate the hypothesis domain at toy scale (< 1000 samples)\n"
-            "- The FINAL line of code MUST be exactly:\n"
+            "- Code must complete in under 120 seconds\n"
+            "- No persistent processes, no while True, no server patterns\n"
+            "- print('OK All assertions passed') MUST appear before the RESULT line\n"
+            "- The FINAL line MUST be exactly:\n"
             "    print('RESULT:', round(float(score), 4))\n"
             "  where score is 0.0-1.0 measuring hypothesis validity\n"
             "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
-            "- Code must complete in under 120 seconds\n"
-            "- No persistent processes, no while True, no server patterns\n"
             "Return ONLY the Python code. No explanation, no markdown, no backticks."
         )
 
@@ -636,10 +703,10 @@ Domain to:          {domain_to}
 Initial confidence: {confidence}
 Experiment design:  {minimum_exp}
 
-Write Python code that tests whether this hypothesis holds at toy scale
-using only synthetic data. Measure the result as a score 0.0-1.0."""
+{scaffold_note}
+Follow the structure above exactly. Compute score from real measurements, not random numbers."""
 
-        print(f"[EXPERIMENT] Generating experiment code for: '{statement[:60]}...'")
+        print(f"[EXPERIMENT] Generating experiment code for: '{statement[:60]}...' (domain={domain_tag})")
         code = await self._think(prompt, system=system, temperature=0.4)
 
         # Strip accidental markdown fences if model ignores instructions
