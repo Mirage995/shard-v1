@@ -579,42 +579,78 @@ Example: ["query 1", "query 2", "query 3"]"""
         if not statement:
             return True, "no statement"
 
-        # ── Stage 1: arxiv search ─────────────────────────────────────────────
+        # ── Stage 1: arxiv search + semantic relevance check ─────────────────
         arxiv_summary = ""
         arxiv_hit_count = 0
+        arxiv_results = []
         try:
             import arxiv as _arxiv
-            import asyncio as _asyncio
-            # Build a compact query from key terms in the statement
             query_terms = " ".join(statement.split()[:12])
             client = _arxiv.Client()
-            results = list(client.results(_arxiv.Search(
+            arxiv_results = list(client.results(_arxiv.Search(
                 query=query_terms, max_results=5,
                 sort_by=_arxiv.SortCriterion.Relevance,
             )))
-            if results:
+            if arxiv_results:
                 lines = []
-                for r in results:
-                    lines.append(f"- {r.title} ({r.published.year if r.published else '?'})")
+                for r in arxiv_results:
+                    abstract_snippet = (r.summary or "")[:200].replace("\n", " ")
+                    lines.append(f"- {r.title} ({r.published.year if r.published else '?'}): {abstract_snippet}")
                 arxiv_summary = "Related arxiv papers found:\n" + "\n".join(lines)
-                arxiv_hit_count = len(results)
+                arxiv_hit_count = len(arxiv_results)
                 print(f"[NOVELTY] arxiv: {arxiv_hit_count} results for '{query_terms[:50]}'")
-                print(f"[NOVELTY] Top hit: {results[0].title}")
+                print(f"[NOVELTY] Top hit: {arxiv_results[0].title}")
 
-                # Fast-path: if top-3 titles are very similar to statement → KNOWN
+                # Fast-path 1: word overlap on title
                 stmt_words = set(statement.lower().split())
-                for r in results[:3]:
+                for r in arxiv_results[:3]:
                     title_words = set(r.title.lower().split())
                     overlap = len(stmt_words & title_words) / (len(stmt_words) + 1e-8)
                     if overlap > 0.35:
-                        reason = f"KNOWN (arxiv match: '{r.title}')"
+                        reason = f"KNOWN (title overlap {overlap:.0%}: '{r.title}')"
                         logger.info("[NOVELTY] Fast-path KNOWN: overlap=%.2f '%s'", overlap, r.title)
                         return False, reason
         except Exception as _e:
             logger.debug("[NOVELTY] arxiv search failed: %s", _e)
             arxiv_summary = ""
+            arxiv_results = []
 
-        # ── Stage 2: LLM judge with arxiv evidence ────────────────────────────
+        # ── Stage 1b: LLM semantic relevance check on top arxiv hit ──────────
+        # Word overlap misses papers that are semantically identical but use
+        # different terminology. Ask the LLM directly about the top hit.
+        if arxiv_results:
+            top = arxiv_results[0]
+            top_abstract = (top.summary or "")[:400].replace("\n", " ")
+            relevance_prompt = (
+                f"Paper title: {top.title}\n"
+                f"Paper abstract (excerpt): {top_abstract}\n\n"
+                f"Hypothesis: {statement}\n\n"
+                f"Does this paper DIRECTLY test, prove, or refute the same specific claim "
+                f"as the hypothesis above? Answer with exactly one word: YES or NO."
+            )
+            try:
+                from llm_router import llm_complete
+            except ImportError:
+                from backend.llm_router import llm_complete
+            try:
+                relevance_answer = await llm_complete(
+                    prompt=relevance_prompt,
+                    system="You are a scientific literature expert. Answer with exactly one word: YES or NO.",
+                    max_tokens=5,
+                    temperature=0.0,
+                    providers=PROVIDERS_PRIMARY,
+                )
+                if "YES" in relevance_answer.upper():
+                    reason = f"KNOWN (LLM confirms top paper directly tests same claim: '{top.title}')"
+                    logger.info("[NOVELTY] Semantic match KNOWN: '%s'", top.title)
+                    print(f"[NOVELTY] Top hit is directly relevant → KNOWN")
+                    return False, reason
+                else:
+                    print(f"[NOVELTY] Top hit not directly relevant (LLM: NO) → continuing")
+            except Exception as _e2:
+                logger.debug("[NOVELTY] relevance LLM check failed: %s", _e2)
+
+        # ── Stage 2: LLM judge with full arxiv evidence ───────────────────────
         arxiv_block = f"\n\n{arxiv_summary}\n" if arxiv_summary else ""
         prompt = (
             f"Is this scientific hypothesis a well-known, already extensively studied connection "
@@ -662,13 +698,25 @@ Example: ["query 1", "query 2", "query 3"]"""
         "logistic regression", "neural network classification",
     ])
 
+    _QUANTUM_LIKE_KEYWORDS = frozenset([
+        "quantum-like", "quantum like", "quantum model", "density matrix",
+        "superposition", "interference", "entanglement", "wave function",
+        "contextuality", "qlra", "open quantum system", "quantum cognition",
+        "quantum biology", "quantum formalism", "probability amplitude",
+        "hilbert space", "quantum probability", "decoherence", "quantum brain",
+        "quantum neuroscience", "ligand binding quantum", "quantum molecular",
+        "khrennikov", "quantum-like modeling",
+    ])
+
     def _detect_domain(self, statement: str, minimum_exp) -> str:
         """Return a domain tag used to select the experiment scaffold."""
         # minimum_exp may be a dict if LLM returned nested JSON — coerce to str
         combined = (str(statement) + " " + str(minimum_exp)).lower()
-        # Continual learning takes precedence
+        # Priority: most specific first
         if any(kw in combined for kw in self._CONTINUAL_LEARNING_KEYWORDS):
             return "continual_learning"
+        if any(kw in combined for kw in self._QUANTUM_LIKE_KEYWORDS):
+            return "quantum_like"
         if any(kw in combined for kw in self._CLASSIFICATION_KEYWORDS):
             return "classification"
         return "generic"
@@ -748,6 +796,56 @@ CRITICAL RULES:
 - Do NOT use random.random() as your score. Score must come from accuracy measurements.
 - CPU only — no .cuda() calls.
 - Total epochs: 200+200 = 400 max. Should complete in under 60 seconds.
+"""
+        elif domain_tag == "quantum_like":
+            scaffold_note = """
+EXPERIMENT DOMAIN: quantum-like modeling.
+
+This hypothesis involves quantum-like mathematical formalism applied to a biological
+or cognitive domain. Do NOT simulate it with a classical ensemble or voting classifier.
+Instead, implement an actual quantum-like model using density matrices and interference.
+
+REQUIRED STRUCTURE — implement this toy quantum-like binding model:
+
+Step 1 — Define the quantum-like state space:
+  import numpy as np
+  np.random.seed(42)
+  dim = 4  # Hilbert space dimension (small, tractable)
+  # A "pure state" is a unit vector in C^dim
+  # A density matrix is rho = |psi><psi|
+
+Step 2 — Generate N=200 ligand-receptor interaction samples:
+  - Each sample is a pair (ligand_state, receptor_state) as normalized complex vectors in C^dim
+  - Label y=1 if quantum-like interference term is positive (binding), y=0 otherwise
+  - Interference term: I = Re(psi_ligand.conj() @ psi_receptor)
+  - Add Gaussian noise to simulate stochastic molecular environment
+
+Step 3 — Implement TECHNIQUE: quantum-like classifier
+  - Predict binding (y=1) using: sign(Re(psi_ligand.conj() @ H @ psi_receptor))
+    where H is a learned Hermitian interaction matrix (fit by gradient-free optimization
+    or just use the identity for a zero-parameter baseline first)
+  - Or: use density matrix overlap: Tr(rho_ligand @ rho_receptor) as binding score
+
+Step 4 — Implement BASELINE: classical dot-product classifier
+  - Treat ligand/receptor vectors as real-valued feature vectors (flatten Re+Im parts)
+  - Classify using threshold on |dot(v_ligand, v_receptor)|
+
+Step 5 — Compare: accuracy_technique vs accuracy_baseline on held-out 30% test split.
+  Use train_test_split(X, y, test_size=0.3, random_state=42).
+
+Step 6 — score = (accuracy_technique - accuracy_baseline) / (1.0 - accuracy_baseline + 1e-8)
+
+Step 7 — Assertions + RESULT:
+  assert accuracy_baseline >= 0.50, f"Baseline too weak: {accuracy_baseline}"
+  assert 0 <= accuracy_technique <= 1.0
+  print('OK All assertions passed')
+  print('RESULT:', round(min(max(float(score), 0.0), 1.0), 4))
+
+IMPORTANT:
+- Use numpy complex arrays (dtype=complex128) for quantum states.
+- Keep dim <= 8 to stay tractable on CPU.
+- Do NOT use RandomForest, voting ensembles, or classical ML as the "quantum" model.
+- The quantum-like model must use interference, density matrices, or probability amplitudes.
 """
         elif domain_tag == "classification":
             scaffold_note = """
