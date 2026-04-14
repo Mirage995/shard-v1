@@ -639,33 +639,56 @@ Example: ["query 1", "query 2", "query 3"]"""
             scaffold_note = """
 EXPERIMENT DOMAIN: continual learning / catastrophic forgetting.
 
-REQUIRED STRUCTURE — follow this exact pattern:
-1. Create a small MLP (e.g., 2-3 layers, 64 units) using numpy or torch.
-2. Generate Task 1 data (e.g., class 0 vs class 1, binary XOR or linearly separable, ~200 samples).
-3. Train the model on Task 1. Record accuracy_task1_before (must be >= 0.75 to pass guard).
-4. Generate Task 2 data (different distribution / different classes, ~200 samples).
-5. Implement the technique stated in the hypothesis (OGD, ANV, EWC, etc.) — NOT vanilla SGD.
-   Also implement a BASELINE without the technique (plain SGD) for comparison.
-6. Train BOTH models on Task 2.
-7. Measure accuracy on Task 1 AFTER Task 2 training:
-   - technique_task1_after  (the hypothesis model)
-   - baseline_task1_after   (plain SGD)
-8. forgetting_baseline  = accuracy_task1_before - baseline_task1_after
-   forgetting_technique = accuracy_task1_before - technique_task1_after
-   score = (forgetting_baseline - forgetting_technique) / (forgetting_baseline + 1e-8)
-   (positive score means technique reduced forgetting vs baseline)
-9. ASSERTIONS (all must pass before RESULT line):
-   assert accuracy_task1_before >= 0.55, f"Task 1 pre-training accuracy too low: {accuracy_task1_before}"
-   assert 0.0 <= score <= 2.0, f"Score out of range: {score}"
-   print('OK All assertions passed')
-10. FINAL line: print('RESULT:', round(min(max(float(score), 0.0), 1.0), 4))
+REQUIRED STRUCTURE — follow this EXACT pattern, step by step:
 
-IMPORTANT:
-- Do NOT use random.random() as your score. Compute it from actual accuracy measurements.
-- If torch is used, use CPU only (no .cuda()). Keep epochs <= 50 to stay under 120s.
-- If the technique is OGD, project gradients to be orthogonal to gradients from Task 1.
-- If the technique is ANV, add small Gaussian noise to weights during Task 2 training.
-- If the technique is EWC, add a quadratic penalty on important weights.
+Step 1 — Define a small MLP class (2-3 layers, 32-64 units) using torch (CPU only).
+
+Step 2 — Generate Task 1 data: ~200 linearly separable samples, binary labels.
+  Use torch.manual_seed(42) and np.random.seed(42) for reproducibility.
+
+Step 3 — Train ONE base model on Task 1 for 200 epochs, lr=0.05, CrossEntropyLoss.
+  Record: accuracy_task1_before = fraction of Task 1 correctly classified.
+
+Step 4 — Save Task 1 gradients: do one more forward+backward on Task 1 data,
+  then: task1_grads = [p.grad.clone().detach() for p in model.parameters()]
+
+Step 5 — Generate Task 2 data: ~200 samples, DIFFERENT feature threshold from Task 1.
+
+Step 6 — Create TWO INDEPENDENT model copies using copy.deepcopy(model):
+  model_baseline = copy.deepcopy(model)   # will be trained with vanilla SGD
+  model_technique = copy.deepcopy(model)  # will use the technique from hypothesis
+
+Step 7 — Train BOTH on Task 2 for 200 epochs, lr=0.05:
+  model_baseline: vanilla SGD, no modifications.
+  model_technique: apply the technique from the hypothesis at each step:
+    - OGD: after loss.backward(), for each param p and task1 grad g:
+        proj = (p.grad.view(-1) @ g.view(-1)) / (g.view(-1).norm()**2 + 1e-8)
+        p.grad.data -= proj * g
+    - ANV: after optimizer.step(), add Gaussian noise:
+        p.data += torch.randn_like(p) * 0.003
+    - EWC: add L2 penalty on weight deviation from task1 params.
+
+Step 8 — Measure Task 1 accuracy on BOTH after Task 2:
+  baseline_task1_after  = accuracy of model_baseline on Task 1
+  technique_task1_after = accuracy of model_technique on Task 1
+
+Step 9 — Compute forgetting and score:
+  forgetting_baseline  = accuracy_task1_before - baseline_task1_after
+  forgetting_technique = accuracy_task1_before - technique_task1_after
+  score = (forgetting_baseline - forgetting_technique) / (forgetting_baseline + 1e-8)
+
+Step 10 — Assertions + RESULT (in this order):
+  assert accuracy_task1_before >= 0.55, f"Task 1 pre-training accuracy too low: {accuracy_task1_before}"
+  assert -2.0 <= score <= 2.0, f"Score out of range: {score}"
+  print('OK All assertions passed')
+  print('RESULT:', round(min(max(float(score), 0.0), 1.0), 4))
+
+CRITICAL RULES:
+- import copy and use copy.deepcopy(model) for BOTH model_baseline and model_technique.
+  NEVER wrap the same model object in two different classes — they must be fully independent.
+- Do NOT use random.random() as your score. Score must come from accuracy measurements.
+- CPU only — no .cuda() calls.
+- Total epochs: 200+200 = 400 max. Should complete in under 60 seconds.
 """
         else:
             scaffold_note = """
