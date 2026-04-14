@@ -662,9 +662,10 @@ Example: ["query 1", "query 2", "query 3"]"""
         "logistic regression", "neural network classification",
     ])
 
-    def _detect_domain(self, statement: str, minimum_exp: str) -> str:
+    def _detect_domain(self, statement: str, minimum_exp) -> str:
         """Return a domain tag used to select the experiment scaffold."""
-        combined = (statement + " " + minimum_exp).lower()
+        # minimum_exp may be a dict if LLM returned nested JSON — coerce to str
+        combined = (str(statement) + " " + str(minimum_exp)).lower()
         # Continual learning takes precedence
         if any(kw in combined for kw in self._CONTINUAL_LEARNING_KEYWORDS):
             return "continual_learning"
@@ -680,10 +681,12 @@ Example: ["query 1", "query 2", "query 3"]"""
         Temperature 0.4 -- deterministic enough for code, not 0.3 to allow
         minor creative choices in synthetic data generation.
         """
-        statement        = hypothesis.get("statement", "")
-        domain_from      = hypothesis.get("domain_from", "")
-        domain_to        = hypothesis.get("domain_to", "")
-        minimum_exp      = hypothesis.get("minimum_experiment", "")
+        statement        = str(hypothesis.get("statement", ""))
+        domain_from      = str(hypothesis.get("domain_from", ""))
+        domain_to        = str(hypothesis.get("domain_to", ""))
+        # minimum_experiment may be a dict if LLM returned nested JSON -- coerce
+        _min_exp_raw     = hypothesis.get("minimum_experiment", "")
+        minimum_exp      = str(_min_exp_raw) if not isinstance(_min_exp_raw, str) else _min_exp_raw
         confidence       = hypothesis.get("confidence", 0.0)
 
         domain_tag = self._detect_domain(statement, minimum_exp)
