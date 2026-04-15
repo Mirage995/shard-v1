@@ -519,6 +519,24 @@ Example: ["query 1", "query 2", "query 3"]"""
 
     # ── EXPERIMENT ENGINE (#35) ───────────────────────────────────────────────
 
+    # Keywords indicating a wet-lab / molecular biology hypothesis that cannot
+    # be meaningfully simulated with a toy ML classification task.
+    _BIO_CHEM_KEYWORDS = frozenset([
+        "molecular", "ligand", "receptor", "protein", "enzyme",
+        "pharmacology", "drug target", "neurotransmitter", "cell membrane",
+        "metabol", "biochem", "amino acid", "peptide", "neuroscience",
+        "neurochemistry", "synaptic", "neurotoxin", "ion channel",
+        "gpcr", "signaling pathway", "kinase", "transcription factor",
+        "gene expression", "dna", "rna", "mrna", "epigenetic",
+    ])
+    # Keywords indicating the minimum_experiment proposes an ML proxy
+    # that is unrelated to the biological domain of the hypothesis.
+    _ML_PROXY_KEYWORDS = frozenset([
+        "mnist", "load_digits", "digits dataset", "image classification",
+        "logistic regression on", "random forest on", "svm on",
+        "classify images", "digit recognition",
+    ])
+
     async def _is_experiment_feasible(self, hypothesis: Dict) -> bool:
         """Quick LLM gate: can minimum_experiment run in a headless Python sandbox?
 
@@ -530,6 +548,21 @@ Example: ["query 1", "query 2", "query 3"]"""
         statement   = hypothesis.get("statement", "")
 
         if not minimum_exp.strip():
+            return False
+
+        # ── Domain mismatch guard ─────────────────────────────────────────────
+        # A biology/chemistry hypothesis described with an ML proxy experiment
+        # (e.g. MNIST classification for a neurochemistry idea) is not feasible:
+        # the experiment does not test the hypothesis at all.
+        stmt_lower    = statement.lower()
+        min_exp_lower = str(minimum_exp).lower()
+        _is_bio       = any(kw in stmt_lower for kw in self._BIO_CHEM_KEYWORDS)
+        _uses_ml_proxy = any(kw in min_exp_lower for kw in self._ML_PROXY_KEYWORDS)
+        if _is_bio and _uses_ml_proxy:
+            logger.info(
+                "[FEASIBILITY] Domain mismatch: bio/chem hypothesis with ML proxy → SKIP_TOO_COMPLEX"
+            )
+            print("[FEASIBILITY] SKIP: biology/chemistry hypothesis cannot be proxied by ML classification")
             return False
 
         system = (
@@ -615,51 +648,57 @@ Example: ["query 1", "query 2", "query 3"]"""
             arxiv_summary = ""
             arxiv_results = []
 
-        # ── Stage 1b: LLM semantic relevance check on top arxiv hit ──────────
+        # ── Stage 1b: LLM semantic relevance check on ALL arxiv hits ────────
         # Word overlap misses papers that are semantically identical but use
-        # different terminology. Ask the LLM directly about the top hit.
+        # different terminology. Check all results, not just the top hit.
         if arxiv_results:
-            top = arxiv_results[0]
-            top_abstract = (top.summary or "")[:400].replace("\n", " ")
-            relevance_prompt = (
-                f"Paper title: {top.title}\n"
-                f"Paper abstract (excerpt): {top_abstract}\n\n"
-                f"Hypothesis: {statement}\n\n"
-                f"Does this paper DIRECTLY test, prove, or refute the same specific claim "
-                f"as the hypothesis above? Answer with exactly one word: YES or NO."
-            )
             try:
                 from llm_router import llm_complete
             except ImportError:
                 from backend.llm_router import llm_complete
-            try:
-                relevance_answer = await llm_complete(
-                    prompt=relevance_prompt,
-                    system="You are a scientific literature expert. Answer with exactly one word: YES or NO.",
-                    max_tokens=5,
-                    temperature=0.0,
-                    providers=PROVIDERS_PRIMARY,
+
+            for hit in arxiv_results:
+                hit_abstract = (hit.summary or "")[:300].replace("\n", " ")
+                relevance_prompt = (
+                    f"Paper title: {hit.title}\n"
+                    f"Year: {hit.published.year if hit.published else '?'}\n"
+                    f"Abstract excerpt: {hit_abstract}\n\n"
+                    f"Hypothesis: {statement}\n\n"
+                    f"Does this paper DIRECTLY test, prove, or refute the same specific claim "
+                    f"as the hypothesis above? Answer with exactly one word: YES or NO."
                 )
-                if "YES" in relevance_answer.upper():
-                    reason = f"KNOWN (LLM confirms top paper directly tests same claim: '{top.title}')"
-                    logger.info("[NOVELTY] Semantic match KNOWN: '%s'", top.title)
-                    print(f"[NOVELTY] Top hit is directly relevant → KNOWN")
-                    return False, reason
-                else:
-                    print(f"[NOVELTY] Top hit not directly relevant (LLM: NO) → continuing")
-            except Exception as _e2:
-                logger.debug("[NOVELTY] relevance LLM check failed: %s", _e2)
+                try:
+                    relevance_answer = await llm_complete(
+                        prompt=relevance_prompt,
+                        system="You are a scientific literature expert. Answer with exactly one word: YES or NO.",
+                        max_tokens=5,
+                        temperature=0.0,
+                        providers=PROVIDERS_PRIMARY,
+                    )
+                    if "YES" in relevance_answer.upper():
+                        reason = f"KNOWN (LLM confirms paper directly tests same claim: '{hit.title}')"
+                        logger.info("[NOVELTY] Semantic match KNOWN: '%s'", hit.title)
+                        print(f"[NOVELTY] Hit is directly relevant → KNOWN: {hit.title[:60]}")
+                        return False, reason
+                except Exception as _e2:
+                    logger.debug("[NOVELTY] relevance LLM check failed for '%s': %s", hit.title, _e2)
+            print(f"[NOVELTY] No arxiv hit directly matches hypothesis → continuing to Stage 2")
 
         # ── Stage 2: LLM judge with full arxiv evidence ───────────────────────
+        # Lower bar: KNOWN if documented in literature at all, not just "extensively studied".
         arxiv_block = f"\n\n{arxiv_summary}\n" if arxiv_summary else ""
         prompt = (
-            f"Is this scientific hypothesis a well-known, already extensively studied connection "
-            f"(published in many papers for 5+ years with established results)? "
-            f"Or is it a novel / understudied idea worth exploring?\n\n"
+            f"Is the following scientific hypothesis already documented in the scientific "
+            f"literature — meaning someone has published a paper, study, or review that "
+            f"directly addresses this specific connection or claim?\n\n"
             f"Hypothesis: {statement}\n"
             f"Domain transfer: {domain_from} → {domain_to}"
             f"{arxiv_block}\n"
-            f"Answer with exactly one word: KNOWN (if widely established) or NOVEL (if understudied)."
+            f"Answer KNOWN if this connection appears in published scientific literature "
+            f"(even a single paper from any year). "
+            f"Answer NOVEL only if you have no knowledge of any publication testing this "
+            f"specific claim.\n"
+            f"Answer with exactly one word: KNOWN or NOVEL."
         )
         try:
             from llm_router import llm_complete
