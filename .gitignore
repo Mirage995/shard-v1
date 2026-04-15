@@ -106,3 +106,51 @@ test_patch_ui.py
 test_popup.txt
 test_swe.py
 .shard_cache/
+
+# ── SHARD: Root-level junk files (created by sandbox cwd bug) ─────────────────
+/max_fails
+/str
+/%d
+/%s
+/0
+/3
+/7.5
+/0.65
+/0.6)
+/2)
+/120s
+/CERTIFY
+/CONFIRMED
+/(CONFIRMED
+/None
+/Dict
+/Poi
+/pass_rate
+/new_relevance}
+/runs
+/List[Dict]
+
+# ── SHARD: Exposed settings copies (never commit) ─────────────────────────────
+settings*.json
+settings\ -\ *.json
+*\ -\ Copia.json
+
+# ── SHARD: Debug/temp scripts in root ─────────────────────────────────────────
+debug_*.py
+tmp_*.py
+test_out*.txt
+validation_*.log
+ab_results_*.json
+schemacallemilio.txt
+ruvector.db
+
+# ── SHARD: ChromaDB (binary, regenerable) ─────────────────────────────────────
+shard_memory/chromadb/
+shard_memory/*.bak
+
+# ── SHARD: Visual input (large binary files) ──────────────────────────────────
+shard_workspace/visual_input/
+backend/face_landmarker.task
+
+# ── SHARD: Benchmark forge artifacts ──────────────────────────────────────────
+benchmark/task_forge_*/
