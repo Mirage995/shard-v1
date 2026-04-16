@@ -521,49 +521,84 @@ Example: ["query 1", "query 2", "query 3"]"""
 
     # Keywords indicating a wet-lab / molecular biology hypothesis that cannot
     # be meaningfully simulated with a toy ML classification task.
-    _BIO_CHEM_KEYWORDS = frozenset([
+    # Non-ML/non-CS scientific domains — hypotheses in these domains cannot be
+    # meaningfully tested by an ML classification proxy on digits/breast cancer.
+    # Extends the original bio/chem list to cover physics, materials, social science, etc.
+    _NON_ML_DOMAIN_KEYWORDS = frozenset([
+        # Biology / Chemistry
         "molecular", "ligand", "receptor", "protein", "enzyme",
         "pharmacology", "drug target", "neurotransmitter", "cell membrane",
         "metabol", "biochem", "amino acid", "peptide", "neuroscience",
         "neurochemistry", "synaptic", "neurotoxin", "ion channel",
         "gpcr", "signaling pathway", "kinase", "transcription factor",
         "gene expression", "dna", "rna", "mrna", "epigenetic",
+        # Physics / Materials
+        "average-atom", "average atom", "mean-field", "mean field",
+        "quantum", "thermodynamic", "statistical mechanic", "hamiltonian",
+        "plasma", "lattice", "crystal", "phonon", "electron density",
+        "density functional", "equation of state", "phase transition",
+        "condensed matter", "solid state", "atomic", "nuclear",
+        "2d material", "graphene", "electronic propert", "band structure",
+        "blazar", "gamma-ray", "astrophysic", "spectral emission",
+        "wildfire", "power line", "geospatial risk",
+        # Pure mathematics applied to physical/material domains
+        "quaternion", "differential geometry", "riemannian", "manifold",
+        "topological", "cohomolog", "homolog", "fiber bundle",
+        "algebraic geometry", "symplectic", "spinor",
+        # Social / Economic domains (when used as physics analogy source)
+        "opinion dynamics", "epidemic spread", "contagion model",
+        "voter model", "ising model applied",
+        # Earth / Climate
+        "climate model", "geophysical", "oceanograph", "atmospheric",
     ])
-    # Keywords indicating the minimum_experiment proposes an ML proxy
-    # that is unrelated to the biological domain of the hypothesis.
+    # Kept as alias for backwards compatibility with any external references
+    _BIO_CHEM_KEYWORDS = _NON_ML_DOMAIN_KEYWORDS
+
+    # Keywords indicating the minimum_experiment proposes a generic ML proxy
+    # that does not test the non-ML hypothesis at all.
     _ML_PROXY_KEYWORDS = frozenset([
         "mnist", "load_digits", "digits dataset", "image classification",
         "logistic regression on", "random forest on", "svm on",
         "classify images", "digit recognition",
+        "dataset=load_digits", "metric=accuracy", "load_breast_cancer",
+        # Generic patterns that indicate an LLM-generated ML proxy spec
+        "using metrics such as accuracy", "metric=accuracy and variance",
+        "predictive power", "classification accuracy",
     ])
 
-    async def _is_experiment_feasible(self, hypothesis: Dict) -> bool:
+    async def _is_experiment_feasible(self, hypothesis: Dict) -> str:
         """Quick LLM gate: can minimum_experiment run in a headless Python sandbox?
 
-        Returns True (feasible) or False (too abstract / needs real data/GPU/network).
-        Temperature 0.1 -- binary decision, must be stable.
-        Defaults to True on any error to avoid false negatives.
+        Returns one of three strings:
+          "local"   -- can run in sandbox as-is
+          "kaggle"  -- scientifically valid but needs GPU/downloads; generate code anyway
+          "invalid" -- domain mismatch or no minimum_experiment; skip with no code
+
+        Temperature 0.1 -- must be stable.
+        Defaults to "local" on any error to avoid false negatives.
         """
         minimum_exp = hypothesis.get("minimum_experiment", "")
         statement   = hypothesis.get("statement", "")
 
         if not minimum_exp.strip():
-            return False
+            return "invalid"
 
         # ── Domain mismatch guard ─────────────────────────────────────────────
-        # A biology/chemistry hypothesis described with an ML proxy experiment
-        # (e.g. MNIST classification for a neurochemistry idea) is not feasible:
-        # the experiment does not test the hypothesis at all.
+        # A non-ML/non-CS hypothesis (physics, biology, chemistry, materials...)
+        # paired with a generic ML classification proxy does NOT test the
+        # hypothesis at all → hard skip, no code worth generating.
         stmt_lower    = statement.lower()
         min_exp_lower = str(minimum_exp).lower()
-        _is_bio       = any(kw in stmt_lower for kw in self._BIO_CHEM_KEYWORDS)
+        _matched_kw   = next((kw for kw in self._NON_ML_DOMAIN_KEYWORDS if kw in stmt_lower), None)
+        _is_non_ml    = _matched_kw is not None
         _uses_ml_proxy = any(kw in min_exp_lower for kw in self._ML_PROXY_KEYWORDS)
-        if _is_bio and _uses_ml_proxy:
+        if _is_non_ml and _uses_ml_proxy:
             logger.info(
-                "[FEASIBILITY] Domain mismatch: bio/chem hypothesis with ML proxy → SKIP_TOO_COMPLEX"
+                "[FEASIBILITY] Domain mismatch: non-ML hypothesis ('%s') with ML proxy → invalid",
+                _matched_kw,
             )
-            print("[FEASIBILITY] SKIP: biology/chemistry hypothesis cannot be proxied by ML classification")
-            return False
+            print(f"[FEASIBILITY] SKIP: non-ML hypothesis (matched: '{_matched_kw}') cannot be proxied by ML classification")
+            return "invalid"
 
         system = (
             "You are a strict sandbox feasibility checker. "
@@ -589,9 +624,12 @@ Example: ["query 1", "query 2", "query 3"]"""
         )
         try:
             answer = await self._think(prompt, system=system, temperature=0.1)
-            return "NO" in answer.upper()  # NO = non serve niente di esterno = feasible
+            if "NO" in answer.upper():
+                return "local"   # runs in sandbox
+            else:
+                return "kaggle"  # valid science, needs external compute
         except Exception:
-            return True  # default feasible on error to avoid false negatives
+            return "local"  # default feasible on error to avoid false negatives
 
     async def _check_hypothesis_novelty(self, hypothesis: Dict) -> tuple[bool, str]:
         """Novelty gate: arxiv search + LLM judge.
@@ -760,8 +798,131 @@ Example: ["query 1", "query 2", "query 3"]"""
             return "classification"
         return "generic"
 
-    async def _generate_experiment_code(self, hypothesis: Dict) -> str:
-        """Translate hypothesis.minimum_experiment into executable sandbox Python.
+    async def _validate_experiment_alignment(self, hypothesis: Dict,
+                                               attempt: int = 0) -> Dict:
+        """LLM scientific reviewer: does minimum_experiment actually test the hypothesis?
+
+        Returns a structured dict:
+          alignment_score  : float 0.0-1.0
+          verdict          : "VALID" | "REWRITE" | "INVALID"
+          issues           : list[str]
+          rewritten        : str | None
+          is_implementable : bool
+          required_tools   : list[str]
+          estimated_runtime: "short" | "medium" | "long"
+          attempt          : int
+
+        Score thresholds (permissive to avoid over-constraining):
+          >= 0.70 → VALID
+          >= 0.30 → REWRITE  (prefer rewrite over discard)
+          <  0.30 → INVALID
+
+        Fails open: returns VALID on any error.
+        """
+        statement   = hypothesis.get("statement", "")
+        min_exp     = str(hypothesis.get("minimum_experiment", ""))
+        domain_from = hypothesis.get("domain_from", "")
+        domain_to   = hypothesis.get("domain_to", "")
+
+        system = (
+            "You are a scientific peer reviewer. Evaluate whether a proposed experiment "
+            "genuinely tests a stated hypothesis. Be precise but not overly strict: "
+            "prefer REWRITE over INVALID when an experiment can be salvaged."
+        )
+        prompt = f"""HYPOTHESIS:
+  Statement:   {statement}
+  Domain from: {domain_from}
+  Domain to:   {domain_to}
+
+PROPOSED EXPERIMENT:
+  {min_exp}
+
+Score the experiment on 4 criteria (0.0-1.0 each), then average for alignment_score.
+alignment_score MUST be a float with at least one decimal place (e.g. 0.60, 0.75, 0.85).
+Do NOT return 1.0 unless the experiment is a textbook-perfect test of the hypothesis — that is rare.
+Typical scores: 0.30=weak, 0.50=partial, 0.70=good, 0.85=strong, 0.95=excellent.
+
+1. CAUSAL LINK: Does the experiment model the mechanism the hypothesis describes?
+   1.0=direct test of the stated mechanism | 0.5=related but indirect proxy | 0.0=completely unrelated
+
+2. DOMAIN FIDELITY: Does the experiment use data/structures from the hypothesis domain?
+   1.0=appropriate domain data or synthetic analogue | 0.5=partial proxy | 0.0=wrong domain (e.g. load_digits for a physics hypothesis)
+
+3. FALSIFIABILITY: Would a negative result specifically disprove this hypothesis?
+   1.0=clear metric that fails if hypothesis is wrong | 0.5=partially distinguishing | 0.0=result is the same regardless of technique
+
+4. IMPLEMENTABILITY: Is the experiment runnable with numpy/scipy/torch-CPU, no downloads?
+   1.0=fully synthetic, no internet needed | 0.5=needs GPU/dataset (feasible on Kaggle) | 0.0=needs external API/RL environment/large corpus
+
+DECISION (apply these thresholds to the averaged score):
+  alignment_score >= 0.70 → VALID
+  alignment_score >= 0.30 → REWRITE (fix the experiment spec, keep the hypothesis)
+  alignment_score <  0.30 → INVALID
+
+For REWRITE: write a corrected minimum_experiment using numpy/scipy synthetic data that
+DIRECTLY models the phenomenon. Be specific about: data structure, technique vs baseline,
+metric, expected direction. Keep it implementable in a CPU sandbox.
+
+Respond with valid JSON only:
+{{
+  "alignment_score": <0.0-1.0>,
+  "verdict": "VALID" | "REWRITE" | "INVALID",
+  "issues": ["specific issue 1", "specific issue 2"],
+  "rewritten": "corrected minimum_experiment or null",
+  "is_implementable": true | false,
+  "required_tools": ["numpy", "scipy", "torch"],
+  "estimated_runtime": "short" | "medium" | "long"
+}}"""
+
+        try:
+            raw = await self._think(prompt, system=system, json_mode=True, temperature=0.1)
+            from utils import safe_json_load
+            result = safe_json_load(raw)
+            if not isinstance(result, dict):
+                return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
+                        "issues": [], "is_implementable": True, "estimated_runtime": "short",
+                        "required_tools": [], "attempt": attempt}
+
+            # Score-based verdict (override LLM's own verdict for stability)
+            score = float(result.get("alignment_score", 0.75))
+            score = max(0.0, min(1.0, score))
+            if score >= 0.70:
+                verdict = "VALID"
+            elif score >= 0.30:
+                verdict = "REWRITE"
+            else:
+                verdict = "INVALID"
+
+            # implementability override: long runtime → kaggle at best, not local
+            runtime = result.get("estimated_runtime", "short")
+            if not result.get("is_implementable", True) and runtime == "long":
+                if verdict == "VALID":
+                    verdict = "REWRITE"  # downgrade, don't skip
+
+            result.update({
+                "verdict":          verdict,
+                "alignment_score":  score,
+                "attempt":          attempt,
+                "is_implementable": result.get("is_implementable", True),
+                "required_tools":   result.get("required_tools", []),
+                "estimated_runtime": runtime,
+            })
+            issues_str = "; ".join(result.get("issues", []))[:100]
+            print(f"[EXPERIMENT_ALIGN] attempt={attempt} {verdict} score={score:.2f} "
+                  f"impl={result['is_implementable']} runtime={runtime} — {issues_str}")
+            return result
+
+        except Exception as exc:
+            logger.warning("[EXPERIMENT_ALIGN] failed (fail open): %s", exc)
+            return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
+                    "issues": [], "is_implementable": True, "estimated_runtime": "short",
+                    "required_tools": [], "attempt": attempt}
+
+    async def _generate_experiment_code(self, hypothesis: Dict, kaggle_mode: bool = False) -> str:
+        """Translate hypothesis.minimum_experiment into executable Python.
+
+        kaggle_mode=False → sandbox code (numpy/sklearn/torch CPU, no downloads, <120s)
+        kaggle_mode=True  → Kaggle notebook code (GPU, torchvision, real datasets OK)
 
         Called by ExperimentDesignPhase when research_mode=True.
         Returns raw Python code string (no markdown, no explanation).
@@ -940,21 +1101,189 @@ REQUIRED STRUCTURE:
 6. FINAL line: print('RESULT:', round(float(score), 4))
 """
 
-        system = (
-            "Generate executable Python code to test a scientific hypothesis.\n"
-            "HARD CONSTRAINTS:\n"
-            "- Zero network calls, zero downloads, zero file I/O\n"
-            "- Allowed libraries ONLY: numpy, sklearn, torch (CPU), scipy, pandas\n"
-            "- sklearn.datasets.load_digits() and load_breast_cancer() ARE available (pre-bundled in sklearn)\n"
-            "- Code must complete in under 120 seconds\n"
-            "- No persistent processes, no while True, no server patterns\n"
-            "- print('OK All assertions passed') MUST appear before the RESULT line\n"
-            "- The FINAL line MUST be exactly:\n"
-            "    print('RESULT:', round(float(score), 4))\n"
-            "  where score is 0.0-1.0 measuring hypothesis validity\n"
-            "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
-            "Return ONLY the Python code. No explanation, no markdown, no backticks."
-        )
+        # ── Kaggle scaffold overrides (validated patterns, GPU-ready) ─────────
+        if kaggle_mode and domain_tag == "continual_learning":
+            scaffold_note = """
+EXPERIMENT DOMAIN: continual learning / catastrophic forgetting — KAGGLE GPU MODE.
+
+Use the following EXACT structure (validated on Kaggle T4 GPU):
+
+--- IMPORTS AND SETUP ---
+import torch, torch.nn as nn, torch.optim as optim
+from torch.utils.data import DataLoader, Subset
+from torchvision import datasets, transforms
+import numpy as np, random, matplotlib.pyplot as plt
+from copy import deepcopy
+
+SEED = 42; torch.manual_seed(SEED); np.random.seed(SEED); random.seed(SEED)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Device: {DEVICE}")
+
+--- DATA: Split-MNIST ---
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+train_full = datasets.MNIST(".", train=True,  download=True, transform=transform)
+test_full  = datasets.MNIST(".", train=False, download=True, transform=transform)
+
+def split_by_labels(dataset, labels):
+    idx = [i for i, (_, y) in enumerate(dataset) if y in labels]
+    return Subset(dataset, idx)
+
+def make_loader(dataset, labels, batch_size=256, train=True):
+    return DataLoader(split_by_labels(dataset, labels), batch_size=batch_size, shuffle=train)
+
+train1 = make_loader(train_full, set(range(5)),     train=True)
+test1  = make_loader(test_full,  set(range(5)),     train=False)
+train2 = make_loader(train_full, set(range(5, 10)), train=True)
+test2  = make_loader(test_full,  set(range(5, 10)), train=False)
+
+--- MODEL: small MLP ---
+class MLP(nn.Module):
+    def __init__(self, hidden=256):
+        super().__init__()
+        self.net = nn.Sequential(nn.Flatten(), nn.Linear(784, hidden), nn.ReLU(),
+                                 nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, 5))
+    def forward(self, x): return self.net(x)
+
+--- HELPERS ---
+def accuracy(model, loader, label_offset=0):
+    model.eval(); correct = total = 0
+    with torch.no_grad():
+        for x, y in loader:
+            x, y = x.to(DEVICE), (y - label_offset).to(DEVICE)
+            correct += (model(x).argmax(1) == y).sum().item(); total += len(y)
+    return correct / total
+
+# ANV hook factory — use factory pattern to avoid closure issues
+def make_hook(sigma):
+    def h(mod, inp, out): return out * (1 + sigma * torch.randn_like(out))
+    return h
+
+def train_epoch(model, loader, optimizer, label_offset=0, anv_noise=0.0, grad_proj_fn=None):
+    model.train(); total_loss = 0; criterion = nn.CrossEntropyLoss()
+    for x, y in loader:
+        x, y = x.to(DEVICE), (y - label_offset).to(DEVICE)
+        hooks = []
+        if anv_noise > 0:
+            for layer in model.net:
+                if isinstance(layer, nn.ReLU):
+                    hooks.append(layer.register_forward_hook(make_hook(anv_noise)))
+        optimizer.zero_grad(); loss = criterion(model(x), y); loss.backward()
+        if grad_proj_fn is not None: grad_proj_fn(model)
+        optimizer.step()
+        for h in hooks: h.remove()
+        total_loss += loss.item()
+    return total_loss / len(loader)
+
+# OGD: collect gradient basis from task-1, then project new gradients onto orthogonal complement
+def collect_task_gradient_basis(model, loader, label_offset=0, n_batches=30):
+    criterion = nn.CrossEntropyLoss(); basis = []
+    for i, (x, y) in enumerate(loader):
+        if i >= n_batches: break
+        x, y = x.to(DEVICE), (y - label_offset).to(DEVICE)
+        model.zero_grad(); criterion(model(x), y).backward()
+        g = torch.cat([p.grad.data.clone().flatten() for p in model.parameters() if p.grad is not None])
+        basis.append(g); model.zero_grad()
+    return basis
+
+def make_ogd_projector(basis_vecs, eps=1e-8):
+    normed = [v / v.norm() for v in basis_vecs if v.norm() > eps]
+    def project(model):
+        g_flat = torch.cat([p.grad.data.flatten() for p in model.parameters() if p.grad is not None])
+        for v in normed: g_flat = g_flat - (g_flat @ v) * v
+        offset = 0
+        for p in model.parameters():
+            if p.grad is None: continue
+            size = p.grad.data.numel()
+            p.grad.data.copy_(g_flat[offset:offset + size].view_as(p.grad.data)); offset += size
+    return project
+
+--- EXPERIMENT: 4 CONDITIONS ---
+EPOCHS_T1 = 5; EPOCHS_T2 = 5; LR = 1e-3; ANV_SIGMA = 0.15; OGD_BATCHES = 30
+results = {}
+
+def run_condition(name, use_anv=False, use_ogd=False):
+    print(f"\\n{'='*50}\\n{name}\\n{'='*50}")
+    model = MLP().to(DEVICE)
+    opt   = optim.SGD(model.parameters(), lr=LR, momentum=0.9)
+    for ep in range(EPOCHS_T1):
+        loss = train_epoch(model, train1, opt, label_offset=0, anv_noise=ANV_SIGMA if use_anv else 0.0)
+        print(f"  T1 ep{ep+1}: loss={loss:.3f} acc={accuracy(model, test1):.3f}")
+    t1_before = accuracy(model, test1, label_offset=0)
+    proj_fn = None
+    if use_ogd:
+        proj_fn = make_ogd_projector(collect_task_gradient_basis(model, train1, n_batches=OGD_BATCHES))
+    for ep in range(EPOCHS_T2):
+        train_epoch(model, train2, opt, label_offset=5,
+                    anv_noise=ANV_SIGMA if use_anv else 0.0, grad_proj_fn=proj_fn)
+    t1_after = accuracy(model, test1, label_offset=0)
+    t2_after = accuracy(model, test2, label_offset=5)
+    bwt = t1_before - t1_after
+    results[name] = dict(t1_before=t1_before, t1_after=t1_after, t2_after=t2_after, bwt=bwt)
+    print(f"  BWT={bwt:.4f}  T2={t2_after:.4f}")
+
+# Replace technique names below with the actual hypothesis technique
+run_condition("Baseline (SGD)",  use_anv=False, use_ogd=False)
+run_condition("Technique only",  use_anv=True,  use_ogd=False)   # adapt flags to hypothesis
+run_condition("OGD only",        use_anv=False, use_ogd=True)
+run_condition("Combined",        use_anv=True,  use_ogd=True)    # hypothesis combination
+
+--- SCORING AND RESULT ---
+baseline_bwt  = results["Baseline (SGD)"]["bwt"]
+technique_bwt = results["Combined"]["bwt"]          # use the hypothesis condition
+score = (baseline_bwt - technique_bwt) / (baseline_bwt + 1e-8)
+score = round(min(max(float(score), 0.0), 1.0), 4)
+
+print("\\n" + "="*60)
+print(f"{'Condition':<20} {'T1_before':>10} {'T1_after':>9} {'T2_after':>9} {'BWT':>7}")
+print("-"*60)
+for k, r in results.items():
+    print(f"{k:<20} {r['t1_before']:>10.4f} {r['t1_after']:>9.4f} {r['t2_after']:>9.4f} {r['bwt']:>7.4f}")
+print("="*60)
+assert results["Baseline (SGD)"]["t1_before"] >= 0.90, "Task-1 pre-training too weak"
+assert 0 <= score <= 1.0, f"Score out of range: {score}"
+print('OK All assertions passed')
+print('RESULT:', score)
+"""
+
+        if kaggle_mode:
+            system = (
+                "Generate self-contained Python code for a Kaggle notebook to test a scientific hypothesis.\n"
+                "CONSTRAINTS:\n"
+                "- Target: Kaggle GPU environment (Tesla T4 or P100)\n"
+                "- Available: torch (CUDA), torchvision, numpy, sklearn, scipy, pandas, matplotlib\n"
+                "- Datasets: torchvision.datasets.MNIST, CIFAR10, etc. (downloaded via torchvision)\n"
+                "- Code must be self-contained and run top-to-bottom in a single cell\n"
+                "- Use DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n"
+                "- print('OK All assertions passed') MUST appear before the RESULT line\n"
+                "- The FINAL line MUST be exactly:\n"
+                "    print('RESULT:', round(float(score), 4))\n"
+                "  where score is 0.0-1.0 measuring hypothesis validity\n"
+                "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
+                "- Add a summary table printed at the end comparing baseline vs technique\n"
+                "Return ONLY the Python code. No explanation, no markdown, no backticks."
+            )
+        else:
+            system = (
+                "Generate executable Python code to test a scientific hypothesis.\n"
+                "HARD CONSTRAINTS:\n"
+                "- Zero network calls, zero downloads, zero file I/O\n"
+                "- Allowed libraries ONLY: numpy, sklearn, torch (CPU), scipy, pandas\n"
+                "- sklearn.datasets.load_digits() and load_breast_cancer() ARE available (pre-bundled in sklearn)\n"
+                "- Code must complete in under 120 seconds\n"
+                "- No persistent processes, no while True, no server patterns\n"
+                "\n"
+                "MANDATORY OUTPUT PROTOCOL (non-negotiable):\n"
+                "Your code MUST end with EXACTLY these two print statements in this order:\n"
+                "  print('OK All assertions passed')\n"
+                "  print('RESULT:', round(float(score), 4))\n"
+                "\n"
+                "The RESULT line is parsed by an automated system.\n"
+                "If this line is missing, the entire experiment is discarded as INCONCLUSIVE.\n"
+                "score must be a float 0.0-1.0 derived from real measurements:\n"
+                "  score = (technique_metric - baseline_metric) / (baseline_metric + 1e-8)\n"
+                "Do NOT use random numbers or constants as score.\n"
+                "Return ONLY the Python code. No explanation, no markdown, no backticks."
+            )
 
         prompt = f"""Hypothesis to test:
 Statement:          {statement}
@@ -996,12 +1325,35 @@ Follow the structure above exactly. Compute score from real measurements, not ra
         domain_to   = hypothesis.get("domain_to", "")
         conf_init   = hypothesis.get("confidence", 0.0)
 
-        # Extract numeric RESULT if present
-        result_match = _re.search(r"RESULT:\s*([\d.]+)", stdout)
+        # ── Deterministic RESULT extraction ──────────────────────────────────
+        # Allow negative deltas (e.g. BWT reduction) with [-+]?
+        result_match = _re.search(r"RESULT:\s*([-+]?[\d.]+)", stdout)
         result_score = float(result_match.group(1)) if result_match else None
-        result_line  = f"Numeric RESULT extracted: {result_score}" if result_score is not None else "No RESULT line found in stdout."
 
-        prompt = f"""You are evaluating the outcome of a hypothesis experiment.
+        # Fix 1: if no RESULT line → INCONCLUSIVE immediately, never ask LLM to guess
+        if result_score is None:
+            reason = (
+                "Experiment produced no RESULT line in stdout -- cannot evaluate numerically."
+            )
+            print(f"[EXPERIMENT] No RESULT line found -- forcing INCONCLUSIVE")
+            return {
+                "status":             "INCONCLUSIVE",
+                "confidence_updated": conf_init,
+                "reasoning":          reason,
+            }
+
+        # ── Status derived purely from numeric score (deterministic) ─────────
+        if result_score >= 0.65:
+            det_status = "CONFIRMED"
+        elif result_score <= 0.35:
+            det_status = "REFUTED"
+        else:
+            det_status = "INCONCLUSIVE"
+
+        print(f"[EXPERIMENT] Validating result (result_score={result_score} -> {det_status})...")
+
+        # Ask LLM only for reasoning text (status already decided)
+        prompt = f"""You are writing the reasoning for an experiment verdict that has already been determined.
 
 Hypothesis:
   Statement:   {statement}
@@ -1010,45 +1362,32 @@ Hypothesis:
   Initial confidence: {conf_init}
 
 Experiment output:
-  STDOUT: {stdout[:800] or '(empty)'}
-  STDERR: {stderr[:400] or '(none)'}
-  {result_line}
+  STDOUT: {stdout[:600] or '(empty)'}
+  STDERR: {stderr[:300] or '(none)'}
+  Numeric RESULT extracted: {result_score}
+  Verdict (already decided): {det_status}
 
-Based on the experiment output, decide:
-1. status: CONFIRMED if result >= 0.65, REFUTED if result <= 0.35, INCONCLUSIVE otherwise.
-   If no RESULT line was found or execution failed, use INCONCLUSIVE.
-2. confidence_updated: revised confidence 0.0-1.0 based on actual result
-3. reasoning: one sentence explaining the verdict
+Write one concise sentence explaining why RESULT={result_score} leads to {det_status}.
+Also provide a revised confidence (0.0-1.0).
 
 Return ONLY valid JSON:
-{{"status": "CONFIRMED|REFUTED|INCONCLUSIVE", "confidence_updated": 0.0, "reasoning": "..."}}"""
+{{"status": "{det_status}", "confidence_updated": 0.0, "reasoning": "..."}}"""
 
-        print(f"[EXPERIMENT] Validating result (result_score={result_score})...")
         raw = await self._think(prompt, json_mode=True, temperature=0.3)
 
         from study_utils import safe_json_load
         data = safe_json_load(raw)
 
-        # Validate and sanitize
-        valid_statuses = {"CONFIRMED", "REFUTED", "INCONCLUSIVE"}
-        if not isinstance(data, dict) or data.get("status") not in valid_statuses:
-            # Fallback: derive from numeric score if available
-            if result_score is not None:
-                if result_score >= 0.65:
-                    status = "CONFIRMED"
-                elif result_score <= 0.35:
-                    status = "REFUTED"
-                else:
-                    status = "INCONCLUSIVE"
-                return {
-                    "status": status,
-                    "confidence_updated": result_score,
-                    "reasoning": f"Derived from RESULT score {result_score} (LLM parse failed).",
-                }
-            return {"status": "INCONCLUSIVE", "confidence_updated": conf_init, "reasoning": "Could not parse LLM verdict."}
+        # Fix 1b: enforce deterministic status regardless of what LLM returns
+        if not isinstance(data, dict):
+            data = {}
+        data["status"] = det_status
 
-        # Clamp confidence to valid range
-        conf = float(data.get("confidence_updated", conf_init))
+        # Clamp confidence to valid range; fallback to result_score if LLM gives garbage
+        try:
+            conf = float(data.get("confidence_updated", result_score))
+        except (TypeError, ValueError):
+            conf = result_score
         data["confidence_updated"] = max(0.0, min(1.0, conf))
         return data
 
@@ -1177,8 +1516,30 @@ Return ONLY valid JSON:
                     f"Your hypothesis MUST explore a direction not already listed above as REFUTED.\n"
                 )
 
+            # Domain diversity guardrail: inject recently used domain pairs so LLM explores new territory
+            domain_diversity_block = ""
+            try:
+                from shard_db import get_db as _get_shard_db
+                _recent = _get_shard_db().execute(
+                    "SELECT DISTINCT domain_from, domain_to FROM research_hypotheses "
+                    "ORDER BY created_at DESC LIMIT 10"
+                ).fetchall()
+                if _recent:
+                    _pairs = [f"- {r['domain_from']} -> {r['domain_to']}" for r in _recent
+                              if r['domain_from'] and r['domain_to']]
+                    if _pairs:
+                        domain_diversity_block = (
+                            f"\n[EXPLORED DOMAIN PAIRS — AVOID REPEATING]\n"
+                            + "\n".join(_pairs) + "\n"
+                            f"Your hypothesis MUST use a domain_from/domain_to pair NOT in the list above.\n"
+                            f"Explore a completely different scientific field or technique.\n"
+                        )
+                        print(f"[SYNTHESIZE] Domain diversity block: {len(_pairs)} pairs injected")
+            except Exception as _div_exc:
+                print(f"[SYNTHESIZE] Domain diversity block failed (non-fatal): {_div_exc}")
+
             hypothesis_instruction = f"""
-{source_papers_block}{empirical_block}
+{source_papers_block}{empirical_block}{domain_diversity_block}
 [RESEARCH MODE -- HYPOTHESIS GENERATION]
 In addition to the standard fields, generate a "hypothesis" field.
 
@@ -1203,9 +1564,22 @@ SANDBOX RESOURCES AVAILABLE FOR minimum_experiment:
 - numpy, torch (CPU), sklearn, scipy, pandas
 - NO internet, NO GPU, NO external files
 
-Your hypothesis MUST be testable using ONLY these resources.
-For minimum_experiment: describe the exact comparison (technique vs baseline on
-load_digits or load_breast_cancer), what metric to measure, and expected direction.
+CRITICAL RULES FOR minimum_experiment:
+1. Use load_digits or load_breast_cancer ONLY if the hypothesis is genuinely about
+   image/tabular classification. Do NOT use them as generic proxies for unrelated domains.
+2. If the hypothesis is about physics, biology, chemistry, geometry, astrophysics,
+   materials, or any non-ML domain: describe a SYNTHETIC experiment using numpy/scipy
+   that directly models the phenomenon (e.g. simulate a graph, generate synthetic spectra,
+   implement the mathematical model). Do NOT map it to digit classification.
+3. If the hypothesis is about ML techniques (regularization, training dynamics, continual
+   learning, robustness): describe the technique applied to a real ML problem, not just
+   a classification accuracy comparison.
+4. The minimum_experiment must be a valid test of THIS specific hypothesis, not a
+   generic "compare technique vs baseline on load_digits" template.
+
+For minimum_experiment: describe the exact comparison (technique vs baseline),
+what synthetic data or available dataset to use, what metric to measure, and
+the expected direction of the result.
 
 "hypothesis": {{
   "statement": "one sentence — the specific, non-obvious cross-domain claim",
