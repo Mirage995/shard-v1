@@ -388,6 +388,8 @@ class SynthesizePhase(BasePhase):
             empirical_context=empirical_context,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
+        # Persist diversity block for calibration logging in ExperimentDesignPhase
+        ctx.domain_pairs_blocked = ctx.structured.pop("_domain_pairs_blocked", None) or []
 
         # ── Novelty gate for research mode hypotheses (#48) ───────────────────
         # If hypothesis is already a well-known established finding, retry once

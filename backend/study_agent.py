@@ -1487,6 +1487,7 @@ Return ONLY valid JSON:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
+        _diversity_pairs_injected: list[str] = []   # populated below if research_mode
 
         meta_line = (
             f"\nMeta-learning hint (historically best approach for this category): {strategy_hint}\n"
@@ -1584,9 +1585,6 @@ Return ONLY valid JSON:
                               f"(blocked_from: {', '.join(_blocked_from[:4])}...)")
             except Exception as _div_exc:
                 print(f"[SYNTHESIZE] Domain diversity block failed (non-fatal): {_div_exc}")
-
-            # Persist blocked pairs on ctx for calibration logging
-            ctx.domain_pairs_blocked = _diversity_pairs_injected
 
             hypothesis_instruction = f"""
 {source_papers_block}{empirical_block}{domain_diversity_block}
@@ -1777,6 +1775,8 @@ RAW CONTENT:
                 print(f"[GRAPH_RAG] skipped: {e}")
 
         self.progress.complete_phase("SYNTHESIZE")
+        # Attach domain_pairs_blocked so SynthesizePhase can pass it to ctx
+        result["_domain_pairs_blocked"] = _diversity_pairs_injected
         return result
 
     # ── PHASE 4: STORE ────────────────────────────────────────────────────────
