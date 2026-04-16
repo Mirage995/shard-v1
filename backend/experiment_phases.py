@@ -10,7 +10,10 @@ All three phases are non-fatal and self-gating:
   - If research_mode=False or hypothesis not suitable -> SKIPPED, pipeline continues
   - Errors are caught and logged, never propagate to CertifyRetryGroup
 """
+import json
 import logging
+import os
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -19,6 +22,29 @@ if TYPE_CHECKING:
 from study_phases import BasePhase
 
 logger = logging.getLogger("shard.experiment_phases")
+
+# ── Calibration log (jsonl, one record per hypothesis alignment decision) ─────
+_CALIB_LOG_PATH: str | None = None   # set once per process on first use
+
+def _calib_log_path() -> str:
+    global _CALIB_LOG_PATH
+    if _CALIB_LOG_PATH is None:
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        experiments_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "shard_workspace", "experiments"
+        )
+        os.makedirs(experiments_dir, exist_ok=True)
+        _CALIB_LOG_PATH = os.path.join(experiments_dir, f"alignment_log_{ts}.jsonl")
+    return _CALIB_LOG_PATH
+
+def _calib_append(record: dict) -> None:
+    """Append one JSON line to the calibration log. Non-fatal."""
+    try:
+        with open(_calib_log_path(), "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        logger.debug("[CALIB_LOG] write failed (non-fatal): %s", exc)
 
 _MIN_CONFIDENCE = 0.6   # gate threshold -- hypotheses below this are SKIPPED
 
@@ -103,6 +129,8 @@ class ExperimentDesignPhase(BasePhase):
         # INVALID: skips entirely (proxy unrelated to hypothesis domain).
         _MAX_REWRITES = 2
         _alignment_ok = False
+        _calib_attempts: list[dict] = []   # one entry per loop iteration
+
         for _attempt in range(_MAX_REWRITES + 1):
             try:
                 alignment = await ctx.agent._validate_experiment_alignment(hypothesis, attempt=_attempt)
@@ -111,7 +139,14 @@ class ExperimentDesignPhase(BasePhase):
 
             _verdict = alignment.get("verdict", "VALID")
             _score   = alignment.get("alignment_score", 1.0)
-            _issues  = "; ".join(alignment.get("issues", []))
+            _issues  = alignment.get("issues", [])
+
+            _calib_attempts.append({
+                "attempt": _attempt,
+                "score":   round(_score, 4),
+                "verdict": _verdict,
+                "issues":  _issues,
+            })
 
             if _verdict == "VALID":
                 _alignment_ok = True
@@ -132,10 +167,22 @@ class ExperimentDesignPhase(BasePhase):
 
             # INVALID verdict, or REWRITE with no rewritten text, or rewrites exhausted
             ctx.experiment_status = "SKIPPED_TOO_COMPLEX"
+            issues_str = "; ".join(_issues) if isinstance(_issues, list) else str(_issues)
             reason = (
-                f"INVALID (score={_score:.2f}): {_issues}" if _verdict == "INVALID"
-                else f"REWRITE loop exhausted after {_attempt} attempt(s): {_issues}"
+                f"INVALID (score={_score:.2f}): {issues_str}" if _verdict == "INVALID"
+                else f"REWRITE loop exhausted after {_attempt} attempt(s): {issues_str}"
             )
+            # ── Calibration record (failed path) ─────────────────────────────
+            _calib_append({
+                "ts":             time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "hypothesis":     (hypothesis.get("statement", "") or "")[:100],
+                "domain_from":    hypothesis.get("domain_from", ""),
+                "domain_to":      hypothesis.get("domain_to", ""),
+                "kaggle_feasible": is_kaggle,
+                "attempts":        _calib_attempts,
+                "num_rewrites":    _attempt,
+                "final_verdict":   "INVALID" if _verdict == "INVALID" else "REWRITE_EXHAUSTED",
+            })
             await ctx.emit("EXPERIMENT_DESIGN", 0,
                            f"Alignment check failed -- SKIPPED ({reason[:100]})")
             print(f"[EXPERIMENT_DESIGN] ALIGNMENT_FAILED -- {reason[:140]}")
@@ -147,6 +194,18 @@ class ExperimentDesignPhase(BasePhase):
             ctx.experiment_status = "SKIPPED_TOO_COMPLEX"
             _persist_skipped(ctx, hypothesis, "SKIPPED_TOO_COMPLEX")
             return
+
+        # ── Calibration record (success path) ────────────────────────────────
+        _calib_append({
+            "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "hypothesis":      (hypothesis.get("statement", "") or "")[:100],
+            "domain_from":     hypothesis.get("domain_from", ""),
+            "domain_to":       hypothesis.get("domain_to", ""),
+            "kaggle_feasible": is_kaggle,
+            "attempts":        _calib_attempts,
+            "num_rewrites":    len(_calib_attempts) - 1,
+            "final_verdict":   "VALID",
+        })
 
         # ── Generate code ─────────────────────────────────────────────────────
         await ctx.emit("EXPERIMENT_DESIGN", 0, f"Designing experiment for: '{hypothesis.get('statement','')[:60]}...'")
