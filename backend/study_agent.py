@@ -903,7 +903,6 @@ Respond with valid JSON only:
         try:
             # temperature=0.25: enough variance to break 1.0 collapse, still stable
             raw = await self._think(prompt, system=system, json_mode=True, temperature=0.25)
-            from utils import safe_json_load
             result = safe_json_load(raw)
             if not isinstance(result, dict):
                 return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
@@ -994,13 +993,13 @@ Respond with valid JSON only:
             return result
 
         except Exception as exc:
-            logger.warning("[EXPERIMENT_ALIGN] failed (fail open): %s", exc)
+            logger.warning("[EXPERIMENT_ALIGN] MODEL_FAILURE (validator exception): %s", exc)
             return {
                 "verdict":            "VALID",
                 "alignment_score":    None,
                 "evaluation_status":  "MODEL_FAILURE",
                 "criteria":           None,
-                "issues":             [f"Exception: {exc}"],
+                "issues":             [f"validator_error: {exc}"],
                 "rewritten":          None,
                 "is_implementable":   True,
                 "estimated_runtime":  "short",
