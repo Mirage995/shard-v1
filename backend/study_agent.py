@@ -825,9 +825,9 @@ Example: ["query 1", "query 2", "query 3"]"""
         domain_to   = hypothesis.get("domain_to", "")
 
         system = (
-            "You are a scientific peer reviewer. Evaluate whether a proposed experiment "
-            "genuinely tests a stated hypothesis. Be precise but not overly strict: "
-            "prefer REWRITE over INVALID when an experiment can be salvaged."
+            "You are a rigorous scientific peer reviewer. Your job is to detect misalignments "
+            "between a hypothesis and its proposed experiment. Most proposed experiments have "
+            "at least one weakness — find it. Be specific, not charitable."
         )
         prompt = f"""HYPOTHESIS:
   Statement:   {statement}
@@ -837,37 +837,60 @@ Example: ["query 1", "query 2", "query 3"]"""
 PROPOSED EXPERIMENT:
   {min_exp}
 
-Score the experiment on 4 criteria (0.0-1.0 each), then average for alignment_score.
-alignment_score MUST be a float with at least one decimal place (e.g. 0.60, 0.75, 0.85).
-Do NOT return 1.0 unless the experiment is a textbook-perfect test of the hypothesis — that is rare.
-Typical scores: 0.30=weak, 0.50=partial, 0.70=good, 0.85=strong, 0.95=excellent.
+Rate each criterion individually on a 0.0–1.0 scale, then average them into alignment_score.
 
-1. CAUSAL LINK: Does the experiment model the mechanism the hypothesis describes?
-   1.0=direct test of the stated mechanism | 0.5=related but indirect proxy | 0.0=completely unrelated
+IMPORTANT SCORING RULES:
+- alignment_score is a float (e.g. 0.55, 0.72). NEVER return exactly 1.0 unless every
+  criterion is textbook-perfect — this is extremely rare. A "reasonable" experiment scores
+  around 0.65–0.75, not 1.0.
+- You MUST find at least one weakness. If you can't find one, you are not looking hard enough.
+- Anchors: 0.0=broken/contradicted | 0.3=weak/speculative | 0.5=partial proxy |
+           0.7=plausible with minor gaps | 0.9=strong direct test | 1.0=perfect (almost never)
 
-2. DOMAIN FIDELITY: Does the experiment use data/structures from the hypothesis domain?
-   1.0=appropriate domain data or synthetic analogue | 0.5=partial proxy | 0.0=wrong domain (e.g. load_digits for a physics hypothesis)
+CRITERION 1 — CAUSAL LINK (does the experiment test the specific mechanism?)
+  Score 0.9+ only if the experiment directly instantiates the mechanism in the hypothesis.
+  Score 0.5 if it tests a related but different mechanism.
+  Score 0.1 if it just measures a correlated variable.
+  Your score: ___
 
-3. FALSIFIABILITY: Would a negative result specifically disprove this hypothesis?
-   1.0=clear metric that fails if hypothesis is wrong | 0.5=partially distinguishing | 0.0=result is the same regardless of technique
+CRITERION 2 — DOMAIN FIDELITY (right data / structures for this domain?)
+  Score 0.9+ only if the data structure matches the hypothesis domain exactly.
+  Score 0.5 if it uses a proxy from a different domain.
+  Score 0.1 if domain is completely wrong (e.g. random classification for a geometry hypothesis).
+  Your score: ___
 
-4. IMPLEMENTABILITY: Is the experiment runnable with numpy/scipy/torch-CPU, no downloads?
-   1.0=fully synthetic, no internet needed | 0.5=needs GPU/dataset (feasible on Kaggle) | 0.0=needs external API/RL environment/large corpus
+CRITERION 3 — FALSIFIABILITY (would failure specifically refute the hypothesis?)
+  Score 0.9+ if a score < threshold clearly disproves the hypothesis.
+  Score 0.5 if result is ambiguous or partially distinguishing.
+  Score 0.1 if the experiment always produces ~0.0 or ~1.0 regardless of technique.
+  Your score: ___
 
-DECISION (apply these thresholds to the averaged score):
+CRITERION 4 — IMPLEMENTABILITY (runnable: numpy/scipy/torch-CPU, no downloads, <120s?)
+  Score 0.9+ if fully synthetic, no internet, CPU only.
+  Score 0.5 if needs GPU or dataset download (Kaggle-feasible).
+  Score 0.0 if needs external API, RL environment, or large corpora.
+  Your score: ___
+
+alignment_score = average of the 4 scores above.
+
+DECISION:
   alignment_score >= 0.70 → VALID
-  alignment_score >= 0.30 → REWRITE (fix the experiment spec, keep the hypothesis)
+  alignment_score >= 0.30 → REWRITE (provide a corrected minimum_experiment)
   alignment_score <  0.30 → INVALID
 
-For REWRITE: write a corrected minimum_experiment using numpy/scipy synthetic data that
-DIRECTLY models the phenomenon. Be specific about: data structure, technique vs baseline,
-metric, expected direction. Keep it implementable in a CPU sandbox.
+For REWRITE: write minimum_experiment using numpy/scipy synthetic data that directly
+models the phenomenon. Specify: data structure, technique vs baseline, metric,
+expected direction. Must be CPU-sandbox-runnable.
 
 Respond with valid JSON only:
 {{
-  "alignment_score": <0.0-1.0>,
+  "causal_link": <0.0-1.0>,
+  "domain_fidelity": <0.0-1.0>,
+  "falsifiability": <0.0-1.0>,
+  "implementability": <0.0-1.0>,
+  "alignment_score": <average of above, float>,
   "verdict": "VALID" | "REWRITE" | "INVALID",
-  "issues": ["specific issue 1", "specific issue 2"],
+  "issues": ["specific weakness 1", "specific weakness 2"],
   "rewritten": "corrected minimum_experiment or null",
   "is_implementable": true | false,
   "required_tools": ["numpy", "scipy", "torch"],
@@ -875,7 +898,8 @@ Respond with valid JSON only:
 }}"""
 
         try:
-            raw = await self._think(prompt, system=system, json_mode=True, temperature=0.1)
+            # temperature=0.25: enough variance to break 1.0 collapse, still stable
+            raw = await self._think(prompt, system=system, json_mode=True, temperature=0.25)
             from utils import safe_json_load
             result = safe_json_load(raw)
             if not isinstance(result, dict):
@@ -883,9 +907,16 @@ Respond with valid JSON only:
                         "issues": [], "is_implementable": True, "estimated_runtime": "short",
                         "required_tools": [], "attempt": attempt}
 
+            # Recompute alignment_score from individual criteria if present (more reliable)
+            criteria_keys = ("causal_link", "domain_fidelity", "falsifiability", "implementability")
+            criteria_scores = [float(result[k]) for k in criteria_keys if k in result]
+            if len(criteria_scores) == 4:
+                score = sum(criteria_scores) / 4.0
+            else:
+                score = float(result.get("alignment_score", 0.75))
+            score = max(0.0, min(0.99, score))   # hard-cap at 0.99, never 1.0 from code
+
             # Score-based verdict (override LLM's own verdict for stability)
-            score = float(result.get("alignment_score", 0.75))
-            score = max(0.0, min(1.0, score))
             if score >= 0.70:
                 verdict = "VALID"
             elif score >= 0.30:
@@ -901,22 +932,26 @@ Respond with valid JSON only:
 
             result.update({
                 "verdict":          verdict,
-                "alignment_score":  score,
+                "alignment_score":  round(score, 3),
+                "criteria": {k: round(float(result.get(k, 0.75)), 3) for k in criteria_keys},
                 "attempt":          attempt,
                 "is_implementable": result.get("is_implementable", True),
                 "required_tools":   result.get("required_tools", []),
                 "estimated_runtime": runtime,
             })
             issues_str = "; ".join(result.get("issues", []))[:100]
+            crit = result["criteria"]
             print(f"[EXPERIMENT_ALIGN] attempt={attempt} {verdict} score={score:.2f} "
-                  f"impl={result['is_implementable']} runtime={runtime} — {issues_str}")
+                  f"CL={crit['causal_link']:.2f} DF={crit['domain_fidelity']:.2f} "
+                  f"FA={crit['falsifiability']:.2f} IM={crit['implementability']:.2f} "
+                  f"— {issues_str}")
             return result
 
         except Exception as exc:
             logger.warning("[EXPERIMENT_ALIGN] failed (fail open): %s", exc)
             return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
                     "issues": [], "is_implementable": True, "estimated_runtime": "short",
-                    "required_tools": [], "attempt": attempt}
+                    "required_tools": [], "attempt": attempt, "criteria": {}}
 
     async def _generate_experiment_code(self, hypothesis: Dict, kaggle_mode: bool = False) -> str:
         """Translate hypothesis.minimum_experiment into executable Python.
@@ -1518,25 +1553,40 @@ Return ONLY valid JSON:
 
             # Domain diversity guardrail: inject recently used domain pairs so LLM explores new territory
             domain_diversity_block = ""
+            _diversity_pairs_injected: list[str] = []
             try:
                 from shard_db import get_db as _get_shard_db
+                # Fetch last 15 pairs (cross-cycle global memory)
                 _recent = _get_shard_db().execute(
-                    "SELECT DISTINCT domain_from, domain_to FROM research_hypotheses "
-                    "ORDER BY created_at DESC LIMIT 10"
+                    "SELECT domain_from, domain_to FROM research_hypotheses "
+                    "ORDER BY created_at DESC LIMIT 15"
                 ).fetchall()
                 if _recent:
                     _pairs = [f"- {r['domain_from']} -> {r['domain_to']}" for r in _recent
                               if r['domain_from'] and r['domain_to']]
+                    # Also extract individual domain_from values to block semantically similar domains
+                    _blocked_from = list(dict.fromkeys(
+                        r['domain_from'] for r in _recent if r['domain_from']
+                    ))[:8]
                     if _pairs:
+                        _diversity_pairs_injected = _pairs
                         domain_diversity_block = (
-                            f"\n[EXPLORED DOMAIN PAIRS — AVOID REPEATING]\n"
-                            + "\n".join(_pairs) + "\n"
-                            f"Your hypothesis MUST use a domain_from/domain_to pair NOT in the list above.\n"
-                            f"Explore a completely different scientific field or technique.\n"
+                            f"\n[DOMAIN DIVERSITY CONSTRAINT — MANDATORY]\n"
+                            f"The following domain pairs have been explored recently. "
+                            f"DO NOT reuse them or any semantically similar domain:\n"
+                            + "\n".join(_pairs) + "\n\n"
+                            f"Blocked source domains (and similar ones): {', '.join(_blocked_from)}\n"
+                            f"You MUST choose a domain_from from a DIFFERENT scientific area "
+                            f"(e.g. biology, economics, linguistics, materials, climate, chemistry).\n"
+                            f"Repeating a blocked domain pair will cause the hypothesis to be rejected.\n"
                         )
-                        print(f"[SYNTHESIZE] Domain diversity block: {len(_pairs)} pairs injected")
+                        print(f"[SYNTHESIZE] Domain diversity block: {len(_pairs)} pairs injected "
+                              f"(blocked_from: {', '.join(_blocked_from[:4])}...)")
             except Exception as _div_exc:
                 print(f"[SYNTHESIZE] Domain diversity block failed (non-fatal): {_div_exc}")
+
+            # Persist blocked pairs on ctx for calibration logging
+            ctx.domain_pairs_blocked = _diversity_pairs_injected
 
             hypothesis_instruction = f"""
 {source_papers_block}{empirical_block}{domain_diversity_block}

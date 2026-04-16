@@ -142,10 +142,11 @@ class ExperimentDesignPhase(BasePhase):
             _issues  = alignment.get("issues", [])
 
             _calib_attempts.append({
-                "attempt": _attempt,
-                "score":   round(_score, 4),
-                "verdict": _verdict,
-                "issues":  _issues,
+                "attempt":  _attempt,
+                "score":    round(_score, 4),
+                "verdict":  _verdict,
+                "issues":   _issues,
+                "criteria": alignment.get("criteria", {}),
             })
 
             if _verdict == "VALID":
@@ -174,14 +175,15 @@ class ExperimentDesignPhase(BasePhase):
             )
             # ── Calibration record (failed path) ─────────────────────────────
             _calib_append({
-                "ts":             time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "hypothesis":     (hypothesis.get("statement", "") or "")[:100],
-                "domain_from":    hypothesis.get("domain_from", ""),
-                "domain_to":      hypothesis.get("domain_to", ""),
+                "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "hypothesis":      (hypothesis.get("statement", "") or "")[:100],
+                "domain_from":     hypothesis.get("domain_from", ""),
+                "domain_to":       hypothesis.get("domain_to", ""),
                 "kaggle_feasible": is_kaggle,
                 "attempts":        _calib_attempts,
                 "num_rewrites":    _attempt,
                 "final_verdict":   "INVALID" if _verdict == "INVALID" else "REWRITE_EXHAUSTED",
+                "domain_blocked":  getattr(ctx, "domain_pairs_blocked", None) or [],
             })
             await ctx.emit("EXPERIMENT_DESIGN", 0,
                            f"Alignment check failed -- SKIPPED ({reason[:100]})")
@@ -205,6 +207,7 @@ class ExperimentDesignPhase(BasePhase):
             "attempts":        _calib_attempts,
             "num_rewrites":    len(_calib_attempts) - 1,
             "final_verdict":   "VALID",
+            "domain_blocked":  getattr(ctx, "domain_pairs_blocked", None) or [],
         })
 
         # ── Generate code ─────────────────────────────────────────────────────

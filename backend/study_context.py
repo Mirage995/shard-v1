@@ -56,6 +56,7 @@ class StudyContext:
     experiment_result: Optional[Dict] = None                 # {stdout, stderr, exit_code, success}
     experiment_status: Optional[str] = None                  # CONFIRMED/REFUTED/INCONCLUSIVE/SKIPPED
     hypothesis_confidence_updated: Optional[float] = None    # empirical confidence post-test
+    domain_pairs_blocked: Optional[list] = None              # diversity block injected in SynthesizePhase
 
     # ── Strategy / meta hints (set by InitPhase) ─────────────────────────────
     best_strategy: Optional[str] = None
