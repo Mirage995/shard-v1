@@ -905,9 +905,19 @@ Respond with valid JSON only:
             raw = await self._think(prompt, system=system, json_mode=True, temperature=0.25)
             result = safe_json_load(raw)
             if not isinstance(result, dict):
-                return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
-                        "issues": [], "is_implementable": True, "estimated_runtime": "short",
-                        "required_tools": [], "attempt": attempt}
+                print(f"[EXPERIMENT_ALIGN] INVALID_FORMAT — non-dict output from model")
+                return {
+                    "verdict":           "INVALID",
+                    "alignment_score":   None,
+                    "evaluation_status": "INVALID_FORMAT",
+                    "criteria":          None,
+                    "issues":            ["non_dict_output"],
+                    "rewritten":         None,
+                    "is_implementable":  True,
+                    "estimated_runtime": "short",
+                    "required_tools":    [],
+                    "attempt":           attempt,
+                }
 
             # Check output contract: all 4 criteria fields must be present
             criteria_keys = ("causal_link", "domain_fidelity", "falsifiability", "implementability")
@@ -942,7 +952,7 @@ Respond with valid JSON only:
                     # Both attempts failed → return INVALID_FORMAT, score=None
                     print(f"[EXPERIMENT_ALIGN] INVALID_FORMAT after retry — failing open")
                     return {
-                        "verdict":          "VALID",     # fail open: don't block pipeline
+                        "verdict":          "INVALID",
                         "alignment_score":  None,        # None = protocol failure, NOT low score
                         "evaluation_status": "INVALID_FORMAT",
                         "criteria":         None,
@@ -995,7 +1005,7 @@ Respond with valid JSON only:
         except Exception as exc:
             logger.warning("[EXPERIMENT_ALIGN] MODEL_FAILURE (validator exception): %s", exc)
             return {
-                "verdict":            "VALID",
+                "verdict":            "INVALID",
                 "alignment_score":    None,
                 "evaluation_status":  "MODEL_FAILURE",
                 "criteria":           None,
