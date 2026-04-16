@@ -85,17 +85,39 @@ def analyse(records: list[dict], path: str = "") -> None:
     else:
         print("  No rewrites observed.")
 
+    # ── Protocol compliance ───────────────────────────────────────────────
+    all_attempts = [a for r in records for a in r.get("attempts", [])]
+    invalid_format = [a for a in all_attempts if a.get("evaluation_status") in ("INVALID_FORMAT", "MODEL_FAILURE")]
+    no_criteria    = [a for a in all_attempts if not a.get("criteria") and a.get("evaluation_status","VALID") == "VALID"]
+
     # ── Alignment score distribution ──────────────────────────────────────
+    # Only include attempts with real numeric scores (skip None = protocol failure)
     all_scores = []
     for r in records:
         for a in r.get("attempts", []):
             if a.get("verdict") == r.get("final_verdict") or (
                 r.get("final_verdict") == "VALID" and a.get("verdict") == "VALID"
             ):
-                all_scores.append(a.get("score", 0.0))
+                s = a.get("score")
+                if s is not None:
+                    all_scores.append(float(s))
                 break
 
+    print(f"\n--- PROTOCOL COMPLIANCE ---")
+    print(f"  Total attempts     : {len(all_attempts)}")
+    if invalid_format:
+        print(f"  [!] INVALID_FORMAT / MODEL_FAILURE : {len(invalid_format)}  "
+              f"({100*len(invalid_format)/len(all_attempts):.0f}%)")
+    if no_criteria:
+        print(f"  [!] Missing criteria (schema drift): {len(no_criteria)}  "
+              f"({100*len(no_criteria)/len(all_attempts):.0f}%)")
+    if not invalid_format and not no_criteria:
+        print(f"  [OK] All attempts returned valid schema")
+
     print(f"\n--- ALIGNMENT SCORES ---")
+    none_scores = len(all_attempts) - len(all_scores)
+    if none_scores:
+        print(f"  [!] {none_scores} attempts had score=None (protocol failure, excluded)")
     if all_scores:
         avg = sum(all_scores) / len(all_scores)
         buckets = {"<0.3": 0, "0.3-0.5": 0, "0.5-0.7": 0, "0.7-0.9": 0, ">=0.9": 0}

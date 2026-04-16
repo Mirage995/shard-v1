@@ -137,17 +137,27 @@ class ExperimentDesignPhase(BasePhase):
             except Exception:
                 alignment = {"verdict": "VALID", "rewritten": None, "issues": []}
 
-            _verdict = alignment.get("verdict", "VALID")
-            _score   = alignment.get("alignment_score", 1.0)
-            _issues  = alignment.get("issues", [])
+            _verdict    = alignment.get("verdict", "VALID")
+            _score      = alignment.get("alignment_score")   # may be None (protocol failure)
+            _eval_status = alignment.get("evaluation_status", "VALID")
+            _issues     = alignment.get("issues", [])
 
+            _score_safe = round(_score, 4) if _score is not None else None
             _calib_attempts.append({
-                "attempt":  _attempt,
-                "score":    round(_score, 4),
-                "verdict":  _verdict,
-                "issues":   _issues,
-                "criteria": alignment.get("criteria", {}),
+                "attempt":          _attempt,
+                "score":            _score_safe,
+                "verdict":          _verdict,
+                "evaluation_status": _eval_status,
+                "issues":           _issues,
+                "criteria":         alignment.get("criteria") or {},
             })
+
+            # Protocol failure (INVALID_FORMAT / MODEL_FAILURE): fail open, log and continue
+            if _eval_status in ("INVALID_FORMAT", "MODEL_FAILURE"):
+                print(f"[EXPERIMENT_DESIGN] ALIGNMENT_{_eval_status} attempt={_attempt} "
+                      f"— failing open, proceeding to code generation")
+                _alignment_ok = True
+                break
 
             if _verdict == "VALID":
                 _alignment_ok = True
@@ -160,17 +170,19 @@ class ExperimentDesignPhase(BasePhase):
                 old_exp = hypothesis.get("minimum_experiment", "")
                 hypothesis = dict(hypothesis)  # don't mutate original
                 hypothesis["minimum_experiment"] = alignment["rewritten"]
+                score_str = f"{_score:.2f}" if _score is not None else "?"
                 print(f"[EXPERIMENT_DESIGN] ALIGNMENT_REWRITE attempt={_attempt+1}/{_MAX_REWRITES} "
-                      f"score={_score:.2f} -- '{old_exp[:50]}' -> '{alignment['rewritten'][:50]}'")
+                      f"score={score_str} -- '{old_exp[:50]}' -> '{alignment['rewritten'][:50]}'")
                 await ctx.emit("EXPERIMENT_DESIGN", 0,
-                               f"minimum_experiment rewritten (attempt {_attempt+1}) score={_score:.2f}")
+                               f"minimum_experiment rewritten (attempt {_attempt+1}) score={score_str}")
                 continue
 
             # INVALID verdict, or REWRITE with no rewritten text, or rewrites exhausted
             ctx.experiment_status = "SKIPPED_TOO_COMPLEX"
             issues_str = "; ".join(_issues) if isinstance(_issues, list) else str(_issues)
+            score_str  = f"{_score:.2f}" if _score is not None else "?"
             reason = (
-                f"INVALID (score={_score:.2f}): {issues_str}" if _verdict == "INVALID"
+                f"INVALID (score={score_str}): {issues_str}" if _verdict == "INVALID"
                 else f"REWRITE loop exhausted after {_attempt} attempt(s): {issues_str}"
             )
             # ── Calibration record (failed path) ─────────────────────────────

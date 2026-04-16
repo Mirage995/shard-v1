@@ -907,13 +907,54 @@ Respond with valid JSON only:
                         "issues": [], "is_implementable": True, "estimated_runtime": "short",
                         "required_tools": [], "attempt": attempt}
 
-            # Recompute alignment_score from individual criteria if present (more reliable)
+            # Check output contract: all 4 criteria fields must be present
             criteria_keys = ("causal_link", "domain_fidelity", "falsifiability", "implementability")
-            criteria_scores = [float(result[k]) for k in criteria_keys if k in result]
-            if len(criteria_scores) == 4:
-                score = sum(criteria_scores) / 4.0
-            else:
-                score = float(result.get("alignment_score", 0.75))
+            criteria_present = all(k in result for k in criteria_keys)
+
+            if not criteria_present:
+                # Contract violation: model did not return required fields.
+                # Retry once with an explicit format correction prompt.
+                format_retry_prompt = (
+                    "You FAILED to provide the required JSON fields.\n\n"
+                    "Return ONLY a JSON object with EXACTLY these fields (floats 0.0-1.0):\n"
+                    "{\n"
+                    '  "causal_link": <float>,\n'
+                    '  "domain_fidelity": <float>,\n'
+                    '  "falsifiability": <float>,\n'
+                    '  "implementability": <float>,\n'
+                    '  "alignment_score": <average of above>,\n'
+                    '  "verdict": "VALID" | "REWRITE" | "INVALID",\n'
+                    '  "issues": ["..."],\n'
+                    '  "rewritten": null\n'
+                    "}\n\n"
+                    "No explanation. No extra text. Only valid JSON."
+                )
+                print(f"[EXPERIMENT_ALIGN] INVALID_FORMAT — retrying with contract enforcement")
+                raw2 = await self._think(format_retry_prompt, json_mode=True, temperature=0.1)
+                result2 = safe_json_load(raw2)
+                if isinstance(result2, dict) and all(k in result2 for k in criteria_keys):
+                    result = result2
+                    criteria_present = True
+                    print(f"[EXPERIMENT_ALIGN] contract retry succeeded")
+                else:
+                    # Both attempts failed → return INVALID_FORMAT, score=None
+                    print(f"[EXPERIMENT_ALIGN] INVALID_FORMAT after retry — failing open")
+                    return {
+                        "verdict":          "VALID",     # fail open: don't block pipeline
+                        "alignment_score":  None,        # None = protocol failure, NOT low score
+                        "evaluation_status": "INVALID_FORMAT",
+                        "criteria":         None,
+                        "issues":           ["Model did not return required criteria fields"],
+                        "rewritten":        None,
+                        "is_implementable": True,
+                        "estimated_runtime": "short",
+                        "required_tools":   [],
+                        "attempt":          attempt,
+                    }
+
+            # Compute score from 4 criteria (authoritative)
+            criteria_scores = [float(result[k]) for k in criteria_keys]
+            score = sum(criteria_scores) / 4.0
             score = max(0.0, min(0.99, score))   # hard-cap at 0.99, never 1.0 from code
 
             # Score-based verdict (override LLM's own verdict for stability)
@@ -930,28 +971,39 @@ Respond with valid JSON only:
                 if verdict == "VALID":
                     verdict = "REWRITE"  # downgrade, don't skip
 
+            criteria_dict = {k: round(float(result[k]), 3) for k in criteria_keys}
             result.update({
-                "verdict":          verdict,
-                "alignment_score":  round(score, 3),
-                "criteria": {k: round(float(result.get(k, 0.75)), 3) for k in criteria_keys},
-                "attempt":          attempt,
-                "is_implementable": result.get("is_implementable", True),
-                "required_tools":   result.get("required_tools", []),
-                "estimated_runtime": runtime,
+                "verdict":            verdict,
+                "alignment_score":    round(score, 3),
+                "evaluation_status":  "VALID",
+                "criteria":           criteria_dict,
+                "attempt":            attempt,
+                "is_implementable":   result.get("is_implementable", True),
+                "required_tools":     result.get("required_tools", []),
+                "estimated_runtime":  runtime,
             })
             issues_str = "; ".join(result.get("issues", []))[:100]
-            crit = result["criteria"]
+            c = criteria_dict
             print(f"[EXPERIMENT_ALIGN] attempt={attempt} {verdict} score={score:.2f} "
-                  f"CL={crit['causal_link']:.2f} DF={crit['domain_fidelity']:.2f} "
-                  f"FA={crit['falsifiability']:.2f} IM={crit['implementability']:.2f} "
+                  f"CL={c['causal_link']} DF={c['domain_fidelity']} "
+                  f"FA={c['falsifiability']} IM={c['implementability']} "
                   f"— {issues_str}")
             return result
 
         except Exception as exc:
             logger.warning("[EXPERIMENT_ALIGN] failed (fail open): %s", exc)
-            return {"verdict": "VALID", "alignment_score": 1.0, "rewritten": None,
-                    "issues": [], "is_implementable": True, "estimated_runtime": "short",
-                    "required_tools": [], "attempt": attempt, "criteria": {}}
+            return {
+                "verdict":            "VALID",
+                "alignment_score":    None,
+                "evaluation_status":  "MODEL_FAILURE",
+                "criteria":           None,
+                "issues":             [f"Exception: {exc}"],
+                "rewritten":          None,
+                "is_implementable":   True,
+                "estimated_runtime":  "short",
+                "required_tools":     [],
+                "attempt":            attempt,
+            }
 
     async def _generate_experiment_code(self, hypothesis: Dict, kaggle_mode: bool = False) -> str:
         """Translate hypothesis.minimum_experiment into executable Python.

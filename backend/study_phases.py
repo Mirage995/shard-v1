@@ -389,7 +389,10 @@ class SynthesizePhase(BasePhase):
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
         # Persist diversity block for calibration logging in ExperimentDesignPhase
-        ctx.domain_pairs_blocked = ctx.structured.pop("_domain_pairs_blocked", None) or []
+        _blocked = ctx.structured.pop("_domain_pairs_blocked", None)
+        if _blocked is None:
+            print("[SYNTHESIZE][WARN] No _domain_pairs_blocked received from phase_synthesize -- propagation gap")
+        ctx.domain_pairs_blocked = _blocked or []
 
         # ── Novelty gate for research mode hypotheses (#48) ───────────────────
         # If hypothesis is already a well-known established finding, retry once
