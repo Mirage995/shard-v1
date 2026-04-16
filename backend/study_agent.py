@@ -1,5 +1,6 @@
 import os
 import asyncio
+import logging
 import re
 import json
 import random
@@ -52,6 +53,8 @@ class TopicBudgetExceeded(Exception):
     """Raised when a single topic burns more LLM calls than the per-topic budget."""
     pass
 
+
+logger = logging.getLogger(__name__)
 
 # Default per-topic LLM call limit. Overridable via StudyAgent._topic_llm_budget.
 DEFAULT_TOPIC_LLM_BUDGET = 200

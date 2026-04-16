@@ -134,13 +134,29 @@ class ExperimentDesignPhase(BasePhase):
         for _attempt in range(_MAX_REWRITES + 1):
             try:
                 alignment = await ctx.agent._validate_experiment_alignment(hypothesis, attempt=_attempt)
-            except Exception:
-                alignment = {"verdict": "VALID", "rewritten": None, "issues": []}
+            except Exception as _outer_exc:
+                print(f"[EXPERIMENT_DESIGN] ALIGNMENT_OUTER_EXCEPTION attempt={_attempt}: {_outer_exc}")
+                alignment = {
+                    "verdict":           "VALID",       # fail open: don't block pipeline
+                    "alignment_score":   None,
+                    "evaluation_status": "MODEL_FAILURE",
+                    "criteria":          None,
+                    "issues":            [f"Outer exception: {_outer_exc}"],
+                    "rewritten":         None,
+                }
 
             _verdict    = alignment.get("verdict", "VALID")
             _score      = alignment.get("alignment_score")   # may be None (protocol failure)
             _eval_status = alignment.get("evaluation_status", "VALID")
             _issues     = alignment.get("issues", [])
+
+            # Invariant: VALID ⇒ score must exist. Violation means the caller
+            # returned a semantically incoherent dict — treat it as MODEL_FAILURE.
+            if _eval_status == "VALID" and _score is None:
+                print(f"[EXPERIMENT_DESIGN] INVARIANT VIOLATION attempt={_attempt}: "
+                      f"eval_status=VALID but score=None — reclassifying as MODEL_FAILURE")
+                _eval_status = "MODEL_FAILURE"
+                _issues = list(_issues) + ["Invariant violation: VALID without score"]
 
             _score_safe = round(_score, 4) if _score is not None else None
             _calib_attempts.append({
