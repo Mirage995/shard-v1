@@ -123,6 +123,9 @@ def analyse(records: list[dict], path: str = "") -> None:
     if not invalid_format and not no_criteria:
         print(f"  [OK] All attempts returned valid schema")
 
+    total_coercions   = sum(r.get("coercions_count", 0) for r in records)
+    total_regressions = sum(r.get("regressions_count", 0) for r in records)
+
     if attempts_with_audit:
         print(f"\n--- 4-SECTION STRUCTURAL AUDIT ({n_audit} attempts) ---")
         print(f"  All 4 sections present : {n_ok}/{n_audit}  ({100*n_ok/n_audit:.0f}%)")
@@ -131,10 +134,14 @@ def analyse(records: list[dict], path: str = "") -> None:
         print(f"  MEASUREMENT            : {n_measure}/{n_audit}  ({100*n_measure/n_audit:.0f}%)")
         print(f"  SUCCESS CRITERION      : {n_crit}/{n_audit}  ({100*n_crit/n_audit:.0f}%)")
         print(f"  Numeric threshold      : {n_thresh}/{n_audit}  ({100*n_thresh/n_audit:.0f}%)")
+        print(f"  Coercions (force-rw)   : {total_coercions}")
+        print(f"  Regressions (validator broke canonical): {total_regressions}")
         if n_ok == n_audit:
             print(f"  [OK] Generator is respecting the 4-section template")
         elif n_ok == 0:
             print(f"  [!!] GENERATOR IGNORING TEMPLATE — all experiments are free-form")
+        else:
+            print(f"  [~] Partial compliance — gate enforcement active")
 
     print(f"\n--- ALIGNMENT SCORES ---")
     none_scores = len(all_attempts) - len(all_scores)

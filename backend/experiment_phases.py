@@ -318,6 +318,10 @@ class ExperimentDesignPhase(BasePhase):
         _alignment_ok = False
         _calib_attempts: list[dict] = []   # one entry per loop iteration
         _attempt = 0
+        _coercions_count   = 0   # forced rewrites applied inside the loop
+        _regressions_count = 0   # times validator broke a valid spec
+        # Track last known canonical text for regression guard
+        _previous_canonical_text: str | None = _to_str(hypothesis.get("minimum_experiment", ""))
         while _attempt <= _MAX_REWRITES:
             try:
                 alignment = await ctx.agent._validate_experiment_alignment(hypothesis, attempt=_attempt)
@@ -348,15 +352,15 @@ class ExperimentDesignPhase(BasePhase):
             _score_safe = round(_score, 4) if _score is not None else None
 
             # ── Structural audit of the 4-section template ────────────────────
-            _min_exp_text = _to_str(hypothesis.get("minimum_experiment", "")).upper()
-            _has_mechanism  = "MECHANISM:"  in _min_exp_text
-            _has_interv     = "INTERVENTION:" in _min_exp_text
-            _has_measure    = "MEASUREMENT:" in _min_exp_text
-            _has_criterion  = "SUCCESS CRITERION:" in _min_exp_text
-            _sections_ok    = _has_mechanism and _has_interv and _has_measure and _has_criterion
-            _meas_len = len(hypothesis.get("minimum_experiment", "") or "")
-            import re as _re
-            _has_threshold = bool(_re.search(r'[><=!]=?\s*\d+[\d.]*\s*%?', _to_str(hypothesis.get("minimum_experiment", ""))))
+            _cur_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
+            _cur_spec     = parse_experiment_spec(_cur_exp_str)
+            _sections_ok  = _cur_spec is not None
+            _has_mechanism  = _sections_ok and bool(_cur_spec.get("mechanism"))
+            _has_interv     = _sections_ok and bool(_cur_spec.get("intervention"))
+            _has_measure    = _sections_ok and bool(_cur_spec.get("measurement"))
+            _has_criterion  = _sections_ok and bool(_cur_spec.get("success_criterion"))
+            _meas_len     = len(_cur_exp_str)
+            _has_threshold = _sections_ok and _has_numeric_threshold(_cur_spec.get("success_criterion", ""))
 
             _calib_attempts.append({
                 "attempt":          _attempt,
@@ -404,6 +408,37 @@ class ExperimentDesignPhase(BasePhase):
                 if _rewritten_raw and _attempt < _MAX_REWRITES:
                     old_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
                     _rewritten   = _normalize_rewritten(_rewritten_raw)
+
+                    # ── GATE RE-APPLICATION (invariant: every min_exp entering
+                    # the validator must be canonical 4-section) ────────────────
+                    _rw_spec = parse_experiment_spec(_rewritten)
+                    if _rw_spec is None:
+                        # Regression guard: if previous was canonical, log it
+                        if _previous_canonical_text and parse_experiment_spec(_previous_canonical_text) is not None:
+                            _regressions_count += 1
+                            print(f"[EXPERIMENT_DESIGN] SPEC_REGRESSION attempt={_attempt} "
+                                  f"(validator broke canonical spec) regressions={_regressions_count}")
+                        # One coercion attempt — sterile prompt
+                        _coerced = await _force_rewrite_experiment(_rewritten, ctx)
+                        _coerced_spec = parse_experiment_spec(_coerced) if _coerced else None
+                        if _coerced_spec is not None:
+                            _coercions_count += 1
+                            _rewritten = _coerced
+                            print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI "
+                                  f"stage=validator_rewrite parsed=False rewrite_ok=True "
+                                  f"coercions={_coercions_count}")
+                        else:
+                            # Hard fail — propagating free-form would recreate the leak
+                            print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI "
+                                  f"stage=validator_rewrite parsed=False rewrite_ok=False — hard stop")
+                            _alignment_ok = False
+                            break
+                    else:
+                        print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI "
+                              f"stage=validator_rewrite parsed=True rewrite_ok=True")
+                    _previous_canonical_text = _rewritten
+                    # ── /GATE ─────────────────────────────────────────────────
+
                     _delta       = _rewrite_delta(old_exp_str, _rewritten)
                     _prev_score  = _calib_attempts[-2]["score"] if len(_calib_attempts) >= 2 else None
                     _score_delta = round(_score - _prev_score, 4) if (
@@ -437,15 +472,17 @@ class ExperimentDesignPhase(BasePhase):
             )
             # ── Calibration record (failed path) ─────────────────────────────
             _calib_append({
-                "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "hypothesis":      (hypothesis.get("statement", "") or "")[:100],
-                "domain_from":     hypothesis.get("domain_from", ""),
-                "domain_to":       hypothesis.get("domain_to", ""),
-                "kaggle_feasible": is_kaggle,
-                "attempts":        _calib_attempts,
-                "num_rewrites":    _attempt,
-                "final_verdict":   "INVALID" if _verdict == "INVALID" else "REWRITE_EXHAUSTED",
-                "domain_blocked":  getattr(ctx, "domain_pairs_blocked", None) or [],
+                "ts":               time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "hypothesis":       (hypothesis.get("statement", "") or "")[:100],
+                "domain_from":      hypothesis.get("domain_from", ""),
+                "domain_to":        hypothesis.get("domain_to", ""),
+                "kaggle_feasible":  is_kaggle,
+                "attempts":         _calib_attempts,
+                "num_rewrites":     _attempt,
+                "final_verdict":    "INVALID" if _verdict == "INVALID" else "REWRITE_EXHAUSTED",
+                "domain_blocked":   getattr(ctx, "domain_pairs_blocked", None) or [],
+                "coercions_count":  _coercions_count,
+                "regressions_count": _regressions_count,
             })
             await ctx.emit("EXPERIMENT_DESIGN", 0,
                            f"Alignment check failed -- SKIPPED ({reason[:100]})")
@@ -461,15 +498,17 @@ class ExperimentDesignPhase(BasePhase):
 
         # ── Calibration record (success path) ────────────────────────────────
         _calib_append({
-            "ts":              time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "hypothesis":      (hypothesis.get("statement", "") or "")[:100],
-            "domain_from":     hypothesis.get("domain_from", ""),
-            "domain_to":       hypothesis.get("domain_to", ""),
-            "kaggle_feasible": is_kaggle,
-            "attempts":        _calib_attempts,
-            "num_rewrites":    len(_calib_attempts) - 1,
-            "final_verdict":   "VALID",
-            "domain_blocked":  getattr(ctx, "domain_pairs_blocked", None) or [],
+            "ts":               time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "hypothesis":       (hypothesis.get("statement", "") or "")[:100],
+            "domain_from":      hypothesis.get("domain_from", ""),
+            "domain_to":        hypothesis.get("domain_to", ""),
+            "kaggle_feasible":  is_kaggle,
+            "attempts":         _calib_attempts,
+            "num_rewrites":     len(_calib_attempts) - 1,
+            "final_verdict":    "VALID",
+            "domain_blocked":   getattr(ctx, "domain_pairs_blocked", None) or [],
+            "coercions_count":  _coercions_count,
+            "regressions_count": _regressions_count,
         })
 
         # ── Generate code ─────────────────────────────────────────────────────
