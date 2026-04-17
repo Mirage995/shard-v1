@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import time
+from difflib import SequenceMatcher
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -24,32 +25,55 @@ from study_phases import BasePhase
 logger = logging.getLogger("shard.experiment_phases")
 
 
+def _to_str(exp) -> str:
+    """Convert any experiment spec to a stable, loggable string.
+
+    Handles str, dict, None, and arbitrary objects safely.
+    Uses json.dumps (sorted keys) for dicts to preserve structure readably.
+    Never crashes.
+    """
+    if isinstance(exp, str):
+        return exp
+    if exp is None:
+        return ""
+    try:
+        return json.dumps(exp, ensure_ascii=False, sort_keys=True)
+    except Exception:
+        try:
+            return str(exp)
+        except Exception:
+            return "<unserializable_experiment>"
+
+
 def _normalize_rewritten(exp) -> str:
     """Normalize the `rewritten` field from the alignment validator.
 
     The model sometimes returns a structured dict instead of a plain string.
-    Preserve semantic content rather than doing a blind str() coercion.
+    Preserve semantic content via field-by-field decomposition; fall back to
+    _to_str() for unknown structures.
     """
     if isinstance(exp, str):
         return exp.strip()
     if isinstance(exp, dict):
         parts = []
-        if "description" in exp:
-            parts.append(exp["description"])
-        if "dataset" in exp:
-            parts.append(f"dataset: {exp['dataset']}")
-        if "method" in exp:
-            parts.append(f"method: {exp['method']}")
-        if "metric" in exp:
-            parts.append(f"metric: {exp['metric']}")
-        if "comparison" in exp:
-            parts.append(f"compare: {exp['comparison']}")
-        if "procedure" in exp:
-            parts.append(f"procedure: {exp['procedure']}")
-        if "expected_result" in exp:
-            parts.append(f"expected: {exp['expected_result']}")
-        return " | ".join(parts) if parts else str(exp)
-    return str(exp)
+        for key in ("description", "procedure", "method", "dataset", "metric",
+                    "comparison", "expected_result"):
+            if key in exp:
+                label = "" if key == "description" else f"{key}: "
+                parts.append(f"{label}{exp[key]}")
+        return " | ".join(parts) if parts else _to_str(exp)
+    return _to_str(exp)
+
+
+def _rewrite_delta(a: str, b: str) -> float:
+    """Semantic distance between two experiment specs (0.0=identical, 1.0=completely different).
+
+    Uses SequenceMatcher ratio so it's sensitive to character-level changes
+    while being robust to whitespace and minor reformulations.
+    """
+    if not a or not b:
+        return 0.0
+    return round(1.0 - SequenceMatcher(None, a, b).ratio(), 4)
 
 # ── Calibration log (jsonl, one record per hypothesis alignment decision) ─────
 _CALIB_LOG_PATH: str | None = None   # set once per process on first use
@@ -226,16 +250,27 @@ class ExperimentDesignPhase(BasePhase):
                     continue  # do NOT increment _attempt
 
                 if _rewritten_raw and _attempt < _MAX_REWRITES:
-                    old_exp = hypothesis.get("minimum_experiment", "")
-                    _rewritten = _normalize_rewritten(_rewritten_raw)
+                    old_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
+                    _rewritten   = _normalize_rewritten(_rewritten_raw)
+                    _delta       = _rewrite_delta(old_exp_str, _rewritten)
+                    _prev_score  = _calib_attempts[-1]["score"] if _calib_attempts else None
+                    _score_delta = round(_score - _prev_score, 4) if (
+                        _score is not None and _prev_score is not None
+                    ) else None
                     hypothesis = dict(hypothesis)  # don't mutate original
                     hypothesis["minimum_experiment"] = _rewritten
                     score_str = f"{_score:.2f}" if _score is not None else "?"
-                    _preview = _rewritten[:50]
                     print(f"[EXPERIMENT_DESIGN] ALIGNMENT_REWRITE attempt={_attempt+1}/{_MAX_REWRITES} "
-                          f"score={score_str} -- '{old_exp[:50]}' -> '{_preview}'")
+                          f"score={score_str} delta={_delta:.3f} score_delta={_score_delta} "
+                          f"-- '{old_exp_str[:50]}' -> '{_rewritten[:50]}'")
                     await ctx.emit("EXPERIMENT_DESIGN", 0,
-                                   f"minimum_experiment rewritten (attempt {_attempt+1}) score={score_str}")
+                                   f"minimum_experiment rewritten (attempt {_attempt+1}) "
+                                   f"score={score_str} delta={_delta:.3f}")
+                    # patch last calib entry with rewrite diagnostics
+                    if _calib_attempts:
+                        _calib_attempts[-1]["rewrite_len"]   = len(_rewritten)
+                        _calib_attempts[-1]["rewrite_delta"] = _delta
+                        _calib_attempts[-1]["score_delta"]   = _score_delta
                     _empty_retries = 0   # reset for next attempt
                     _attempt += 1
                     continue
