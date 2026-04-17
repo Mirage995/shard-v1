@@ -138,11 +138,32 @@ settings\ -\ *.json
 # ── SHARD: Debug/temp scripts in root ─────────────────────────────────────────
 debug_*.py
 tmp_*.py
+temp_*.py
 test_out*.txt
 validation_*.log
 ab_results_*.json
 schemacallemilio.txt
 ruvector.db
+check_cuda.py
+grep_trace.py
+read_trace.py
+hand_gesture_test.py
+validate_ticket20.py
+
+# ── SHARD: Root-level log/output txt files ────────────────────────────────────
+output.txt
+trace.txt
+test_err.txt
+test_results.txt
+specific_tests.txt
+problemirealidishard.txt
+shardmemorianuova.txt
+tmp_design.txt
+tmp_msgs.txt
+roi_run_*.txt
+roi_run_*.log
+pytest_out*.txt
+pytest_cad_out.txt
 
 # ── SHARD: ChromaDB (binary, regenerable) ─────────────────────────────────────
 shard_memory/chromadb/
