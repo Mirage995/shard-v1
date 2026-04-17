@@ -101,6 +101,17 @@ def analyse(records: list[dict], path: str = "") -> None:
             if s is not None:
                 all_scores.append(float(s))
 
+    # ── 4-section structural audit ────────────────────────────────────────────
+    attempts_with_audit = [a for a in all_attempts if "sections_ok" in a]
+    if attempts_with_audit:
+        n_ok        = sum(1 for a in attempts_with_audit if a.get("sections_ok"))
+        n_mech      = sum(1 for a in attempts_with_audit if a.get("has_mechanism"))
+        n_interv    = sum(1 for a in attempts_with_audit if a.get("has_intervention"))
+        n_measure   = sum(1 for a in attempts_with_audit if a.get("has_measurement"))
+        n_crit      = sum(1 for a in attempts_with_audit if a.get("has_criterion"))
+        n_thresh    = sum(1 for a in attempts_with_audit if a.get("has_threshold"))
+        n_audit     = len(attempts_with_audit)
+
     print(f"\n--- PROTOCOL COMPLIANCE ---")
     print(f"  Total attempts     : {len(all_attempts)}")
     if invalid_format:
@@ -111,6 +122,19 @@ def analyse(records: list[dict], path: str = "") -> None:
               f"({100*len(no_criteria)/len(all_attempts):.0f}%)")
     if not invalid_format and not no_criteria:
         print(f"  [OK] All attempts returned valid schema")
+
+    if attempts_with_audit:
+        print(f"\n--- 4-SECTION STRUCTURAL AUDIT ({n_audit} attempts) ---")
+        print(f"  All 4 sections present : {n_ok}/{n_audit}  ({100*n_ok/n_audit:.0f}%)")
+        print(f"  MECHANISM              : {n_mech}/{n_audit}  ({100*n_mech/n_audit:.0f}%)")
+        print(f"  INTERVENTION           : {n_interv}/{n_audit}  ({100*n_interv/n_audit:.0f}%)")
+        print(f"  MEASUREMENT            : {n_measure}/{n_audit}  ({100*n_measure/n_audit:.0f}%)")
+        print(f"  SUCCESS CRITERION      : {n_crit}/{n_audit}  ({100*n_crit/n_audit:.0f}%)")
+        print(f"  Numeric threshold      : {n_thresh}/{n_audit}  ({100*n_thresh/n_audit:.0f}%)")
+        if n_ok == n_audit:
+            print(f"  [OK] Generator is respecting the 4-section template")
+        elif n_ok == 0:
+            print(f"  [!!] GENERATOR IGNORING TEMPLATE — all experiments are free-form")
 
     print(f"\n--- ALIGNMENT SCORES ---")
     none_scores = len(all_attempts) - len(all_scores)

@@ -213,6 +213,18 @@ class ExperimentDesignPhase(BasePhase):
                 _issues = list(_issues) + ["Invariant violation: VALID without score"]
 
             _score_safe = round(_score, 4) if _score is not None else None
+
+            # ── Structural audit of the 4-section template ────────────────────
+            _min_exp_text = _to_str(hypothesis.get("minimum_experiment", "")).upper()
+            _has_mechanism  = "MECHANISM:"  in _min_exp_text
+            _has_interv     = "INTERVENTION:" in _min_exp_text
+            _has_measure    = "MEASUREMENT:" in _min_exp_text
+            _has_criterion  = "SUCCESS CRITERION:" in _min_exp_text
+            _sections_ok    = _has_mechanism and _has_interv and _has_measure and _has_criterion
+            _meas_len = len(hypothesis.get("minimum_experiment", "") or "")
+            import re as _re
+            _has_threshold = bool(_re.search(r'[><=!]=?\s*\d+[\d.]*\s*%?', _to_str(hypothesis.get("minimum_experiment", ""))))
+
             _calib_attempts.append({
                 "attempt":          _attempt,
                 "score":            _score_safe,
@@ -220,6 +232,13 @@ class ExperimentDesignPhase(BasePhase):
                 "evaluation_status": _eval_status,
                 "issues":           _issues,
                 "criteria":         alignment.get("criteria") or {},
+                "sections_ok":      _sections_ok,
+                "has_mechanism":    _has_mechanism,
+                "has_intervention": _has_interv,
+                "has_measurement":  _has_measure,
+                "has_criterion":    _has_criterion,
+                "exp_len":          _meas_len,
+                "has_threshold":    _has_threshold,
             })
 
             # Protocol failure (INVALID_FORMAT / MODEL_FAILURE): fail open, log and continue
