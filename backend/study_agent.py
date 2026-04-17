@@ -885,6 +885,10 @@ For REWRITE: write minimum_experiment using numpy/scipy synthetic data that dire
 models the phenomenon. Specify: data structure, technique vs baseline, metric,
 expected direction. Must be CPU-sandbox-runnable.
 
+IMPORTANT: "rewritten" MUST be a plain string (one or two sentences).
+DO NOT return a dict, object, or structured JSON for "rewritten".
+Example: "Generate two 100-element arrays representing X and Y; apply Z; compare metric M."
+
 Respond with valid JSON only:
 {{
   "causal_link": <0.0-1.0>,
@@ -894,7 +898,7 @@ Respond with valid JSON only:
   "alignment_score": <average of above, float>,
   "verdict": "VALID" | "REWRITE" | "INVALID",
   "issues": ["specific weakness 1", "specific weakness 2"],
-  "rewritten": "corrected minimum_experiment or null",
+  "rewritten": "corrected minimum_experiment as a plain string, or null",
   "is_implementable": true | false,
   "required_tools": ["numpy", "scipy", "torch"],
   "estimated_runtime": "short" | "medium" | "long"
