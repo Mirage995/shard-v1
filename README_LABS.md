@@ -103,13 +103,21 @@ These behaviors were not encoded as heuristics. They emerged from the interactio
 StudyAgent           10-phase learning pipeline
 CognitionCore        Bidirectional event bus — 14 citizens
   MoodEngine         Affective state [-1,+1], broadcasts mood_shift
-  IdentityCore       Persistent biography from SQLite, self_esteem computed
-  SelfModelTracker   Predictive processing loop
-  HebbianUpdater     LTP/LTD synaptic plasticity across cycles
-  GoalEngine         Autonomous goal generation
-  GraphRAG           Causal knowledge graph (2135+ relations)
+  IdentityCore       Persistent biography from SQLite, self_esteem computed not declared
+  SelfModelTracker   Predictive processing loop — mood + identity modulate predictions
+  HebbianUpdater     LTP/LTD synaptic plasticity across study cycles
+  DesireEngine       Frustration + curiosity + goal persistence signals
+  GoalEngine         Autonomous goal generation — SHARD picks its own objectives
+  WorldModel         58-skill relevance map, self_calibrate()
+  SelfModel          cert_rate, momentum, blind_spots, quarantine
+  SemanticMemory     ChromaDB triple-store
+  Consciousness      Internal narration layer
+  VisionEngine       Long-term focus + avoid_domains registry
+  ImprovementEngine  Failure queue → NightRunner injection
+  CapabilityGraph    Certified skill tracker
 SwarmEngine          Architect → Coder → parallel reviewers + Focus Mode + Rollback
 ExperimentEngine     Hypothesis generation, alignment validation, Docker execution
+GraphRAG             Causal knowledge graph (2135+ relations, injected into every prompt)
 LLMRouter            Gemini Flash → Groq → Claude fallback chain
 ```
 
