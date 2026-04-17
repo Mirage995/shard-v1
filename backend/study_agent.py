@@ -882,8 +882,11 @@ DECISION:
   alignment_score <  0.30 → INVALID
 
 For REWRITE: write minimum_experiment using numpy/scipy synthetic data that directly
-models the phenomenon. Specify: data structure, technique vs baseline, metric,
-expected direction. Must be CPU-sandbox-runnable.
+models the phenomenon. Use the 4-section format: MECHANISM / INTERVENTION / MEASUREMENT / SUCCESS CRITERION.
+Must be CPU-sandbox-runnable.
+
+SCORING RULE: If any of the 4 sections (MECHANISM, INTERVENTION, MEASUREMENT, SUCCESS CRITERION)
+are missing or vague in the minimum_experiment, you MUST penalize causal_link and falsifiability.
 
 CRITICAL RULES for "rewritten":
 - If verdict is REWRITE, "rewritten" MUST be a non-empty plain string. NEVER null.
@@ -1692,16 +1695,14 @@ CRITICAL RULES FOR minimum_experiment:
 3. If the hypothesis is about ML techniques (regularization, training dynamics, continual
    learning, robustness): describe the technique applied to a real ML problem, not just
    a classification accuracy comparison.
-4. The minimum_experiment must be a valid test of THIS specific hypothesis, not a
-   generic "compare technique vs baseline on load_digits" template.
-   It MUST satisfy ALL three of the following:
-   a) Test a SPECIFIC causal mechanism stated in the hypothesis (not a proxy or correlation).
-   b) Produce a MEASURABLE SCALAR output (e.g. accuracy, RMSE, forgetting rate, p-value) — not qualitative.
-   c) Include an EXPLICIT success/failure criterion (e.g. "technique_A exceeds baseline_B by >5% on metric M").
+4. The minimum_experiment MUST be written using this EXACT 4-section structure (all 4 required):
 
-For minimum_experiment: describe the exact comparison (technique vs baseline),
-what synthetic data or available dataset to use, what metric to measure, and
-the expected direction of the result.
+   MECHANISM: [The causal mechanism — how X from domain_from affects Y in domain_to via what process M]
+   INTERVENTION: [What is manipulated to activate the mechanism — the specific technique vs baseline]
+   MEASUREMENT: [The scalar metric that captures the effect, e.g. accuracy, RMSE, forgetting_rate, p-value]
+   SUCCESS CRITERION: [Numeric threshold — e.g. "technique_A exceeds baseline_B by >5% on metric M"]
+
+   This is NOT optional formatting. A minimum_experiment missing any of the 4 sections will be rejected.
 
 "hypothesis": {{
   "statement": "one sentence — the specific, non-obvious cross-domain claim",
@@ -1709,7 +1710,7 @@ the expected direction of the result.
   "domain_to": "target domain/problem where it is applied",
   "rationale": "why this transfer is non-obvious and has NOT been widely studied (cite what IS known, explain the gap)",
   "falsifiable": true or false,
-  "minimum_experiment": "exact test: dataset=load_digits/load_breast_cancer, metric=accuracy/forgetting/variance, comparison=technique_A vs baseline_B",
+  "minimum_experiment": "MECHANISM: ... INTERVENTION: ... MEASUREMENT: ... SUCCESS CRITERION: ...",
   "confidence": 0.0 to 1.0
 }}
 
