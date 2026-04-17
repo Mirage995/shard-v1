@@ -156,10 +156,12 @@ class ExperimentDesignPhase(BasePhase):
         # REWRITE: replaces minimum_experiment and retries (up to MAX_REWRITES).
         # INVALID: skips entirely (proxy unrelated to hypothesis domain).
         _MAX_REWRITES = 2
+        _MAX_EMPTY_RETRIES = 1   # max times we retry a REWRITE with missing payload
+        _empty_retries = 0
         _alignment_ok = False
         _calib_attempts: list[dict] = []   # one entry per loop iteration
-
-        for _attempt in range(_MAX_REWRITES + 1):
+        _attempt = 0
+        while _attempt <= _MAX_REWRITES:
             try:
                 alignment = await ctx.agent._validate_experiment_alignment(hypothesis, attempt=_attempt)
             except Exception as _outer_exc:
@@ -210,18 +212,33 @@ class ExperimentDesignPhase(BasePhase):
                           f"(score={_score:.2f})")
                 break
 
-            if _verdict == "REWRITE" and alignment.get("rewritten") and _attempt < _MAX_REWRITES:
-                old_exp = hypothesis.get("minimum_experiment", "")
-                _rewritten = _normalize_rewritten(alignment["rewritten"])
-                hypothesis = dict(hypothesis)  # don't mutate original
-                hypothesis["minimum_experiment"] = _rewritten
-                score_str = f"{_score:.2f}" if _score is not None else "?"
-                _preview = _rewritten[:50]
-                print(f"[EXPERIMENT_DESIGN] ALIGNMENT_REWRITE attempt={_attempt+1}/{_MAX_REWRITES} "
-                      f"score={score_str} -- '{old_exp[:50]}' -> '{_preview}'")
-                await ctx.emit("EXPERIMENT_DESIGN", 0,
-                               f"minimum_experiment rewritten (attempt {_attempt+1}) score={score_str}")
-                continue
+            if _verdict == "REWRITE":
+                _rewritten_raw = alignment.get("rewritten")
+                _rewrite_len = len(str(_rewritten_raw)) if _rewritten_raw else 0
+                print(f"[EXPERIMENT_DESIGN] ALIGNMENT_REWRITE_LEN attempt={_attempt} rewrite_len={_rewrite_len}")
+
+                if not _rewritten_raw and _empty_retries < _MAX_EMPTY_RETRIES:
+                    # Invariant: REWRITE ⇒ rewritten MUST exist.
+                    # Retry the same attempt without incrementing _attempt.
+                    _empty_retries += 1
+                    print(f"[EXPERIMENT_DESIGN] REWRITE_EMPTY attempt={_attempt} "
+                          f"(empty_retry {_empty_retries}/{_MAX_EMPTY_RETRIES}) — retrying same attempt")
+                    continue  # do NOT increment _attempt
+
+                if _rewritten_raw and _attempt < _MAX_REWRITES:
+                    old_exp = hypothesis.get("minimum_experiment", "")
+                    _rewritten = _normalize_rewritten(_rewritten_raw)
+                    hypothesis = dict(hypothesis)  # don't mutate original
+                    hypothesis["minimum_experiment"] = _rewritten
+                    score_str = f"{_score:.2f}" if _score is not None else "?"
+                    _preview = _rewritten[:50]
+                    print(f"[EXPERIMENT_DESIGN] ALIGNMENT_REWRITE attempt={_attempt+1}/{_MAX_REWRITES} "
+                          f"score={score_str} -- '{old_exp[:50]}' -> '{_preview}'")
+                    await ctx.emit("EXPERIMENT_DESIGN", 0,
+                                   f"minimum_experiment rewritten (attempt {_attempt+1}) score={score_str}")
+                    _empty_retries = 0   # reset for next attempt
+                    _attempt += 1
+                    continue
 
             # INVALID verdict, or REWRITE with no rewritten text, or rewrites exhausted
             ctx.experiment_status = "SKIPPED_TOO_COMPLEX"

@@ -91,17 +91,15 @@ def analyse(records: list[dict], path: str = "") -> None:
     no_criteria    = [a for a in all_attempts if not a.get("criteria") and a.get("evaluation_status","VALID") == "VALID"]
 
     # ── Alignment score distribution ──────────────────────────────────────
-    # Only include attempts with real numeric scores (skip None = protocol failure)
+    # Score belongs to the validator step, NOT the lifecycle verdict.
+    # Collect ALL attempt scores (non-None) across all records.
+    # None = protocol failure (INVALID_FORMAT / MODEL_FAILURE) → excluded.
     all_scores = []
     for r in records:
         for a in r.get("attempts", []):
-            if a.get("verdict") == r.get("final_verdict") or (
-                r.get("final_verdict") == "VALID" and a.get("verdict") == "VALID"
-            ):
-                s = a.get("score")
-                if s is not None:
-                    all_scores.append(float(s))
-                break
+            s = a.get("score")
+            if s is not None:
+                all_scores.append(float(s))
 
     print(f"\n--- PROTOCOL COMPLIANCE ---")
     print(f"  Total attempts     : {len(all_attempts)}")

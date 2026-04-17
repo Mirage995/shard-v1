@@ -885,9 +885,11 @@ For REWRITE: write minimum_experiment using numpy/scipy synthetic data that dire
 models the phenomenon. Specify: data structure, technique vs baseline, metric,
 expected direction. Must be CPU-sandbox-runnable.
 
-IMPORTANT: "rewritten" MUST be a plain string (one or two sentences).
-DO NOT return a dict, object, or structured JSON for "rewritten".
-Example: "Generate two 100-element arrays representing X and Y; apply Z; compare metric M."
+CRITICAL RULES for "rewritten":
+- If verdict is REWRITE, "rewritten" MUST be a non-empty plain string. NEVER null.
+- If you cannot produce a rewrite, set verdict to INVALID instead of REWRITE.
+- DO NOT return a dict, object, or structured JSON for "rewritten".
+- Example: "Generate two 100-element arrays X and Y; apply technique Z; measure metric M vs baseline B."
 
 Respond with valid JSON only:
 {{
