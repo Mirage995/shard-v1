@@ -1697,6 +1697,14 @@ SANDBOX RESOURCES AVAILABLE FOR minimum_experiment:
 - numpy, torch (CPU), sklearn, scipy, pandas
 - NO internet, NO GPU, NO external files
 
+CAPABILITY CONTRACT (hard constraints — not suggestions):
+- The experiment MUST be executable with Python + numpy/scipy only
+- NO external datasets, NO domain-specific data (fMRI, clinical records, satellite imagery,
+  EEG signals, genomic data, sensor streams, real-world time series)
+- You MUST specify explicitly HOW the phenomenon is simulated with synthetic data
+- If the hypothesis requires real-world variability to be meaningful → DO NOT propose it;
+  generate a different hypothesis instead
+
 CRITICAL RULES FOR minimum_experiment:
 1. Use load_digits or load_breast_cancer ONLY if the hypothesis is genuinely about
    image/tabular classification. Do NOT use them as generic proxies for unrelated domains.

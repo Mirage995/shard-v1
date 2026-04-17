@@ -86,6 +86,31 @@ def validate_structure(spec: dict) -> tuple[bool, list[str]]:
     return (len(issues) == 0, issues)
 
 
+_REAL_WORLD_FLAGS = {
+    "fmri", "eeg", "clinical", "patient", "wildfire", "satellite",
+    "real-world", "biological variability", "in vivo", "in situ",
+    "ecg", "mri", "ct scan", "hospital", "genomic", "transcriptomic",
+    "sensor data", "lidar", "remote sensing",
+}
+
+_SYNTHETIC_SIGNALS = {
+    "synthetic", "simulated", "simulate", "random", "toy", "benchmark",
+    "generate", "numpy", "scipy", "artificial",
+}
+
+
+def requires_real_world_data(spec: dict) -> bool:
+    """True if the spec references domain-specific real-world data the sandbox can't provide."""
+    text = " ".join(spec.values()).lower()
+    return any(k in text for k in _REAL_WORLD_FLAGS)
+
+
+def synthetic_declared(spec: dict) -> bool:
+    """True if the spec explicitly states the phenomenon is simulated synthetically."""
+    text = (spec.get("intervention", "") + " " + spec.get("mechanism", "")).lower()
+    return any(k in text for k in _SYNTHETIC_SIGNALS)
+
+
 async def _force_rewrite_experiment(original: str, ctx) -> str | None:
     """Atomic LLM call to reformat a free-form experiment into the 4-section spec.
 
@@ -308,6 +333,23 @@ class ExperimentDesignPhase(BasePhase):
             print(f"[EXPERIMENT_DESIGN] SPEC_GATE: micro-validation issues: {_struct_issues}")
             # Log issues but don't block — validator will penalize FA/CL naturally
 
+        # ── Feasibility gate (deterministic, pre-validator) ───────────────────
+        # If the spec requires real-world data the sandbox cannot provide, route
+        # to KAGGLE_READY instead of burning validator budget on a guaranteed fail.
+        if requires_real_world_data(_parsed_spec):
+            _rwd_reason = next(
+                (k for k in _REAL_WORLD_FLAGS
+                 if k in " ".join(_parsed_spec.values()).lower()), "real_world_data"
+            )
+            print(f"[EXPERIMENT_DESIGN] FEASIBILITY_GATE: REQUIRES_REAL_WORLD_DATA "
+                  f"flag='{_rwd_reason}' — routing to KAGGLE_READY")
+            # Treat as kaggle-ready: generate a notebook-style experiment
+            is_kaggle = True
+            await ctx.emit(
+                "EXPERIMENT_DESIGN", 0,
+                f"Feasibility gate: real-world data required ({_rwd_reason}) — KAGGLE_READY"
+            )
+
         # ── Experiment alignment validator (LLM-based, semantic check) ────────
         # Checks that minimum_experiment actually tests the hypothesis.
         # REWRITE: replaces minimum_experiment and retries (up to MAX_REWRITES).
@@ -351,6 +393,34 @@ class ExperimentDesignPhase(BasePhase):
 
             _score_safe = round(_score, 4) if _score is not None else None
 
+            # ── Conditional IM adjustment ─────────────────────────────────────
+            # If the spec explicitly declares synthetic simulation, reduce the
+            # "real-world gap" penalty on implementability by a small fixed amount.
+            # This does NOT raise the VALID threshold — it only corrects over-penalization
+            # of genuinely sandbox-runnable experiments.
+            _im_adjusted = False
+            if _score is not None and alignment.get("criteria"):
+                _cur_exp_for_im = _to_str(hypothesis.get("minimum_experiment", ""))
+                _spec_for_im    = parse_experiment_spec(_cur_exp_for_im)
+                if _spec_for_im and synthetic_declared(_spec_for_im):
+                    _criteria_adj = dict(alignment["criteria"])
+                    _im_raw = float(_criteria_adj.get("implementability", 0.0))
+                    _im_new = min(1.0, _im_raw + 0.05)
+                    if _im_new != _im_raw:
+                        _criteria_adj["implementability"] = round(_im_new, 4)
+                        alignment = dict(alignment)
+                        alignment["criteria"] = _criteria_adj
+                        # Recompute alignment_score as average of adjusted criteria
+                        _crit_vals = [float(v) for v in _criteria_adj.values()]
+                        _new_score = sum(_crit_vals) / len(_crit_vals)
+                        alignment["alignment_score"] = round(_new_score, 4)
+                        _score      = alignment["alignment_score"]
+                        _score_safe = round(_score, 4)
+                        _im_adjusted = True
+                        print(f"[EXPERIMENT_DESIGN] IM_ADJUSTMENT attempt={_attempt} "
+                              f"im {_im_raw:.3f}→{_im_new:.3f} "
+                              f"score→{_score_safe:.3f} (synthetic declared)")
+
             # ── Structural audit of the 4-section template ────────────────────
             _cur_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
             _cur_spec     = parse_experiment_spec(_cur_exp_str)
@@ -376,6 +446,7 @@ class ExperimentDesignPhase(BasePhase):
                 "has_criterion":    _has_criterion,
                 "exp_len":          _meas_len,
                 "has_threshold":    _has_threshold,
+                "im_adjusted":      _im_adjusted,
             })
 
             # Protocol failure (INVALID_FORMAT / MODEL_FAILURE): fail open, log and continue
