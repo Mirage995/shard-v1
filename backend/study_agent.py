@@ -1694,6 +1694,10 @@ CRITICAL RULES FOR minimum_experiment:
    a classification accuracy comparison.
 4. The minimum_experiment must be a valid test of THIS specific hypothesis, not a
    generic "compare technique vs baseline on load_digits" template.
+   It MUST satisfy ALL three of the following:
+   a) Test a SPECIFIC causal mechanism stated in the hypothesis (not a proxy or correlation).
+   b) Produce a MEASURABLE SCALAR output (e.g. accuracy, RMSE, forgetting rate, p-value) — not qualitative.
+   c) Include an EXPLICIT success/failure criterion (e.g. "technique_A exceeds baseline_B by >5% on metric M").
 
 For minimum_experiment: describe the exact comparison (technique vs baseline),
 what synthetic data or available dataset to use, what metric to measure, and

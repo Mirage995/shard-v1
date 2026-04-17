@@ -253,7 +253,7 @@ class ExperimentDesignPhase(BasePhase):
                     old_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
                     _rewritten   = _normalize_rewritten(_rewritten_raw)
                     _delta       = _rewrite_delta(old_exp_str, _rewritten)
-                    _prev_score  = _calib_attempts[-1]["score"] if _calib_attempts else None
+                    _prev_score  = _calib_attempts[-2]["score"] if len(_calib_attempts) >= 2 else None
                     _score_delta = round(_score - _prev_score, 4) if (
                         _score is not None and _prev_score is not None
                     ) else None
