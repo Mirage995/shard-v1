@@ -73,7 +73,46 @@ def _has_numeric_threshold(text: str) -> bool:
     return bool(_re_module.search(r'\d+(\.\d+)?\s*(%|>|<|>=|<=)', text))
 
 
-def validate_structure(spec: dict) -> tuple[bool, list[str]]:
+_STOPWORDS = {
+    "the", "a", "an", "is", "are", "of", "in", "to", "by", "for",
+    "with", "and", "or", "that", "this", "it", "be", "as", "at",
+    "from", "on", "not", "can", "will", "which", "its", "has",
+}
+
+_SIMULATION_KEYWORDS = {
+    "distribution", "generate", "sample", "random", "numpy",
+    "scipy", "simulate", "synthetic", "np.", "randn", "randint",
+}
+
+
+def check_metric_linkage(spec: dict) -> bool:
+    """Check that the metric named in MEASUREMENT is referenced in SUCCESS CRITERION.
+
+    Captures the MECHANISM→MEASUREMENT→SUCCESS chain without full AST parsing.
+    Extracts significant tokens (len≥4, not stopwords) from MEASUREMENT and checks
+    that at least one appears in SUCCESS CRITERION.
+    """
+    measurement = spec.get("measurement", "").lower()
+    success = spec.get("success_criterion", "").lower()
+    tokens = {
+        w for w in _re_module.findall(r'\b\w{4,}\b', measurement)
+        if w not in _STOPWORDS
+    }
+    return bool(tokens) and any(tok in success for tok in tokens)
+
+
+def check_simulation_grounding(spec: dict) -> bool:
+    """Check that INTERVENTION or MECHANISM describes how data is generated synthetically."""
+    text = (spec.get("intervention", "") + " " + spec.get("mechanism", "")).lower()
+    return any(k in text for k in _SIMULATION_KEYWORDS)
+
+
+def check_control_clause(raw_text: str) -> bool:
+    """Check that a CONTROL section is present in the raw spec text."""
+    return bool(_re_module.search(r'CONTROL\s*:', raw_text, _re_module.IGNORECASE))
+
+
+def validate_structure(spec: dict, raw_text: str = "") -> tuple[bool, list[str]]:
     """Zero-LLM micro-validation of a parsed 4-section spec.
 
     Returns (ok, list_of_issues).
@@ -83,6 +122,12 @@ def validate_structure(spec: dict) -> tuple[bool, list[str]]:
         issues.append("MEASUREMENT appears qualitative (not scalar)")
     if not _has_numeric_threshold(spec.get("success_criterion", "")):
         issues.append("SUCCESS CRITERION has no numeric threshold")
+    if not check_metric_linkage(spec):
+        issues.append("METRIC not linked: MEASUREMENT token absent from SUCCESS CRITERION")
+    if not check_simulation_grounding(spec):
+        issues.append("SIMULATION not grounded: no data-generation keywords in INTERVENTION/MECHANISM")
+    if raw_text and not check_control_clause(raw_text):
+        issues.append("CONTROL clause missing: no confounder isolation declared")
     return (len(issues) == 0, issues)
 
 
@@ -119,17 +164,22 @@ async def _force_rewrite_experiment(original: str, ctx) -> str | None:
     Returns reformatted string if parse succeeds, else None (hard fail).
     """
     prompt = (
-        "Convert this experiment into EXACTLY 4 sections.\n\n"
-        "FORMAT (each section on its own line, no extra text):\n"
-        "MECHANISM: [how X causes Y via mechanism M]\n"
-        "INTERVENTION: [what is manipulated — technique vs baseline]\n"
-        "MEASUREMENT: [single scalar metric, e.g. accuracy, RMSE, forgetting_rate]\n"
-        "SUCCESS CRITERION: [numeric threshold, e.g. technique_A > baseline_B by >5%]\n\n"
+        "Convert this experiment into the required structured format.\n\n"
+        "FORMAT (each section on its own line):\n"
+        "MECHANISM: [property P of X reduces/increases process Q in Y. VARIABLE: V = <formula>]\n"
+        "INTERVENTION: [technique vs baseline. Simulated as: generate data using numpy/scipy with <distribution/process>]\n"
+        "MEASUREMENT: [Metric: <name_of_V>, computed as <formula>]\n"
+        "SUCCESS CRITERION: [<name_of_V> exceeds baseline by ><threshold>]\n"
+        "CONTROL: [1-2 confounders held constant: <what and how>]\n\n"
         "STRICT RULES:\n"
-        "- All 4 sections MUST be present\n"
+        "- All 5 sections MUST be present (MECHANISM, INTERVENTION, MEASUREMENT, SUCCESS CRITERION, CONTROL)\n"
+        "- MECHANISM must define a named VARIABLE (e.g. 'VARIABLE: V = metric()')\n"
+        "- MEASUREMENT must reference that same variable name\n"
+        "- SUCCESS CRITERION must threshold that same variable name with a number\n"
+        "- INTERVENTION must describe synthetic data generation (distribution, numpy, scipy)\n"
+        "- CONTROL must name 1-2 confounders and how they are held constant\n"
         "- MEASUREMENT must be a single scalar (no qualitative descriptions)\n"
-        "- SUCCESS CRITERION must include a numeric threshold\n"
-        "- No explanations, no extra lines\n\n"
+        "- No explanations, no extra text outside the 5 sections\n\n"
         f"INPUT:\n{original}"
     )
     try:
@@ -324,14 +374,46 @@ class ExperimentDesignPhase(BasePhase):
                 _persist_skipped(ctx, hypothesis, "INVALID_SPEC_STRUCTURE")
                 return
 
-        # Zero-LLM micro-validations on the parsed spec
-        _struct_ok, _struct_issues = validate_structure(_parsed_spec)
+        # Zero-LLM micro-validations on the parsed spec (binding + simulation + control)
+        _min_exp_str_for_gate = _to_str(hypothesis.get("minimum_experiment", ""))
+        _struct_ok, _struct_issues = validate_structure(_parsed_spec, raw_text=_min_exp_str_for_gate)
         print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI parsed=True "
               f"had_rewrite={_gate_had_rewrite} rewrite_ok={_gate_rewrite_ok} "
               f"struct_ok={_struct_ok} issues={_struct_issues}")
-        if not _struct_ok:
+
+        # ── Binding gate (deterministic, pre-validator) ───────────────────────
+        # If metric linkage or simulation grounding is missing, force a binding-aware
+        # rewrite before entering the validator — one attempt, hard fail if it doesn't
+        # improve the chain. CONTROL absence is soft (logged, not blocking alone).
+        _binding_issues = [i for i in _struct_issues if any(
+            kw in i for kw in ("METRIC not linked", "SIMULATION not grounded")
+        )]
+        if _binding_issues:
+            print(f"[EXPERIMENT_DESIGN] BINDING_GATE: {_binding_issues} — forcing binding rewrite")
+            _binding_rewritten = await _force_rewrite_experiment(_min_exp_str_for_gate, ctx)
+            if _binding_rewritten is not None:
+                _binding_spec = parse_experiment_spec(_binding_rewritten)
+                if _binding_spec is not None:
+                    _binding_issues_after = [
+                        i for i in validate_structure(_binding_spec, raw_text=_binding_rewritten)[1]
+                        if any(kw in i for kw in ("METRIC not linked", "SIMULATION not grounded"))
+                    ]
+                    if not _binding_issues_after:
+                        hypothesis = dict(hypothesis)
+                        hypothesis["minimum_experiment"] = _binding_rewritten
+                        _parsed_spec = _binding_spec
+                        print(f"[EXPERIMENT_DESIGN] BINDING_GATE: rewrite resolved binding issues")
+                    else:
+                        print(f"[EXPERIMENT_DESIGN] BINDING_GATE: rewrite did not resolve "
+                              f"— proceeding anyway (validator will score)")
+                else:
+                    print(f"[EXPERIMENT_DESIGN] BINDING_GATE: rewrite failed parse — proceeding with original")
+            else:
+                print(f"[EXPERIMENT_DESIGN] BINDING_GATE: force_rewrite returned None — proceeding with original")
+
+        if _struct_issues:
             print(f"[EXPERIMENT_DESIGN] SPEC_GATE: micro-validation issues: {_struct_issues}")
-            # Log issues but don't block — validator will penalize FA/CL naturally
+            # Remaining issues logged; validator will penalize FA/IM accordingly
 
         # ── Feasibility gate (deterministic, pre-validator) ───────────────────
         # If the spec requires real-world data the sandbox cannot provide, route

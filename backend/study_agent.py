@@ -1715,14 +1715,29 @@ CRITICAL RULES FOR minimum_experiment:
 3. If the hypothesis is about ML techniques (regularization, training dynamics, continual
    learning, robustness): describe the technique applied to a real ML problem, not just
    a classification accuracy comparison.
-4. The minimum_experiment MUST be written using this EXACT 4-section structure (all 4 required):
+4. The minimum_experiment MUST be written using this EXACT 5-section structure (all 5 required):
 
-   MECHANISM: [The causal mechanism — how X from domain_from affects Y in domain_to via what process M]
-   INTERVENTION: [What is manipulated to activate the mechanism — the specific technique vs baseline]
-   MEASUREMENT: [The scalar metric that captures the effect, e.g. accuracy, RMSE, forgetting_rate, p-value]
-   SUCCESS CRITERION: [Numeric threshold — e.g. "technique_A exceeds baseline_B by >5% on metric M"]
+   MECHANISM: [The causal mechanism. MUST include: property P of domain_from reduces/increases
+               process Q in domain_to. MUST define: VARIABLE: V = <observable formula or metric name>]
+   INTERVENTION: [What is manipulated — technique vs baseline. MUST include:
+                  Simulated as: generate <data> using <numpy/scipy distribution or process>]
+   MEASUREMENT: [Metric: <name_of_V> — computed as <exact formula>. Must use the same variable V
+                 defined in MECHANISM]
+   SUCCESS CRITERION: [<name_of_V> condition: e.g. "delta_V > 0.10 on held-out test set"]
+   CONTROL: [1-2 confounders held constant: e.g. "random seed fixed; sample size equal across conditions"]
 
-   This is NOT optional formatting. A minimum_experiment missing any of the 4 sections will be rejected.
+   CHAIN REQUIREMENT: MECHANISM defines V → INTERVENTION computes V → MEASUREMENT reports V →
+   SUCCESS CRITERION thresholds V. All 4 must reference the same observable variable.
+
+   EXAMPLE (correct):
+   MECHANISM: Dropout regularization reduces co-adaptation between neurons. VARIABLE: V = test_accuracy
+   INTERVENTION: Train 2-layer MLP with dropout=0.5 vs no dropout on synthetic classification data.
+                 Simulated as: X = np.random.randn(1000, 20), y = (X[:,0] > 0).astype(int)
+   MEASUREMENT: Metric: test_accuracy — fraction correct on 20% held-out split
+   SUCCESS CRITERION: test_accuracy(dropout) > test_accuracy(baseline) + 0.03
+   CONTROL: Random seed fixed at 42; learning rate identical across conditions
+
+   This is NOT optional. A minimum_experiment missing the VARIABLE binding or CONTROL will be rejected.
 
 "hypothesis": {{
   "statement": "one sentence — the specific, non-obvious cross-domain claim",
@@ -1730,7 +1745,7 @@ CRITICAL RULES FOR minimum_experiment:
   "domain_to": "target domain/problem where it is applied",
   "rationale": "why this transfer is non-obvious and has NOT been widely studied (cite what IS known, explain the gap)",
   "falsifiable": true or false,
-  "minimum_experiment": "MECHANISM: ... INTERVENTION: ... MEASUREMENT: ... SUCCESS CRITERION: ...",
+  "minimum_experiment": "MECHANISM: ... VARIABLE: V=... INTERVENTION: ... Simulated as:... MEASUREMENT: Metric: V ... SUCCESS CRITERION: V>... CONTROL: ...",
   "confidence": 0.0 to 1.0
 }}
 
