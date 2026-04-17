@@ -24,6 +24,105 @@ from study_phases import BasePhase
 
 logger = logging.getLogger("shard.experiment_phases")
 
+# ── Deterministic 4-section parser ──────────────────────────────────────────
+
+import re as _re_module
+
+# ── Regex-based multiline 4-section parser ────────────────────────────────────
+# Handles: "MECHANISM:\n text", whitespace/indent variation, out-of-order sections.
+
+_SECTION_PATTERNS = {
+    "mechanism":        r"MECHANISM:\s*(.+?)(?=\n[A-Z ]+:|$)",
+    "intervention":     r"INTERVENTION:\s*(.+?)(?=\n[A-Z ]+:|$)",
+    "measurement":      r"MEASUREMENT:\s*(.+?)(?=\n[A-Z ]+:|$)",
+    "success_criterion": r"SUCCESS CRITERION:\s*(.+?)(?=\n[A-Z ]+:|$)",
+}
+
+# Qualitative signals → measurement is NOT scalar
+_MEASUREMENT_BLACKLIST = {"compare", "visual", "plot", "qualitative", "describe", "observe", "show"}
+
+
+def parse_experiment_spec(text: str) -> dict | None:
+    """Parse the 4-section structure from minimum_experiment text (regex, multiline).
+
+    Handles newline after colon, indentation, out-of-order sections.
+    Returns dict[mechanism/intervention/measurement/success_criterion] or None.
+    """
+    if not text:
+        return None
+    spec = {}
+    for key, pattern in _SECTION_PATTERNS.items():
+        m = _re_module.search(pattern, text, _re_module.DOTALL | _re_module.IGNORECASE)
+        if not m:
+            return None
+        value = m.group(1).strip()
+        if not value:
+            return None
+        spec[key] = value
+    return spec
+
+
+def _is_scalar_metric(text: str) -> bool:
+    """True if measurement is likely scalar (not qualitative/visual)."""
+    lower = text.lower()
+    return not any(w in lower for w in _MEASUREMENT_BLACKLIST)
+
+
+def _has_numeric_threshold(text: str) -> bool:
+    """True if success criterion contains a numeric comparison threshold."""
+    return bool(_re_module.search(r'\d+(\.\d+)?\s*(%|>|<|>=|<=)', text))
+
+
+def validate_structure(spec: dict) -> tuple[bool, list[str]]:
+    """Zero-LLM micro-validation of a parsed 4-section spec.
+
+    Returns (ok, list_of_issues).
+    """
+    issues = []
+    if not _is_scalar_metric(spec.get("measurement", "")):
+        issues.append("MEASUREMENT appears qualitative (not scalar)")
+    if not _has_numeric_threshold(spec.get("success_criterion", "")):
+        issues.append("SUCCESS CRITERION has no numeric threshold")
+    return (len(issues) == 0, issues)
+
+
+async def _force_rewrite_experiment(original: str, ctx) -> str | None:
+    """Atomic LLM call to reformat a free-form experiment into the 4-section spec.
+
+    Uses a sterile minimal prompt — no system context contamination.
+    json_mode=False: we want rigid plain text, not JSON.
+    Returns reformatted string if parse succeeds, else None (hard fail).
+    """
+    prompt = (
+        "Convert this experiment into EXACTLY 4 sections.\n\n"
+        "FORMAT (each section on its own line, no extra text):\n"
+        "MECHANISM: [how X causes Y via mechanism M]\n"
+        "INTERVENTION: [what is manipulated — technique vs baseline]\n"
+        "MEASUREMENT: [single scalar metric, e.g. accuracy, RMSE, forgetting_rate]\n"
+        "SUCCESS CRITERION: [numeric threshold, e.g. technique_A > baseline_B by >5%]\n\n"
+        "STRICT RULES:\n"
+        "- All 4 sections MUST be present\n"
+        "- MEASUREMENT must be a single scalar (no qualitative descriptions)\n"
+        "- SUCCESS CRITERION must include a numeric threshold\n"
+        "- No explanations, no extra lines\n\n"
+        f"INPUT:\n{original}"
+    )
+    try:
+        raw = await ctx.agent._think(
+            prompt,
+            system="You strictly format experimental specifications.",
+            json_mode=False,
+            temperature=0.1,
+        )
+        if raw:
+            reformatted = raw.strip()
+            if parse_experiment_spec(reformatted) is not None:
+                return reformatted
+            print(f"[EXPERIMENT_DESIGN] FORCE_REWRITE: model output failed parse — hard fail")
+    except Exception as _e:
+        print(f"[EXPERIMENT_DESIGN] FORCE_REWRITE_EXCEPTION: {_e}")
+    return None
+
 
 def _to_str(exp) -> str:
     """Convert any experiment spec to a stable, loggable string.
@@ -174,6 +273,40 @@ class ExperimentDesignPhase(BasePhase):
                 "Experiment needs external compute (GPU/data) -- generating Kaggle-ready code"
             )
             print(f"[EXPERIMENT_DESIGN] KAGGLE_READY -- generating code for: '{hypothesis.get('statement','')[:80]}'")
+
+        # ── 4-section enforcement gate (deterministic, pre-validator) ──────────
+        # If minimum_experiment is free-form, attempt one targeted LLM reformat.
+        # If still missing sections after reformat → skip as INVALID (no validator call).
+        _min_exp_raw = hypothesis.get("minimum_experiment", "") or ""
+        _parsed_spec = parse_experiment_spec(_to_str(_min_exp_raw))
+        _gate_had_rewrite   = False
+        _gate_rewrite_ok    = False
+
+        if _parsed_spec is None:
+            _gate_had_rewrite = True
+            print(f"[EXPERIMENT_DESIGN] SPEC_GATE: free-form — forcing 4-section rewrite")
+            _reformatted = await _force_rewrite_experiment(_to_str(_min_exp_raw), ctx)
+            if _reformatted is not None:
+                _gate_rewrite_ok = True
+                print(f"[EXPERIMENT_DESIGN] SPEC_GATE: reformat OK — proceeding to validator")
+                hypothesis = dict(hypothesis)
+                hypothesis["minimum_experiment"] = _reformatted
+                _parsed_spec = parse_experiment_spec(_reformatted)
+            else:
+                # Hard fail — no fallback to free-form text
+                print(f"[EXPERIMENT_DESIGN] SPEC_GATE: reformat FAILED — hard stop INVALID")
+                print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI parsed=False had_rewrite=True rewrite_ok=False")
+                _persist_skipped(ctx, hypothesis, "INVALID_SPEC_STRUCTURE")
+                return
+
+        # Zero-LLM micro-validations on the parsed spec
+        _struct_ok, _struct_issues = validate_structure(_parsed_spec)
+        print(f"[EXPERIMENT_DESIGN] SPEC_GATE_KPI parsed=True "
+              f"had_rewrite={_gate_had_rewrite} rewrite_ok={_gate_rewrite_ok} "
+              f"struct_ok={_struct_ok} issues={_struct_issues}")
+        if not _struct_ok:
+            print(f"[EXPERIMENT_DESIGN] SPEC_GATE: micro-validation issues: {_struct_issues}")
+            # Log issues but don't block — validator will penalize FA/CL naturally
 
         # ── Experiment alignment validator (LLM-based, semantic check) ────────
         # Checks that minimum_experiment actually tests the hypothesis.
