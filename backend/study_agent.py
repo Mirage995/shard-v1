@@ -881,9 +881,21 @@ DECISION:
   alignment_score >= 0.30 → REWRITE (provide a corrected minimum_experiment)
   alignment_score <  0.30 → INVALID
 
-For REWRITE: write minimum_experiment using numpy/scipy synthetic data that directly
-models the phenomenon. Use the 4-section format: MECHANISM / INTERVENTION / MEASUREMENT / SUCCESS CRITERION.
-Must be CPU-sandbox-runnable.
+For REWRITE: You MUST output the experiment in EXACTLY these 4 sections, one per line:
+
+MECHANISM: [The causal mechanism — how X from domain_from affects Y in domain_to via what process M]
+INTERVENTION: [What is manipulated — specific technique vs baseline, with domain-specific parameters]
+MEASUREMENT: [The scalar metric capturing the effect, e.g. accuracy, RMSE, forgetting_rate, p-value]
+SUCCESS CRITERION: [Numeric threshold — e.g. "technique_A exceeds baseline_B by >5% on metric M"]
+
+Rules for the rewrite:
+- Output exactly those 4 section headers followed by content on the same line
+- Do not omit any section
+- Do not add explanations, commentary, or extra sections
+- PRESERVE domain-specific details from the original experiment (same domain, same mechanism type)
+- Do NOT simplify or generalize the mechanism — keep the original causal claim intact
+- If you cannot preserve the original mechanism, set verdict to INVALID instead of REWRITE
+- Must be CPU-sandbox-runnable using numpy/scipy synthetic data
 
 SCORING RULE: If any of the 4 sections (MECHANISM, INTERVENTION, MEASUREMENT, SUCCESS CRITERION)
 are missing or vague in the minimum_experiment, you MUST penalize causal_link and falsifiability.
@@ -892,7 +904,7 @@ CRITICAL RULES for "rewritten":
 - If verdict is REWRITE, "rewritten" MUST be a non-empty plain string. NEVER null.
 - If you cannot produce a rewrite, set verdict to INVALID instead of REWRITE.
 - DO NOT return a dict, object, or structured JSON for "rewritten".
-- Example: "Generate two 100-element arrays X and Y; apply technique Z; measure metric M vs baseline B."
+- Example: "MECHANISM: dropout regularization reduces co-adaptation in neural nets\nINTERVENTION: compare dropout=0.5 vs no dropout on 2-layer MLP\nMEASUREMENT: test accuracy on held-out 20% split\nSUCCESS CRITERION: dropout model exceeds baseline by >3% accuracy"
 
 Respond with valid JSON only:
 {{

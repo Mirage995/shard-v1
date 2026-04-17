@@ -409,6 +409,20 @@ class ExperimentDesignPhase(BasePhase):
                     old_exp_str  = _to_str(hypothesis.get("minimum_experiment", ""))
                     _rewritten   = _normalize_rewritten(_rewritten_raw)
 
+                    # ── SEMANTIC DRIFT CHECK (log only, don't block) ──────────
+                    _old_spec = parse_experiment_spec(old_exp_str)
+                    _new_spec = parse_experiment_spec(_rewritten)
+                    if _old_spec and _new_spec:
+                        _old_mech = _old_spec.get("mechanism", "")
+                        _new_mech = _new_spec.get("mechanism", "")
+                        _drift_ratio = SequenceMatcher(None, _old_mech, _new_mech).ratio()
+                        if _drift_ratio < 0.6:
+                            print(f"[EXPERIMENT_DESIGN] SEMANTIC_DRIFT attempt={_attempt} "
+                                  f"mech_similarity={_drift_ratio:.2f} — mechanism may have shifted")
+                            # Log into the current calib attempt if it exists
+                            if _calib_attempts:
+                                _calib_attempts[-1]["semantic_drift"] = round(_drift_ratio, 3)
+
                     # ── GATE RE-APPLICATION (invariant: every min_exp entering
                     # the validator must be canonical 4-section) ────────────────
                     _rw_spec = parse_experiment_spec(_rewritten)
