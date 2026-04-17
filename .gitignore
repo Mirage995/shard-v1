@@ -154,3 +154,36 @@ backend/face_landmarker.task
 
 # ── SHARD: Benchmark forge artifacts ──────────────────────────────────────────
 benchmark/task_forge_*/
+
+# ── Tool artifacts (claude-flow, swarm) ───────────────────────────────────────
+.claude-flow/
+.swarm/
+
+# ── SHARD: Root-level junk (sandbox cwd bug — continued) ──────────────────────
+/'
+/0.90
+/2
+/5%
+/Machine
+/SKIPPED
+/float
+/{ctx.hypothesis_confidence_updated
+
+# ── SHARD: backend/ junk (sandbox cwd bug) ────────────────────────────────────
+backend/'
+backend/0.55
+backend/0.8
+backend/11
+backend/120s
+backend/2}
+backend/3
+backend/CERTIFY
+backend/List[Dict]
+backend/SNA
+backend/new_relevance}
+backend/pass_rate
+backend/runs
+backend/%s
+backend/{ctx.hypothesis_confidence_updated
+backend/2`.,+Commit
+backend/shard_memory/
