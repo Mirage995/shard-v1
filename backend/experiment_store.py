@@ -4,7 +4,7 @@ Manages hypothesis lifecycle for the SHARD Experiment Engine (#34).
 No LLM logic -- pure SQLite read/write following the experiment_cache.py pattern.
 
 Lifecycle:
-    PENDING -> CONFIRMED | REFUTED | INCONCLUSIVE | SKIPPED_TOO_COMPLEX
+    PENDING -> CONFIRMED | REFUTED | INCONCLUSIVE | SKIPPED_TOO_COMPLEX | KAGGLE_READY
 """
 import json
 import logging
@@ -119,7 +119,7 @@ def update_result(
 
     Args:
         hypothesis_id       : row id returned by store_hypothesis()
-        status              : CONFIRMED | REFUTED | INCONCLUSIVE | SKIPPED_TOO_COMPLEX
+        status              : CONFIRMED | REFUTED | INCONCLUSIVE | SKIPPED_TOO_COMPLEX | KAGGLE_READY
         experiment_code     : Python code that was executed
         experiment_result   : dict with stdout/stderr/exit_code/success
         confidence_updated  : empirical confidence post-test (0.0-1.0)
@@ -225,4 +225,26 @@ def get_skipped_complex() -> List[Dict]:
         return [_row_to_dict(r) for r in rows]
     except Exception as exc:
         logger.error("[EXPERIMENT_STORE] get_skipped_complex failed: %s", exc)
+        return []
+
+
+def get_kaggle_ready() -> List[Dict]:
+    """Return hypotheses that need GPU/external data but have generated Kaggle code.
+
+    These are ready to run on Kaggle/Colab — the experiment_code column holds
+    the notebook-ready Python. Ordered by confidence_initial DESC.
+    """
+    try:
+        conn = _get_db()
+        _ensure_table()
+        rows = conn.execute(
+            """
+            SELECT * FROM research_hypotheses
+            WHERE status = 'KAGGLE_READY'
+            ORDER BY confidence_initial DESC, created_at DESC
+            """
+        ).fetchall()
+        return [_row_to_dict(r) for r in rows]
+    except Exception as exc:
+        logger.error("[EXPERIMENT_STORE] get_kaggle_ready failed: %s", exc)
         return []

@@ -27,3 +27,5 @@ marshmallow
 cryptography
 aiohttp
 tensorflow
+OpenGL
+pyopencl
