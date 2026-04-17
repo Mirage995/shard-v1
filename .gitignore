@@ -155,6 +155,9 @@ output.txt
 trace.txt
 test_err.txt
 test_results.txt
+test_cad_out.txt
+test_out.txt
+test_out2.txt
 specific_tests.txt
 problemirealidishard.txt
 shardmemorianuova.txt
@@ -164,6 +167,11 @@ roi_run_*.txt
 roi_run_*.log
 pytest_out*.txt
 pytest_cad_out.txt
+
+# ── SHARD: Local config (never commit) ────────────────────────────────────────
+shard_tuning.json
+.mcp.json
+*.pdf
 
 # ── SHARD: ChromaDB (binary, regenerable) ─────────────────────────────────────
 shard_memory/chromadb/
