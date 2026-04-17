@@ -70,5 +70,53 @@
   "unix signal basics": {
     "resolved_at": "2026-04-10T13:35:44.380883",
     "score": 9.1
+  },
+  "higher order functions": {
+    "resolved_at": "2026-04-16T11:35:42.359514",
+    "score": 8.1
+  },
+  "python functools itertools mastery": {
+    "resolved_at": "2026-04-16T11:32:53.276172",
+    "score": 8.2
+  },
+  "python operator overloading dunder methods": {
+    "resolved_at": "2026-04-16T11:57:57.992505",
+    "score": 7.9
+  },
+  "3D polygon wrapping": {
+    "resolved_at": "2026-04-16T18:54:25.063724",
+    "score": 9.1
+  },
+  "3D geometry transformations": {
+    "resolved_at": "2026-04-16T19:01:16.727728",
+    "score": 9.1
+  },
+  "3D geometry fundamentals": {
+    "resolved_at": "2026-04-16T19:11:58.042691",
+    "score": 8.2
+  },
+  "polygon mesh creation": {
+    "resolved_at": "2026-04-16T19:15:34.121600",
+    "score": 7.9
+  },
+  "3D vertex buffers": {
+    "resolved_at": "2026-04-16T19:59:08.690594",
+    "score": 9.1
+  },
+  "indexed mesh rendering": {
+    "resolved_at": "2026-04-17T11:47:57.851702",
+    "score": 7.9
+  },
+  "GPU memory management": {
+    "resolved_at": "2026-04-17T12:58:24.110353",
+    "score": 8.8
+  },
+  "OpenGL vertex arrays": {
+    "resolved_at": "2026-04-17T13:05:09.243379",
+    "score": 7.9
+  },
+  "concurrent futures threadpool processpool": {
+    "resolved_at": "2026-04-17T15:00:05.547231",
+    "score": 9.4
   }
 }

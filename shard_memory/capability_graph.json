@@ -3701,5 +3701,921 @@
     ],
     "acquired": "2026-04-10T17:24:26.021116",
     "source_topic": "dynamic programming"
+  },
+  "python basics": {
+    "requires": [],
+    "acquired": "2026-04-11T15:21:49.861556",
+    "source_topic": "Python basics"
+  },
+  "python fundamentals": {
+    "requires": [
+      "python basics"
+    ],
+    "acquired": "2026-04-11T15:21:49.878744",
+    "source_topic": "Python basics"
+  },
+  "average-atom models": {
+    "requires": [
+      "python basics"
+    ],
+    "acquired": "2026-04-11T15:21:49.892850",
+    "source_topic": "Python basics"
+  },
+  "kalman filter": {
+    "requires": [
+      "python basics"
+    ],
+    "acquired": "2026-04-11T15:21:49.906533",
+    "source_topic": "Python basics"
+  },
+  "social network analysis": {
+    "requires": [
+      "python basics"
+    ],
+    "acquired": "2026-04-11T15:21:49.920672",
+    "source_topic": "Python basics"
+  },
+  "python interpreter": {
+    "requires": [
+      "python basics"
+    ],
+    "acquired": "2026-04-11T17:24:45.145814",
+    "source_topic": "Python basics"
+  },
+  "jepa world model lecun": {
+    "requires": [],
+    "acquired": "2026-04-11T17:38:49.699664",
+    "source_topic": "JEPA world model LeCun"
+  },
+  "neural network basics": {
+    "requires": [],
+    "acquired": "2026-04-11T18:12:57.299022",
+    "source_topic": "neural network basics"
+  },
+  "deep learning": {
+    "requires": [
+      "neural network basics"
+    ],
+    "acquired": "2026-04-11T18:12:57.313024",
+    "source_topic": "neural network basics"
+  },
+  "recurrent neural networks": {
+    "requires": [
+      "neural network basics"
+    ],
+    "acquired": "2026-04-11T18:12:57.326953",
+    "source_topic": "neural network basics"
+  },
+  "jepa world model": {
+    "requires": [
+      "jepa world model lecun"
+    ],
+    "acquired": "2026-04-11T18:17:37.739120",
+    "source_topic": "JEPA world model LeCun"
+  },
+  "latent variable models": {
+    "requires": [
+      "jepa world model lecun"
+    ],
+    "acquired": "2026-04-11T18:17:37.751463",
+    "source_topic": "JEPA world model LeCun"
+  },
+  "energy-based models": {
+    "requires": [
+      "jepa world model lecun"
+    ],
+    "acquired": "2026-04-11T18:17:37.763701",
+    "source_topic": "JEPA world model LeCun"
+  },
+  "ewc regularization catastrophic forgetting": {
+    "requires": [],
+    "acquired": "2026-04-11T18:25:07.242572",
+    "source_topic": "EWC regularization catastrophic forgetting"
+  },
+  "python decorators": {
+    "requires": [
+      "python functions"
+    ],
+    "acquired": "2026-04-13T14:38:04.401677",
+    "source_topic": "python functions"
+  },
+  "higher order functions": {
+    "requires": [],
+    "acquired": "2026-04-13T14:41:13.714618",
+    "source_topic": "higher order functions"
+  },
+  "higher-order functions": {
+    "requires": [
+      "higher order functions"
+    ],
+    "acquired": "2026-04-13T14:41:13.725327",
+    "source_topic": "higher order functions"
+  },
+  "function expressions": {
+    "requires": [
+      "higher order functions"
+    ],
+    "acquired": "2026-04-13T14:41:13.735941",
+    "source_topic": "higher order functions"
+  },
+  "continual learning methods": {
+    "requires": [],
+    "acquired": "2026-04-13T14:44:59.346084",
+    "source_topic": "continual learning methods"
+  },
+  "weight regularization techniques": {
+    "requires": [],
+    "acquired": "2026-04-13T15:15:58.566030",
+    "source_topic": "weight regularization techniques"
+  },
+  "l1 regularization": {
+    "requires": [
+      "weight regularization techniques"
+    ],
+    "acquired": "2026-04-13T15:15:58.577428",
+    "source_topic": "weight regularization techniques"
+  },
+  "l2 regularization": {
+    "requires": [
+      "weight regularization techniques"
+    ],
+    "acquired": "2026-04-13T15:15:58.588339",
+    "source_topic": "weight regularization techniques"
+  },
+  "elastic net regularization": {
+    "requires": [
+      "weight regularization techniques"
+    ],
+    "acquired": "2026-04-13T15:15:58.599558",
+    "source_topic": "weight regularization techniques"
+  },
+  "dropout regularization": {
+    "requires": [
+      "weight regularization techniques"
+    ],
+    "acquired": "2026-04-13T15:15:58.611050",
+    "source_topic": "weight regularization techniques"
+  },
+  "python abstract base classes abc": {
+    "requires": [],
+    "acquired": "2026-04-13T15:18:40.357947",
+    "source_topic": "python abstract base classes abc"
+  },
+  "abstract base class (abc)": {
+    "requires": [
+      "python abstract base classes abc"
+    ],
+    "acquired": "2026-04-13T15:18:40.368395",
+    "source_topic": "python abstract base classes abc"
+  },
+  "flyweight pattern memory optimization python": {
+    "requires": [],
+    "acquired": "2026-04-13T15:21:35.144004",
+    "source_topic": "flyweight pattern memory optimization python"
+  },
+  "flyweight design pattern": {
+    "requires": [
+      "flyweight pattern memory optimization python"
+    ],
+    "acquired": "2026-04-13T15:21:35.154476",
+    "source_topic": "flyweight pattern memory optimization python"
+  },
+  "memory optimization": {
+    "requires": [
+      "flyweight pattern memory optimization python"
+    ],
+    "acquired": "2026-04-13T15:21:35.164817",
+    "source_topic": "flyweight pattern memory optimization python"
+  },
+  "structural design patterns": {
+    "requires": [
+      "flyweight pattern memory optimization python"
+    ],
+    "acquired": "2026-04-13T15:21:35.175684",
+    "source_topic": "flyweight pattern memory optimization python"
+  },
+  "python object oriented": {
+    "requires": [],
+    "acquired": "2026-04-13T15:25:08.659466",
+    "source_topic": "python object oriented"
+  },
+  "python contextlib advanced patterns": {
+    "requires": [],
+    "acquired": "2026-04-13T15:27:46.063109",
+    "source_topic": "python contextlib advanced patterns"
+  },
+  "contextmanager decorator": {
+    "requires": [
+      "python contextlib advanced patterns"
+    ],
+    "acquired": "2026-04-13T15:27:46.073883",
+    "source_topic": "python contextlib advanced patterns"
+  },
+  "visitor pattern double dispatch python": {
+    "requires": [],
+    "acquired": "2026-04-13T15:31:51.706306",
+    "source_topic": "visitor pattern double dispatch python"
+  },
+  "python enum advanced patterns": {
+    "requires": [],
+    "acquired": "2026-04-13T15:34:33.324078",
+    "source_topic": "python enum advanced patterns"
+  },
+  "window size determination": {
+    "requires": [
+      "sliding window technique"
+    ],
+    "acquired": "2026-04-13T15:37:09.344829",
+    "source_topic": "sliding window technique"
+  },
+  "sliding window optimization": {
+    "requires": [
+      "sliding window technique"
+    ],
+    "acquired": "2026-04-13T15:37:09.356117",
+    "source_topic": "sliding window technique"
+  },
+  "python file input output": {
+    "requires": [],
+    "acquired": "2026-04-13T15:41:09.637518",
+    "source_topic": "Python file input output"
+  },
+  "railway-oriented programming": {
+    "requires": [
+      "monadic error handling result type python"
+    ],
+    "acquired": "2026-04-13T15:43:17.506674",
+    "source_topic": "monadic error handling result type python"
+  },
+  "chain of responsibility pattern python": {
+    "requires": [],
+    "acquired": "2026-04-13T18:11:49.336738",
+    "source_topic": "chain of responsibility pattern python"
+  },
+  "parallel computing": {
+    "requires": [
+      "chain of responsibility pattern python"
+    ],
+    "acquired": "2026-04-13T18:11:49.348745",
+    "source_topic": "chain of responsibility pattern python"
+  },
+  "linear algebra basics": {
+    "requires": [],
+    "acquired": "2026-04-13T18:33:34.388682",
+    "source_topic": "linear algebra basics"
+  },
+  "divide and conquer": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-13T23:43:48.612273",
+    "source_topic": "binary search implementation"
+  },
+  "sorted array": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-13T23:43:48.625728",
+    "source_topic": "binary search implementation"
+  },
+  "recursive binary search": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T00:03:02.106661",
+    "source_topic": "binary search implementation"
+  },
+  "iterative binary search": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T00:03:02.121797",
+    "source_topic": "binary search implementation"
+  },
+  "recursive implementation": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T11:12:10.780838",
+    "source_topic": "binary search implementation"
+  },
+  "binary data search": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T11:12:10.794778",
+    "source_topic": "binary search implementation"
+  },
+  "sorted list": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T11:36:50.692478",
+    "source_topic": "binary search implementation"
+  },
+  "iterative implementation": {
+    "requires": [
+      "binary search implementation"
+    ],
+    "acquired": "2026-04-14T11:42:05.414429",
+    "source_topic": "binary search implementation"
+  },
+  "continual learning catastrophic forgetting": {
+    "requires": [],
+    "acquired": "2026-04-14T13:34:21.007096",
+    "source_topic": "continual learning catastrophic forgetting"
+  },
+  "data structures": {
+    "requires": [],
+    "acquired": "2026-04-14T15:42:59.218252",
+    "source_topic": "data structures"
+  },
+  "byzantine-resilient distributed optimization": {
+    "requires": [
+      "data structures"
+    ],
+    "acquired": "2026-04-14T15:42:59.237827",
+    "source_topic": "data structures"
+  },
+  "data encoding": {
+    "requires": [
+      "data structures"
+    ],
+    "acquired": "2026-04-14T15:42:59.255254",
+    "source_topic": "data structures"
+  },
+  "error correction": {
+    "requires": [
+      "data structures"
+    ],
+    "acquired": "2026-04-14T15:42:59.271443",
+    "source_topic": "data structures"
+  },
+  "molecular neurochemistry": {
+    "requires": [],
+    "acquired": "2026-04-14T15:56:50.368369",
+    "source_topic": "molecular neurochemistry"
+  },
+  "dynamic reconfiguration of neural circuits": {
+    "requires": [
+      "higher order functions"
+    ],
+    "acquired": "2026-04-15T23:31:12.784303",
+    "source_topic": "higher order functions"
+  },
+  "non-von neumann computer architecture": {
+    "requires": [
+      "higher order functions"
+    ],
+    "acquired": "2026-04-15T23:31:12.798470",
+    "source_topic": "higher order functions"
+  },
+  "template method pattern python": {
+    "requires": [],
+    "acquired": "2026-04-15T23:34:19.524486",
+    "source_topic": "template method pattern python"
+  },
+  "python functools itertools mastery": {
+    "requires": [],
+    "acquired": "2026-04-16T11:32:21.654022",
+    "source_topic": "python functools itertools mastery"
+  },
+  "dynamic reconfiguration": {
+    "requires": [
+      "higher order functions"
+    ],
+    "acquired": "2026-04-16T11:35:14.148212",
+    "source_topic": "higher order functions"
+  },
+  "python classes": {
+    "requires": [],
+    "acquired": "2026-04-16T11:38:17.664125",
+    "source_topic": "python classes"
+  },
+  "python magic methods": {
+    "requires": [],
+    "acquired": "2026-04-16T11:43:11.586074",
+    "source_topic": "python magic methods"
+  },
+  "gamma-ray emission": {
+    "requires": [
+      "python magic methods"
+    ],
+    "acquired": "2026-04-16T11:43:11.598041",
+    "source_topic": "python magic methods"
+  },
+  "cherenkov telescopes": {
+    "requires": [
+      "python magic methods"
+    ],
+    "acquired": "2026-04-16T11:43:11.609499",
+    "source_topic": "python magic methods"
+  },
+  "point orientation test": {
+    "requires": [],
+    "acquired": "2026-04-16T11:47:07.366410",
+    "source_topic": "point orientation test"
+  },
+  "mutation testing": {
+    "requires": [
+      "point orientation test"
+    ],
+    "acquired": "2026-04-16T11:47:07.378311",
+    "source_topic": "point orientation test"
+  },
+  "focal methods": {
+    "requires": [
+      "point orientation test"
+    ],
+    "acquired": "2026-04-16T11:47:07.389551",
+    "source_topic": "point orientation test"
+  },
+  "goal-oriented mutation testing": {
+    "requires": [
+      "point orientation test"
+    ],
+    "acquired": "2026-04-16T11:47:07.401677",
+    "source_topic": "point orientation test"
+  },
+  "2d geometry basics": {
+    "requires": [],
+    "acquired": "2026-04-16T11:50:05.696191",
+    "source_topic": "2D geometry basics"
+  },
+  "differential geometry": {
+    "requires": [
+      "2d geometry basics"
+    ],
+    "acquired": "2026-04-16T11:50:05.707918",
+    "source_topic": "2D geometry basics"
+  },
+  "sub-riemannian geometry": {
+    "requires": [
+      "2d geometry basics"
+    ],
+    "acquired": "2026-04-16T11:50:05.718477",
+    "source_topic": "2D geometry basics"
+  },
+  "materials science": {
+    "requires": [
+      "2d geometry basics"
+    ],
+    "acquired": "2026-04-16T11:50:05.730042",
+    "source_topic": "2D geometry basics"
+  },
+  "line sweep algorithm": {
+    "requires": [],
+    "acquired": "2026-04-16T11:53:34.272959",
+    "source_topic": "line sweep algorithm"
+  },
+  "power line management": {
+    "requires": [
+      "line sweep algorithm"
+    ],
+    "acquired": "2026-04-16T11:53:34.284508",
+    "source_topic": "line sweep algorithm"
+  },
+  "wildfire risk mitigation": {
+    "requires": [
+      "line sweep algorithm"
+    ],
+    "acquired": "2026-04-16T11:53:34.295983",
+    "source_topic": "line sweep algorithm"
+  },
+  "chance-constrained ac optimal power flow": {
+    "requires": [
+      "line sweep algorithm"
+    ],
+    "acquired": "2026-04-16T11:53:34.307318",
+    "source_topic": "line sweep algorithm"
+  },
+  "python operator overloading dunder methods": {
+    "requires": [],
+    "acquired": "2026-04-16T11:56:40.355129",
+    "source_topic": "python operator overloading dunder methods"
+  },
+  "python object-oriented programming": {
+    "requires": [
+      "python operator overloading dunder methods"
+    ],
+    "acquired": "2026-04-16T11:56:40.366624",
+    "source_topic": "python operator overloading dunder methods"
+  },
+  "gauss elimination": {
+    "requires": [
+      "point orientation test"
+    ],
+    "acquired": "2026-04-16T14:30:42.354497",
+    "source_topic": "point orientation test"
+  },
+  "solar orientation": {
+    "requires": [
+      "point orientation test"
+    ],
+    "acquired": "2026-04-16T14:30:42.367229",
+    "source_topic": "point orientation test"
+  },
+  "low frequency ac technology": {
+    "requires": [
+      "line sweep algorithm"
+    ],
+    "acquired": "2026-04-16T14:37:29.130081",
+    "source_topic": "line sweep algorithm"
+  },
+  "2d point clouds": {
+    "requires": [],
+    "acquired": "2026-04-16T18:26:53.539629",
+    "source_topic": "2D point clouds"
+  },
+  "point cloud processing": {
+    "requires": [
+      "2d point clouds"
+    ],
+    "acquired": "2026-04-16T18:26:53.551928",
+    "source_topic": "2D point clouds"
+  },
+  "spectral point clouds": {
+    "requires": [
+      "2d point clouds"
+    ],
+    "acquired": "2026-04-16T18:26:53.564295",
+    "source_topic": "2D point clouds"
+  },
+  "3d gift wrapping": {
+    "requires": [],
+    "acquired": "2026-04-16T18:51:07.324380",
+    "source_topic": "3D gift wrapping"
+  },
+  "gift wrapping algorithm": {
+    "requires": [
+      "3d gift wrapping"
+    ],
+    "acquired": "2026-04-16T18:51:07.337931",
+    "source_topic": "3D gift wrapping"
+  },
+  "dataset distillation": {
+    "requires": [
+      "3d gift wrapping"
+    ],
+    "acquired": "2026-04-16T18:51:07.351083",
+    "source_topic": "3D gift wrapping"
+  },
+  "3d polygon wrapping": {
+    "requires": [],
+    "acquired": "2026-04-16T18:53:46.824459",
+    "source_topic": "3D polygon wrapping"
+  },
+  "computational geometry": {
+    "requires": [
+      "3d polygon wrapping"
+    ],
+    "acquired": "2026-04-16T18:53:46.835925",
+    "source_topic": "3D polygon wrapping"
+  },
+  "spatial reasoning": {
+    "requires": [
+      "3d polygon wrapping"
+    ],
+    "acquired": "2026-04-16T18:53:46.848640",
+    "source_topic": "3D polygon wrapping"
+  },
+  "2d array indexing": {
+    "requires": [],
+    "acquired": "2026-04-16T18:56:44.130392",
+    "source_topic": "2D array indexing"
+  },
+  "corsika simulation": {
+    "requires": [
+      "2d array indexing"
+    ],
+    "acquired": "2026-04-16T18:56:44.141641",
+    "source_topic": "2D array indexing"
+  },
+  "3d geometry transformations": {
+    "requires": [],
+    "acquired": "2026-04-16T19:00:43.098695",
+    "source_topic": "3D geometry transformations"
+  },
+  "quaternionic differential geometry": {
+    "requires": [
+      "3d geometry transformations"
+    ],
+    "acquired": "2026-04-16T19:00:43.110789",
+    "source_topic": "3D geometry transformations"
+  },
+  "3d geometry fundamentals": {
+    "requires": [],
+    "acquired": "2026-04-16T19:11:20.888684",
+    "source_topic": "3D geometry fundamentals"
+  },
+  "dilatation structures": {
+    "requires": [
+      "3d geometry fundamentals"
+    ],
+    "acquired": "2026-04-16T19:11:20.900122",
+    "source_topic": "3D geometry fundamentals"
+  },
+  "polygon mesh creation": {
+    "requires": [],
+    "acquired": "2026-04-16T19:14:56.582486",
+    "source_topic": "polygon mesh creation"
+  },
+  "mesh networks": {
+    "requires": [
+      "polygon mesh creation"
+    ],
+    "acquired": "2026-04-16T19:14:56.595476",
+    "source_topic": "polygon mesh creation"
+  },
+  "3d mesh generation": {
+    "requires": [
+      "polygon mesh creation"
+    ],
+    "acquired": "2026-04-16T19:14:56.608292",
+    "source_topic": "polygon mesh creation"
+  },
+  "quaternionic viewpoint": {
+    "requires": [
+      "polygon mesh creation"
+    ],
+    "acquired": "2026-04-16T19:14:56.620189",
+    "source_topic": "polygon mesh creation"
+  },
+  "array signal processing": {
+    "requires": [
+      "2d array indexing"
+    ],
+    "acquired": "2026-04-16T19:40:01.099480",
+    "source_topic": "2D array indexing"
+  },
+  "phased arrays": {
+    "requires": [
+      "2d array indexing"
+    ],
+    "acquired": "2026-04-16T19:40:01.116849",
+    "source_topic": "2D array indexing"
+  },
+  "2d grid traversal": {
+    "requires": [],
+    "acquired": "2026-04-16T19:53:22.440377",
+    "source_topic": "2D grid traversal"
+  },
+  "grid computing": {
+    "requires": [
+      "2d grid traversal"
+    ],
+    "acquired": "2026-04-16T19:53:22.452797",
+    "source_topic": "2D grid traversal"
+  },
+  "smart grid": {
+    "requires": [
+      "2d grid traversal"
+    ],
+    "acquired": "2026-04-16T19:53:22.465189",
+    "source_topic": "2D grid traversal"
+  },
+  "federated learning": {
+    "requires": [
+      "2d grid traversal"
+    ],
+    "acquired": "2026-04-16T19:53:22.478633",
+    "source_topic": "2D grid traversal"
+  },
+  "3d vertex buffers": {
+    "requires": [],
+    "acquired": "2026-04-16T19:55:55.677792",
+    "source_topic": "3D vertex buffers"
+  },
+  "transfer learning": {
+    "requires": [
+      "3d vertex buffers"
+    ],
+    "acquired": "2026-04-16T19:55:55.689487",
+    "source_topic": "3D vertex buffers"
+  },
+  "vertex operator algebras": {
+    "requires": [
+      "3d vertex buffers"
+    ],
+    "acquired": "2026-04-16T19:55:55.701904",
+    "source_topic": "3D vertex buffers"
+  },
+  "twisted modules": {
+    "requires": [
+      "3d vertex buffers"
+    ],
+    "acquired": "2026-04-16T19:58:32.530739",
+    "source_topic": "3D vertex buffers"
+  },
+  "3d mesh rendering": {
+    "requires": [],
+    "acquired": "2026-04-17T11:40:04.939414",
+    "source_topic": "3D mesh rendering"
+  },
+  "neural 3d mesh renderer": {
+    "requires": [
+      "3d mesh rendering"
+    ],
+    "acquired": "2026-04-17T11:40:04.965316",
+    "source_topic": "3D mesh rendering"
+  },
+  "temporal 3d diffusion": {
+    "requires": [
+      "3d mesh rendering"
+    ],
+    "acquired": "2026-04-17T11:40:04.988556",
+    "source_topic": "3D mesh rendering"
+  },
+  "indexed mesh rendering": {
+    "requires": [],
+    "acquired": "2026-04-17T11:47:12.049787",
+    "source_topic": "indexed mesh rendering"
+  },
+  "gaussian mesh renderer": {
+    "requires": [
+      "indexed mesh rendering"
+    ],
+    "acquired": "2026-04-17T11:47:12.067434",
+    "source_topic": "indexed mesh rendering"
+  },
+  "dynamic gaussians mesh": {
+    "requires": [
+      "indexed mesh rendering"
+    ],
+    "acquired": "2026-04-17T11:47:12.081392",
+    "source_topic": "indexed mesh rendering"
+  },
+  "evolutive rendering models": {
+    "requires": [
+      "indexed mesh rendering"
+    ],
+    "acquired": "2026-04-17T11:47:12.094866",
+    "source_topic": "indexed mesh rendering"
+  },
+  "opencl optimization": {
+    "requires": [],
+    "acquired": "2026-04-17T12:01:50.522184",
+    "source_topic": "OpenCL optimization"
+  },
+  "opengl vertex arrays": {
+    "requires": [],
+    "acquired": "2026-04-17T12:55:08.199107",
+    "source_topic": "OpenGL vertex arrays"
+  },
+  "teichmüller modular forms": {
+    "requires": [
+      "opengl vertex arrays"
+    ],
+    "acquired": "2026-04-17T12:55:08.213502",
+    "source_topic": "OpenGL vertex arrays"
+  },
+  "gpu memory management": {
+    "requires": [],
+    "acquired": "2026-04-17T12:58:24.089565",
+    "source_topic": "GPU memory management"
+  },
+  "molecular arrays": {
+    "requires": [
+      "opengl vertex arrays"
+    ],
+    "acquired": "2026-04-17T13:04:26.607508",
+    "source_topic": "OpenGL vertex arrays"
+  },
+  "process pool executor": {
+    "requires": [],
+    "acquired": "2026-04-17T13:08:04.818048",
+    "source_topic": "process pool executor"
+  },
+  "dispatcher/executor principle": {
+    "requires": [
+      "process pool executor"
+    ],
+    "acquired": "2026-04-17T13:08:04.830519",
+    "source_topic": "process pool executor"
+  },
+  "dark pools": {
+    "requires": [
+      "process pool executor"
+    ],
+    "acquired": "2026-04-17T13:08:04.842740",
+    "source_topic": "process pool executor"
+  },
+  "online local pool generation": {
+    "requires": [
+      "process pool executor"
+    ],
+    "acquired": "2026-04-17T13:08:04.855881",
+    "source_topic": "process pool executor"
+  },
+  "buddy compression": {
+    "requires": [
+      "process pool executor"
+    ],
+    "acquired": "2026-04-17T13:08:04.869078",
+    "source_topic": "process pool executor"
+  },
+  "thread pool": {
+    "requires": [
+      "process pool executor"
+    ],
+    "acquired": "2026-04-17T13:08:04.882683",
+    "source_topic": "process pool executor"
+  },
+  "concurrent futures threadpool processpool": {
+    "requires": [],
+    "acquired": "2026-04-17T14:59:24.201196",
+    "source_topic": "concurrent futures threadpool processpool"
+  },
+  "probabilistic concurrent systems": {
+    "requires": [
+      "concurrent futures threadpool processpool"
+    ],
+    "acquired": "2026-04-17T14:59:24.214537",
+    "source_topic": "concurrent futures threadpool processpool"
+  },
+  "concurrent programs": {
+    "requires": [
+      "concurrent futures threadpool processpool"
+    ],
+    "acquired": "2026-04-17T14:59:24.228609",
+    "source_topic": "concurrent futures threadpool processpool"
+  },
+  "patterns and anticipation": {
+    "requires": [
+      "concurrent futures threadpool processpool"
+    ],
+    "acquired": "2026-04-17T14:59:24.242700",
+    "source_topic": "concurrent futures threadpool processpool"
+  },
+  "artificial general intelligence": {
+    "requires": [
+      "concurrent futures threadpool processpool"
+    ],
+    "acquired": "2026-04-17T14:59:24.257184",
+    "source_topic": "concurrent futures threadpool processpool"
+  },
+  "python linear algebra": {
+    "requires": [],
+    "acquired": "2026-04-17T15:03:43.345975",
+    "source_topic": "python linear algebra"
+  },
+  "linear mappings": {
+    "requires": [
+      "python linear algebra"
+    ],
+    "acquired": "2026-04-17T15:03:43.358237",
+    "source_topic": "python linear algebra"
+  },
+  "left-symmetric algebras": {
+    "requires": [
+      "python linear algebra"
+    ],
+    "acquired": "2026-04-17T15:03:43.370003",
+    "source_topic": "python linear algebra"
+  },
+  "binary tree traversal": {
+    "requires": [],
+    "acquired": "2026-04-17T15:07:03.140112",
+    "source_topic": "binary tree traversal"
+  },
+  "binary decision tree traversals": {
+    "requires": [
+      "binary tree traversal"
+    ],
+    "acquired": "2026-04-17T15:07:03.154242",
+    "source_topic": "binary tree traversal"
+  },
+  "tree structures": {
+    "requires": [
+      "binary tree traversal"
+    ],
+    "acquired": "2026-04-17T15:07:03.167591",
+    "source_topic": "binary tree traversal"
+  },
+  "arithmetic operations": {
+    "requires": [
+      "binary tree traversal"
+    ],
+    "acquired": "2026-04-17T15:07:03.181183",
+    "source_topic": "binary tree traversal"
+  },
+  "lru cache implementation python": {
+    "requires": [],
+    "acquired": "2026-04-17T15:10:32.259929",
+    "source_topic": "lru cache implementation python"
+  },
+  "cache replacement policies": {
+    "requires": [
+      "lru cache implementation python"
+    ],
+    "acquired": "2026-04-17T15:10:32.274272",
+    "source_topic": "lru cache implementation python"
+  },
+  "computer architecture": {
+    "requires": [
+      "lru cache implementation python"
+    ],
+    "acquired": "2026-04-17T15:10:32.287841",
+    "source_topic": "lru cache implementation python"
   }
 }

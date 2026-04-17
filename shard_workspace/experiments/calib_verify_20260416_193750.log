@@ -1,0 +1,2292 @@
+[NIGHT RUNNER] [19:37] Random seed: 8029006
+[NIGHT RUNNER] [19:37] [SESSION LOCK] Acquired by NightRunner.
+[NIGHT RUNNER] [19:37] Session started
+[NIGHT RUNNER] [19:37] [STATE] INIT -> INIT  (loading memory + capability graph)
+[NIGHT RUNNER] [19:37] [SESSION] id=8e92cd29-eefc-49df-a1f9-fa50c0f63baa
+[NIGHT RUNNER] [19:37] [ENV OBS] Golden solutions snapshotted.
+[NIGHT RUNNER] [19:37] [SELF MODEL] cert_rate=22%  avg_score=4.8  momentum=stagnating  blind_spots=0
+[NIGHT RUNNER] [19:37] [WORLD MODEL] coverage=86.9%  known=152/175 skills
+[NIGHT RUNNER] [19:37] [WORLD MODEL] Top priority gaps: tree structures and traversal, numpy array operations and boolean indexing, test driven development and assertion design
+[NIGHT RUNNER] [19:37] [GOAL AUTO] Active goal: 'master: numpy array operations and boolean indexing' | progress=0% | type=autonomous
+[NIGHT RUNNER] [19:37] [GOAL AUTO] Keywords: ['operations', 'data', 'boolean', 'and', 'numpy', 'science', 'indexing', 'array']
+[NIGHT RUNNER] [19:37] [GOAL AUTO] Reason: World relevance: 90%  domain: data_science
+[NIGHT RUNNER] [19:37] [SEMANTIC] ChromaDB ready: episodes=1370  knowledge=180  errors=111
+[NIGHT RUNNER] [19:37] [SSJ3] Resuming 8 improvement topics from previous run
+[NIGHT RUNNER] [19:37] [DESIRE] DesireEngine top: 'design patterns factory singleton observer' (d=0.72 f=10), 'async io with python selectors' (d=0.60 f=6), 'async generator and async iterator python' (d=0.53 f=3)
+INFO:QuantumSoul:\u269b\ufe0f Quantum Soul initialized with classical approximation
+INFO:QuantumSoul:\u2728 QuantumSoul initialized: 15 qubits, real_quantum=False
+INFO:shard.self_log:[SELF_LOG] Loaded 245 thoughts from disk.
+INFO:shard.cognition_core:[CORE ENV] Registered 'consciousness' -- interests: ['skill_certified', 'skill_failed', 'frustration_peak', 'momentum_changed', 'mood_shift', 'identity_updated']
+INFO:shard.cognition_core:[CORE ENV] Registered 'self_model_tracker' -- interests: ['session_complete', 'mood_shift', 'identity_updated']
+[NIGHT RUNNER] [19:37] [CORE ENV] 9 module(s) registered in shared environment
+INFO:NIGHT_RUNNER:[CORE ENV] 9 module(s) registered in shared environment
+INFO:shard.cognition_core:[CORE ENV] Registered 'mood_engine' -- interests: ['frustration_peak', 'momentum_changed', 'skill_certified', 'skill_failed']
+INFO:shard.mood:[MOOD] score=-0.227 (strained) | frustration=0.74 cert=0.41 momentum=0.00
+[NIGHT RUNNER] [19:37] [MOOD] Initial state: score=-0.227 (strained)
+INFO:NIGHT_RUNNER:[MOOD] Initial state: score=-0.227 (strained)
+[NIGHT RUNNER] [19:37] [VISION] Mission: SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robu
+INFO:NIGHT_RUNNER:[VISION] Mission: SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robu
+[NIGHT RUNNER] [19:37] [VISION] Focus: algorithms, debugging, code quality, performance, fundamentals review
+INFO:NIGHT_RUNNER:[VISION] Focus: algorithms, debugging, code quality, performance, fundamentals review
+[NIGHT RUNNER] [19:37] [VISION] Avoid: race condition handling and debugging, state mutation handling and debugging, ttl cache handling and debugging, algorithm complexity and performance optimization, dynamic programming, async generator and async iterator python
+INFO:NIGHT_RUNNER:[VISION] Avoid: race condition handling and debugging, state mutation handling and debugging, ttl cache handling and debugging, algorithm complexity and performance optimization, dynamic programming, async generator and async iterator python
+INFO:shard.cognition_core:[CORE ENV] Registered 'vision' -- interests: ['skill_certified', 'frustration_peak', 'momentum_changed']
+[NIGHT RUNNER] [19:37] [VISION] Registered in CognitionCore.
+INFO:NIGHT_RUNNER:[VISION] Registered in CognitionCore.
+[NIGHT RUNNER] [19:37] [REFLECTION] Past context loaded (1666 chars) -- injecting into study_agent system prompt.
+INFO:NIGHT_RUNNER:[REFLECTION] Past context loaded (1666 chars) -- injecting into study_agent system prompt.
+INFO:shard.cognition_core:[CORE ENV] Registered 'hebbian_updater' -- interests: ['mood_shift', 'skill_certified', 'skill_failed']
+[NIGHT RUNNER] [19:37] [HEBBIAN] Registered in CognitionCore.
+INFO:NIGHT_RUNNER:[HEBBIAN] Registered in CognitionCore.
+INFO:shard.cognition_core:[CORE ENV] Registered 'skill_library' -- interests: ['skill_certified']
+[NIGHT RUNNER] [19:37] [SKILL_LIB] Loaded -- 180 certified skills (avg=8.6)
+INFO:NIGHT_RUNNER:[SKILL_LIB] Loaded -- 180 certified skills (avg=8.6)
+INFO:shard.cognition_core:[CORE ENV] Registered 'identity_core' -- interests: ['session_complete', 'skill_certified', 'skill_failed']
+[NIGHT RUNNER] [19:37] [IDENTITY] Biography injected (612 chars) -- sessions=158 self_esteem=0.35 trajectory=growing
+INFO:NIGHT_RUNNER:[IDENTITY] Biography injected (612 chars) -- sessions=158 self_esteem=0.35 trajectory=growing
+[NIGHT RUNNER] [19:37] [BENCH TRACKER] Previous session: Benchmark delta vs last session: no changes. Stable: 16 passing, 0 failing.
+INFO:NIGHT_RUNNER:[BENCH TRACKER] Previous session: Benchmark delta vs last session: no changes. Stable: 16 passing, 0 failing.
+[NIGHT RUNNER] [19:37] [GAP] [GAP DETECTOR] 2026-04-16T19:37:52.885291
+  Failures analyzed: 57
+  Gaps found:        3
+  Topics queued:     0
+  GAP: sql injection prevention and input sanitization (seen 33x)
+  GAP: python object oriented programming (seen 6x)
+  GAP: regular expressions in python (seen 2x)
+INFO:NIGHT_RUNNER:[GAP] [GAP DETECTOR] 2026-04-16T19:37:52.885291
+  Failures analyzed: 57
+  Gaps found:        3
+  Topics queued:     0
+  GAP: sql injection prevention and input sanitization (seen 33x)
+  GAP: python object oriented programming (seen 6x)
+  GAP: regular expressions in python (seen 2x)
+[NIGHT RUNNER] [19:37] [STATE] INIT -> SELECT  (cycle 1/3)
+INFO:NIGHT_RUNNER:[STATE] INIT -> SELECT  (cycle 1/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: '3D gift wrapping' (7 remaining)
+[NIGHT RUNNER] [19:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D gift wrapping
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D gift wrapping
+[NIGHT RUNNER] [19:37] [VISION] Improvement topic in avoid_domains -- skipping: '3D gift wrapping'
+INFO:NIGHT_RUNNER:[VISION] Improvement topic in avoid_domains -- skipping: '3D gift wrapping'
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: 'mesh texture mapping' (6 remaining)
+[NIGHT RUNNER] [19:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): mesh texture mapping
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): mesh texture mapping
+[NIGHT RUNNER] [19:37] [SSJ3] Improvement topic dequeued: 'mesh texture mapping'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: 'mesh texture mapping'
+[NIGHT RUNNER] [19:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 2D array indexing
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 2D array indexing
+[NIGHT RUNNER] [19:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): image pixel manipulation
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): image pixel manipulation
+[NIGHT RUNNER] [19:37] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D mesh rendering
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D mesh rendering
+[NIGHT RUNNER] [19:37] [AFFORD] 'mesh texture mapping' (feasibility=0.33) out of reach -- decomposing into ['2D array indexing', 'image pixel manipulation', '3D mesh rendering']
+INFO:NIGHT_RUNNER:[AFFORD] 'mesh texture mapping' (feasibility=0.33) out of reach -- decomposing into ['2D array indexing', 'image pixel manipulation', '3D mesh rendering']
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'mesh texture mapping'
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'image pixel manipulation'
+[NIGHT RUNNER] [19:37] === Cycle 1/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 1/3 ===
+[NIGHT RUNNER] [19:37] Topic selected: 2D array indexing
+INFO:NIGHT_RUNNER:Topic selected: 2D array indexing
+[NIGHT RUNNER] [19:37] Source: affordance
+INFO:NIGHT_RUNNER:Source: affordance
+[NIGHT RUNNER] [19:37] Reason: Decomposed from 'mesh texture mapping' (feasibility=0.33)
+INFO:NIGHT_RUNNER:Reason: Decomposed from 'mesh texture mapping' (feasibility=0.33)
+[NIGHT RUNNER] [19:37] [STRATEGY] Reusing strategy: 2D array indexing for topic: 2D array indexing
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: 2D array indexing for topic: 2D array indexing
+[NIGHT RUNNER] [19:37] [STRATEGY] fingerprint=85580e13eec0  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=85580e13eec0  strategies=1
+[NIGHT RUNNER] [19:37] [SELF_MODEL] Predicted score for '2D array indexing': 10.0 | desire=0.23 difficulty=1.00 graphrag=0.30
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for '2D array indexing': 10.0 | desire=0.23 difficulty=1.00 graphrag=0.30
+[NIGHT RUNNER] [19:37] [CONTRADICTION WARNING]
+Topic: 2D array indexing
+- confidence_history_mismatch [medium]
+  * Predicted score 10.0 is optimistic against historical average 3.5
+  * Historical certification rate for related history is 0%
+Recommended action: lower_confidence
+WARNING:NIGHT_RUNNER:[CONTRADICTION WARNING]
+Topic: 2D array indexing
+- confidence_history_mismatch [medium]
+  * Predicted score 10.0 is optimistic against historical average 3.5
+  * Historical certification rate for related history is 0%
+Recommended action: lower_confidence
+[NIGHT RUNNER] [19:37] [KCD] Lowering predicted score for '2D array indexing': 10.0 -> 8.5
+INFO:NIGHT_RUNNER:[KCD] Lowering predicted score for '2D array indexing': 10.0 -> 8.5
+[NIGHT RUNNER] [19:37] [KCD] Final predicted score for '2D array indexing': 8.5
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for '2D array indexing': 8.5
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'affordance'
+[NIGHT RUNNER] [19:37] [PERSONA] Selected 'hacker' (tier=1) for: 2D array indexing
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: 2D array indexing
+[NIGHT RUNNER] [19:37] [STATE] SELECT -> STUDY  (2D array indexing)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (2D array indexing)
+INFO:shard.mood:[MOOD] score=-0.227 (strained) | frustration=0.74 cert=0.41 momentum=0.00
+[NIGHT RUNNER] [19:37] [MOOD] Injected into study prompt: strained (-0.227)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.227)
+[VOICE BROADCASTER] Enqueued (medium): 'Sessione notturna avviata. Studio autonomo in corso per un massimo di 3 cicli.'
+[DB] Loaded 668 capabilities from SQLite
+[DB] Loaded 668 capabilities from SQLite
+[STRATEGY] Memory initialized (442 strategies stored)
+[SKILL DISCOVERY] Initialized with 37 patterns
+[STRATEGY] Memory initialized (442 strategies stored)
+[RESEARCH AGENDA] Initialized with 31 skill->topic mappings
+[COGNITION CORE] Senso Interno initialized
+[quantum_soul] Qiskit non disponibile - fallback su simulazione quantica
+[RESEARCH AGENDA] Initialized with 31 skill->topic mappings
+[STRATEGY] Memory initialized (442 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of '2D array indexing'...
+INFO:shard.episodic_memory:[DB] Loaded 2455 episodes from SQLite
+INFO:shard.study:[FAIL-REUSE] Injecting 1 previous failure(s) for '2D array indexing' (types: ['benchmark_failure'])
+[EPISODIC] Context found for '2D array indexing':
+Past experience with '2D array indexing' (3 relevant attempt(s)):
+  - 2026-04-16 | score=5.2/10 | FAILED (near_miss) | strategies: binary search implementation
+  - 2026-04-16 | score=0.0/10 | FAILED (unknown) | strategies: none
+  - 2026-04-16 | score=5.2/10 | FAILED (unknown) | strategies: none
+Hint: previous attempt was a near-miss -- focus on depth, complete runnable code, and edge-case coverage to push score above 7.5.
+[PRINCIPLES] Injected principle layer for '2D array indexing'
+[MEMORY P0] Prior knowledge injected (4 lines) for '2D array indexing'
+[L3] loaded=True predicted=8.5 attempts=3 reason=retry
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for '2D array indexing'...
+INFO:shard.arxiv_fetcher:[ARXIV] '2D array indexing' -> 5 papers
+[RESEARCH MODE] Fetched 5 papers from arxiv for '2D array indexing'
+[MAP] Phase completed. 5 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 5 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 5 sources...
+[AGGREGATE] ✅ [1/5] Beamforming Techniques for Large-N Aperture Arrays (3937 chars)
+[AGGREGATE] ✅ [2/5] CORSIKA Simulation of the Telescope Array Surface  (3947 chars)
+[AGGREGATE] ✅ [3/5] Observations of TeV gamma ray flares from Markaria (3518 chars)
+[AGGREGATE] ✅ [4/5] The Hybrid Energy Spectrum of TA's Middle Drum Det (4269 chars)
+[AGGREGATE] ✅ [5/5] Pierre Auger Observatory and Telescope Array: Join (11126 chars)
+[AGGREGATE] Total raw text: 15678 chars
+[AGGREGATE] Phase completed. 15678 chars scraped.
+[SHARD.STUDY] [ 20%] SYNTHESIZE | 0/10 | Building structured knowledge...
+INFO:shard.episodic_memory:[DB] Loaded 2455 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1507 chars)
+INFO:arxiv:Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=Applying+beamforming+techniques+from+astrophysics+to+geophysics+can+significantly+enhance+the+accuracy&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+INFO:arxiv:Got first page: 100 of 2167566 total results
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (578 chars)
+INFO:shard.graph_rag:[GRAPH_RAG] Stored 3 new causal relations for topic: 2D array indexing
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (6 chars)
+[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: 2D array indexing
+[SYNTHESIZE] GraphRAG injected 3 causal warnings
+[SYNTHESIZE] Memory injected 3 prior memories
+[SYNTHESIZE] Domain diversity block: 15 pairs injected (blocked_from: Mesh Networks, Differential Geometry, materials science, Astrophysics...)
+[SYNTHESIZE] JSON recovered successfully
+[SYNTHESIZE] Hypothesis generated: 'Applying beamforming techniques from astrophysics to geophysics can significantl...'
+[SYNTHESIZE] JSON parsed successfully (3 concepts)
+[WORLD MODEL] entities: 3 edges: 0
+[WORLD MODEL] hub detected: Beamforming (degree 0)
+[WORLD MODEL] hub detected: Array Signal Processing (degree 0)
+[WORLD MODEL] hub detected: Phased Arrays (degree 0)
+[SYNTHESIZE] concepts extracted: 3 after semantic validation
+[SYNTHESIZE] Phase completed. 3 concepts extracted.
+[NOVELTY] arxiv: 5 results for 'Applying beamforming techniques from astrophysics '
+[NOVELTY] Top hit: Small-World Networks in Geophysics
+[NOVELTY] No arxiv hit directly matches hypothesis → continuing to Stage 2
+[CROSS-REF] Filter query failed (Error executing plan: Internal error: Error finding id), retrying without filter...
+[CROSS-REF] Found 3 connections with existing knowledge
+[SHARD.STUDY] [ 35%] SYNTHESIZE | 0/10 | Found 3 connections with existing knowledge
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (515 chars)
+[SHARD.STUDY] [ 35%] EXPERIMENT_DESIGN | 0/10 | Designing experiment for: 'Applying beamforming techniques from astrophysics to geophys...'
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1444 chars)
+[EXPERIMENT] Generating experiment code for: 'Applying beamforming techniques from astrophysics to geophys...' (domain=classification)
+[SHARD.STUDY] [ 35%] EXPERIMENT_DESIGN | 0/10 | Experiment code generated (1430 chars)
+[EXPERIMENT_DESIGN] Code preview:
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the dataset
+data = load_digits()
+X, y = data.data, ...
+[SHARD.STUDY] [ 35%] EXPERIMENT_SANDBOX | 0/10 | Running experiment in Docker sandbox...
+[SANDBOX] Executing code in Docker container for: [EXPERIMENT] 2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_a4f70f57.py
+[SANDBOX] Code (1430 chars):
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the dataset
+data = load_digits()
+X, y = data.data, ...
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: OK All assertions passed
+RESULT: 0.0
+[SHARD.STUDY] [ 45%] EXPERIMENT_SANDBOX | 0/10 | Sandbox [OK] -- stdout: OK All assertions passed
+RESULT: 0.0
+[SHARD.STUDY] [ 45%] EXPERIMENT_VALIDATE | 0/10 | Interpreting experiment result...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (259 chars)
+[EXPERIMENT] Validating result (result_score=0.0 -> REFUTED)...
+[SHARD.STUDY] [ 45%] EXPERIMENT_VALIDATE | 0/10 | Verdict: REFUTED | confidence 0.80 -> 0.00 | The RESULT of 0.0 indicates that applying beamforming techniques from astrophysi
+ERROR:shard.experiment_store:[EXPERIMENT_STORE] store_hypothesis failed: Error binding parameter 7: type 'dict' is not supported
+[EXPERIMENT_VALIDATE] REFUTED | reasoning: The RESULT of 0.0 indicates that applying beamforming techniques from astrophysics to geophysics did not enhance the accuracy of seismic monitoring systems, contradicting the initial hypothesis.
+[SHARD.STUDY] [ 45%] STORE | 0/10 | Persisting to knowledge base...
+[STORE] Persisting knowledge for: 2D array indexing
+[STORE] ✅ Saved to ChromaDB
+[STORE] Phase completed.
+[SHARD.STUDY] [ 50%] CROSS_POLLINATE | 0/10 | Generating Integration Report...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (757 chars)
+[CROSS-POLLINATE] Generating Integration Report for: 2D array indexing
+[CROSS-POLLINATE] ChromaDB query error: Error executing plan: Internal error: Error finding id
+[CROSS-POLLINATE] ✅ Integration Report generated (757 chars)
+[CROSS-POLLINATE] Report preview: **Rapporto di Integrazione**
+
+Ho appena studiato il concetto di "2D array indexing" e ho scoperto che è strettamente legato ad altri concetti come "Beamforming", "Array Signal Processing" e "Phased Ar...
+[CROSS-POLLINATE] ✅ Report saved to ChromaDB (type: deep_knowledge)
+[SHARD.STUDY] [ 60%] CROSS_POLLINATE | 0/10 | Integration Report: **Rapporto di Integrazione**
+
+Ho appena studiato il concetto di "2D array indexing" e ho scoperto ch...
+[PRINCIPLES] +1 new principles saved (total: 153)
+[PRINCIPLES] Extracted 1 new principles from '2D array indexing'
+[CROSS-POLLINATE] Phase completed.
+[SHARD.STUDY] [ 60%] MATERIALIZE | 0/10 | Writing Cheat Sheet to filesystem...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1495 chars)
+[MATERIALIZE] Creating Cheat Sheet for: 2D array indexing
+[MATERIALIZE] ✅ Cheat Sheet generated (1495 chars)
+[TOOL] write_file -> resolved workspace path: C:\Users\andre\Desktop\shard_v1\shard_workspace\knowledge_base\2d_array_indexing.md
+[MATERIALIZE] ✅ Cheat Sheet written to: shard_workspace/knowledge_base/2d_array_indexing.md
+[MATERIALIZE] Result: Success: file 'knowledge_base/2d_array_indexing.md' written (1524 bytes).
+[SHARD.STUDY] [ 70%] MATERIALIZE | 0/10 | Cheat Sheet saved to knowledge_base/
+[MATERIALIZE] Phase completed.
+[STRATEGY RETRIEVAL] Found prior strategy
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Using past strategy to guide code generation
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1318 chars)
+[STUDY] Using past strategy
+[SANDBOX] Generating code independently from theory phase
+[SANDBOX] applying library constraints
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Executing generated code
+[SANDBOX] Executing generated code
+[SANDBOX] Executing code in Docker container for: 2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_914f4f0c.py
+[SANDBOX] Code (1304 chars):
+import numpy as np
+
+def get_index(array, value):
+    for i in range(len(array)):
+        for j in range(len(array[i])):
+            if array[i][j] == value:
+                return (i, j)
+    return None
+
+def binary_search(array, value):
+    for i in range(len(array)):
+        for j in range(len(arra...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2930 chars)
+INFO:shard.swe_agent:[SWE] Starting repair: study_914f4f0c.py | issue: 
+[SANDBOX] AssertionError: missing 'OK All assertions passed' -- add assert stat
+INFO:shard.swe_agent:[SWE] No tests found for study_914f4f0c.
+INFO:shard.swe_agent:[SWE] Attempt 1/3 for study_914f4f0c.py
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2602 chars)
+INFO:shard.swe_agent:[SWE] Patch written atomically to 'study_914f4f0c.py'.
+WARNING:shard.swe_agent:[SWE] git commit failed: 
+INFO:shard.swe_agent:[SWE] OK Repair committed: study_914f4f0c.py ()
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] [WARN]️  No assertion marker in stdout -- code ran but did not validate behavior
+[STUDY] sandbox failure
+[WORLD MODEL] recording failure: 2D array indexing
+[STUDY] invoking SWE agent
+[SANDBOX] Assertion failure detected -- code logic is wrong, not syntax
+[SIMULATION] generating candidate repairs
+[SIMULATION] evaluating patch candidate fix runtime error: AssertionError in topic '2D array indexing': the implementation produced wrong output values. Fix the logic so all assert statements pass. Details: 
+[SANDBOX] AssertionError: missing 'OK All assertions passed' -- add assert statements that verify actual output values, then print('OK All assertions passed')
+[SIMULATION] heuristic: 0.7
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.8799999999999999
+[SIMULATION] evaluating patch candidate fix code logic for topic: 2D array indexing
+[SIMULATION] heuristic: 0.7
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.8799999999999999
+[SIMULATION] evaluating patch candidate fix sandbox execution failure
+[SIMULATION] heuristic: 0.5
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.8
+[SIMULATION] best predicted repair fix runtime error: AssertionError in topic '2D array indexing': the implementation produced wrong output values. Fix the logic so all assert statements pass. Details: 
+[SANDBOX] AssertionError: missing 'OK All assertions passed' -- add assert statements that verify actual output values, then print('OK All assertions passed')
+[STUDY] retry sandbox
+[SANDBOX] Executing code in Docker container for: 2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_cfd0cce3.py
+[SANDBOX] Code (1304 chars):
+import numpy as np
+
+def get_index(array, value):
+    for i in range(len(array)):
+        for j in range(len(array[i])):
+            if array[i][j] == value:
+                return (i, j)
+    return None
+
+def binary_search(array, value):
+    for i in range(len(array)):
+        for j in range(len(arra...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2311 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[STRATEGY] Memory initialized (442 strategies stored)
+[STRATEGY] Updated stats -> runs=11 avg=10.0 success=1.0
+[STRATEGY] Stored strategy for 'swe_repair' (outcome=success, score=10.0)
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Sandbox passed: Il codice fornito esegue correttamente la ricerca di un valore all'interno di un array 2D utilizzand
+[SANDBOX] Execution completed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 1/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1910 chars)
+[VALIDATE] Self-interrogation on: 2D array indexing
+[VALIDATE] GraphRAG injected 3 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come si può applicare la tecnica di beamforming alle grandi ... -> answered
+[VALIDATE] Q: In che modo la conoscenza della tecnica di beamforming e del... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (625 chars)
+INFO:shard.experiment_cache:[DB] Registered failed experiment: '2D array indexing' (skills=668)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1290 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (221 chars)
+[EVALUATE] Scoring understanding of: 2D array indexing
+[EVALUATE] GraphRAG injected 3 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE] Using rule-based fallback scoring
+[EVALUATE]
+theory=2.0
+code=0.0
+sandbox=10.0
+synthesis=5.0
+total=4.25
+[STRATEGY] Strategia scartata (score insufficiente: 4.25, FAIL)
+[CACHE] Registered failed experiment: '2D array indexing' (Skills at failure: 668)
+[BENCHMARK] Generating tests for '2D array indexing'...
+[BENCHMARK_GEN] OK 5/5 tests validated for '2D array indexing'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 3 causal warnings into impl prompt
+[BENCHMARK] Memory injected 3 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_f70f05e2.py
+[SANDBOX] Code (338 chars):
+def solve(input_data):
+    target = 5
+    for i in range(len(input_data)):
+        for j in range(len(input_data[i])):
+            if input_data[i][j] == target:
+                return (i, j)
+    return None
+
+# --- benchmark test 0 ---
+input_data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+expected = (1, 1)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1440 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_e66d2da0.py
+[SANDBOX] Code (336 chars):
+def solve(input_data):
+    target = 5
+    for i in range(len(input_data)):
+        for j in range(len(input_data[i])):
+            if input_data[i][j] == target:
+                return (i, j)
+    return None
+
+# --- benchmark test 1 ---
+input_data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+expected = None
+a...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1003 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_e66d2da0.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_41bfc77f.py
+[SANDBOX] Code (368 chars):
+def solve(input_data):
+    target = 5
+    for i in range(len(input_data)):
+        for j in range(len(input_data[i])):
+            if input_data[i][j] == target:
+                return (i, j)
+    return None
+
+# --- benchmark test 2 ---
+input_data = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1368 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_41bfc77f.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_ddb225e0.py
+[SANDBOX] Code (316 chars):
+def solve(input_data):
+    target = 5
+    for i in range(len(input_data)):
+        for j in range(len(input_data[i])):
+            if input_data[i][j] == target:
+                return (i, j)
+    return None
+
+# --- benchmark test 3 ---
+input_data = [[1, 2, 3]]
+expected = (0, 1)
+assert solve(input_da...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1633 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_ddb225e0.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_faa52052.py
+[SANDBOX] Code (320 chars):
+def solve(input_data):
+    target = 5
+    for i in range(len(input_data)):
+        for j in range(len(input_data[i])):
+            if input_data[i][j] == target:
+                return (i, j)
+    return None
+
+# --- benchmark test 4 ---
+input_data = [[1], [2], [3]]
+expected = (1, 0)
+assert solve(inpu...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2121 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_faa52052.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[BENCHMARK_RUN] '2D array indexing': 1/5 passed (+0 discarded) -> pass_rate=20%
+[BENCHMARK] LLM=4.25 × 40%  +  bench=2.0 × 60%  =  final=2.9  (pass_rate=20%)
+[CERTIFY] ❌ '2D array indexing' FAILED -- score 2.9 < 7.5, pass_rate 20% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 85%] VALIDATE | 2.9/10 | Score 2.9/10 -- Retrying. Focus: providing concrete examples of 2D array indexing in various fields, such as imag
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1100 chars)
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Regenerating code (attempt 2/3, gaps: ['lack of technical validity', 'insufficient concrete examples'])...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1614 chars)
+[SANDBOX] Executing code in Docker container for: 2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_97c663ae.py
+[SANDBOX] Code (1600 chars):
+import numpy as np
+import random
+
+# Create a 2D array
+array_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+# Indexing examples
+print("Element at position (1, 1):", array_2d[1, 1])
+print("Row 0:", array_2d[0, :])
+print("Column 1:", array_2d[:, 1])
+
+# Image analysis example
+image = np.array([[1, 2,...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2192 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: Element at position (1, 1): 5
+Row 0: [1 2 3]
+Column 1: [2 5 8]
+Pixel value at (1, 1): 5
+Value at row 1, column 2: 6
+Random 2D array:
+[[2 5 4 2 3]
+ [9 1 7 6 1]
+ [1 3 4 5 3]
+ [8 0 1 0 6]
+ [3 4 3 1 2]]
+Element at position (2, 2) in random array: 4
+Element at position (0, 0): 1
+Element at position (0, 1
+[RETRY] Sandbox re-run: passed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 2/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2429 chars)
+[VALIDATE] Self-interrogation on: 2D array indexing
+[VALIDATE] GraphRAG injected 3 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come si può utilizzare l'indicizzazione di array 2D per otti... -> answered
+[VALIDATE] Q: In che modo l'indicizzazione di array 2D può essere utilizza... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (678 chars)
+INFO:shard.capability_graph:[CAPABILITY] Added: 'Array Signal Processing' (requires: ['2d array indexing'])
+INFO:shard.capability_graph:[DB] Capabilities saved to SQLite (669 total)
+INFO:shard.capability_graph:[CAPABILITY] Added: 'Phased Arrays' (requires: ['2d array indexing'])
+INFO:shard.capability_graph:[DB] Capabilities saved to SQLite (670 total)
+INFO:shard.capability_graph:[CAPABILITY] Updated from strategy on '2D array indexing' -- total: 670
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1187 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (289 chars)
+[EVALUATE] Scoring understanding of: 2D array indexing
+[EVALUATE] GraphRAG injected 3 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=8.0
+code=8.0
+sandbox=10.0
+synthesis=7.0
+total=8.25
+[STRATEGY] Updated stats -> runs=3 avg=8.25 success=1.0
+[STRATEGY] Stored strategy for '2D array indexing' (outcome=success, score=8.25)
+[SKILL DISCOVERY] No new skills -- 1 already known
+[BENCHMARK] Generating tests for '2D array indexing'...
+[BENCHMARK_GEN] OK 5/5 tests validated for '2D array indexing'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 3 causal warnings into impl prompt
+[BENCHMARK] Memory injected 3 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_b129c5dc.py
+[SANDBOX] Code (407 chars):
+def solve(input_data):
+    if not input_data:
+        return []
+    flat_list = [item for sublist in input_data for item in sublist]
+    flat_list.sort()
+    n = len(flat_list)
+    if n % 2 == 1:
+        return flat_list[n // 2]
+    else:
+        return flat_list[n // 2 - 1]
+
+# --- benchmark test 0 ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1425 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_b129c5dc.py", line 15, in <module>
+    assert solve(input_data)[1][1] == expected
+TypeError: 'int' object is not subscriptable
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_ae9d4ae6.py
+[SANDBOX] Code (371 chars):
+def solve(input_data):
+    if not input_data:
+        return []
+    flat_list = [item for sublist in input_data for item in sublist]
+    flat_list.sort()
+    n = len(flat_list)
+    if n % 2 == 1:
+        return flat_list[n // 2]
+    else:
+        return flat_list[n // 2 - 1]
+
+# --- benchmark test 1 ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1829 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_78d62413.py
+[SANDBOX] Code (379 chars):
+def solve(input_data):
+    if not input_data:
+        return []
+    flat_list = [item for sublist in input_data for item in sublist]
+    flat_list.sort()
+    n = len(flat_list)
+    if n % 2 == 1:
+        return flat_list[n // 2]
+    else:
+        return flat_list[n // 2 - 1]
+
+# --- benchmark test 2 ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1584 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_78d62413.py", line 15, in <module>
+    assert solve(input_data)[0][0] == expected
+TypeError: 'int' object is not subscriptable
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_6d6f5fbc.py
+[SANDBOX] Code (476 chars):
+def solve(input_data):
+    if not input_data:
+        return []
+    flat_list = [item for sublist in input_data for item in sublist]
+    flat_list.sort()
+    n = len(flat_list)
+    if n % 2 == 1:
+        return flat_list[n // 2]
+    else:
+        return flat_list[n // 2 - 1]
+
+# --- benchmark test 3 ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1895 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_6d6f5fbc.py", line 15, in <module>
+    assert solve(input_data)[2][2] == expected
+TypeError: 'int' object is not subscriptable
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_5e2f7008.py
+[SANDBOX] Code (427 chars):
+def solve(input_data):
+    if not input_data:
+        return []
+    flat_list = [item for sublist in input_data for item in sublist]
+    flat_list.sort()
+    n = len(flat_list)
+    if n % 2 == 1:
+        return flat_list[n // 2]
+    else:
+        return flat_list[n // 2 - 1]
+
+# --- benchmark test 4 ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1745 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_5e2f7008.py", line 15, in <module>
+    assert solve(input_data)[4][5] == expected
+TypeError: 'int' object is not subscriptable
+[BENCHMARK_RUN] '2D array indexing': 1/5 passed (+0 discarded) -> pass_rate=20%
+[BENCHMARK] LLM=8.25 × 40%  +  bench=2.0 × 60%  =  final=4.5  (pass_rate=20%)
+[CERTIFY] ❌ '2D array indexing' FAILED -- score 4.5 < 7.5, pass_rate 20% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 85%] VALIDATE | 4.5/10 | Score 4.5/10 -- Retrying. Focus: exploring edge cases and boundary conditions for 2D array indexing
+INFO:shard.self_model:[SELF MODEL] Gap assessment: 10/31 missing (32%) -- severity=medium  critical_categories=['numerical', 'data', 'vectorized', 'iterative', 'recursive', 'systematic', 'test', 'performance', 'minimal', 'safe', 'asynchronous', 'api', 'http', 'tabular', 'database', 'pattern', 'object', 'metaprogramming', 'functional', 'containerization', 'version', 'error', 'observability', 'concurrent', 'parallel', 'realtime', 'web', 'machine', 'deep']
+INFO:shard.episodic_memory:[DB] Loaded 2455 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (636 chars)
+[CRITIC-LLM][SKEPTICAL] Meta-critique for '2D array indexing' (attempt 2): SHARD consistently fails to address edge cases and parallel processing in 2D array indexing, indicating a lack of depth ...
+[SHARD.STUDY] [ 85%] VALIDATE | 4.5/10 | [CRITIC] SHARD consistently fails to address edge cases and parallel processing in 2D array indexing, indicat...
+INFO:shard.self_model:[SELF MODEL] Gap assessment: 10/31 missing (32%) -- severity=medium  critical_categories=['numerical', 'data', 'vectorized', 'iterative', 'recursive', 'systematic', 'test', 'performance', 'minimal', 'safe', 'asynchronous', 'api', 'http', 'tabular', 'database', 'pattern', 'object', 'metaprogramming', 'functional', 'containerization', 'version', 'error', 'observability', 'concurrent', 'parallel', 'realtime', 'web', 'machine', 'deep']
+INFO:shard.episodic_memory:[DB] Loaded 2455 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (721 chars)
+[CRITIC-LLM] Injecting meta-critique into retry prompt for '2D array indexing'
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Regenerating code (attempt 3/3, gaps: ['lack of discussion on edge cases', 'no mention of parallel processing'])...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2014 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1252 chars)
+[SWARM] Activating Architect→Coder pipeline (attempt 2)
+[SWARM] Architect strategy (2014 chars)
+[SWARM] Coder produced 1238 chars
+[SANDBOX] Executing code in Docker container for: 2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_31b6d2fe.py
+[SANDBOX] Code (1238 chars):
+import numpy as np
+import math
+import random
+import itertools
+import collections
+import concurrent.futures
+
+def boundary_check(array, index):
+    if index[0] < 0 or index[0] >= array.shape[0] or index[1] < 0 or index[1] >= array.shape[1]:
+        raise IndexError("Index out of bounds")
+
+def handle_e...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2820 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: OK All assertions passed
+[RETRY] Sandbox re-run: passed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 3/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2096 chars)
+[VALIDATE] Self-interrogation on: 2D array indexing
+[VALIDATE] GraphRAG injected 3 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come si può applicare la tecnica di beamforming alle immagin... -> answered
+[VALIDATE] Q: In che modo la comprensione dell'indice di un array 2D può i... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (754 chars)
+INFO:shard.capability_graph:[CAPABILITY] Updated from strategy on '2D array indexing' -- total: 670
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1175 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (165 chars)
+[EVALUATE] Scoring understanding of: 2D array indexing
+[EVALUATE] GraphRAG injected 3 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=8.0
+code=6.0
+sandbox=10.0
+synthesis=7.0
+total=7.75
+[STRATEGY] Updated stats -> runs=4 avg=8.125 success=1.0
+[STRATEGY] Stored strategy for '2D array indexing' (outcome=success, score=7.75)
+[SKILL DISCOVERY] No new skills -- 1 already known
+[BENCHMARK] Generating tests for '2D array indexing'...
+[BENCHMARK_GEN] OK 5/5 tests validated for '2D array indexing'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 3 causal warnings into impl prompt
+[BENCHMARK] Memory injected 3 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_c1f3ea48.py
+[SANDBOX] Code (260 chars):
+def solve(input_data):
+    row = 1
+    col = 1
+    try:
+        return input_data[row][col]
+    except IndexError:
+        return 'Index out of bounds'
+
+# --- benchmark test 0 ---
+input_data = [[1, 2], [3, 4]]
+expected = 3
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (970 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_c1f3ea48.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_f17d1515.py
+[SANDBOX] Code (280 chars):
+def solve(input_data):
+    row = 1
+    col = 1
+    try:
+        return input_data[row][col]
+    except IndexError:
+        return 'Index out of bounds'
+
+# --- benchmark test 1 ---
+input_data = [[1, 2], [3, 4]]
+expected = 'Index out of bounds'
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1852 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_f17d1515.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_f052d3d5.py
+[SANDBOX] Code (346 chars):
+def solve(input_data):
+    row = 1
+    col = 1
+    try:
+        return input_data[row][col]
+    except IndexError:
+        return 'Index out of bounds'
+
+# --- benchmark test 2 ---
+input_data = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20], [21, 22, 23, 24, 25]]
+expec...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1188 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_f052d3d5.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_39db576e.py
+[SANDBOX] Code (280 chars):
+def solve(input_data):
+    row = 1
+    col = 1
+    try:
+        return input_data[row][col]
+    except IndexError:
+        return 'Index out of bounds'
+
+# --- benchmark test 3 ---
+input_data = [[1, 2], [3, 4]]
+expected = 'Index out of bounds'
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1488 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_39db576e.py", line 12, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:2D array indexing
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_05edc4f6.py
+[SANDBOX] Code (266 chars):
+def solve(input_data):
+    row = 1
+    col = 1
+    try:
+        return input_data[row][col]
+    except IndexError:
+        return 'Index out of bounds'
+
+# --- benchmark test 4 ---
+input_data = []
+expected = 'Index out of bounds'
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2236 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[BENCHMARK_RUN] '2D array indexing': 1/5 passed (+0 discarded) -> pass_rate=20%
+[BENCHMARK] LLM=7.75 × 40%  +  bench=2.0 × 60%  =  final=4.3  (pass_rate=20%)
+[CERTIFY] ❌ '2D array indexing' FAILED -- score 4.3 < 7.5, pass_rate 20% < 60% (benchmark gate -- fin delle auto-congratulazioni)
+[SHARD.STUDY] [ 85%] VALIDATE | 4.3/10 | Score 4.3/10 -- Retrying. Focus: Practicing implementation of 2D array indexing in different programming language
+[SHARD.STUDY] [ 85%] FAILED | 4.3/10 | Could not certify '2D array indexing' after 3 attempts. Best: 8.25/10
+INFO:shard.meta_learning:[DB] MetaLearning recorded: '2D array indexing' [general] score=4.3 cert=False
+INFO:shard.meta_learning:[META] #2456 | '2D array indexing' [general] score=4.3 cert=False | global avg=6.4+ best=algorithms worst=data_structures
+INFO:shard.episodic_memory:[DB] Episodic record: '2D array indexing' score=None
+[NIGHT RUNNER] [19:40] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'affordance': hacker (metric=0.67)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (670 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [19:40] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+[NIGHT RUNNER] [19:40] [DESIRE] '2D array indexing': frustration=2 curiosity=0.30 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] '2D array indexing': frustration=2 curiosity=0.30 engagement=0.00
+[NIGHT RUNNER] [19:40] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: 2D array indexing)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: 2D array indexing)
+[NIGHT RUNNER] [19:40] [STATE] REFACTOR -> FAILED  (score=4.3/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=4.3/10)
+[NIGHT RUNNER] [19:40] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [19:40] Score: 4.3/10
+INFO:NIGHT_RUNNER:Score: 4.3/10
+[NIGHT RUNNER] [19:40] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [19:40] Skills unlocked: 2
+INFO:NIGHT_RUNNER:Skills unlocked: 2
+[NIGHT RUNNER] [19:40] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [19:40] Cycle duration: 2.78 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 2.78 minutes
+[NIGHT RUNNER] [19:40] [DB] Experiment recorded: topic='2D array indexing' score=4.3 cert=False reason=low_score
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='2D array indexing' score=4.3 cert=False reason=low_score
+WARNING:shard.self_model_tracker:[AUDIT] OVERCONFIDENT prediction on '2D array indexing': predicted=10.0 actual=4.3 gap=-5.7
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'sig_difficulty': global=7.76  contextual[unknown:general]=4.06  gap=3.70
+[NIGHT RUNNER] [19:40] [SELF_MODEL] Inconsistency on '2D array indexing': feature='sig_difficulty' gap=3.701
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on '2D array indexing': feature='sig_difficulty' gap=3.701
+[NIGHT RUNNER] [19:40] [AUDIT BLINDNESS] OVERCONFIDENT on '2D array indexing': predicted=8.5  actual=4.3  gap=-4.2
+WARNING:NIGHT_RUNNER:[AUDIT BLINDNESS] OVERCONFIDENT on '2D array indexing': predicted=8.5  actual=4.3  gap=-4.2
+[NIGHT RUNNER] [19:40] Pausing for 1 minutes...
+INFO:NIGHT_RUNNER:Pausing for 1 minutes...
+[NIGHT RUNNER] [19:41] [STATE] RECORD -> SELECT  (cycle 2/3)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> SELECT  (cycle 2/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: '3D mesh rendering' (7 remaining)
+[NIGHT RUNNER] [19:41] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D mesh rendering
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): 3D mesh rendering
+[NIGHT RUNNER] [19:41] [SSJ3] Improvement topic dequeued: '3D mesh rendering'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: '3D mesh rendering'
+[NIGHT RUNNER] [19:41] === Cycle 2/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 2/3 ===
+[NIGHT RUNNER] [19:41] Topic selected: 3D mesh rendering
+INFO:NIGHT_RUNNER:Topic selected: 3D mesh rendering
+[NIGHT RUNNER] [19:41] Source: improvement_engine
+INFO:NIGHT_RUNNER:Source: improvement_engine
+[NIGHT RUNNER] [19:41] Reason: Proactive improvement ticket (SSJ3)
+INFO:NIGHT_RUNNER:Reason: Proactive improvement ticket (SSJ3)
+[NIGHT RUNNER] [19:41] [STRATEGY] Reusing strategy: polygon mesh creation for topic: 3D mesh rendering
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: polygon mesh creation for topic: 3D mesh rendering
+[NIGHT RUNNER] [19:41] [STRATEGY] fingerprint=c38131c5e46e  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=c38131c5e46e  strategies=1
+[NIGHT RUNNER] [19:41] [SELF_MODEL] Predicted score for '3D mesh rendering': 6.1 | desire=0.17 difficulty=0.50 graphrag=0.00
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for '3D mesh rendering': 6.1 | desire=0.17 difficulty=0.50 graphrag=0.00
+[NIGHT RUNNER] [19:41] [KCD] Final predicted score for '3D mesh rendering': 6.1
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for '3D mesh rendering': 6.1
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'improvement_engine'
+[NIGHT RUNNER] [19:41] [PERSONA] Selected 'hacker' (tier=1) for: 3D mesh rendering
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: 3D mesh rendering
+[NIGHT RUNNER] [19:41] [STATE] SELECT -> STUDY  (3D mesh rendering)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (3D mesh rendering)
+INFO:shard.mood:[MOOD] score=-0.227 (strained) | frustration=0.74 cert=0.41 momentum=0.00
+[NIGHT RUNNER] [19:41] [MOOD] Injected into study prompt: strained (-0.227)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.227)
+[EPISODIC] Episode stored for topic '2D array indexing'
+[VOICE BROADCASTER] Enqueued (medium): 'Topic fallito: 2D array indexing. Miglior score raggiunto: 4.3 su dieci.'
+[DB] Loaded 670 capabilities from SQLite
+[DB] Loaded 670 capabilities from SQLite
+[STRATEGY] Memory initialized (445 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of '3D mesh rendering'...
+INFO:shard.episodic_memory:[DB] Loaded 2458 episodes from SQLite
+[PRINCIPLES] Injected principle layer for '3D mesh rendering'
+[MEMORY P0] Prior knowledge injected (3 lines) for '3D mesh rendering'
+[L3] loaded=False predicted=6.11 attempts=0 reason=n/a
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for '3D mesh rendering'...
+WARNING:shard.arxiv_fetcher:[ARXIV] Request failed for '3D mesh rendering': The read operation timed out
+[RESEARCH MODE] Fetched 0 papers from arxiv for '3D mesh rendering'
+[MAP] Phase completed. 0 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 0 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 0 sources...
+[AGGREGATE] Total raw text: 0 chars
+[AGGREGATE] Phase completed. 0 chars scraped.
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | No content could be scraped from any source.
+
+============================================================
+[CRITICAL] CRITICAL ERROR during phase AGGREGATE: RuntimeError: No content scraped -- aborting pipeline
+[CRITICAL] Full traceback:
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_pipeline.py", line 81, in execute
+    await phase.run(ctx)
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_phases.py", line 321, in run
+    raise RuntimeError("No content scraped -- aborting pipeline")
+RuntimeError: No content scraped -- aborting pipeline
+
+============================================================
+
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | Crash in AGGREGATE: No content scraped -- aborting pipeline
+[NIGHT RUNNER] [19:41] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'improvement_engine': hacker (metric=0.61)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (670 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [19:41] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+[NIGHT RUNNER] [19:41] [DESIRE] '3D mesh rendering': frustration=1 curiosity=0.00 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] '3D mesh rendering': frustration=1 curiosity=0.00 engagement=0.00
+[NIGHT RUNNER] [19:41] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: 3D mesh rendering)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: 3D mesh rendering)
+[NIGHT RUNNER] [19:41] [STATE] REFACTOR -> FAILED  (score=0.0/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=0.0/10)
+[NIGHT RUNNER] [19:41] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [19:41] Score: 0.0/10
+INFO:NIGHT_RUNNER:Score: 0.0/10
+[NIGHT RUNNER] [19:41] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [19:41] Skills unlocked: 0
+INFO:NIGHT_RUNNER:Skills unlocked: 0
+[NIGHT RUNNER] [19:41] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [19:41] Cycle duration: 0.19 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 0.19 minutes
+[NIGHT RUNNER] [19:41] [DB] Experiment recorded: topic='3D mesh rendering' score=0.0 cert=False reason=phase_error
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='3D mesh rendering' score=0.0 cert=False reason=phase_error
+WARNING:shard.self_model_tracker:[AUDIT] OVERCONFIDENT prediction on '3D mesh rendering': predicted=6.1 actual=0.0 gap=-6.1
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'sig_difficulty': global=7.52  contextual[unknown:general]=3.82  gap=3.70
+[NIGHT RUNNER] [19:41] [SELF_MODEL] Inconsistency on '3D mesh rendering': feature='sig_difficulty' gap=3.701
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on '3D mesh rendering': feature='sig_difficulty' gap=3.701
+[NIGHT RUNNER] [19:41] [AUDIT BLINDNESS] OVERCONFIDENT on '3D mesh rendering': predicted=6.1  actual=0.0  gap=-6.1
+WARNING:NIGHT_RUNNER:[AUDIT BLINDNESS] OVERCONFIDENT on '3D mesh rendering': predicted=6.1  actual=0.0  gap=-6.1
+[NIGHT RUNNER] [19:41] Pausing for 1 minutes...
+INFO:NIGHT_RUNNER:Pausing for 1 minutes...
+[NIGHT RUNNER] [19:42] [STATE] RECORD -> SELECT  (cycle 3/3)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> SELECT  (cycle 3/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: 'OpenGL rendering pipeline' (6 remaining)
+[NIGHT RUNNER] [19:42] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL rendering pipeline
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL rendering pipeline
+[NIGHT RUNNER] [19:42] [SSJ3] Improvement topic dequeued: 'OpenGL rendering pipeline'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: 'OpenGL rendering pipeline'
+[NIGHT RUNNER] [19:42] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL context creation
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL context creation
+[NIGHT RUNNER] [19:42] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+[NIGHT RUNNER] [19:42] [AFFORD] 'OpenGL rendering pipeline' (feasibility=0.00) out of reach -- decomposing into ['Python graphics basics', 'OpenGL context creation', 'Shader programming fundamentals']
+INFO:NIGHT_RUNNER:[AFFORD] 'OpenGL rendering pipeline' (feasibility=0.00) out of reach -- decomposing into ['Python graphics basics', 'OpenGL context creation', 'Shader programming fundamentals']
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'OpenGL rendering pipeline'
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'Shader programming fundamentals'
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'OpenGL context creation'
+[NIGHT RUNNER] [19:42] === Cycle 3/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 3/3 ===
+[NIGHT RUNNER] [19:42] Topic selected: Python graphics basics
+INFO:NIGHT_RUNNER:Topic selected: Python graphics basics
+[NIGHT RUNNER] [19:42] Source: affordance
+INFO:NIGHT_RUNNER:Source: affordance
+[NIGHT RUNNER] [19:42] Reason: Decomposed from 'OpenGL rendering pipeline' (feasibility=0.00)
+INFO:NIGHT_RUNNER:Reason: Decomposed from 'OpenGL rendering pipeline' (feasibility=0.00)
+[NIGHT RUNNER] [19:42] [STRATEGY] Reusing strategy: 2D graphics basics for topic: Python graphics basics
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: 2D graphics basics for topic: Python graphics basics
+[NIGHT RUNNER] [19:42] [STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+[NIGHT RUNNER] [19:42] [SELF_MODEL] Predicted score for 'Python graphics basics': 4.3 | desire=0.21 difficulty=1.00 graphrag=0.20
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for 'Python graphics basics': 4.3 | desire=0.21 difficulty=1.00 graphrag=0.20
+[NIGHT RUNNER] [19:42] [KCD] Final predicted score for 'Python graphics basics': 4.3
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for 'Python graphics basics': 4.3
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'affordance'
+[NIGHT RUNNER] [19:42] [PERSONA] Selected 'hacker' (tier=1) for: Python graphics basics
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: Python graphics basics
+[NIGHT RUNNER] [19:42] [STATE] SELECT -> STUDY  (Python graphics basics)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (Python graphics basics)
+INFO:shard.mood:[MOOD] score=-0.227 (strained) | frustration=0.74 cert=0.41 momentum=0.00
+[NIGHT RUNNER] [19:42] [MOOD] Injected into study prompt: strained (-0.227)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.227)
+[DB] Loaded 670 capabilities from SQLite
+[DB] Loaded 670 capabilities from SQLite
+[STRATEGY] Memory initialized (445 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of 'Python graphics basics'...
+INFO:shard.episodic_memory:[DB] Loaded 2459 episodes from SQLite
+INFO:shard.study:[FAIL-REUSE] Injecting 3 previous failure(s) for 'Python graphics basics' (types: ['assertion_error', 'benchmark_failure', 'import_error'])
+[EPISODIC] Context found for 'Python graphics basics':
+Past experience with 'Python graphics basics' (3 relevant attempt(s)):
+  - 2026-04-16 | score=5.8/10 | FAILED (near_miss) | strategies: 2D graphics basics
+  - 2026-04-16 | score=0.0/10 | FAILED (unknown) | strategies: none
+  - 2026-04-16 | score=5.8/10 | FAILED (unknown) | strategies: none
+Hint: previous attempt was a near-miss -- focus on depth, complete runnable code, and edge-case coverage to push score above 7.5.
+[PRINCIPLES] Injected principle layer for 'Python graphics basics'
+[MEMORY P0] Prior knowledge injected (10 lines) for 'Python graphics basics'
+[L3] loaded=True predicted=4.34 attempts=3 reason=low_pred=4.3 retry
+[L3] Injected 7 cross-topic link(s) for 'Python graphics basics'
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for 'Python graphics basics'...
+INFO:shard.arxiv_fetcher:[ARXIV] 'Python graphics basics' -> 5 papers
+[RESEARCH MODE] Fetched 5 papers from arxiv for 'Python graphics basics'
+[MAP] Phase completed. 5 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 5 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 5 sources...
+[AGGREGATE] ✅ [1/5] ePython: An implementation of Python for the many- (4729 chars)
+[AGGREGATE] ✅ [2/5] Social Network Analysis: From Graph Theory to Appl (4139 chars)
+[AGGREGATE] ✅ [3/5] Temperature Illusions in Mixed Reality using Color (4435 chars)
+[AGGREGATE] ✅ [4/5] MoVer: Motion Verification for Motion Graphics Ani (4637 chars)
+[AGGREGATE] ✅ [5/5] atoMEC: An open-source average-atom Python code (4599 chars)
+[AGGREGATE] Total raw text: 15600 chars
+[AGGREGATE] Phase completed. 15600 chars scraped.
+[SHARD.STUDY] [ 20%] SYNTHESIZE | 0/10 | Building structured knowledge...
+INFO:shard.episodic_memory:[DB] Loaded 2459 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1655 chars)
+INFO:arxiv:Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=Applying+graph+theory+to+social+network+analysis+in+mixed+reality+environments+can&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+INFO:arxiv:Sleeping: 2.999959 seconds
+INFO:arxiv:Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=Applying+graph+theory+to+social+network+analysis+in+mixed+reality+environments+can&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+INFO:arxiv:Sleeping: 2.999967 seconds
+INFO:arxiv:Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=Applying+graph+theory+to+social+network+analysis+in+mixed+reality+environments+can&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+INFO:arxiv:Sleeping: 2.999976 seconds
+INFO:arxiv:Requesting page (first: True, try: 3): https://export.arxiv.org/api/query?search_query=Applying+graph+theory+to+social+network+analysis+in+mixed+reality+environments+can&id_list=&sortBy=relevance&sortOrder=descending&start=0&max_results=100
+INFO:arxiv:Got first page: 100 of 2173782 total results
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (5 chars)
+[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: Python graphics basics
+[SYNTHESIZE] GraphRAG injected 4 causal warnings
+[SYNTHESIZE] Memory injected 8 prior memories
+[SYNTHESIZE] Domain diversity block: 15 pairs injected (blocked_from: Mesh Networks, Differential Geometry, materials science, Astrophysics...)
+[SYNTHESIZE] JSON recovered successfully
+[SYNTHESIZE] Hypothesis generated: 'Applying graph theory to social network analysis in mixed reality environments c...'
+[SYNTHESIZE] JSON parsed successfully (3 concepts)
+[WORLD MODEL] entities: 3 edges: 0
+[WORLD MODEL] hub detected: Graph Theory (degree 0)
+[WORLD MODEL] hub detected: Social Network Analysis (degree 0)
+[WORLD MODEL] hub detected: Mixed Reality (degree 0)
+[SYNTHESIZE] concepts extracted: 3 after semantic validation
+[SYNTHESIZE] Phase completed. 3 concepts extracted.
+[NOVELTY] arxiv: 5 results for 'Applying graph theory to social network analysis i'
+[NOVELTY] Top hit: Multidimensional Social Network in the Social Recommender System
+[NOVELTY] No arxiv hit directly matches hypothesis → continuing to Stage 2
+[CROSS-REF] Filter query failed (Error executing plan: Internal error: Error finding id), retrying without filter...
+[CROSS-REF] Found 3 connections with existing knowledge
+[SHARD.STUDY] [ 35%] SYNTHESIZE | 0/10 | Found 3 connections with existing knowledge
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (3 chars)
+[SHARD.STUDY] [ 35%] EXPERIMENT_DESIGN | 0/10 | Experiment needs external compute (GPU/data) -- generating Kaggle-ready code
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (965 chars)
+[EXPERIMENT_DESIGN] KAGGLE_READY -- generating code for: 'Applying graph theory to social network analysis in mixed reality environments c'
+[SHARD.STUDY] [ 35%] EXPERIMENT_DESIGN | 0/10 | Designing experiment for: 'Applying graph theory to social network analysis in mixed re...'
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2649 chars)
+INFO:shard.experiment_store:[EXPERIMENT_STORE] Stored hypothesis id=39 topic='Python graphics basics'
+INFO:shard.experiment_store:[EXPERIMENT_STORE] Updated id=39 status=KAGGLE_READY
+[EXPERIMENT] Generating experiment code for: 'Applying graph theory to social network analysis in mixed re...' (domain=generic)
+[EXPERIMENT_DESIGN] Persisted KAGGLE_READY id=39
+[SHARD.STUDY] [ 35%] EXPERIMENT_DESIGN | 0/10 | Kaggle-ready code generated (2635 chars) -- persisted to DB
+[EXPERIMENT_DESIGN] KAGGLE_READY code saved for: 'Applying graph theory to social network analysis in mixed reality environments c'
+[SHARD.STUDY] [ 35%] STORE | 0/10 | Persisting to knowledge base...
+[STORE] Persisting knowledge for: Python graphics basics
+[STORE] ✅ Saved to ChromaDB
+[STORE] Phase completed.
+[SHARD.STUDY] [ 40%] CROSS_POLLINATE | 0/10 | Generating Integration Report...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (844 chars)
+[CROSS-POLLINATE] Generating Integration Report for: Python graphics basics
+[CROSS-POLLINATE] ChromaDB query error: Error executing plan: Internal error: Error finding id
+[CROSS-POLLINATE] ✅ Integration Report generated (844 chars)
+[CROSS-POLLINATE] Report preview: Rapporto di Integrazione:
+
+Ho appreso i concetti chiave di 'Python graphics basics', tra cui Graph Theory, Social Network Analysis e Mixed Reality. La teoria dei grafi si basa sulla scienza delle reti...
+[CROSS-POLLINATE] ✅ Report saved to ChromaDB (type: deep_knowledge)
+[SHARD.STUDY] [ 50%] CROSS_POLLINATE | 0/10 | Integration Report: Rapporto di Integrazione:
+
+Ho appreso i concetti chiave di 'Python graphics basics', tra cui Graph T...
+[PRINCIPLES] +1 new principles saved (total: 154)
+[PRINCIPLES] Extracted 1 new principles from 'Python graphics basics'
+[CROSS-POLLINATE] Phase completed.
+[SHARD.STUDY] [ 50%] MATERIALIZE | 0/10 | Writing Cheat Sheet to filesystem...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1825 chars)
+[MATERIALIZE] Creating Cheat Sheet for: Python graphics basics
+[MATERIALIZE] ✅ Cheat Sheet generated (1825 chars)
+[TOOL] write_file -> resolved workspace path: C:\Users\andre\Desktop\shard_v1\shard_workspace\knowledge_base\python_graphics_basics.md
+[MATERIALIZE] ✅ Cheat Sheet written to: shard_workspace/knowledge_base/python_graphics_basics.md
+[MATERIALIZE] Result: Success: file 'knowledge_base/python_graphics_basics.md' written (1863 bytes).
+[SHARD.STUDY] [ 60%] MATERIALIZE | 0/10 | Cheat Sheet saved to knowledge_base/
+[MATERIALIZE] Phase completed.
+[STRATEGY RETRIEVAL] Strategy found but out-of-context; discarding.
+[SHARD.STUDY] [ 60%] SANDBOX | 0/10 | Generating code independently from theory phase
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1453 chars)
+[SANDBOX] Generating code independently from theory phase
+[SANDBOX] applying library constraints
+[SHARD.STUDY] [ 60%] SANDBOX | 0/10 | Executing generated code
+[SANDBOX] Executing generated code
+[SANDBOX] Executing code in Docker container for: Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_b532eb67.py
+[SANDBOX] Code (1439 chars):
+import tkinter as tk
+
+def create_window(width, height):
+    root = tk.Tk()
+    root.geometry(f"{width}x{height}")
+    return root
+
+def draw_rectangle(canvas, x, y, width, height):
+    canvas.create_rectangle(x, y, x + width, y + height, fill="blue")
+
+def draw_text(canvas, x, y, text):
+    canvas.cre...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1503 chars)
+INFO:shard.swe_agent:[SWE] Starting repair: study_b532eb67.py | issue: Traceback (most recent call last):
+  File "/app/study_b532eb67.py", line 1, in <
+INFO:shard.swe_agent:[SWE] No tests found for study_b532eb67.
+INFO:shard.swe_agent:[SWE] Attempt 1/3 for study_b532eb67.py
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1605 chars)
+INFO:shard.swe_agent:[SWE] Patch written atomically to 'study_b532eb67.py'.
+WARNING:shard.swe_agent:[SWE] git commit failed: 
+INFO:shard.swe_agent:[SWE] OK Repair committed: study_b532eb67.py ()
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_b532eb67.py", line 1, in <module>
+    import tkinter as tk
+  File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: libtk8.6.so: cannot 
+[STUDY] sandbox failure
+[WORLD MODEL] recording failure: Python graphics basics
+[STUDY] invoking SWE agent
+[SIMULATION] generating candidate repairs
+[SIMULATION] evaluating patch candidate fix runtime error: File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module> | import _tkinter # If this fails your Python may not be configured for Tk | ImportError: libtk8.6.so: cannot open shared object file: No such file or directory
+[SIMULATION] heuristic: 0.6
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.8400000000000001
+[SIMULATION] evaluating patch candidate fix code logic for topic: Python graphics basics
+[SIMULATION] heuristic: 0.8
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.9200000000000002
+[SIMULATION] evaluating patch candidate fix sandbox execution failure
+[SIMULATION] heuristic: 0.5
+[SIMULATION] history_score: 1.0
+[SIMULATION] failure_score: 1.0
+[SIMULATION] final_score: 0.8
+[SIMULATION] best predicted repair fix code logic for topic: Python graphics basics
+[STUDY] retry sandbox
+[SANDBOX] Executing code in Docker container for: Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_a6554244.py
+[SANDBOX] Code (1439 chars):
+import tkinter as tk
+
+def create_window(width, height):
+    root = tk.Tk()
+    root.geometry(f"{width}x{height}")
+    return root
+
+def draw_rectangle(canvas, x, y, width, height):
+    canvas.create_rectangle(x, y, x + width, y + height, fill="blue")
+
+def draw_text(canvas, x, y, text):
+    canvas.cre...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1766 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_a6554244.py", line 1, in <module>
+    import tkinter as tk
+  File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: libtk8.6.so: cannot 
+[RELIABILITY] Sandbox failure classified as: import_error
+[RELIABILITY] Heuristic fix unavailable or failed; continuing normal failure flow
+[CRITIC] Sandbox failure on 'Python graphics basics'. Error type: import_error. Error: ImportError: libtk8.6.so: cannot open shared object file: No such file or directory. Suggested remediation: study 'python module system and dependency management'.
+[RELIABILITY] Critic analysis: {'analysis': "Sandbox failure on 'Python graphics basics'. Error type: import_error. Error: ImportError: libtk8.6.so: cannot open shared object file: No such file or directory. Suggested remediation: study 'python module system and dependency management'.", 'error_type': 'import_error', 'error_summary': 'ImportError: libtk8.6.so: cannot open shared object file: No such file or directory', 'remediation_topic': 'python module system and dependency management', 'confidence': 0.85, 'capability': 'Python graphics basics', 'data': {'stderr': 'Traceback (most recent call last):\n  File "/app/study_a6554244.py", line 1, in <module>\n    import tkinter as tk\n  File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module>\n    import _tkinter # If this fails your Python may not be configured for Tk\nImportError: libtk8.6.so: cannot open shared object file: No such file or directory', 'stdout': '', 'failure_type': 'import_error', 'capability': 'Python graphics basics'}}
+[CRITIC FEEDBACK] Injected Priority 0 topic: 'python module system and dependency management' (from failure on 'Python graphics basics', confidence=0.85)
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Sandbox failed: Il codice presentato sembra essere una buona implementazione di base per la creazione di una finestr
+[SANDBOX] Execution completed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 1/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2113 chars)
+[VALIDATE] Self-interrogation on: Python graphics basics
+[VALIDATE] GraphRAG injected 4 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come posso utilizzare le librerie di grafica di Python, come... -> answered
+[VALIDATE] Q: In che modo la conoscenza della teoria dei grafi e dell'anal... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (961 chars)
+INFO:shard.experiment_cache:[DB] Registered failed experiment: 'Python graphics basics' (skills=670)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1285 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (177 chars)
+[EVALUATE] Scoring understanding of: Python graphics basics
+[EVALUATE] GraphRAG injected 4 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=6.0
+code=1.0
+sandbox=0.0
+synthesis=4.0
+total=2.75
+[STRATEGY] Strategia scartata (score insufficiente: 2.75, FAIL)
+[CACHE] Registered failed experiment: 'Python graphics basics' (Skills at failure: 670)
+[BENCHMARK] Generating tests for 'Python graphics basics'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python graphics basics'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 4 causal warnings into impl prompt
+[BENCHMARK] Memory injected 6 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_272acee5.py
+[SANDBOX] Code (300 chars):
+def solve(input_data):
+    if input_data['width'] <= 0 or input_data['height'] <= 0:
+        return 'invalid window size'
+    else:
+        return 'window created'
+
+# --- benchmark test 0 ---
+input_data = {'width': 400, 'height': 300}
+expected = 'window created'
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1714 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_e70fa24f.py
+[SANDBOX] Code (301 chars):
+def solve(input_data):
+    if input_data['width'] <= 0 or input_data['height'] <= 0:
+        return 'invalid window size'
+    else:
+        return 'window created'
+
+# --- benchmark test 1 ---
+input_data = {'width': 0, 'height': 0}
+expected = 'invalid window size'
+assert solve(input_data) == expected...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1548 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_e1dadcd1.py
+[SANDBOX] Code (300 chars):
+def solve(input_data):
+    if input_data['width'] <= 0 or input_data['height'] <= 0:
+        return 'invalid window size'
+    else:
+        return 'window created'
+
+# --- benchmark test 2 ---
+input_data = {'width': 800, 'height': 600}
+expected = 'window created'
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1517 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_9b8b7f6c.py
+[SANDBOX] Code (307 chars):
+def solve(input_data):
+    if input_data['width'] <= 0 or input_data['height'] <= 0:
+        return 'invalid window size'
+    else:
+        return 'window created'
+
+# --- benchmark test 3 ---
+input_data = {'width': 400.5, 'height': 300}
+expected = 'invalid window size'
+assert solve(input_data) == ex...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1351 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_9b8b7f6c.py", line 10, in <module>
+    assert solve(input_data) == expected
+AssertionError
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_ccf12390.py
+[SANDBOX] Code (306 chars):
+def solve(input_data):
+    if input_data['width'] <= 0 or input_data['height'] <= 0:
+        return 'invalid window size'
+    else:
+        return 'window created'
+
+# --- benchmark test 4 ---
+input_data = {'width': -400, 'height': 300}
+expected = 'invalid window size'
+assert solve(input_data) == exp...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1322 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[BENCHMARK_RUN] 'Python graphics basics': 4/5 passed (+0 discarded) -> pass_rate=80%
+[BENCHMARK] LLM=2.75 × 40%  +  bench=8.0 × 60%  =  final=5.9  (pass_rate=80%)
+[CERTIFY] ❌ 'Python graphics basics' FAILED -- score 5.9 < 7.5, synthesis 4.0 < 5, sandbox 0.0 < 5
+[SHARD.STUDY] [ 85%] VALIDATE | 5.9/10 | Score 5.9/10 -- Retrying. Focus: practicing with hands-on exercises to improve code quality and troubleshooting s
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2091 chars)
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Regenerating code (attempt 2/3, gaps: ['lack of hands-on experience with Python graphics libraries', 'inability to troubleshoot import errors'])...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1128 chars)
+[SANDBOX] Executing code in Docker container for: Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_35bcc40e.py
+[SANDBOX] Code (1114 chars):
+import tkinter as tk
+import random
+import math
+
+def draw_circle(canvas, x, y, radius, color):
+    canvas.create_oval(x - radius, y - radius, x + radius, y + radius, fill=color)
+
+def draw_square(canvas, x, y, size, color):
+    canvas.create_rectangle(x - size / 2, y - size / 2, x + size / 2, y + size...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1655 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_35bcc40e.py", line 1, in <module>
+    import tkinter as tk
+  File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: libtk8.6.so: cannot 
+[RETRY] Sandbox re-run: failed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 2/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2063 chars)
+[VALIDATE] Self-interrogation on: Python graphics basics
+[VALIDATE] GraphRAG injected 4 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come posso utilizzare la libreria tkinter per creare un'inte... -> answered
+[VALIDATE] Q: Come posso applicare le conoscenze di graph theory e social ... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (877 chars)
+INFO:shard.experiment_cache:[DB] Registered failed experiment: 'Python graphics basics' (skills=670)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2110 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (80 chars)
+[EVALUATE] Scoring understanding of: Python graphics basics
+[EVALUATE] GraphRAG injected 4 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=6.0
+code=1.0
+sandbox=0.0
+synthesis=4.0
+total=2.75
+[STRATEGY] Strategia scartata (score insufficiente: 2.75, FAIL)
+[CACHE] Registered failed experiment: 'Python graphics basics' (Skills at failure: 670)
+[BENCHMARK] Generating tests for 'Python graphics basics'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python graphics basics'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 4 causal warnings into impl prompt
+[BENCHMARK] Memory injected 6 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_24711c2c.py
+[SANDBOX] Code (347 chars):
+def solve(input_data):
+    return {'shapes': input_data['shapes']}
+
+# --- benchmark test 0 ---
+input_data = {'width': 100, 'height': 100, 'shapes': [{'type': 'circle', 'x': 50, 'y': 50, 'radius': 20, 'color': 'red'}]}
+expected = {'shapes': [{'type': 'circle', 'x': 50, 'y': 50, 'radius': 20, 'color':...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2077 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_9ccac49e.py
+[SANDBOX] Code (215 chars):
+def solve(input_data):
+    return {'shapes': input_data['shapes']}
+
+# --- benchmark test 1 ---
+input_data = {'width': 100, 'height': 100, 'shapes': []}
+expected = {'shapes': []}
+assert solve(input_data) == expected
+...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1189 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_41dbd56f.py
+[SANDBOX] Code (495 chars):
+def solve(input_data):
+    return {'shapes': input_data['shapes']}
+
+# --- benchmark test 2 ---
+input_data = {'width': 800, 'height': 600, 'shapes': [{'type': 'circle', 'x': 100, 'y': 100, 'radius': 50, 'color': 'blue'}, {'type': 'square', 'x': 300, 'y': 300, 'size': 100, 'color': 'green'}]}
+expected...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2191 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_29832dfe.py
+[SANDBOX] Code (493 chars):
+def solve(input_data):
+    return {'shapes': input_data['shapes']}
+
+# --- benchmark test 3 ---
+input_data = {'width': 400, 'height': 400, 'shapes': [{'type': 'circle', 'x': 200, 'y': 200, 'radius': 100, 'color': 'red'}, {'type': 'square', 'x': 250, 'y': 250, 'size': 150, 'color': 'blue'}]}
+expected ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1736 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_e66b57b5.py
+[SANDBOX] Code (351 chars):
+def solve(input_data):
+    return {'shapes': input_data['shapes']}
+
+# --- benchmark test 4 ---
+input_data = {'width': 200, 'height': 200, 'shapes': [{'type': 'circle', 'x': 0, 'y': 100, 'radius': 50, 'color': 'green'}]}
+expected = {'shapes': [{'type': 'circle', 'x': 0, 'y': 100, 'radius': 50, 'color...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1809 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[BENCHMARK_RUN] 'Python graphics basics': 5/5 passed (+0 discarded) -> pass_rate=100%
+[BENCHMARK] LLM=2.75 × 40%  +  bench=10.0 × 60%  =  final=7.1  (pass_rate=100%)
+[CERTIFY] ❌ 'Python graphics basics' FAILED -- score 7.1 < 7.5, synthesis 4.0 < 5, sandbox 0.0 < 5
+[SHARD.STUDY] [ 85%] VALIDATE | 7.1/10 | Score 7.1/10 -- Retrying. Focus: practicing with tkinter and Docker to improve hands-on experience and code quali
+INFO:shard.self_model:[SELF MODEL] Gap assessment: 10/31 missing (32%) -- severity=medium  critical_categories=['numerical', 'data', 'vectorized', 'iterative', 'recursive', 'systematic', 'test', 'performance', 'minimal', 'safe', 'asynchronous', 'api', 'http', 'tabular', 'database', 'pattern', 'object', 'metaprogramming', 'functional', 'containerization', 'version', 'error', 'observability', 'concurrent', 'parallel', 'realtime', 'web', 'machine', 'deep']
+INFO:shard.episodic_memory:[DB] Loaded 2459 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (556 chars)
+[CRITIC-LLM][SKEPTICAL] Meta-critique for 'Python graphics basics' (attempt 2): SHARD consistently fails to demonstrate hands-on experience with tkinter and understanding of its dependencies, such as ...
+[SHARD.STUDY] [ 85%] VALIDATE | 7.1/10 | [CRITIC] SHARD consistently fails to demonstrate hands-on experience with tkinter and understanding of its de...
+INFO:shard.self_model:[SELF MODEL] Gap assessment: 10/31 missing (32%) -- severity=medium  critical_categories=['numerical', 'data', 'vectorized', 'iterative', 'recursive', 'systematic', 'test', 'performance', 'minimal', 'safe', 'asynchronous', 'api', 'http', 'tabular', 'database', 'pattern', 'object', 'metaprogramming', 'functional', 'containerization', 'version', 'error', 'observability', 'concurrent', 'parallel', 'realtime', 'web', 'machine', 'deep']
+INFO:shard.episodic_memory:[DB] Loaded 2459 episodes from SQLite
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1630 chars)
+[CRITIC-LLM] Injecting meta-critique into retry prompt for 'Python graphics basics'
+[SHARD.STUDY] [ 70%] SANDBOX | 0/10 | Regenerating code (attempt 3/3, gaps: ['lack of hands-on experience with tkinter', 'limited understanding of Docker and its relation to tkinter'])...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2211 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1079 chars)
+[SWARM] Activating Architect→Coder pipeline (attempt 2)
+[SWARM] Architect strategy (2211 chars)
+[SWARM] Coder produced 1065 chars
+[SANDBOX] Executing code in Docker container for: Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_b90347c5.py
+[SANDBOX] Code (1065 chars):
+import tkinter as tk
+import random
+
+def draw_shape(canvas, x, y, size, color):
+    canvas.create_oval(x, y, x + size, y + size, fill=color)
+
+def draw_graphics(root):
+    canvas = tk.Canvas(root, width=400, height=400)
+    canvas.pack()
+
+    for _ in range(10):
+        x = random.randint(0, 350)
+    ...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2235 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_b90347c5.py", line 1, in <module>
+    import tkinter as tk
+  File "/usr/local/lib/python3.10/tkinter/__init__.py", line 37, in <module>
+    import _tkinter # If this fails your Python may not be configured for Tk
+ImportError: libtk8.6.so: cannot 
+[RETRY] Sandbox re-run: failed
+[SHARD.STUDY] [ 70%] VALIDATE | 0/10 | Self-interrogation (attempt 3/3)...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1993 chars)
+[VALIDATE] Self-interrogation on: Python graphics basics
+[VALIDATE] GraphRAG injected 4 causal warnings
+[VALIDATE] Memory injected episode history
+[VALIDATE] Q: Come posso utilizzare le librerie grafiche di Python per cre... -> answered
+[VALIDATE] Q: In che modo l'utilizzo della libreria Docker SDK per Python ... -> answered
+[SHARD.STUDY] [ 80%] EVALUATE | 0/10 | Scoring with Test-Driven Protocol...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (800 chars)
+INFO:shard.experiment_cache:[DB] Registered failed experiment: 'Python graphics basics' (skills=670)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1452 chars)
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (480 chars)
+[EVALUATE] Scoring understanding of: Python graphics basics
+[EVALUATE] GraphRAG injected 4 causal warnings
+[EVALUATE] Scoring via Groq (Groq -> Gemini -> Claude fallback)...
+[EVALUATE]
+theory=6.0
+code=0.0
+sandbox=0.0
+synthesis=4.0
+total=2.5
+[STRATEGY] Strategia scartata (score insufficiente: 2.5, FAIL)
+[CACHE] Registered failed experiment: 'Python graphics basics' (Skills at failure: 670)
+[BENCHMARK] Generating tests for 'Python graphics basics'...
+[BENCHMARK_GEN] OK 5/5 tests validated for 'Python graphics basics'
+[BENCHMARK] 5 tests generated -- requesting implementation attempt from LLM...
+[BENCHMARK] GraphRAG injected 4 causal warnings into impl prompt
+[BENCHMARK] Memory injected 6 fact memories into impl prompt
+[BENCHMARK] Running tests in sandbox...
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_90bcad94.py
+[SANDBOX] Code (643 chars):
+def solve(input_data):
+    if 'shapes' in input_data:
+        for shape in input_data['shapes']:
+            if not (0 <= shape['x'] <= input_data['width'] - shape['size'] and 0 <= shape['y'] <= input_data['height'] - shape['size']):
+                return False
+    else:
+        if not (0 <= input_...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1722 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_4aacf5e1.py
+[SANDBOX] Code (639 chars):
+def solve(input_data):
+    if 'shapes' in input_data:
+        for shape in input_data['shapes']:
+            if not (0 <= shape['x'] <= input_data['width'] - shape['size'] and 0 <= shape['y'] <= input_data['height'] - shape['size']):
+                return False
+    else:
+        if not (0 <= input_...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1509 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_c9d07fd4.py
+[SANDBOX] Code (711 chars):
+def solve(input_data):
+    if 'shapes' in input_data:
+        for shape in input_data['shapes']:
+            if not (0 <= shape['x'] <= input_data['width'] - shape['size'] and 0 <= shape['y'] <= input_data['height'] - shape['size']):
+                return False
+    else:
+        if not (0 <= input_...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (2064 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_5408e672.py
+[SANDBOX] Code (592 chars):
+def solve(input_data):
+    if 'shapes' in input_data:
+        for shape in input_data['shapes']:
+            if not (0 <= shape['x'] <= input_data['width'] - shape['size'] and 0 <= shape['y'] <= input_data['height'] - shape['size']):
+                return False
+    else:
+        if not (0 <= input_...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1381 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ❌ Exit code: 1
+[SANDBOX] stdout: 
+[SANDBOX] stderr: Traceback (most recent call last):
+  File "/app/study_5408e672.py", line 14, in <module>
+    assert solve(input_data) == expected
+  File "/app/study_5408e672.py", line 7, in solve
+    if not (0 <= input_data['x'] <= input_data['width'] - input_data['size'] and 0 <= input_data['y'] <= input_data['hei
+[SANDBOX] Executing code in Docker container for: benchmark:Python graphics basics
+[SANDBOX] Code saved to: C:\Users\andre\Desktop\shard_v1\sandbox\study_e5de886f.py
+[SANDBOX] Code (647 chars):
+def solve(input_data):
+    if 'shapes' in input_data:
+        for shape in input_data['shapes']:
+            if not (0 <= shape['x'] <= input_data['width'] - shape['size'] and 0 <= shape['y'] <= input_data['height'] - shape['size']):
+                return False
+    else:
+        if not (0 <= input_...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1480 chars)
+[SANDBOX] Docker command: docker run --rm --network none -m 256m --cpus=0.5 --pids-limit 64...
+[SANDBOX] ✅ Exit code: 0
+[SANDBOX] stdout: 
+[BENCHMARK_RUN] 'Python graphics basics': 4/5 passed (+0 discarded) -> pass_rate=80%
+[BENCHMARK] LLM=2.5 × 40%  +  bench=8.0 × 60%  =  final=5.8  (pass_rate=80%)
+[CERTIFY] ❌ 'Python graphics basics' FAILED -- score 5.8 < 7.5, synthesis 4.0 < 5, sandbox 0.0 < 5
+[SHARD.STUDY] [ 85%] VALIDATE | 5.8/10 | Score 5.8/10 -- Retrying. Focus: installing and configuring necessary libraries for Python graphics
+[SHARD.STUDY] [ 85%] FAILED | 5.8/10 | Could not certify 'Python graphics basics' after 3 attempts. Best: 7.1/10
+INFO:shard.meta_learning:[DB] MetaLearning recorded: 'Python graphics basics' [algorithms] score=5.8 cert=False
+INFO:shard.meta_learning:[META] #2460 | 'Python graphics basics' [algorithms] score=5.8 cert=False | global avg=6.4- best=systems worst=data_structures
+INFO:shard.episodic_memory:[DB] Episodic record: 'Python graphics basics' score=None
+[NIGHT RUNNER] [19:47] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'affordance': hacker (metric=0.66)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (670 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [19:47] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+[NIGHT RUNNER] [19:47] [DESIRE] 'Python graphics basics': frustration=2 curiosity=0.30 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] 'Python graphics basics': frustration=2 curiosity=0.30 engagement=0.00
+[NIGHT RUNNER] [19:47] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python graphics basics)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python graphics basics)
+[NIGHT RUNNER] [19:47] [STATE] REFACTOR -> FAILED  (score=5.8/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=5.8/10)
+[NIGHT RUNNER] [19:47] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [19:47] Score: 5.8/10
+INFO:NIGHT_RUNNER:Score: 5.8/10
+[NIGHT RUNNER] [19:47] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [19:47] Skills unlocked: 0
+INFO:NIGHT_RUNNER:Skills unlocked: 0
+[NIGHT RUNNER] [19:47] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [19:47] Cycle duration: 4.48 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 4.48 minutes
+[NIGHT RUNNER] [19:47] [DB] Experiment recorded: topic='Python graphics basics' score=5.8 cert=False reason=near_miss
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='Python graphics basics' score=5.8 cert=False reason=near_miss
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'sig_difficulty': global=7.69  contextual[unknown:algorithm]=1.60  gap=6.10
+[NIGHT RUNNER] [19:47] [SELF_MODEL] Inconsistency on 'Python graphics basics': feature='sig_difficulty' gap=6.096
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on 'Python graphics basics': feature='sig_difficulty' gap=6.096
+[NIGHT RUNNER] [19:47] [STATE] RECORD -> DONE  (all cycles completed)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> DONE  (all cycles completed)
+[NIGHT RUNNER] [19:47] [BENCHMARK] Found 17 task(s): ['task_01_html_trap', 'task_02_ghost_bug', 'task_03_dirty_data', 'task_04_race_condition', 'task_05_state_mutation', 'task_06_ttl_cache', 'task_07_metrics_bleed', 'task_08_multi_file_labyrinth', 'task_09_ghost_mutation', 'task_10_template_parser', 'task_11_stream_decoder', 'task_12_note_tag', 'task_13_config_parser', 'task_14_boundary_check', 'task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me', 'task_forge_20260414_114631_binary_search_implem_x_binary_search_implem', 'task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio']
+INFO:NIGHT_RUNNER:[BENCHMARK] Found 17 task(s): ['task_01_html_trap', 'task_02_ghost_bug', 'task_03_dirty_data', 'task_04_race_condition', 'task_05_state_mutation', 'task_06_ttl_cache', 'task_07_metrics_bleed', 'task_08_multi_file_labyrinth', 'task_09_ghost_mutation', 'task_10_template_parser', 'task_11_stream_decoder', 'task_12_note_tag', 'task_13_config_parser', 'task_14_boundary_check', 'task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me', 'task_forge_20260414_114631_binary_search_implem_x_binary_search_implem', 'task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio']
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_01_html_trap
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_01_html_trap
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_01_html_trap # Task 01 � The HTML Trap
+
+## Ob' cluster_boost=1.00 mult=1.278 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_01_html_trap -- 0 attempt(s), 1.3s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_01_html_trap -- 0 attempt(s), 1.3s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_02_ghost_bug
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_02_ghost_bug
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_02_ghost_bug # Task 02 � The Ghost Bug
+
+## Ob' cluster_boost=1.25 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_02_ghost_bug -- 0 attempt(s), 1.4s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_02_ghost_bug -- 0 attempt(s), 1.4s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_03_dirty_data
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_03_dirty_data
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_03_dirty_data # Task 03 � Optimize the Transa' cluster_boost=1.00 mult=1.364 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_03_dirty_data -- 0 attempt(s), 2.5s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_03_dirty_data -- 0 attempt(s), 2.5s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_04_race_condition
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_04_race_condition
+INFO:shard.cross_task_router:[ROUTER] cluster=concurrency | boost=1.40 | strategies: 5 -> 5
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_04_race_condition # Task 04 � Fix the Banking' cluster_boost=1.40 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_04_race_condition -- 0 attempt(s), 1.4s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_04_race_condition -- 0 attempt(s), 1.4s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_05_state_mutation
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_05_state_mutation
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_05_state_mutation # Task 05 � Fix the Data Pi' cluster_boost=1.25 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_05_state_mutation -- 0 attempt(s), 1.4s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_05_state_mutation -- 0 attempt(s), 1.4s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_06_ttl_cache
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_06_ttl_cache
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_06_ttl_cache # Task 06 � Fix the TTL Cache
+
+#' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_06_ttl_cache -- 0 attempt(s), 1.3s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_06_ttl_cache -- 0 attempt(s), 1.3s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_07_metrics_bleed
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_07_metrics_bleed
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_07_metrics_bleed # Task 07 � Fix the Metrics ' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_07_metrics_bleed -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_07_metrics_bleed -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_08_multi_file_labyrinth
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_08_multi_file_labyrinth
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_08_multi_file_labyrinth # Task 08
+
+The pipeli' cluster_boost=1.00 mult=1.213 confidence=0.828 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_08_multi_file_labyrinth -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_08_multi_file_labyrinth -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_09_ghost_mutation
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_09_ghost_mutation
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_09_ghost_mutation # Task 09 � Ghost Mutation
+' cluster_boost=1.25 mult=1.360 confidence=1.000 (3 strategies)
+[EPISODIC] Episode stored for topic 'Python graphics basics'
+[VOICE BROADCASTER] Enqueued (medium): 'Topic fallito: Python graphics basics. Miglior score raggiunto: 5.8 su dieci.'
+[DB] Loaded 670 capabilities from SQLite
+[DB] Loaded 670 capabilities from SQLite
+[VOICE BROADCASTER] Enqueued (high): 'Avvio benchmark: 17 task da risolvere.'
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_01_html_trap
+  Language: PYTHON
+  Source: refactored_agent.py -> refactored_agent.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (679 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,137 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 17 test(s) -- will protect on regression
+  [golden] All 17 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (592 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,451 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_03_dirty_data
+  Language: PYTHON
+  Source: optimized_processor.py -> optimized_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (814 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (201 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,873 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 24 test(s) -- will protect on regression
+  [golden] All 24 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_04_race_condition
+  Language: PYTHON
+  Source: bank.py -> fixed_bank.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (665 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (7,948 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_05_state_mutation
+  Language: PYTHON
+  Source: pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (611 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,985 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 21 test(s) -- will protect on regression
+  [golden] All 21 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_06_ttl_cache
+  Language: PYTHON
+  Source: cache.py -> fixed_cache.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (663 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,099 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 17 test(s) -- will protect on regression
+  [golden] All 17 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_07_metrics_bleed
+  Language: PYTHON
+  Source: metrics.py -> fixed_metrics.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (584 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (204 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,206 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_08_multi_file_labyrinth
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (854 chars, confidence=0.83)
+  [gate] Selected: self_profile     score=0.85  (211 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,158 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.911
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_09_ghost_mutation
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (575 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile][NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_09_ghost_mutation -- 0 attempt(s), 1.4s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_09_ghost_mutation -- 0 attempt(s), 1.4s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_10_template_parser
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_10_template_parser
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_10_template_parser # Task 10 � Template Parse' cluster_boost=1.00 mult=1.213 confidence=0.828 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_10_template_parser -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_10_template_parser -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_11_stream_decoder
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_11_stream_decoder
+INFO:shard.cross_task_router:[ROUTER] cluster=serialization | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_11_stream_decoder # Task 11 � Stream Decoder
+' cluster_boost=1.00 mult=1.216 confidence=0.841 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_11_stream_decoder -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_11_stream_decoder -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_12_note_tag
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_12_note_tag
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_12_note_tag # Task 12 � Note Tag Matcher
+
+A c' cluster_boost=1.00 mult=1.430 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_12_note_tag -- 0 attempt(s), 0.9s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_12_note_tag -- 0 attempt(s), 0.9s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_13_config_parser
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_13_config_parser
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_13_config_parser # Task 13 � Config Parser (O' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_13_config_parser -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_13_config_parser -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_14_boundary_check
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_14_boundary_check
+INFO:shard.cross_task_router:[ROUTER] cluster=boundary | boost=1.10 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_14_boundary_check # Task 14 � Boundary Check ' cluster_boost=1.10 mult=1.430 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_14_boundary_check -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_14_boundary_check -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+INFO:shard.cross_task_router:[ROUTER] cluster=crypto_logic | boost=0.70 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260413_154422_python_abstract_base_x_' cluster_boost=0.70 mult=1.346 confidence=0.761 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+INFO:shard.cross_task_router:[ROUTER] Near-miss boost applied for 'task_forge_20260414_114631_binary_search_implem_x_'
+INFO:shard.cross_task_router:[ROUTER] cluster=algorithm | boost=1.30 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260414_114631_binary_search_implem_x_' cluster_boost=1.30 mult=1.338 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_forge_20260414_114631_binary_search_implem_x_binary_search_implem -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260414_114631_binary_search_implem_x_binary_search_implem -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Starting task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260416_191607_3d_geometry_fundamen_x_' cluster_boost=1.00 mult=1.230 confidence=0.892 (3 strategies)
+[NIGHT RUNNER] [19:47] [BENCHMARK] SUCCESS task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio -- 0 attempt(s), 1.0s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio -- 0 attempt(s), 1.0s
+[NIGHT RUNNER] [19:47] [BENCHMARK] Complete: 17/17 tasks solved.
+INFO:NIGHT_RUNNER:[BENCHMARK] Complete: 17/17 tasks solved.
+[NIGHT RUNNER] [19:47] [BENCH TRACKER] Benchmark delta vs last session: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio first seen (1 new). Stable: 16 passing, 0 failing.
+INFO:NIGHT_RUNNER:[BENCH TRACKER] Benchmark delta vs last session: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio first seen (1 new). Stable: 16 passing, 0 failing.
+[NIGHT RUNNER] [19:47] === Session Summary ===
+INFO:NIGHT_RUNNER:=== Session Summary ===
+[NIGHT RUNNER] [19:47] Total cycles: 3
+INFO:NIGHT_RUNNER:Total cycles: 3
+[NIGHT RUNNER] [19:47] Total certified: 0
+INFO:NIGHT_RUNNER:Total certified: 0
+[NIGHT RUNNER] [19:47] Total failed: 3
+INFO:NIGHT_RUNNER:Total failed: 3
+[NIGHT RUNNER] [19:47] Total skills gained: 2
+INFO:NIGHT_RUNNER:Total skills gained: 2
+[NIGHT RUNNER] [19:47] Total runtime: 9.79 minutes
+INFO:NIGHT_RUNNER:Total runtime: 9.79 minutes
+[NIGHT RUNNER] [19:47] [ENV OBS] intrusion_rate=0.000  unauthorized=0  opportunities=1
+INFO:NIGHT_RUNNER:[ENV OBS] intrusion_rate=0.000  unauthorized=0  opportunities=1
+[NIGHT RUNNER] [19:47] [CODE_CLEANER] Session metrics: rewrites_applied=0  fast_exits=0  parse_errors=0
+INFO:NIGHT_RUNNER:[CODE_CLEANER] Session metrics: rewrites_applied=0  fast_exits=0  parse_errors=0
+[NIGHT RUNNER] [19:47] JSON dump saved to night_reports\session_2026-04-16.json
+INFO:NIGHT_RUNNER:JSON dump saved to night_reports\session_2026-04-16.json
+[NIGHT RUNNER] [19:47] [BACKUP] capability_graph.json -> backups/capability_graph_20260416_194739.json
+INFO:NIGHT_RUNNER:[BACKUP] capability_graph.json -> backups/capability_graph_20260416_194739.json
+[NIGHT RUNNER] [19:47] [BACKUP] experiment_replay.json -> backups/experiment_replay_20260416_194739.json
+INFO:NIGHT_RUNNER:[BACKUP] experiment_replay.json -> backups/experiment_replay_20260416_194739.json
+[NIGHT RUNNER] [19:47] Generazione riflessioni in corso...
+INFO:NIGHT_RUNNER:Generazione riflessioni in corso...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (804 chars)
+[NIGHT RUNNER] [19:47] [REPORT_AGENT] Generating insights...
+INFO:NIGHT_RUNNER:[REPORT_AGENT] Generating insights...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (873 chars)
+[NIGHT RUNNER] [19:47] Markdown recap saved to night_reports\recap_2026-04-16.md
+INFO:NIGHT_RUNNER:Markdown recap saved to night_reports\recap_2026-04-16.md
+[NIGHT RUNNER] [19:47] [SELF MODEL] Rebuilt -- cert_rate=22%  avg=4.8  momentum=stagnating  blind_spots=[]
+INFO:NIGHT_RUNNER:[SELF MODEL] Rebuilt -- cert_rate=22%  avg=4.8  momentum=stagnating  blind_spots=[]
+[NIGHT RUNNER] [19:47] [GOAL] End-of-session: Goal: 'master: numpy array operations and boolean indexing' | progress=88% | keywords=['operations', 'data', 'boolean']
+INFO:NIGHT_RUNNER:[GOAL] End-of-session: Goal: 'master: numpy array operations and boolean indexing' | progress=88% | keywords=['operations', 'data', 'boolean']
+[NIGHT RUNNER] [19:47] [WATCHDOG] Scanning session log for auto-repairable errors...
+INFO:NIGHT_RUNNER:[WATCHDOG] Scanning session log for auto-repairable errors...
+INFO:shard.error_watchdog:[WATCHDOG] 1 traceback block(s) found in night_session_2026-04-16.log.
+INFO:shard.error_watchdog:[WATCHDOG] No actionable errors detected -- codebase looks clean.
+[NIGHT RUNNER] [19:47] [PROACTIVE] Starting proactive refactoring analysis...
+INFO:NIGHT_RUNNER:[PROACTIVE] Starting proactive refactoring analysis...
+INFO:shard.proactive_refactor:[PROACTIVE] backend/server.py is 100550 chars -- too large, skipping.
+[NIGHT RUNNER] [19:47] [PROACTIVE] No optimization found this session.
+INFO:NIGHT_RUNNER:[PROACTIVE] No optimization found this session.
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1134 chars)
+[NIGHT RUNNER] [19:47] [REFLECTION] Generated (1134 chars):
+PATTERNS - The session revealed a struggle with graphics-related topics, including 2D array indexing, 3D mesh rendering, and Python graphics basics, indicating a need to revisit foundational concepts in computer graphics and spatial reasoning.
+
+CONNECTIONS - Although not immediately apparent, the failure to complete Python graphics basics may be linked to the difficulties in 2D array indexing, as both topics require a solid understanding of spatial relationships and data structures.
+
+SURPRISES -
+INFO:NIGHT_RUNNER:[REFLECTION] Generated (1134 chars):
+PATTERNS - The session revealed a struggle with graphics-related topics, including 2D array indexing, 3D mesh rendering, and Python graphics basics, indicating a need to revisit foundational concepts in computer graphics and spatial reasoning.
+
+CONNECTIONS - Although not immediately apparent, the failure to complete Python graphics basics may be linked to the difficulties in 2D array indexing, as both topics require a solid understanding of spatial relationships and data structures.
+
+SURPRISES -
+INFO:shard.cognition_core:[CORE ENV] broadcast 'identity_updated' from 'identity_core' -> 3 recipient(s)
+INFO:shard.identity:[IDENTITY] Rebuilt -- sessions=159 cert_rate=57% self_esteem=0.35 trajectory=growing domains_strong=algorithms, data, debugging
+[NIGHT RUNNER] [19:47] [IDENTITY] Rebuilt -- sessions=159 cert_rate=57% self_esteem=0.35 trajectory=growing
+INFO:NIGHT_RUNNER:[IDENTITY] Rebuilt -- sessions=159 cert_rate=57% self_esteem=0.35 trajectory=growing
+INFO:shard.cognition_core:[CORE ENV] broadcast 'session_complete' from 'night_runner' -> 3 recipient(s)
+[NIGHT RUNNER] [19:47] [SNAPSHOT] Session saved -- cycles=3 avg=3.4 cert=0% risk=0.0 flags=[]
+INFO:NIGHT_RUNNER:[SNAPSHOT] Session saved -- cycles=3 avg=3.4 cert=0% risk=0.0 flags=[]
+INFO:shard.episode_decay:[GC] EPISODE decay: 5 updated, 0 deleted
+INFO:shard.memory_quality:[QUALITY] Junk-pruned 1 memories
+INFO:shard.episode_decay:[GC] GC: expired=0 decayed=5 deleted=0 pruned=0 quality_junk=1 dedup=0 | memories: 980 -> 979
+[NIGHT RUNNER] [19:47] [MEMORY_GC] GC: expired=0 decayed=5 deleted=0 pruned=0 quality_junk=1 dedup=0 | memories: 980 -> 979
+INFO:NIGHT_RUNNER:[MEMORY_GC] GC: expired=0 decayed=5 deleted=0 pruned=0 quality_junk=1 dedup=0 | memories: 980 -> 979
+[NIGHT RUNNER] [19:47] Session complete. Shutting down cleanly.
+INFO:NIGHT_RUNNER:Session complete. Shutting down cleanly.
+[NIGHT RUNNER] [19:47] [SESSION LOCK] Released by NightRunner.
+INFO:NIGHT_RUNNER:[SESSION LOCK] Released by NightRunner.
+
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,985 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_10_template_parser
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (861 chars, confidence=0.83)
+  [gate] Selected: self_profile     score=0.85  (206 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (3,505 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.911
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_11_stream_decoder
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (868 chars, confidence=0.84)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (7,571 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.925
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_12_note_tag
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (470 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (199 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (8,597 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_13_config_parser
+  Language: PYTHON
+  Source: parser.py -> fixed_parser.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (586 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (204 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (3,842 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_14_boundary_check
+  Language: PYTHON
+  Source: analyzer.py -> fixed_analyzer.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (536 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,330 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 25 test(s) -- will protect on regression
+  [golden] All 25 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (874 chars, confidence=0.76)
+  [gate] Selected: self_profile     score=0.85  (251 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (772 chars)  [8 past sessions]
+  [gate] Selected: kb               score=0.80  (4,127 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.837
+  [golden] Existing solution passes 14 test(s) -- will protect on regression
+  [golden] All 14 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (882 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (251 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (772 chars)  [8 past sessions]
+  [gate] Selected: kb               score=0.80  (4,823 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 8 test(s) -- will protect on regression
+  [golden] All 8 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (445 strategies stored)
+  [strategy_compiler] compiled (878 chars, confidence=0.89)
+  [gate] Selected: self_profile     score=0.85  (263 chars)  [self_profile]
+  [gate] Selected: kb               score=0.80  (3,868 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.981
+  [golden] Existing solution passes 7 test(s) -- will protect on regression
+  [golden] All 7 tests passing -- returning success without LLM attempt
+[VOICE BROADCASTER] Enqueued (high): 'Benchmark completato: 17 su 17 task risolti.'
+[VOICE BROADCASTER] Enqueued (high): 'Sessione notturna completata. 0 topic certificati su 3. 2 nuove skill acquisite '

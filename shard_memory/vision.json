@@ -1,5 +1,5 @@
 {
-  "statement": "SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (360 skills certified so far)",
+  "statement": "SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robust reasoning, and compounding knowledge session by session. (385 skills certified so far)",
   "focus_domains": [
     "algorithms",
     "debugging",
@@ -8,18 +8,18 @@
     "fundamentals review"
   ],
   "avoid_domains": [
-    "python fundamentals review",
-    "graph traversal algorithms bfs dfs",
-    "race condition handling and debugging",
-    "state mutation handling and debugging",
-    "ttl cache handling and debugging",
-    "algorithm complexity and performance optimization",
     "dynamic programming",
     "async generator and async iterator python",
     "async generator",
-    "decision trees"
+    "decision trees",
+    "line sweep algorithm",
+    "3D gift wrapping",
+    "2D array indexing",
+    "Python graphics basics",
+    "Python buffer management",
+    "3D mesh rendering"
   ],
-  "certified_count": 361,
+  "certified_count": 385,
   "frustration_topics": [
     "asyncio advanced patterns",
     "git internals object model",
@@ -34,129 +34,135 @@
     "dynamic programming",
     "async generator and async iterator python",
     "async generator",
-    "decision trees"
+    "decision trees",
+    "line sweep algorithm",
+    "3D gift wrapping",
+    "2D array indexing",
+    "Python graphics basics",
+    "Python buffer management",
+    "3D mesh rendering"
   ],
-  "last_updated": "2026-04-10T15:24:57.209692+00:00",
+  "last_updated": "2026-04-17T13:07:57.781735+00:00",
   "update_log": [
     {
-      "ts": "2026-04-09T13:55:29.850190+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T13:58:20.707760+00:00",
-      "msg": "certified: mock object creation (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T14:01:21.483678+00:00",
-      "msg": "certified: unit testing basics (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T14:05:33.854151+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T14:08:17.979043+00:00",
-      "msg": "certified: mock object creation (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T14:11:03.795331+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T14:14:09.404989+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T14:16:57.120049+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T14:33:42.259403+00:00",
-      "msg": "frustration: async generator (3 hits) -> avoid_domains"
-    },
-    {
-      "ts": "2026-04-09T14:58:06.331404+00:00",
-      "msg": "certified: unit testing basics (score=8.6)"
-    },
-    {
-      "ts": "2026-04-09T15:00:55.241571+00:00",
-      "msg": "certified: mock object creation (score=9.3)"
-    },
-    {
-      "ts": "2026-04-09T15:03:32.850020+00:00",
-      "msg": "certified: unit testing basics (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T15:08:51.092603+00:00",
-      "msg": "certified: mocking and patching unittest mock (score=7.9)"
-    },
-    {
-      "ts": "2026-04-09T15:11:44.828483+00:00",
-      "msg": "certified: mock object creation (score=7.9)"
-    },
-    {
-      "ts": "2026-04-09T15:44:07.381803+00:00",
-      "msg": "certified: immutable data structures python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T15:50:26.494692+00:00",
-      "msg": "certified: python exception handling (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T15:59:12.043137+00:00",
-      "msg": "certified: signal handling unix python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T16:06:31.206497+00:00",
-      "msg": "certified: pipe and ipc patterns python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-09T16:18:40.224975+00:00",
-      "msg": "frustration: decision trees (3 hits) -> avoid_domains"
-    },
-    {
-      "ts": "2026-04-10T09:15:14.025749+00:00",
-      "msg": "frustration: decision trees (4 hits) -> avoid_domains"
-    },
-    {
-      "ts": "2026-04-10T09:19:04.515056+00:00",
-      "msg": "certified: decision trees (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T09:22:55.406058+00:00",
-      "msg": "certified: decision trees (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T09:50:30.686086+00:00",
-      "msg": "certified: python signal handling (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T09:59:36.647225+00:00",
-      "msg": "certified: random forest bagging ensemble python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T11:32:50.247159+00:00",
-      "msg": "certified: signal handling unix python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T11:35:44.323179+00:00",
-      "msg": "certified: unix signal basics (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T11:38:29.249949+00:00",
-      "msg": "certified: recursive descent parser python (score=9.1)"
-    },
-    {
-      "ts": "2026-04-10T11:41:09.637593+00:00",
-      "msg": "certified: strategy pattern runtime behavior python (score=7.9)"
-    },
-    {
-      "ts": "2026-04-10T11:43:57.776077+00:00",
+      "ts": "2026-04-15T21:28:44.940825+00:00",
       "msg": "certified: python functions (score=9.1)"
     },
     {
-      "ts": "2026-04-10T15:24:57.209692+00:00",
-      "msg": "certified: dynamic programming (score=9.4)"
+      "ts": "2026-04-15T21:31:46.272726+00:00",
+      "msg": "certified: higher order functions (score=9.1)"
+    },
+    {
+      "ts": "2026-04-15T21:34:19.540167+00:00",
+      "msg": "certified: template method pattern python (score=8.4)"
+    },
+    {
+      "ts": "2026-04-16T09:32:53.270464+00:00",
+      "msg": "certified: python functools itertools mastery (score=8.2)"
+    },
+    {
+      "ts": "2026-04-16T09:35:42.355820+00:00",
+      "msg": "certified: higher order functions (score=8.1)"
+    },
+    {
+      "ts": "2026-04-16T09:38:45.012576+00:00",
+      "msg": "certified: python classes (score=9.3)"
+    },
+    {
+      "ts": "2026-04-16T09:50:41.123188+00:00",
+      "msg": "certified: 2D geometry basics (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T09:57:57.987265+00:00",
+      "msg": "certified: python operator overloading dunder methods (score=7.9)"
+    },
+    {
+      "ts": "2026-04-16T12:31:06.396686+00:00",
+      "msg": "certified: point orientation test (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T16:27:26.550584+00:00",
+      "msg": "certified: 2D point clouds (score=7.9)"
+    },
+    {
+      "ts": "2026-04-16T16:40:54.856668+00:00",
+      "msg": "frustration: line sweep algorithm (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-16T16:51:33.639614+00:00",
+      "msg": "frustration: 3D gift wrapping (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-16T16:54:25.059400+00:00",
+      "msg": "certified: 3D polygon wrapping (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T17:01:16.722356+00:00",
+      "msg": "certified: 3D geometry transformations (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T17:11:58.037586+00:00",
+      "msg": "certified: 3D geometry fundamentals (score=8.2)"
+    },
+    {
+      "ts": "2026-04-16T17:15:34.116071+00:00",
+      "msg": "certified: polygon mesh creation (score=7.9)"
+    },
+    {
+      "ts": "2026-04-16T17:56:31.058414+00:00",
+      "msg": "certified: 3D vertex buffers (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T17:59:08.685197+00:00",
+      "msg": "certified: 3D vertex buffers (score=9.1)"
+    },
+    {
+      "ts": "2026-04-16T18:04:46.497288+00:00",
+      "msg": "frustration: 2D array indexing (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-16T18:09:19.717644+00:00",
+      "msg": "frustration: Python graphics basics (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-17T09:47:57.843827+00:00",
+      "msg": "certified: indexed mesh rendering (score=7.9)"
+    },
+    {
+      "ts": "2026-04-17T10:01:50.547979+00:00",
+      "msg": "certified: OpenCL optimization (score=8.1)"
+    },
+    {
+      "ts": "2026-04-17T10:04:14.686734+00:00",
+      "msg": "frustration: Python buffer management (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-17T10:55:43.754460+00:00",
+      "msg": "certified: OpenGL vertex arrays (score=7.6)"
+    },
+    {
+      "ts": "2026-04-17T10:58:24.104999+00:00",
+      "msg": "certified: GPU memory management (score=8.8)"
+    },
+    {
+      "ts": "2026-04-17T11:05:09.238064+00:00",
+      "msg": "certified: OpenGL vertex arrays (score=7.9)"
+    },
+    {
+      "ts": "2026-04-17T11:08:43.447398+00:00",
+      "msg": "certified: process pool executor (score=9.1)"
+    },
+    {
+      "ts": "2026-04-17T12:56:37.188348+00:00",
+      "msg": "frustration: 3D mesh rendering (3 hits) -> avoid_domains"
+    },
+    {
+      "ts": "2026-04-17T13:00:05.542007+00:00",
+      "msg": "certified: concurrent futures threadpool processpool (score=9.4)"
+    },
+    {
+      "ts": "2026-04-17T13:07:57.781735+00:00",
+      "msg": "certified: binary tree traversal (score=9.3)"
     }
   ]
 }

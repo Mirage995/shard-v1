@@ -1,1206 +1,6 @@
 {
   "sessions": [
     {
-      "date": "2026-04-08T19:53:49.483453+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 9.2
-        },
-        "task_02_ghost_bug": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 29.7
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 9.1
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.8
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 2,
-          "elapsed": 5.2
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.9
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.2
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.3
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.9
-        },
-        "task_10_template_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 15.0
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.1
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.5
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.7
-        }
-      },
-      "summary": {
-        "passed": 12,
-        "failed": 2,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-08T20:20:51.941260+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 11.7
-        },
-        "task_02_ghost_bug": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 30.3
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 8.7
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.9
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 2,
-          "elapsed": 4.9
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.6
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.1
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.2
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.6
-        },
-        "task_10_template_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 13.0
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.8
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.6
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.7
-        }
-      },
-      "summary": {
-        "passed": 12,
-        "failed": 2,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-08T20:53:19.465832+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 9.7
-        },
-        "task_02_ghost_bug": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 31.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 10.0
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 4.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 2,
-          "elapsed": 5.9
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 4.0
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.8
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.5
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.1
-        },
-        "task_10_template_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 16.2
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.7
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.3
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.7
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.9
-        }
-      },
-      "summary": {
-        "passed": 12,
-        "failed": 2,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-08T22:01:44.695949+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 10.3
-        },
-        "task_02_ghost_bug": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 33.9
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 9.5
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 4.1
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 2,
-          "elapsed": 4.8
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.7
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.0
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.5
-        },
-        "task_10_template_parser": {
-          "success": false,
-          "attempts": 5,
-          "elapsed": 13.8
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.1
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.1
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 2.6
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 1,
-          "elapsed": 3.1
-        }
-      },
-      "summary": {
-        "passed": 12,
-        "failed": 2,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-08T22:42:19.344940+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.8
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.9
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 3.5
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.8
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.9
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.9
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T09:47:42.900416+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.8
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T10:11:18.479966+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.6
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T11:14:42.920605+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 3.1
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T13:43:33.656059+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.7
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T14:01:40.162222+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.7
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T14:17:16.634021+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.8
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.8
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T14:22:51.826567+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.9
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.8
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.8
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T14:34:02.878201+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 3.0
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.7
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.2
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T15:03:51.191716+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 2.7
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.4
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 0.9
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
-      "date": "2026-04-09T15:15:20.228722+00:00",
-      "results": {
-        "task_01_html_trap": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.3
-        },
-        "task_02_ghost_bug": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_03_dirty_data": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 3.0
-        },
-        "task_04_race_condition": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.5
-        },
-        "task_05_state_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_06_ttl_cache": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_07_metrics_bleed": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_08_multi_file_labyrinth": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_09_ghost_mutation": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.6
-        },
-        "task_10_template_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        },
-        "task_11_stream_decoder": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_12_note_tag": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_13_config_parser": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.0
-        },
-        "task_14_boundary_check": {
-          "success": true,
-          "attempts": 0,
-          "elapsed": 1.1
-        }
-      },
-      "summary": {
-        "passed": 14,
-        "failed": 0,
-        "total": 14
-      }
-    },
-    {
       "date": "2026-04-09T16:19:00.845387+00:00",
       "results": {
         "task_01_html_trap": {
@@ -1598,6 +398,1391 @@
         "passed": 14,
         "failed": 0,
         "total": 14
+      }
+    },
+    {
+      "date": "2026-04-15T21:34:42.633279+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.3
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 3.0
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T09:28:11.141520+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.7
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T09:39:06.943420+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.8
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 3.3
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.8
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T09:58:17.264205+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.6
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T12:38:32.877751+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.7
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T16:27:46.928935+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.2
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.6
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T16:49:36.420040+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T17:15:52.558861+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.6
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        }
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    {
+      "date": "2026-04-16T17:47:39.420379+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-16T17:59:28.299710+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-16T18:05:06.749138+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.6
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-16T18:14:59.806809+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-17T10:04:37.363063+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.9
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.8
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.9
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-17T11:09:03.485651+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.5
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.3
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.2
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      }
+    },
+    {
+      "date": "2026-04-17T13:12:14.285162+00:00",
+      "results": {
+        "task_01_html_trap": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.7
+        },
+        "task_02_ghost_bug": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_03_dirty_data": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 2.6
+        },
+        "task_04_race_condition": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_05_state_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.5
+        },
+        "task_06_ttl_cache": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.4
+        },
+        "task_07_metrics_bleed": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_08_multi_file_labyrinth": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.1
+        },
+        "task_09_ghost_mutation": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.6
+        },
+        "task_10_template_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 1.0
+        },
+        "task_11_stream_decoder": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_12_note_tag": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_13_config_parser": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_14_boundary_check": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.8
+        },
+        "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        },
+        "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": {
+          "success": true,
+          "attempts": 0,
+          "elapsed": 0.9
+        }
+      },
+      "summary": {
+        "passed": 17,
+        "failed": 0,
+        "total": 17
       }
     }
   ]

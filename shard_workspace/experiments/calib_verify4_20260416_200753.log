@@ -1,0 +1,921 @@
+[NIGHT RUNNER] [20:07] Random seed: 2351130
+[NIGHT RUNNER] [20:07] [SESSION LOCK] Acquired by NightRunner.
+[NIGHT RUNNER] [20:07] Session started
+[NIGHT RUNNER] [20:07] [STATE] INIT -> INIT  (loading memory + capability graph)
+[NIGHT RUNNER] [20:07] [SESSION] id=081556bd-77bf-4c60-bffd-9d85539aa75f
+[NIGHT RUNNER] [20:07] [ENV OBS] Golden solutions snapshotted.
+[NIGHT RUNNER] [20:07] [SELF MODEL] cert_rate=22%  avg_score=4.8  momentum=stagnating  blind_spots=0
+[NIGHT RUNNER] [20:07] [WORLD MODEL] coverage=86.9%  known=153/176 skills
+[NIGHT RUNNER] [20:07] [WORLD MODEL] Top priority gaps: tree structures and traversal, numpy array operations and boolean indexing, test driven development and assertion design
+[NIGHT RUNNER] [20:07] [GOAL AUTO] Active goal: 'master: numpy array operations and boolean indexing' | progress=0% | type=autonomous
+[NIGHT RUNNER] [20:07] [GOAL AUTO] Keywords: ['indexing', 'boolean', 'science', 'data', 'array', 'operations', 'and', 'numpy']
+[NIGHT RUNNER] [20:07] [GOAL AUTO] Reason: World relevance: 90%  domain: data_science
+[NIGHT RUNNER] [20:07] [SEMANTIC] ChromaDB ready: episodes=1370  knowledge=180  errors=111
+[NIGHT RUNNER] [20:07] [SSJ3] Resuming 12 improvement topics from previous run
+[NIGHT RUNNER] [20:07] [DESIRE] DesireEngine top: 'design patterns factory singleton observer' (d=0.72 f=10), 'async io with python selectors' (d=0.60 f=6), 'async generator and async iterator python' (d=0.53 f=3)
+INFO:QuantumSoul:\u269b\ufe0f Quantum Soul initialized with classical approximation
+INFO:QuantumSoul:\u2728 QuantumSoul initialized: 15 qubits, real_quantum=False
+INFO:shard.self_log:[SELF_LOG] Loaded 245 thoughts from disk.
+INFO:shard.cognition_core:[CORE ENV] Registered 'consciousness' -- interests: ['skill_certified', 'skill_failed', 'frustration_peak', 'momentum_changed', 'mood_shift', 'identity_updated']
+INFO:shard.cognition_core:[CORE ENV] Registered 'self_model_tracker' -- interests: ['session_complete', 'mood_shift', 'identity_updated']
+[NIGHT RUNNER] [20:07] [CORE ENV] 9 module(s) registered in shared environment
+INFO:NIGHT_RUNNER:[CORE ENV] 9 module(s) registered in shared environment
+INFO:shard.cognition_core:[CORE ENV] Registered 'mood_engine' -- interests: ['frustration_peak', 'momentum_changed', 'skill_certified', 'skill_failed']
+INFO:shard.cognition_core:[CORE ENV] broadcast 'mood_shift' from 'mood_engine' -> 5 recipient(s)
+INFO:shard.mood:[MOOD] mood_shift: focused -> strained
+INFO:shard.mood:[MOOD] score=-0.233 (strained) | frustration=0.70 cert=0.33 momentum=0.00
+[NIGHT RUNNER] [20:07] [MOOD] Initial state: score=-0.233 (strained)
+INFO:NIGHT_RUNNER:[MOOD] Initial state: score=-0.233 (strained)
+[NIGHT RUNNER] [20:07] [VISION] Mission: SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robu
+INFO:NIGHT_RUNNER:[VISION] Mission: SHARD seeks to become a reliable autonomous problem-solver -- mastering software engineering fundamentals, building robu
+[NIGHT RUNNER] [20:07] [VISION] Focus: algorithms, debugging, code quality, performance, fundamentals review
+INFO:NIGHT_RUNNER:[VISION] Focus: algorithms, debugging, code quality, performance, fundamentals review
+[NIGHT RUNNER] [20:07] [VISION] Avoid: state mutation handling and debugging, ttl cache handling and debugging, algorithm complexity and performance optimization, dynamic programming, async generator and async iterator python, async generator
+INFO:NIGHT_RUNNER:[VISION] Avoid: state mutation handling and debugging, ttl cache handling and debugging, algorithm complexity and performance optimization, dynamic programming, async generator and async iterator python, async generator
+INFO:shard.cognition_core:[CORE ENV] Registered 'vision' -- interests: ['skill_certified', 'frustration_peak', 'momentum_changed']
+[NIGHT RUNNER] [20:07] [VISION] Registered in CognitionCore.
+INFO:NIGHT_RUNNER:[VISION] Registered in CognitionCore.
+[NIGHT RUNNER] [20:07] [REFLECTION] Past context loaded (1548 chars) -- injecting into study_agent system prompt.
+INFO:NIGHT_RUNNER:[REFLECTION] Past context loaded (1548 chars) -- injecting into study_agent system prompt.
+INFO:shard.cognition_core:[CORE ENV] Registered 'hebbian_updater' -- interests: ['mood_shift', 'skill_certified', 'skill_failed']
+[NIGHT RUNNER] [20:07] [HEBBIAN] Registered in CognitionCore.
+INFO:NIGHT_RUNNER:[HEBBIAN] Registered in CognitionCore.
+INFO:shard.cognition_core:[CORE ENV] Registered 'skill_library' -- interests: ['skill_certified']
+[NIGHT RUNNER] [20:07] [SKILL_LIB] Loaded -- 181 certified skills (avg=8.6)
+INFO:NIGHT_RUNNER:[SKILL_LIB] Loaded -- 181 certified skills (avg=8.6)
+INFO:shard.cognition_core:[CORE ENV] Registered 'identity_core' -- interests: ['session_complete', 'skill_certified', 'skill_failed']
+[NIGHT RUNNER] [20:07] [IDENTITY] Biography injected (615 chars) -- sessions=161 self_esteem=0.34 trajectory=stagnating
+INFO:NIGHT_RUNNER:[IDENTITY] Biography injected (615 chars) -- sessions=161 self_esteem=0.34 trajectory=stagnating
+[NIGHT RUNNER] [20:07] [BENCH TRACKER] Previous session: Benchmark delta vs last session: no changes. Stable: 17 passing, 0 failing.
+INFO:NIGHT_RUNNER:[BENCH TRACKER] Previous session: Benchmark delta vs last session: no changes. Stable: 17 passing, 0 failing.
+[NIGHT RUNNER] [20:07] [GAP] [GAP DETECTOR] 2026-04-16T20:07:55.607831
+  Failures analyzed: 57
+  Gaps found:        3
+  Topics queued:     0
+  GAP: sql injection prevention and input sanitization (seen 33x)
+  GAP: python object oriented programming (seen 6x)
+  GAP: regular expressions in python (seen 2x)
+INFO:NIGHT_RUNNER:[GAP] [GAP DETECTOR] 2026-04-16T20:07:55.607831
+  Failures analyzed: 57
+  Gaps found:        3
+  Topics queued:     0
+  GAP: sql injection prevention and input sanitization (seen 33x)
+  GAP: python object oriented programming (seen 6x)
+  GAP: regular expressions in python (seen 2x)
+[NIGHT RUNNER] [20:07] [STATE] INIT -> SELECT  (cycle 1/3)
+INFO:NIGHT_RUNNER:[STATE] INIT -> SELECT  (cycle 1/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: 'image pixel manipulation' (11 remaining)
+[NIGHT RUNNER] [20:07] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): image pixel manipulation
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): image pixel manipulation
+[NIGHT RUNNER] [20:07] [SSJ3] Improvement topic dequeued: 'image pixel manipulation'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: 'image pixel manipulation'
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (81 chars)
+[NIGHT RUNNER] [20:07] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Pixel array manipulation
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Pixel array manipulation
+[NIGHT RUNNER] [20:07] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Image filtering techniques
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Image filtering techniques
+[NIGHT RUNNER] [20:07] [AFFORD] 'image pixel manipulation' (feasibility=0.00) out of reach -- decomposing into ['Python image basics', 'Pixel array manipulation', 'Image filtering techniques']
+INFO:NIGHT_RUNNER:[AFFORD] 'image pixel manipulation' (feasibility=0.00) out of reach -- decomposing into ['Python image basics', 'Pixel array manipulation', 'Image filtering techniques']
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'image pixel manipulation'
+WARNING:shard.improvement_engine:[ENGINE] Queue full (12/12) -- dropping: 'Image filtering techniques'
+WARNING:shard.improvement_engine:[ENGINE] Queue full (12/12) -- dropping: 'Pixel array manipulation'
+[NIGHT RUNNER] [20:07] === Cycle 1/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 1/3 ===
+[NIGHT RUNNER] [20:07] Topic selected: Python image basics
+INFO:NIGHT_RUNNER:Topic selected: Python image basics
+[NIGHT RUNNER] [20:07] Source: affordance
+INFO:NIGHT_RUNNER:Source: affordance
+[NIGHT RUNNER] [20:07] Reason: Decomposed from 'image pixel manipulation' (feasibility=0.00)
+INFO:NIGHT_RUNNER:Reason: Decomposed from 'image pixel manipulation' (feasibility=0.00)
+[NIGHT RUNNER] [20:07] [STRATEGY] Reusing strategy: Python file input output for topic: Python image basics
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: Python file input output for topic: Python image basics
+[NIGHT RUNNER] [20:07] [STRATEGY] fingerprint=6f5bad5032f1  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=6f5bad5032f1  strategies=1
+[NIGHT RUNNER] [20:07] [SELF_MODEL] Predicted score for 'Python image basics': 0.3 | desire=0.17 difficulty=0.50 graphrag=0.20
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for 'Python image basics': 0.3 | desire=0.17 difficulty=0.50 graphrag=0.20
+[NIGHT RUNNER] [20:07] [KCD] Final predicted score for 'Python image basics': 0.3
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for 'Python image basics': 0.3
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'affordance'
+[NIGHT RUNNER] [20:07] [PERSONA] Selected 'hacker' (tier=1) for: Python image basics
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: Python image basics
+[NIGHT RUNNER] [20:07] [STATE] SELECT -> STUDY  (Python image basics)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (Python image basics)
+INFO:shard.mood:[MOOD] score=-0.233 (strained) | frustration=0.70 cert=0.33 momentum=0.00
+[NIGHT RUNNER] [20:07] [MOOD] Injected into study prompt: strained (-0.233)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.233)
+[VOICE BROADCASTER] Enqueued (medium): 'Sessione notturna avviata. Studio autonomo in corso per un massimo di 3 cicli.'
+[DB] Loaded 678 capabilities from SQLite
+[DB] Loaded 678 capabilities from SQLite
+[STRATEGY] Memory initialized (448 strategies stored)
+[SKILL DISCOVERY] Initialized with 37 patterns
+[STRATEGY] Memory initialized (448 strategies stored)
+[RESEARCH AGENDA] Initialized with 31 skill->topic mappings
+[COGNITION CORE] Senso Interno initialized
+[quantum_soul] Qiskit non disponibile - fallback su simulazione quantica
+[RESEARCH AGENDA] Initialized with 31 skill->topic mappings
+[STRATEGY] Memory initialized (448 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of 'Python image basics'...
+INFO:shard.episodic_memory:[DB] Loaded 2474 episodes from SQLite
+[EPISODIC] Context found for 'Python image basics':
+Past experience with 'Python image basics' (3 relevant attempt(s)):
+  - 2026-04-11 | score=9.1/10 | CERTIFIED | strategies: python functions
+  - 2026-04-11 | score=0.0/10 | CERTIFIED | strategies: none
+  - 2026-04-11 | score=9.1/10 | CERTIFIED | strategies: none
+[PRINCIPLES] Injected principle layer for 'Python image basics'
+[MEMORY P0] Prior knowledge injected (10 lines) for 'Python image basics'
+[L3] loaded=True predicted=0.27 attempts=0 reason=low_pred=0.3
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for 'Python image basics'...
+WARNING:shard.arxiv_fetcher:[ARXIV] Request failed for 'Python image basics': The read operation timed out
+[RESEARCH MODE] Fetched 0 papers from arxiv for 'Python image basics'
+[MAP] Phase completed. 0 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 0 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 0 sources...
+[AGGREGATE] Total raw text: 0 chars
+[AGGREGATE] Phase completed. 0 chars scraped.
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | No content could be scraped from any source.
+
+============================================================
+[CRITICAL] CRITICAL ERROR during phase AGGREGATE: RuntimeError: No content scraped -- aborting pipeline
+[CRITICAL] Full traceback:
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_pipeline.py", line 81, in execute
+    await phase.run(ctx)
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_phases.py", line 321, in run
+    raise RuntimeError("No content scraped -- aborting pipeline")
+RuntimeError: No content scraped -- aborting pipeline
+
+============================================================
+
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | Crash in AGGREGATE: No content scraped -- aborting pipeline
+[NIGHT RUNNER] [20:08] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'affordance': hacker (metric=0.61)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (678 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [20:08] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+[NIGHT RUNNER] [20:08] [DESIRE] 'Python image basics': frustration=1 curiosity=0.00 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] 'Python image basics': frustration=1 curiosity=0.00 engagement=0.00
+[NIGHT RUNNER] [20:08] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python image basics)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python image basics)
+[NIGHT RUNNER] [20:08] [STATE] REFACTOR -> FAILED  (score=0.0/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=0.0/10)
+[NIGHT RUNNER] [20:08] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [20:08] Score: 0.0/10
+INFO:NIGHT_RUNNER:Score: 0.0/10
+[NIGHT RUNNER] [20:08] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [20:08] Skills unlocked: 0
+INFO:NIGHT_RUNNER:Skills unlocked: 0
+[NIGHT RUNNER] [20:08] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [20:08] Cycle duration: 0.19 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 0.19 minutes
+[NIGHT RUNNER] [20:08] [DB] Experiment recorded: topic='Python image basics' score=0.0 cert=False reason=phase_error
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='Python image basics' score=0.0 cert=False reason=phase_error
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'sig_difficulty': global=7.10  contextual[unknown:general]=3.23  gap=3.88
+[NIGHT RUNNER] [20:08] [SELF_MODEL] Inconsistency on 'Python image basics': feature='sig_difficulty' gap=3.876
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on 'Python image basics': feature='sig_difficulty' gap=3.876
+[NIGHT RUNNER] [20:08] Pausing for 1 minutes...
+INFO:NIGHT_RUNNER:Pausing for 1 minutes...
+[NIGHT RUNNER] [20:09] [STATE] RECORD -> SELECT  (cycle 2/3)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> SELECT  (cycle 2/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: 'OpenGL rendering pipeline' (11 remaining)
+[NIGHT RUNNER] [20:09] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL rendering pipeline
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL rendering pipeline
+[NIGHT RUNNER] [20:09] [SSJ3] Improvement topic dequeued: 'OpenGL rendering pipeline'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: 'OpenGL rendering pipeline'
+[NIGHT RUNNER] [20:09] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL context creation
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): OpenGL context creation
+[NIGHT RUNNER] [20:09] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+[NIGHT RUNNER] [20:09] [AFFORD] 'OpenGL rendering pipeline' (feasibility=0.00) out of reach -- decomposing into ['Python graphics basics', 'OpenGL context creation', 'Shader programming fundamentals']
+INFO:NIGHT_RUNNER:[AFFORD] 'OpenGL rendering pipeline' (feasibility=0.00) out of reach -- decomposing into ['Python graphics basics', 'OpenGL context creation', 'Shader programming fundamentals']
+INFO:shard.improvement_engine:[ENGINE] Benchmark-derived topic queued: 'OpenGL rendering pipeline'
+[NIGHT RUNNER] [20:09] === Cycle 2/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 2/3 ===
+[NIGHT RUNNER] [20:09] Topic selected: Python graphics basics
+INFO:NIGHT_RUNNER:Topic selected: Python graphics basics
+[NIGHT RUNNER] [20:09] Source: affordance
+INFO:NIGHT_RUNNER:Source: affordance
+[NIGHT RUNNER] [20:09] Reason: Decomposed from 'OpenGL rendering pipeline' (feasibility=0.00)
+INFO:NIGHT_RUNNER:Reason: Decomposed from 'OpenGL rendering pipeline' (feasibility=0.00)
+[NIGHT RUNNER] [20:09] [STRATEGY] Reusing strategy: 2D graphics basics for topic: Python graphics basics
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: 2D graphics basics for topic: Python graphics basics
+[NIGHT RUNNER] [20:09] [STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+[NIGHT RUNNER] [20:09] [SELF_MODEL] Predicted score for 'Python graphics basics': 5.0 | desire=0.33 difficulty=1.00 graphrag=0.20
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for 'Python graphics basics': 5.0 | desire=0.33 difficulty=1.00 graphrag=0.20
+[NIGHT RUNNER] [20:09] [KCD] Final predicted score for 'Python graphics basics': 5.0
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for 'Python graphics basics': 5.0
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'affordance'
+[NIGHT RUNNER] [20:09] [PERSONA] Selected 'hacker' (tier=1) for: Python graphics basics
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: Python graphics basics
+[NIGHT RUNNER] [20:09] [STATE] SELECT -> STUDY  (Python graphics basics)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (Python graphics basics)
+INFO:shard.mood:[MOOD] score=-0.280 (strained) | frustration=0.70 cert=0.20 momentum=0.00
+[NIGHT RUNNER] [20:09] [MOOD] Injected into study prompt: strained (-0.280)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.280)
+[DB] Loaded 678 capabilities from SQLite
+[DB] Loaded 678 capabilities from SQLite
+[STRATEGY] Memory initialized (448 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of 'Python graphics basics'...
+INFO:shard.episodic_memory:[DB] Loaded 2475 episodes from SQLite
+INFO:shard.study:[FAIL-REUSE] Injecting 3 previous failure(s) for 'Python graphics basics' (types: ['import_error', 'benchmark_failure', 'assertion_error'])
+[EPISODIC] Context found for 'Python graphics basics':
+Past experience with 'Python graphics basics' (3 relevant attempt(s)):
+  - 2026-04-16 | score=5.8/10 | FAILED (near_miss) | strategies: 2D graphics basics
+  - 2026-04-16 | score=0.0/10 | FAILED (unknown) | strategies: none
+  - 2026-04-16 | score=5.8/10 | FAILED (unknown) | strategies: none
+Hint: previous attempt was a near-miss -- focus on depth, complete runnable code, and edge-case coverage to push score above 7.5.
+[PRINCIPLES] Injected principle layer for 'Python graphics basics'
+[MEMORY P0] Prior knowledge injected (10 lines) for 'Python graphics basics'
+[L3] loaded=True predicted=4.98 attempts=6 reason=low_pred=5.0 retry
+[L3] Injected 7 cross-topic link(s) for 'Python graphics basics'
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for 'Python graphics basics'...
+WARNING:shard.arxiv_fetcher:[ARXIV] Request failed for 'Python graphics basics': The read operation timed out
+[RESEARCH MODE] Fetched 0 papers from arxiv for 'Python graphics basics'
+[MAP] Phase completed. 0 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 0 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 0 sources...
+[AGGREGATE] Total raw text: 0 chars
+[AGGREGATE] Phase completed. 0 chars scraped.
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | No content could be scraped from any source.
+
+============================================================
+[CRITICAL] CRITICAL ERROR during phase AGGREGATE: RuntimeError: No content scraped -- aborting pipeline
+[CRITICAL] Full traceback:
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_pipeline.py", line 81, in execute
+    await phase.run(ctx)
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_phases.py", line 321, in run
+    raise RuntimeError("No content scraped -- aborting pipeline")
+RuntimeError: No content scraped -- aborting pipeline
+
+============================================================
+
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | Crash in AGGREGATE: No content scraped -- aborting pipeline
+[NIGHT RUNNER] [20:09] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'affordance': hacker (metric=0.59)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (678 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [20:09] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:shard.cognition_core:[CORE ENV] broadcast 'mood_shift' from 'mood_engine' -> 6 recipient(s)
+INFO:shard.mood:[MOOD] mood_shift: strained -> neutral
+INFO:shard.mood:[MOOD] score=0.070 (neutral) | frustration=0.00 cert=0.20 momentum=0.00
+INFO:shard.cognition_core:[CORE ENV] broadcast 'frustration_peak' from 'desire_engine' -> 7 recipient(s)
+[NIGHT RUNNER] [20:09] [CORE ENV] broadcast 'frustration_peak' (hits=3) -> 7 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'frustration_peak' (hits=3) -> 7 recipient(s) reacted
+[NIGHT RUNNER] [20:09] [DESIRE] 'Python graphics basics': frustration=3 curiosity=0.60 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] 'Python graphics basics': frustration=3 curiosity=0.60 engagement=0.00
+[NIGHT RUNNER] [20:09] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python graphics basics)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Python graphics basics)
+[NIGHT RUNNER] [20:09] [STATE] REFACTOR -> FAILED  (score=0.0/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=0.0/10)
+[NIGHT RUNNER] [20:09] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [20:09] Score: 0.0/10
+INFO:NIGHT_RUNNER:Score: 0.0/10
+[NIGHT RUNNER] [20:09] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [20:09] Skills unlocked: 0
+INFO:NIGHT_RUNNER:Skills unlocked: 0
+[NIGHT RUNNER] [20:09] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [20:09] Cycle duration: 0.19 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 0.19 minutes
+[NIGHT RUNNER] [20:09] [DB] Experiment recorded: topic='Python graphics basics' score=0.0 cert=False reason=phase_error
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='Python graphics basics' score=0.0 cert=False reason=phase_error
+WARNING:shard.self_model_tracker:[AUDIT] OVERCONFIDENT prediction on 'Python graphics basics': predicted=5.0 actual=0.0 gap=-5.0
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'sig_difficulty': global=6.50  contextual[unknown:algorithm]=1.00  gap=5.51
+[NIGHT RUNNER] [20:09] [SELF_MODEL] Inconsistency on 'Python graphics basics': feature='sig_difficulty' gap=5.506
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on 'Python graphics basics': feature='sig_difficulty' gap=5.506
+[NIGHT RUNNER] [20:09] [AUDIT BLINDNESS] OVERCONFIDENT on 'Python graphics basics': predicted=5.0  actual=0.0  gap=-5.0
+WARNING:NIGHT_RUNNER:[AUDIT BLINDNESS] OVERCONFIDENT on 'Python graphics basics': predicted=5.0  actual=0.0  gap=-5.0
+[NIGHT RUNNER] [20:09] Pausing for 1 minutes...
+INFO:NIGHT_RUNNER:Pausing for 1 minutes...
+[NIGHT RUNNER] [20:10] [STATE] RECORD -> SELECT  (cycle 3/3)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> SELECT  (cycle 3/3)
+INFO:shard.improvement_engine:[ENGINE] Dequeued topic: 'indexed mesh rendering' (9 remaining)
+[NIGHT RUNNER] [20:10] [TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+INFO:NIGHT_RUNNER:[TOPIC FILTER] Accepting unrecognized topic (no keyword match, no blacklist hit): Shader programming fundamentals
+[NIGHT RUNNER] [20:10] [SSJ3] Improvement topic dequeued: 'Shader programming fundamentals'
+INFO:NIGHT_RUNNER:[SSJ3] Improvement topic dequeued: 'Shader programming fundamentals'
+[NIGHT RUNNER] [20:10] === Cycle 3/3 ===
+INFO:NIGHT_RUNNER:=== Cycle 3/3 ===
+[NIGHT RUNNER] [20:10] Topic selected: Shader programming fundamentals
+INFO:NIGHT_RUNNER:Topic selected: Shader programming fundamentals
+[NIGHT RUNNER] [20:10] Source: improvement_engine
+INFO:NIGHT_RUNNER:Source: improvement_engine
+[NIGHT RUNNER] [20:10] Reason: Proactive improvement ticket (SSJ3)
+INFO:NIGHT_RUNNER:Reason: Proactive improvement ticket (SSJ3)
+[NIGHT RUNNER] [20:10] [STRATEGY] Reusing strategy: 2D graphics basics for topic: Shader programming fundamentals
+INFO:NIGHT_RUNNER:[STRATEGY] Reusing strategy: 2D graphics basics for topic: Shader programming fundamentals
+[NIGHT RUNNER] [20:10] [STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+INFO:NIGHT_RUNNER:[STRATEGY] fingerprint=fe3b7322eff4  strategies=1
+[NIGHT RUNNER] [20:10] [SELF_MODEL] Predicted score for 'Shader programming fundamentals': 0.4 | desire=0.17 difficulty=1.00 graphrag=0.00
+INFO:NIGHT_RUNNER:[SELF_MODEL] Predicted score for 'Shader programming fundamentals': 0.4 | desire=0.17 difficulty=1.00 graphrag=0.00
+[NIGHT RUNNER] [20:10] [KCD] Final predicted score for 'Shader programming fundamentals': 0.4
+INFO:NIGHT_RUNNER:[KCD] Final predicted score for 'Shader programming fundamentals': 0.4
+INFO:shard.personas:[PERSONAS] Using history winner 'hacker' for category 'improvement_engine'
+[NIGHT RUNNER] [20:10] [PERSONA] Selected 'hacker' (tier=1) for: Shader programming fundamentals
+INFO:NIGHT_RUNNER:[PERSONA] Selected 'hacker' (tier=1) for: Shader programming fundamentals
+[NIGHT RUNNER] [20:10] [STATE] SELECT -> STUDY  (Shader programming fundamentals)
+INFO:NIGHT_RUNNER:[STATE] SELECT -> STUDY  (Shader programming fundamentals)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'mood_shift' from 'mood_engine' -> 6 recipient(s)
+INFO:shard.mood:[MOOD] mood_shift: neutral -> strained
+INFO:shard.mood:[MOOD] score=-0.310 (strained) | frustration=0.76 cert=0.20 momentum=0.00
+[NIGHT RUNNER] [20:10] [MOOD] Injected into study prompt: strained (-0.310)
+INFO:NIGHT_RUNNER:[MOOD] Injected into study prompt: strained (-0.310)
+[DB] Loaded 678 capabilities from SQLite
+[DB] Loaded 678 capabilities from SQLite
+[STRATEGY] Memory initialized (448 strategies stored)
+[SHARD.STUDY] [  0%] INIT | 0/10 | Starting study of 'Shader programming fundamentals'...
+INFO:shard.episodic_memory:[DB] Loaded 2478 episodes from SQLite
+[EPISODIC] Context found for 'Shader programming fundamentals':
+Past experience with 'Shader programming fundamentals' (3 relevant attempt(s)):
+  - 2026-04-16 | score=0.0/10 | FAILED (phase_error) | strategies: 2D graphics basics
+  - 2026-04-10 | score=9.4/10 | CERTIFIED | strategies: python functions
+  - 2026-04-10 | score=0.0/10 | CERTIFIED | strategies: none
+Hint: previous attempt crashed in a pipeline phase -- ensure the topic is concrete enough to produce executable Python code.
+[PRINCIPLES] Injected principle layer for 'Shader programming fundamentals'
+[MEMORY P0] Prior knowledge injected (10 lines) for 'Shader programming fundamentals'
+[L3] loaded=True predicted=0.41 attempts=1 reason=low_pred=0.4 retry
+[SHARD.STUDY] [  0%] MAP | 0/10 | Searching sources for 'Shader programming fundamentals'...
+WARNING:shard.arxiv_fetcher:[ARXIV] Request failed for 'Shader programming fundamentals': HTTP Error 429: Unknown Error
+[RESEARCH MODE] Fetched 0 papers from arxiv for 'Shader programming fundamentals'
+[MAP] Phase completed. 0 sources found.
+[SHARD.STUDY] [  0%] AGGREGATE | 0/10 | Scraping 0 sources...
+[AGGREGATE] Entering phase. Initializing browser...
+[AGGREGATE] Scraping 0 sources...
+[AGGREGATE] Total raw text: 0 chars
+[AGGREGATE] Phase completed. 0 chars scraped.
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | No content could be scraped from any source.
+
+============================================================
+[CRITICAL] CRITICAL ERROR during phase AGGREGATE: RuntimeError: No content scraped -- aborting pipeline
+[CRITICAL] Full traceback:
+Traceback (most recent call last):
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_pipeline.py", line 81, in execute
+    await phase.run(ctx)
+  File "C:\Users\andre\Desktop\shard_v1\shard\debug\..\..\backend\study_phases.py", line 321, in run
+    raise RuntimeError("No content scraped -- aborting pipeline")
+RuntimeError: No content scraped -- aborting pipeline
+
+============================================================
+
+[SHARD.STUDY] [ 20%] ERROR | 0/10 | Crash in AGGREGATE: No content scraped -- aborting pipeline
+[NIGHT RUNNER] [20:10] Sandbox/Study result: failed
+INFO:NIGHT_RUNNER:Sandbox/Study result: failed
+INFO:shard.personas:[PERSONAS] Updated winner for 'improvement_engine': hacker (metric=0.60)
+INFO:shard.capability_graph:[CAPABILITY] Graph initialized (678 capabilities)
+INFO:shard.cognition_core:[CORE ENV] broadcast 'skill_failed' from 'night_runner' -> 11 recipient(s)
+[NIGHT RUNNER] [20:10] [CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+INFO:NIGHT_RUNNER:[CORE ENV] broadcast 'skill_failed' -> 11 recipient(s) reacted
+[NIGHT RUNNER] [20:10] [DESIRE] 'Shader programming fundamentals': frustration=1 curiosity=0.00 engagement=0.00
+INFO:NIGHT_RUNNER:[DESIRE] 'Shader programming fundamentals': frustration=1 curiosity=0.00 engagement=0.00
+[NIGHT RUNNER] [20:10] [STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Shader programming fundamentals)
+INFO:NIGHT_RUNNER:[STATE] STUDY -> REFACTOR  (enqueue modules for failed topic: Shader programming fundamentals)
+[NIGHT RUNNER] [20:10] [STATE] REFACTOR -> FAILED  (score=0.0/10)
+INFO:NIGHT_RUNNER:[STATE] REFACTOR -> FAILED  (score=0.0/10)
+[NIGHT RUNNER] [20:10] [STATE] FAILED -> RECORD  (writing experiment to SQLite)
+INFO:NIGHT_RUNNER:[STATE] FAILED -> RECORD  (writing experiment to SQLite)
+[NIGHT RUNNER] [20:10] Score: 0.0/10
+INFO:NIGHT_RUNNER:Score: 0.0/10
+[NIGHT RUNNER] [20:10] Certified: False
+INFO:NIGHT_RUNNER:Certified: False
+[NIGHT RUNNER] [20:10] Skills unlocked: 0
+INFO:NIGHT_RUNNER:Skills unlocked: 0
+[NIGHT RUNNER] [20:10] Strategies reused: 1
+INFO:NIGHT_RUNNER:Strategies reused: 1
+[NIGHT RUNNER] [20:10] Cycle duration: 0.02 minutes
+INFO:NIGHT_RUNNER:Cycle duration: 0.02 minutes
+[NIGHT RUNNER] [20:10] [DB] Experiment recorded: topic='Shader programming fundamentals' score=0.0 cert=False reason=phase_error
+INFO:NIGHT_RUNNER:[DB] Experiment recorded: topic='Shader programming fundamentals' score=0.0 cert=False reason=phase_error
+INFO:shard.self_model_tracker:[SELF_MODEL] Inconsistency detected -- feature 'source_improvement': global=-4.02  contextual[unknown:general]=-0.53  gap=3.49
+[NIGHT RUNNER] [20:10] [SELF_MODEL] Inconsistency on 'Shader programming fundamentals': feature='source_improvement' gap=3.493
+INFO:NIGHT_RUNNER:[SELF_MODEL] Inconsistency on 'Shader programming fundamentals': feature='source_improvement' gap=3.493
+[NIGHT RUNNER] [20:10] [STATE] RECORD -> DONE  (all cycles completed)
+INFO:NIGHT_RUNNER:[STATE] RECORD -> DONE  (all cycles completed)
+[NIGHT RUNNER] [20:10] [BENCHMARK] Found 17 task(s): ['task_01_html_trap', 'task_02_ghost_bug', 'task_03_dirty_data', 'task_04_race_condition', 'task_05_state_mutation', 'task_06_ttl_cache', 'task_07_metrics_bleed', 'task_08_multi_file_labyrinth', 'task_09_ghost_mutation', 'task_10_template_parser', 'task_11_stream_decoder', 'task_12_note_tag', 'task_13_config_parser', 'task_14_boundary_check', 'task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me', 'task_forge_20260414_114631_binary_search_implem_x_binary_search_implem', 'task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio']
+INFO:NIGHT_RUNNER:[BENCHMARK] Found 17 task(s): ['task_01_html_trap', 'task_02_ghost_bug', 'task_03_dirty_data', 'task_04_race_condition', 'task_05_state_mutation', 'task_06_ttl_cache', 'task_07_metrics_bleed', 'task_08_multi_file_labyrinth', 'task_09_ghost_mutation', 'task_10_template_parser', 'task_11_stream_decoder', 'task_12_note_tag', 'task_13_config_parser', 'task_14_boundary_check', 'task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me', 'task_forge_20260414_114631_binary_search_implem_x_binary_search_implem', 'task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio']
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_01_html_trap
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_01_html_trap
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_01_html_trap # Task 01 — The HTML Trap
+
+## Ob' cluster_boost=1.00 mult=1.278 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_01_html_trap -- 0 attempt(s), 1.2s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_01_html_trap -- 0 attempt(s), 1.2s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_02_ghost_bug
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_02_ghost_bug
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_02_ghost_bug # Task 02 — The Ghost Bug
+
+## Ob' cluster_boost=1.25 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_02_ghost_bug -- 0 attempt(s), 1.5s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_02_ghost_bug -- 0 attempt(s), 1.5s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_03_dirty_data
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_03_dirty_data
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_03_dirty_data # Task 03 — Optimize the Transa' cluster_boost=1.00 mult=1.364 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_03_dirty_data -- 0 attempt(s), 2.5s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_03_dirty_data -- 0 attempt(s), 2.5s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_04_race_condition
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_04_race_condition
+INFO:shard.cross_task_router:[ROUTER] cluster=concurrency | boost=1.40 | strategies: 5 -> 5
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_04_race_condition # Task 04 — Fix the Banking' cluster_boost=1.40 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_04_race_condition -- 0 attempt(s), 1.4s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_04_race_condition -- 0 attempt(s), 1.4s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_05_state_mutation
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_05_state_mutation
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_05_state_mutation # Task 05 — Fix the Data Pi' cluster_boost=1.25 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_05_state_mutation -- 0 attempt(s), 1.5s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_05_state_mutation -- 0 attempt(s), 1.5s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_06_ttl_cache
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_06_ttl_cache
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_06_ttl_cache # Task 06 — Fix the TTL Cache
+
+#' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_06_ttl_cache -- 0 attempt(s), 1.3s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_06_ttl_cache -- 0 attempt(s), 1.3s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_07_metrics_bleed
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_07_metrics_bleed
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_07_metrics_bleed # Task 07 — Fix the Metrics ' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_07_metrics_bleed -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_07_metrics_bleed -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_08_multi_file_labyrinth
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_08_multi_file_labyrinth
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_08_multi_file_labyrinth # Task 08
+
+The pipeli' cluster_boost=1.00 mult=1.213 confidence=0.828 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_08_multi_file_labyrinth -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_08_multi_file_labyrinth -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_09_ghost_mutation
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_09_ghost_mutation
+INFO:shard.cross_task_router:[ROUTER] cluster=mutation_state | boost=1.25 | strategies: 7 -> 7
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_09_ghost_mutation # Task 09 — Ghost Mutation
+' cluster_boost=1.25 mult=1.360 confidence=1.000 (3 strategies)
+[DB] Loaded 678 capabilities from SQLite
+[DB] Loaded 678 capabilities from SQLite
+[VOICE BROADCASTER] Enqueued (high): 'Avvio benchmark: 17 task da risolvere.'
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_01_html_trap
+  Language: PYTHON
+  Source: refactored_agent.py -> refactored_agent.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (679 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,137 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 17 test(s) -- will protect on regression
+  [golden] All 17 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_02_ghost_bug
+  Language: PYTHON
+  Source: buggy_pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (592 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,451 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_03_dirty_data
+  Language: PYTHON
+  Source: optimized_processor.py -> optimized_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (814 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (201 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,873 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 24 test(s) -- will protect on regression
+  [golden] All 24 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_04_race_condition
+  Language: PYTHON
+  Source: bank.py -> fixed_bank.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (665 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (7,948 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_05_state_mutation
+  Language: PYTHON
+  Source: pipeline.py -> fixed_pipeline.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (611 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,985 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 21 test(s) -- will protect on regression
+  [golden] All 21 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_06_ttl_cache
+  Language: PYTHON
+  Source: cache.py -> fixed_cache.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (663 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (200 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,099 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 17 test(s) -- will protect on regression
+  [golden] All 17 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_07_metrics_bleed
+  Language: PYTHON
+  Source: metrics.py -> fixed_metrics.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (584 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (204 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,206 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_08_multi_file_labyrinth
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (854 chars, confidence=0.83)
+  [gate] Selected: self_profile     score=0.85  (211 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (5,158 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.911
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_09_ghost_mutation
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (575 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,985 chars)  [knowledge_base][NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_09_ghost_mutation -- 0 attempt(s), 1.5s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_09_ghost_mutation -- 0 attempt(s), 1.5s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_10_template_parser
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_10_template_parser
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_10_template_parser # Task 10 — Template Parse' cluster_boost=1.00 mult=1.213 confidence=0.828 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_10_template_parser -- 0 attempt(s), 0.9s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_10_template_parser -- 0 attempt(s), 0.9s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_11_stream_decoder
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_11_stream_decoder
+INFO:shard.cross_task_router:[ROUTER] cluster=serialization | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_11_stream_decoder # Task 11 — Stream Decoder
+' cluster_boost=1.00 mult=1.216 confidence=0.841 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_11_stream_decoder -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_11_stream_decoder -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_12_note_tag
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_12_note_tag
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_12_note_tag # Task 12 — Note Tag Matcher
+
+A c' cluster_boost=1.00 mult=1.430 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_12_note_tag -- 0 attempt(s), 0.9s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_12_note_tag -- 0 attempt(s), 0.9s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_13_config_parser
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_13_config_parser
+INFO:shard.cross_task_router:[ROUTER] cluster=parsing_input | boost=1.00 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_13_config_parser # Task 13 — Config Parser (O' cluster_boost=1.00 mult=1.397 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_13_config_parser -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_13_config_parser -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_14_boundary_check
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_14_boundary_check
+INFO:shard.cross_task_router:[ROUTER] cluster=boundary | boost=1.10 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_14_boundary_check # Task 14 — Boundary Check ' cluster_boost=1.10 mult=1.430 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_14_boundary_check -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_14_boundary_check -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+INFO:shard.cross_task_router:[ROUTER] cluster=crypto_logic | boost=0.70 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260413_154422_python_abstract_base_x_' cluster_boost=0.70 mult=1.346 confidence=0.761 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me -- 0 attempt(s), 0.9s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me -- 0 attempt(s), 0.9s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+INFO:shard.cross_task_router:[ROUTER] Near-miss boost applied for 'task_forge_20260414_114631_binary_search_implem_x_'
+INFO:shard.cross_task_router:[ROUTER] cluster=algorithm | boost=1.30 | strategies: 3 -> 3
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260414_114631_binary_search_implem_x_' cluster_boost=1.30 mult=1.338 confidence=1.000 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_forge_20260414_114631_binary_search_implem_x_binary_search_implem -- 0 attempt(s), 0.8s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260414_114631_binary_search_implem_x_binary_search_implem -- 0 attempt(s), 0.8s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Starting task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+INFO:NIGHT_RUNNER:[BENCHMARK] Starting task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+INFO:shard.signal_gate:[gate] strategy signal: topic='task_forge_20260416_191607_3d_geometry_fundamen_x_' cluster_boost=1.00 mult=1.230 confidence=0.892 (3 strategies)
+[NIGHT RUNNER] [20:10] [BENCHMARK] SUCCESS task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio -- 0 attempt(s), 1.0s
+INFO:NIGHT_RUNNER:[BENCHMARK] SUCCESS task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio -- 0 attempt(s), 1.0s
+[NIGHT RUNNER] [20:10] [BENCHMARK] Complete: 17/17 tasks solved.
+INFO:NIGHT_RUNNER:[BENCHMARK] Complete: 17/17 tasks solved.
+[NIGHT RUNNER] [20:10] [BENCH TRACKER] Benchmark delta vs last session: no changes. Stable: 17 passing, 0 failing.
+INFO:NIGHT_RUNNER:[BENCH TRACKER] Benchmark delta vs last session: no changes. Stable: 17 passing, 0 failing.
+[NIGHT RUNNER] [20:10] === Session Summary ===
+INFO:NIGHT_RUNNER:=== Session Summary ===
+[NIGHT RUNNER] [20:10] Total cycles: 3
+INFO:NIGHT_RUNNER:Total cycles: 3
+[NIGHT RUNNER] [20:10] Total certified: 0
+INFO:NIGHT_RUNNER:Total certified: 0
+[NIGHT RUNNER] [20:10] Total failed: 3
+INFO:NIGHT_RUNNER:Total failed: 3
+[NIGHT RUNNER] [20:10] Total skills gained: 0
+INFO:NIGHT_RUNNER:Total skills gained: 0
+[NIGHT RUNNER] [20:10] Total runtime: 2.76 minutes
+INFO:NIGHT_RUNNER:Total runtime: 2.76 minutes
+[NIGHT RUNNER] [20:10] [ENV OBS] intrusion_rate=0.000  unauthorized=0  opportunities=1
+INFO:NIGHT_RUNNER:[ENV OBS] intrusion_rate=0.000  unauthorized=0  opportunities=1
+[NIGHT RUNNER] [20:10] [CODE_CLEANER] Session metrics: rewrites_applied=0  fast_exits=0  parse_errors=0
+INFO:NIGHT_RUNNER:[CODE_CLEANER] Session metrics: rewrites_applied=0  fast_exits=0  parse_errors=0
+[NIGHT RUNNER] [20:10] JSON dump saved to night_reports\session_2026-04-16.json
+INFO:NIGHT_RUNNER:JSON dump saved to night_reports\session_2026-04-16.json
+[NIGHT RUNNER] [20:10] [BACKUP] capability_graph.json -> backups/capability_graph_20260416_201040.json
+INFO:NIGHT_RUNNER:[BACKUP] capability_graph.json -> backups/capability_graph_20260416_201040.json
+[NIGHT RUNNER] [20:10] [BACKUP] experiment_replay.json -> backups/experiment_replay_20260416_201040.json
+INFO:NIGHT_RUNNER:[BACKUP] experiment_replay.json -> backups/experiment_replay_20260416_201040.json
+[NIGHT RUNNER] [20:10] Generazione riflessioni in corso...
+INFO:NIGHT_RUNNER:Generazione riflessioni in corso...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (822 chars)
+[NIGHT RUNNER] [20:10] [REPORT_AGENT] Generating insights...
+INFO:NIGHT_RUNNER:[REPORT_AGENT] Generating insights...
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (829 chars)
+[NIGHT RUNNER] [20:10] Markdown recap saved to night_reports\recap_2026-04-16.md
+INFO:NIGHT_RUNNER:Markdown recap saved to night_reports\recap_2026-04-16.md
+[NIGHT RUNNER] [20:10] [SELF MODEL] Rebuilt -- cert_rate=22%  avg=4.8  momentum=stagnating  blind_spots=[]
+INFO:NIGHT_RUNNER:[SELF MODEL] Rebuilt -- cert_rate=22%  avg=4.8  momentum=stagnating  blind_spots=[]
+[NIGHT RUNNER] [20:10] [GOAL] End-of-session: Goal: 'master: numpy array operations and boolean indexing' | progress=88% | keywords=['indexing', 'boolean', 'science']
+INFO:NIGHT_RUNNER:[GOAL] End-of-session: Goal: 'master: numpy array operations and boolean indexing' | progress=88% | keywords=['indexing', 'boolean', 'science']
+[NIGHT RUNNER] [20:10] [WATCHDOG] Scanning session log for auto-repairable errors...
+INFO:NIGHT_RUNNER:[WATCHDOG] Scanning session log for auto-repairable errors...
+INFO:shard.error_watchdog:[WATCHDOG] 1 traceback block(s) found in night_session_2026-04-16.log.
+INFO:shard.error_watchdog:[WATCHDOG] No actionable errors detected -- codebase looks clean.
+[NIGHT RUNNER] [20:10] [PROACTIVE] Starting proactive refactoring analysis...
+INFO:NIGHT_RUNNER:[PROACTIVE] Starting proactive refactoring analysis...
+INFO:shard.proactive_refactor:[PROACTIVE] Analyzing: backend/meta_learning.py
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1120 chars)
+WARNING:shard.proactive_refactor:[PROACTIVE] Could not parse LLM response as JSON.
+INFO:shard.proactive_refactor:[PROACTIVE] No optimization found for backend/meta_learning.py.
+[NIGHT RUNNER] [20:10] [PROACTIVE] No optimization found this session.
+INFO:NIGHT_RUNNER:[PROACTIVE] No optimization found this session.
+INFO:httpx:HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:shard.llm_router:[LLM_ROUTER] Groq OK (1150 chars)
+[NIGHT RUNNER] [20:10] [REFLECTION] Generated (1150 chars):
+PATTERNS -- The session revealed a recurring theme of struggling with graphics-related topics, including Python image basics, Python graphics basics, and Shader programming fundamentals. This suggests a need to revisit foundational concepts in graphics programming.
+
+CONNECTIONS -- Although not explicitly linked, the failure to complete Python graphics basics and Shader programming fundamentals may be related, as both topics rely on understanding how to manipulate and render visual elements. Impr
+INFO:NIGHT_RUNNER:[REFLECTION] Generated (1150 chars):
+PATTERNS -- The session revealed a recurring theme of struggling with graphics-related topics, including Python image basics, Python graphics basics, and Shader programming fundamentals. This suggests a need to revisit foundational concepts in graphics programming.
+
+CONNECTIONS -- Although not explicitly linked, the failure to complete Python graphics basics and Shader programming fundamentals may be related, as both topics rely on understanding how to manipulate and render visual elements. Impr
+INFO:shard.cognition_core:[CORE ENV] broadcast 'identity_updated' from 'identity_core' -> 3 recipient(s)
+INFO:shard.identity:[IDENTITY] Rebuilt -- sessions=163 cert_rate=57% self_esteem=0.34 trajectory=stagnating domains_strong=algorithms, data, debugging
+[NIGHT RUNNER] [20:10] [IDENTITY] Rebuilt -- sessions=163 cert_rate=57% self_esteem=0.34 trajectory=stagnating
+INFO:NIGHT_RUNNER:[IDENTITY] Rebuilt -- sessions=163 cert_rate=57% self_esteem=0.34 trajectory=stagnating
+INFO:shard.cognition_core:[CORE ENV] broadcast 'session_complete' from 'night_runner' -> 3 recipient(s)
+[NIGHT RUNNER] [20:10] [SNAPSHOT] Session saved -- cycles=3 avg=0.0 cert=0% risk=0.0 flags=[]
+INFO:NIGHT_RUNNER:[SNAPSHOT] Session saved -- cycles=3 avg=0.0 cert=0% risk=0.0 flags=[]
+INFO:shard.episode_decay:[GC] GC: expired=0 decayed=0 deleted=0 pruned=0 quality_junk=0 dedup=0 | memories: 986 -> 986
+[NIGHT RUNNER] [20:10] [MEMORY_GC] GC: expired=0 decayed=0 deleted=0 pruned=0 quality_junk=0 dedup=0 | memories: 986 -> 986
+INFO:NIGHT_RUNNER:[MEMORY_GC] GC: expired=0 decayed=0 deleted=0 pruned=0 quality_junk=0 dedup=0 | memories: 986 -> 986
+[NIGHT RUNNER] [20:10] Session complete. Shutting down cleanly.
+INFO:NIGHT_RUNNER:Session complete. Shutting down cleanly.
+[NIGHT RUNNER] [20:10] [SESSION LOCK] Released by NightRunner.
+INFO:NIGHT_RUNNER:[SESSION LOCK] Released by NightRunner.
+
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_10_template_parser
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: ON
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (861 chars, confidence=0.83)
+  [gate] Selected: self_profile     score=0.85  (206 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (3,505 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.911
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_11_stream_decoder
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (868 chars, confidence=0.84)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (7,571 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.925
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_12_note_tag
+  Language: PYTHON
+  Source: processor.py -> fixed_processor.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (470 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (199 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (8,597 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 10 test(s) -- will protect on regression
+  [golden] All 10 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_13_config_parser
+  Language: PYTHON
+  Source: parser.py -> fixed_parser.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (586 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (204 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (3,842 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 16 test(s) -- will protect on regression
+  [golden] All 16 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_14_boundary_check
+  Language: PYTHON
+  Source: analyzer.py -> fixed_analyzer.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (536 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (205 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (6,330 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 25 test(s) -- will protect on regression
+  [golden] All 25 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (874 chars, confidence=0.76)
+  [gate] Selected: self_profile     score=0.85  (253 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,127 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.837
+  [golden] Existing solution passes 14 test(s) -- will protect on regression
+  [golden] All 14 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260414_114631_binary_search_implem_x_binary_search_implem
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (882 chars, confidence=1.00)
+  [gate] Selected: self_profile     score=0.85  (253 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.64  (773 chars)  [10 past sessions]
+  [gate] Selected: kb               score=0.80  (4,823 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=1.100
+  [golden] Existing solution passes 8 test(s) -- will protect on regression
+  [golden] All 8 tests passing -- returning success without LLM attempt
+
+====================================================================
+  SHARD Benchmark Loop
+  Task: task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio
+  Language: PYTHON
+  Source: solution.py -> solution.py
+  Max attempts: 5
+  Episodic memory: ON
+  Swarm engine:    OFF
+  Concurrency sim: OFF
+====================================================================
+[STRATEGY] Memory initialized (448 strategies stored)
+  [strategy_compiler] compiled (878 chars, confidence=0.89)
+  [gate] Selected: self_profile     score=0.85  (251 chars)  [self_profile]
+  [gate] Selected: episodic         score=0.52  (772 chars)  [3 past sessions]
+  [gate] Selected: kb               score=0.80  (3,868 chars)  [knowledge_base]
+  [ab] strategy_mode=normal activated=False score=0.981
+  [golden] Existing solution passes 7 test(s) -- will protect on regression
+  [golden] All 7 tests passing -- returning success without LLM attempt
+[VOICE BROADCASTER] Enqueued (high): 'Benchmark completato: 17 su 17 task risolti.'
+[VOICE BROADCASTER] Enqueued (high): 'Sessione notturna completata. 0 topic certificati su 3. 0 nuove skill acquisite '

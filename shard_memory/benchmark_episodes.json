@@ -1,8 +1,8 @@
 {
   "task_03_dirty_data": [
     {
-      "run_id": "387271bd",
-      "timestamp": "2026-04-09T16:17:03",
+      "run_id": "686fa6c5",
+      "timestamp": "2026-04-16T18:49:23",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -11,8 +11,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b13afe3d",
-      "timestamp": "2026-04-09T16:22:37",
+      "run_id": "d10422c3",
+      "timestamp": "2026-04-16T19:15:39",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -21,8 +21,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "768d1d3d",
-      "timestamp": "2026-04-09T16:33:48",
+      "run_id": "cc8ac829",
+      "timestamp": "2026-04-16T19:47:25",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -31,8 +31,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "d05df307",
-      "timestamp": "2026-04-09T17:03:38",
+      "run_id": "358999a8",
+      "timestamp": "2026-04-16T19:59:14",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -41,8 +41,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "319e2c3f",
-      "timestamp": "2026-04-09T17:15:06",
+      "run_id": "bb00212c",
+      "timestamp": "2026-04-16T20:04:51",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -51,8 +51,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b0806f12",
-      "timestamp": "2026-04-09T18:18:46",
+      "run_id": "aad3e3b9",
+      "timestamp": "2026-04-16T20:10:26",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -61,8 +61,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7078cfae",
-      "timestamp": "2026-04-10T11:23:01",
+      "run_id": "2bf3d0fb",
+      "timestamp": "2026-04-16T20:14:45",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -71,8 +71,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "544f30b9",
-      "timestamp": "2026-04-10T12:02:54",
+      "run_id": "b06d6bb4",
+      "timestamp": "2026-04-17T12:04:21",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -81,8 +81,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "1f25210a",
-      "timestamp": "2026-04-10T13:44:03",
+      "run_id": "fa8e025b",
+      "timestamp": "2026-04-17T13:08:48",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -91,8 +91,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "51a60a32",
-      "timestamp": "2026-04-10T17:25:03",
+      "run_id": "85ffa8e2",
+      "timestamp": "2026-04-17T15:11:58",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -103,8 +103,8 @@
   ],
   "task_02_ghost_bug": [
     {
-      "run_id": "bed7213c",
-      "timestamp": "2026-04-09T16:17:00",
+      "run_id": "c1b73d89",
+      "timestamp": "2026-04-16T18:49:20",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -113,8 +113,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "c97ea5b7",
-      "timestamp": "2026-04-09T16:22:34",
+      "run_id": "c3df05dd",
+      "timestamp": "2026-04-16T19:15:36",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -123,8 +123,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "95b373c0",
-      "timestamp": "2026-04-09T16:33:45",
+      "run_id": "d37e23f4",
+      "timestamp": "2026-04-16T19:47:22",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -133,8 +133,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "03e4d822",
-      "timestamp": "2026-04-09T17:03:35",
+      "run_id": "b4112460",
+      "timestamp": "2026-04-16T19:59:11",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -143,8 +143,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "0fe13c6f",
-      "timestamp": "2026-04-09T17:15:03",
+      "run_id": "eb53ab0a",
+      "timestamp": "2026-04-16T20:04:49",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -153,8 +153,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "f13d276d",
-      "timestamp": "2026-04-09T18:18:44",
+      "run_id": "243ea954",
+      "timestamp": "2026-04-16T20:10:23",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -163,8 +163,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "a01a8898",
-      "timestamp": "2026-04-10T11:22:58",
+      "run_id": "b0363794",
+      "timestamp": "2026-04-16T20:14:43",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -173,8 +173,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "45da297f",
-      "timestamp": "2026-04-10T12:02:52",
+      "run_id": "3947086a",
+      "timestamp": "2026-04-17T12:04:18",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -183,8 +183,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "bba7242d",
-      "timestamp": "2026-04-10T13:44:00",
+      "run_id": "8d809cb0",
+      "timestamp": "2026-04-17T13:08:46",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -193,8 +193,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "5107f85b",
-      "timestamp": "2026-04-10T17:25:01",
+      "run_id": "ad720576",
+      "timestamp": "2026-04-17T15:11:56",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -205,8 +205,8 @@
   ],
   "task_04_race_condition": [
     {
-      "run_id": "63a99c1a",
-      "timestamp": "2026-04-09T16:17:04",
+      "run_id": "566dc70b",
+      "timestamp": "2026-04-16T18:49:24",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -215,8 +215,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7163ea01",
-      "timestamp": "2026-04-09T16:22:38",
+      "run_id": "775882c1",
+      "timestamp": "2026-04-16T19:15:40",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -225,8 +225,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "e976c832",
-      "timestamp": "2026-04-09T16:33:49",
+      "run_id": "cc1a9894",
+      "timestamp": "2026-04-16T19:47:26",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -235,8 +235,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "3bf55092",
-      "timestamp": "2026-04-09T17:03:39",
+      "run_id": "3c6b3bf9",
+      "timestamp": "2026-04-16T19:59:15",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -245,8 +245,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b91fd1e5",
-      "timestamp": "2026-04-09T17:15:08",
+      "run_id": "f5911dab",
+      "timestamp": "2026-04-16T20:04:53",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -255,8 +255,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "20e117a9",
-      "timestamp": "2026-04-09T18:18:48",
+      "run_id": "3b7b10de",
+      "timestamp": "2026-04-16T20:10:27",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -265,8 +265,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "4005411f",
-      "timestamp": "2026-04-10T11:23:03",
+      "run_id": "e2726137",
+      "timestamp": "2026-04-16T20:14:47",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -275,8 +275,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "9514a2b0",
-      "timestamp": "2026-04-10T12:02:56",
+      "run_id": "735e72eb",
+      "timestamp": "2026-04-17T12:04:22",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -285,8 +285,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b8c94f81",
-      "timestamp": "2026-04-10T13:44:04",
+      "run_id": "3286ef07",
+      "timestamp": "2026-04-17T13:08:50",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -295,8 +295,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b875f11b",
-      "timestamp": "2026-04-10T17:25:05",
+      "run_id": "4a582e8b",
+      "timestamp": "2026-04-17T15:12:00",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -307,8 +307,8 @@
   ],
   "task_01_html_trap": [
     {
-      "run_id": "92743467",
-      "timestamp": "2026-04-09T16:16:58",
+      "run_id": "c96baad5",
+      "timestamp": "2026-04-16T18:49:19",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -317,8 +317,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7ac938f2",
-      "timestamp": "2026-04-09T16:22:32",
+      "run_id": "beab789b",
+      "timestamp": "2026-04-16T19:15:35",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -327,8 +327,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "0ec9c7bd",
-      "timestamp": "2026-04-09T16:33:43",
+      "run_id": "d31ce0dd",
+      "timestamp": "2026-04-16T19:47:21",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -337,8 +337,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "91838233",
-      "timestamp": "2026-04-09T17:03:34",
+      "run_id": "6b16e048",
+      "timestamp": "2026-04-16T19:59:10",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -347,8 +347,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b404b340",
-      "timestamp": "2026-04-09T17:15:01",
+      "run_id": "e0d4997d",
+      "timestamp": "2026-04-16T20:04:47",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -357,8 +357,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "94e7ae9b",
-      "timestamp": "2026-04-09T18:18:42",
+      "run_id": "2ea14702",
+      "timestamp": "2026-04-16T20:10:22",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -367,8 +367,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "486a14d9",
-      "timestamp": "2026-04-10T11:22:57",
+      "run_id": "b0318082",
+      "timestamp": "2026-04-16T20:14:41",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -377,8 +377,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "e4ac12ba",
-      "timestamp": "2026-04-10T12:02:50",
+      "run_id": "0cf6f462",
+      "timestamp": "2026-04-17T12:04:16",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -387,8 +387,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "aff88f51",
-      "timestamp": "2026-04-10T13:43:59",
+      "run_id": "36a9638f",
+      "timestamp": "2026-04-17T13:08:44",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -397,8 +397,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "724b3dab",
-      "timestamp": "2026-04-10T17:24:59",
+      "run_id": "e0d67405",
+      "timestamp": "2026-04-17T15:11:54",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -409,8 +409,8 @@
   ],
   "task_05_state_mutation": [
     {
-      "run_id": "fd4a61cb",
-      "timestamp": "2026-04-09T16:17:06",
+      "run_id": "18470093",
+      "timestamp": "2026-04-16T18:49:26",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -419,8 +419,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "741a65b1",
-      "timestamp": "2026-04-09T16:22:40",
+      "run_id": "aec7e8ac",
+      "timestamp": "2026-04-16T19:15:42",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -429,8 +429,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "88b7232b",
-      "timestamp": "2026-04-09T16:33:51",
+      "run_id": "25954c77",
+      "timestamp": "2026-04-16T19:47:28",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -439,8 +439,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "c28bbb2f",
-      "timestamp": "2026-04-09T17:03:41",
+      "run_id": "cdc4eb3c",
+      "timestamp": "2026-04-16T19:59:16",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -449,8 +449,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "49acbc9a",
-      "timestamp": "2026-04-09T17:15:09",
+      "run_id": "b8f5fc93",
+      "timestamp": "2026-04-16T20:04:54",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -459,8 +459,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "6189fd7a",
-      "timestamp": "2026-04-09T18:18:50",
+      "run_id": "76c9a0da",
+      "timestamp": "2026-04-16T20:10:29",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -469,8 +469,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "8aab1701",
-      "timestamp": "2026-04-10T11:23:04",
+      "run_id": "3ba677aa",
+      "timestamp": "2026-04-16T20:14:48",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -479,8 +479,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "68bdea4a",
-      "timestamp": "2026-04-10T12:02:57",
+      "run_id": "c1332265",
+      "timestamp": "2026-04-17T12:04:24",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -489,8 +489,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "26bdb714",
-      "timestamp": "2026-04-10T13:44:06",
+      "run_id": "3950d18d",
+      "timestamp": "2026-04-17T13:08:51",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -499,8 +499,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "bfd507dc",
-      "timestamp": "2026-04-10T17:25:07",
+      "run_id": "06a6d442",
+      "timestamp": "2026-04-17T15:12:01",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -511,8 +511,8 @@
   ],
   "task_07_metrics_bleed": [
     {
-      "run_id": "a6d9784f",
-      "timestamp": "2026-04-09T16:17:08",
+      "run_id": "42bc5703",
+      "timestamp": "2026-04-16T18:49:28",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -521,8 +521,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b3cd0ebb",
-      "timestamp": "2026-04-09T16:22:43",
+      "run_id": "24d58ad8",
+      "timestamp": "2026-04-16T19:15:44",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -531,8 +531,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "42edf138",
-      "timestamp": "2026-04-09T16:33:54",
+      "run_id": "608290b3",
+      "timestamp": "2026-04-16T19:47:30",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -541,8 +541,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "eca0b918",
-      "timestamp": "2026-04-09T17:03:43",
+      "run_id": "13272efa",
+      "timestamp": "2026-04-16T19:59:19",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -551,8 +551,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "26efeb3c",
-      "timestamp": "2026-04-09T17:15:12",
+      "run_id": "e254f704",
+      "timestamp": "2026-04-16T20:04:57",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -561,8 +561,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "a46640c9",
-      "timestamp": "2026-04-09T18:18:52",
+      "run_id": "c129bb2e",
+      "timestamp": "2026-04-16T20:10:31",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -571,8 +571,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7e7ff6a4",
-      "timestamp": "2026-04-10T11:23:07",
+      "run_id": "936793fd",
+      "timestamp": "2026-04-16T20:14:50",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -581,8 +581,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "b8b01392",
-      "timestamp": "2026-04-10T12:03:00",
+      "run_id": "2ff0063a",
+      "timestamp": "2026-04-17T12:04:27",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -591,8 +591,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "4a24e845",
-      "timestamp": "2026-04-10T13:44:08",
+      "run_id": "60d98fff",
+      "timestamp": "2026-04-17T13:08:54",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -601,8 +601,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "2683b899",
-      "timestamp": "2026-04-10T17:25:09",
+      "run_id": "34335cc8",
+      "timestamp": "2026-04-17T15:12:04",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -613,8 +613,8 @@
   ],
   "task_06_ttl_cache": [
     {
-      "run_id": "5a8f7f58",
-      "timestamp": "2026-04-09T16:17:07",
+      "run_id": "e100863f",
+      "timestamp": "2026-04-16T18:49:27",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -623,8 +623,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "626a68c5",
-      "timestamp": "2026-04-09T16:22:42",
+      "run_id": "f9bc66f1",
+      "timestamp": "2026-04-16T19:15:43",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -633,8 +633,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "e51af646",
-      "timestamp": "2026-04-09T16:33:53",
+      "run_id": "8c273419",
+      "timestamp": "2026-04-16T19:47:29",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -643,8 +643,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "57cfc4fd",
-      "timestamp": "2026-04-09T17:03:42",
+      "run_id": "6728db64",
+      "timestamp": "2026-04-16T19:59:18",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -653,8 +653,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "00d98727",
-      "timestamp": "2026-04-09T17:15:11",
+      "run_id": "917a7e30",
+      "timestamp": "2026-04-16T20:04:56",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -663,8 +663,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "ce09bf40",
-      "timestamp": "2026-04-09T18:18:51",
+      "run_id": "bfb3d624",
+      "timestamp": "2026-04-16T20:10:30",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -673,8 +673,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "3ca4b853",
-      "timestamp": "2026-04-10T11:23:06",
+      "run_id": "c949b871",
+      "timestamp": "2026-04-16T20:14:50",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -683,8 +683,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "da8b5d76",
-      "timestamp": "2026-04-10T12:02:59",
+      "run_id": "6edbfedc",
+      "timestamp": "2026-04-17T12:04:26",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -693,8 +693,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "a69a9158",
-      "timestamp": "2026-04-10T13:44:07",
+      "run_id": "8c471472",
+      "timestamp": "2026-04-17T13:08:53",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -703,8 +703,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "62e6ca8c",
-      "timestamp": "2026-04-10T17:25:08",
+      "run_id": "97ac830d",
+      "timestamp": "2026-04-17T15:12:03",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -715,8 +715,8 @@
   ],
   "task_08_multi_file_labyrinth": [
     {
-      "run_id": "5defacbb",
-      "timestamp": "2026-04-09T16:17:09",
+      "run_id": "4e607804",
+      "timestamp": "2026-04-16T18:49:28",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -725,8 +725,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "88e0e386",
-      "timestamp": "2026-04-09T16:22:44",
+      "run_id": "2abd4952",
+      "timestamp": "2026-04-16T19:15:45",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -735,8 +735,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "98b64de6",
-      "timestamp": "2026-04-09T16:33:55",
+      "run_id": "4bf80b37",
+      "timestamp": "2026-04-16T19:47:31",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -745,8 +745,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "55eef1d6",
-      "timestamp": "2026-04-09T17:03:44",
+      "run_id": "f952ee5a",
+      "timestamp": "2026-04-16T19:59:19",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -755,8 +755,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "6eb5b733",
-      "timestamp": "2026-04-09T17:15:13",
+      "run_id": "53f706d1",
+      "timestamp": "2026-04-16T20:04:58",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -765,8 +765,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "761af9b7",
-      "timestamp": "2026-04-09T18:18:53",
+      "run_id": "9c1d5a3d",
+      "timestamp": "2026-04-16T20:10:32",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -775,8 +775,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "159f37a2",
-      "timestamp": "2026-04-10T11:23:08",
+      "run_id": "a21a2529",
+      "timestamp": "2026-04-16T20:14:51",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -785,8 +785,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7b6d650f",
-      "timestamp": "2026-04-10T12:03:01",
+      "run_id": "fc82f418",
+      "timestamp": "2026-04-17T12:04:28",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -795,8 +795,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "8e53c541",
-      "timestamp": "2026-04-10T13:44:09",
+      "run_id": "e1e17780",
+      "timestamp": "2026-04-17T13:08:55",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -805,8 +805,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7c52c80d",
-      "timestamp": "2026-04-10T17:25:10",
+      "run_id": "39393837",
+      "timestamp": "2026-04-17T15:12:05",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -817,8 +817,8 @@
   ],
   "task_09_ghost_mutation": [
     {
-      "run_id": "b6428f0e",
-      "timestamp": "2026-04-09T16:17:11",
+      "run_id": "af2e0e38",
+      "timestamp": "2026-04-16T18:49:30",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -827,8 +827,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "021d2353",
-      "timestamp": "2026-04-09T16:22:46",
+      "run_id": "8c643ce2",
+      "timestamp": "2026-04-16T19:15:46",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -837,8 +837,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "e9b9e7ac",
-      "timestamp": "2026-04-09T16:33:57",
+      "run_id": "e68a3ee1",
+      "timestamp": "2026-04-16T19:47:32",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -847,8 +847,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "a7da08ec",
-      "timestamp": "2026-04-09T17:03:46",
+      "run_id": "afa84fe7",
+      "timestamp": "2026-04-16T19:59:21",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -857,8 +857,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "1e908cd5",
-      "timestamp": "2026-04-09T17:15:15",
+      "run_id": "0550e5d0",
+      "timestamp": "2026-04-16T20:04:59",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -867,8 +867,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "63ac6db1",
-      "timestamp": "2026-04-09T18:18:55",
+      "run_id": "9a600334",
+      "timestamp": "2026-04-16T20:10:33",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -877,8 +877,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "51c9c587",
-      "timestamp": "2026-04-10T11:23:10",
+      "run_id": "d52d36f6",
+      "timestamp": "2026-04-16T20:14:53",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -887,8 +887,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "5d0c7799",
-      "timestamp": "2026-04-10T12:03:02",
+      "run_id": "37037c80",
+      "timestamp": "2026-04-17T12:04:29",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -897,8 +897,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "89eed856",
-      "timestamp": "2026-04-10T13:44:11",
+      "run_id": "35bed29b",
+      "timestamp": "2026-04-17T13:08:56",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -907,8 +907,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7ade7101",
-      "timestamp": "2026-04-10T17:25:11",
+      "run_id": "e40d1915",
+      "timestamp": "2026-04-17T15:12:06",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -919,8 +919,8 @@
   ],
   "task_10_template_parser": [
     {
-      "run_id": "e621d9f9",
-      "timestamp": "2026-04-09T16:17:12",
+      "run_id": "e5410e37",
+      "timestamp": "2026-04-16T18:49:31",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -929,8 +929,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "5653095e",
-      "timestamp": "2026-04-09T16:22:47",
+      "run_id": "cb68877a",
+      "timestamp": "2026-04-16T19:15:47",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -939,8 +939,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "7d3b52a6",
-      "timestamp": "2026-04-09T16:33:58",
+      "run_id": "c7b06c2a",
+      "timestamp": "2026-04-16T19:47:33",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -949,8 +949,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "64187f15",
-      "timestamp": "2026-04-09T17:03:47",
+      "run_id": "423f4968",
+      "timestamp": "2026-04-16T19:59:22",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -959,8 +959,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "ff0dc352",
-      "timestamp": "2026-04-09T17:15:16",
+      "run_id": "5abcab00",
+      "timestamp": "2026-04-16T20:05:00",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -969,8 +969,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "27411ac3",
-      "timestamp": "2026-04-09T18:18:56",
+      "run_id": "bf5489b8",
+      "timestamp": "2026-04-16T20:10:34",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -979,8 +979,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "136d889e",
-      "timestamp": "2026-04-10T11:23:11",
+      "run_id": "6bfb6f94",
+      "timestamp": "2026-04-16T20:14:53",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -989,8 +989,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "d48d8864",
-      "timestamp": "2026-04-10T12:03:03",
+      "run_id": "b7e4a128",
+      "timestamp": "2026-04-17T12:04:30",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -999,8 +999,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "bd77f180",
-      "timestamp": "2026-04-10T13:44:12",
+      "run_id": "bea279d5",
+      "timestamp": "2026-04-17T13:08:57",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1009,8 +1009,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "f7ef49fa",
-      "timestamp": "2026-04-10T17:25:12",
+      "run_id": "1955e880",
+      "timestamp": "2026-04-17T15:12:08",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1021,8 +1021,8 @@
   ],
   "task_11_stream_decoder": [
     {
-      "run_id": "2f522e62",
-      "timestamp": "2026-04-09T16:17:13",
+      "run_id": "444b63f3",
+      "timestamp": "2026-04-16T18:49:32",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1031,8 +1031,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "fc82b873",
-      "timestamp": "2026-04-09T16:22:48",
+      "run_id": "c0812163",
+      "timestamp": "2026-04-16T19:15:48",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1041,8 +1041,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "14fe7285",
-      "timestamp": "2026-04-09T16:33:59",
+      "run_id": "a0fe13ab",
+      "timestamp": "2026-04-16T19:47:34",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1051,8 +1051,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "fcab2304",
-      "timestamp": "2026-04-09T17:03:48",
+      "run_id": "64dccc91",
+      "timestamp": "2026-04-16T19:59:23",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1061,8 +1061,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "5098ad03",
-      "timestamp": "2026-04-09T17:15:17",
+      "run_id": "eea5785b",
+      "timestamp": "2026-04-16T20:05:01",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1071,8 +1071,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "5583e0d9",
-      "timestamp": "2026-04-09T18:18:57",
+      "run_id": "1532637c",
+      "timestamp": "2026-04-16T20:10:35",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1081,8 +1081,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "a5ac1553",
-      "timestamp": "2026-04-10T11:23:12",
+      "run_id": "fc5a3f66",
+      "timestamp": "2026-04-16T20:14:54",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1091,8 +1091,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "4bdf5017",
-      "timestamp": "2026-04-10T12:03:04",
+      "run_id": "d0e89109",
+      "timestamp": "2026-04-17T12:04:31",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1101,8 +1101,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "2e73399f",
-      "timestamp": "2026-04-10T13:44:13",
+      "run_id": "651d5695",
+      "timestamp": "2026-04-17T13:08:58",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1111,8 +1111,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "bd934897",
-      "timestamp": "2026-04-10T17:25:13",
+      "run_id": "1026338e",
+      "timestamp": "2026-04-17T15:12:08",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1123,8 +1123,8 @@
   ],
   "task_12_note_tag": [
     {
-      "run_id": "cb21a457",
-      "timestamp": "2026-04-09T16:17:14",
+      "run_id": "43133605",
+      "timestamp": "2026-04-16T18:49:32",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1133,8 +1133,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "ddcfb79e",
-      "timestamp": "2026-04-09T16:22:49",
+      "run_id": "83bdcf9d",
+      "timestamp": "2026-04-16T19:15:49",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1143,8 +1143,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "0df19dfb",
-      "timestamp": "2026-04-09T16:34:00",
+      "run_id": "bea337c3",
+      "timestamp": "2026-04-16T19:47:35",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1153,8 +1153,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "97771a6b",
-      "timestamp": "2026-04-09T17:03:49",
+      "run_id": "e8b454fb",
+      "timestamp": "2026-04-16T19:59:23",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1163,8 +1163,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "137ef2e5",
-      "timestamp": "2026-04-09T17:15:18",
+      "run_id": "7fdf726c",
+      "timestamp": "2026-04-16T20:05:02",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1173,8 +1173,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "60d47e94",
-      "timestamp": "2026-04-09T18:18:58",
+      "run_id": "a97ada4a",
+      "timestamp": "2026-04-16T20:10:36",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1183,8 +1183,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "987f18c6",
-      "timestamp": "2026-04-10T11:23:13",
+      "run_id": "84ed022c",
+      "timestamp": "2026-04-16T20:14:55",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1193,8 +1193,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "47a684cd",
-      "timestamp": "2026-04-10T12:03:05",
+      "run_id": "15010f61",
+      "timestamp": "2026-04-17T12:04:32",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1203,8 +1203,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "62be0a22",
-      "timestamp": "2026-04-10T13:44:13",
+      "run_id": "6980350f",
+      "timestamp": "2026-04-17T13:08:59",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -1213,8 +1213,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "4705e8b8",
-      "timestamp": "2026-04-10T17:25:14",
+      "run_id": "22965862",
+      "timestamp": "2026-04-17T15:12:09",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3742,8 +3742,8 @@
   ],
   "task_13_config_parser": [
     {
-      "run_id": "618cae0e",
-      "timestamp": "2026-04-09T16:17:15",
+      "run_id": "7496a8a7",
+      "timestamp": "2026-04-16T18:49:33",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3752,8 +3752,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "4febc396",
-      "timestamp": "2026-04-09T16:22:50",
+      "run_id": "0adf1446",
+      "timestamp": "2026-04-16T19:15:50",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3762,8 +3762,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "1c489008",
-      "timestamp": "2026-04-09T16:34:01",
+      "run_id": "7fcd7617",
+      "timestamp": "2026-04-16T19:47:35",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3772,8 +3772,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "24aca3dd",
-      "timestamp": "2026-04-09T17:03:50",
+      "run_id": "85d7e1a6",
+      "timestamp": "2026-04-16T19:59:24",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3782,8 +3782,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "55411be9",
-      "timestamp": "2026-04-09T17:15:19",
+      "run_id": "4498a236",
+      "timestamp": "2026-04-16T20:05:02",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3792,8 +3792,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "ca1d6816",
-      "timestamp": "2026-04-09T18:18:59",
+      "run_id": "47afdc00",
+      "timestamp": "2026-04-16T20:10:36",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3802,8 +3802,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "22bd5646",
-      "timestamp": "2026-04-10T11:23:14",
+      "run_id": "9d6cb7bf",
+      "timestamp": "2026-04-16T20:14:56",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3812,8 +3812,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "1ce471c1",
-      "timestamp": "2026-04-10T12:03:06",
+      "run_id": "54d1ddcd",
+      "timestamp": "2026-04-17T12:04:33",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3822,8 +3822,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "8635edbf",
-      "timestamp": "2026-04-10T13:44:14",
+      "run_id": "7e580c5e",
+      "timestamp": "2026-04-17T13:09:00",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3832,8 +3832,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "26412048",
-      "timestamp": "2026-04-10T17:25:15",
+      "run_id": "f3fdcfeb",
+      "timestamp": "2026-04-17T15:12:10",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3844,8 +3844,8 @@
   ],
   "task_14_boundary_check": [
     {
-      "run_id": "1dab3c97",
-      "timestamp": "2026-04-09T16:17:16",
+      "run_id": "a06cabdc",
+      "timestamp": "2026-04-16T18:49:34",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3854,8 +3854,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "ecc64e8e",
-      "timestamp": "2026-04-09T16:22:51",
+      "run_id": "f30b1b63",
+      "timestamp": "2026-04-16T19:15:50",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3864,8 +3864,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "9f18c94f",
-      "timestamp": "2026-04-09T16:34:02",
+      "run_id": "2705e77c",
+      "timestamp": "2026-04-16T19:47:36",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3874,8 +3874,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "2d6c4369",
-      "timestamp": "2026-04-09T17:03:51",
+      "run_id": "a411c033",
+      "timestamp": "2026-04-16T19:59:25",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3884,8 +3884,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "1b9a2af4",
-      "timestamp": "2026-04-09T17:15:20",
+      "run_id": "d4807570",
+      "timestamp": "2026-04-16T20:05:03",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3894,8 +3894,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "33491d76",
-      "timestamp": "2026-04-09T18:19:00",
+      "run_id": "d11e4408",
+      "timestamp": "2026-04-16T20:10:37",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3904,8 +3904,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "86f126df",
-      "timestamp": "2026-04-10T11:23:15",
+      "run_id": "eda474cf",
+      "timestamp": "2026-04-16T20:14:57",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3914,8 +3914,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "09ccee18",
-      "timestamp": "2026-04-10T12:03:07",
+      "run_id": "9c98a46d",
+      "timestamp": "2026-04-17T12:04:34",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3924,8 +3924,8 @@
       "winning_hint": ""
     },
     {
-      "run_id": "842a6051",
-      "timestamp": "2026-04-10T13:44:15",
+      "run_id": "35bfae3b",
+      "timestamp": "2026-04-17T13:09:00",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3934,8 +3934,294 @@
       "winning_hint": ""
     },
     {
-      "run_id": "47fb7daf",
-      "timestamp": "2026-04-10T17:25:16",
+      "run_id": "4ebc493b",
+      "timestamp": "2026-04-17T15:12:11",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    }
+  ],
+  "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": [
+    {
+      "run_id": "162ddae7",
+      "timestamp": "2026-04-16T18:49:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "83f413c6",
+      "timestamp": "2026-04-16T19:15:51",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "d12a890f",
+      "timestamp": "2026-04-16T19:47:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "14a0cb8a",
+      "timestamp": "2026-04-16T19:59:26",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "80148ee7",
+      "timestamp": "2026-04-16T20:05:04",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "49c28250",
+      "timestamp": "2026-04-16T20:10:38",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "961ea243",
+      "timestamp": "2026-04-16T20:14:58",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b670362d",
+      "timestamp": "2026-04-17T12:04:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3bd46e52",
+      "timestamp": "2026-04-17T13:09:01",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "77681f24",
+      "timestamp": "2026-04-17T15:12:12",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    }
+  ],
+  "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": [
+    {
+      "run_id": "7e858cc1",
+      "timestamp": "2026-04-16T18:49:36",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "76b5c419",
+      "timestamp": "2026-04-16T19:15:52",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "ec30ba3f",
+      "timestamp": "2026-04-16T19:47:38",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "95f23c52",
+      "timestamp": "2026-04-16T19:59:27",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3638562a",
+      "timestamp": "2026-04-16T20:05:05",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b81d5dcb",
+      "timestamp": "2026-04-16T20:10:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a9dbba48",
+      "timestamp": "2026-04-16T20:14:58",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c50b9c17",
+      "timestamp": "2026-04-17T12:04:36",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "0b49e1a0",
+      "timestamp": "2026-04-17T13:09:02",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "acdfccf2",
+      "timestamp": "2026-04-17T15:12:13",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    }
+  ],
+  "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": [
+    {
+      "run_id": "630ae660",
+      "timestamp": "2026-04-16T19:47:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c3928729",
+      "timestamp": "2026-04-16T19:59:28",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "8eaae2e5",
+      "timestamp": "2026-04-16T20:05:06",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3b99f1fd",
+      "timestamp": "2026-04-16T20:10:40",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "061eccb1",
+      "timestamp": "2026-04-16T20:14:59",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "178a73c7",
+      "timestamp": "2026-04-17T12:04:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "6ac205f6",
+      "timestamp": "2026-04-17T13:09:03",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "bcd04bec",
+      "timestamp": "2026-04-17T15:12:14",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
