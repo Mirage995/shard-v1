@@ -1729,6 +1729,13 @@ CRITICAL RULES FOR minimum_experiment:
    CHAIN REQUIREMENT: MECHANISM defines V → INTERVENTION computes V → MEASUREMENT reports V →
    SUCCESS CRITERION thresholds V. All 4 must reference the same observable variable.
 
+   MECHANISM TESTABILITY RULE:
+   The measurement must directly isolate the mechanism effect.
+   If V could change for reasons unrelated to the stated mechanism, the experiment is scientifically INVALID.
+   FORBIDDEN (proxy metrics): "accuracy improves", "performance increases", "efficiency improves",
+     "better results", "higher score" — these are not isolating measurements.
+   REQUIRED: a named variable V that changes *because of* and *only because of* the mechanism in MECHANISM.
+
    EXAMPLE (correct):
    MECHANISM: Dropout regularization reduces co-adaptation between neurons. VARIABLE: V = test_accuracy
    INTERVENTION: Train 2-layer MLP with dropout=0.5 vs no dropout on synthetic classification data.
@@ -1737,7 +1744,12 @@ CRITICAL RULES FOR minimum_experiment:
    SUCCESS CRITERION: test_accuracy(dropout) > test_accuracy(baseline) + 0.03
    CONTROL: Random seed fixed at 42; learning rate identical across conditions
 
-   This is NOT optional. A minimum_experiment missing the VARIABLE binding or CONTROL will be rejected.
+   EXAMPLE (wrong — proxy metric, will be rejected):
+   MEASUREMENT: Metric: overall model performance  ← NOT acceptable
+   SUCCESS CRITERION: performance improves by >5%  ← NOT acceptable
+
+   This is NOT optional. A minimum_experiment missing the VARIABLE binding, CONTROL, or using
+   proxy metrics will be rejected.
 
 "hypothesis": {{
   "statement": "one sentence — the specific, non-obvious cross-domain claim",

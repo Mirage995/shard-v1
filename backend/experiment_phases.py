@@ -41,6 +41,19 @@ _SECTION_PATTERNS = {
 # Qualitative signals → measurement is NOT scalar
 _MEASUREMENT_BLACKLIST = {"compare", "visual", "plot", "qualitative", "describe", "observe", "show"}
 
+# Proxy metric patterns: vague improvement claims with no specific variable binding.
+# These pass structural checks but are scientifically weak — mechanism is untestable.
+_PROXY_METRIC_PATTERNS = [
+    r'\baccuracy\s+improve[sd]?\b',
+    r'\bperformance\s+increase[sd]?\b',
+    r'\bperformance\s+improve[sd]?\b',
+    r'\befficiency\s+improve[sd]?\b',
+    r'\bquality\s+improve[sd]?\b',
+    r'\bscore\s+increase[sd]?\b',
+    r'\bbetter\s+(?:than|result|outcome|performance)\b',
+    r'\bimprove[sd]?\s+(?:accuracy|performance|efficiency|quality)\b',
+]
+
 
 def parse_experiment_spec(text: str) -> dict | None:
     """Parse the 4-section structure from minimum_experiment text (regex, multiline).
@@ -112,6 +125,32 @@ def check_control_clause(raw_text: str) -> bool:
     return bool(_re_module.search(r'CONTROL\s*:', raw_text, _re_module.IGNORECASE))
 
 
+def check_proxy_metric(spec: dict) -> bool:
+    """Return True if measurement/success_criterion are free of proxy metric patterns.
+
+    Proxy metrics ("accuracy improves", "performance increases") are scientifically weak:
+    the measurement does not isolate the mechanism effect — it could change for reasons
+    unrelated to the stated MECHANISM. Returns False (issue) when a proxy pattern is found
+    AND there is no explicit VARIABLE binding (V = formula) in the spec.
+    """
+    measurement = spec.get("measurement", "").lower()
+    success = spec.get("success_criterion", "").lower()
+    combined = measurement + " " + success
+    mechanism = spec.get("mechanism", "").lower() + spec.get("intervention", "").lower()
+
+    # Only flag if there's no explicit variable binding (the binding already provides specificity)
+    has_variable_binding = bool(_re_module.search(
+        r'\bvariable\s*:\s*\w|[a-z_]\w*\s*=\s*\w', mechanism, _re_module.IGNORECASE
+    ))
+    if has_variable_binding:
+        return True  # binding present — proxy concern overridden
+
+    return not any(
+        _re_module.search(p, combined, _re_module.IGNORECASE)
+        for p in _PROXY_METRIC_PATTERNS
+    )
+
+
 def validate_structure(spec: dict, raw_text: str = "") -> tuple[bool, list[str]]:
     """Zero-LLM micro-validation of a parsed 4-section spec.
 
@@ -128,6 +167,9 @@ def validate_structure(spec: dict, raw_text: str = "") -> tuple[bool, list[str]]
         issues.append("SIMULATION not grounded: no data-generation keywords in INTERVENTION/MECHANISM")
     if raw_text and not check_control_clause(raw_text):
         issues.append("CONTROL clause missing: no confounder isolation declared")
+    if not check_proxy_metric(spec):
+        issues.append("PROXY METRIC: vague improvement claim without direct variable mapping — "
+                      "measurement does not isolate mechanism")
     return (len(issues) == 0, issues)
 
 
@@ -136,6 +178,9 @@ _REAL_WORLD_FLAGS = {
     "real-world", "biological variability", "in vivo", "in situ",
     "ecg", "mri", "ct scan", "hospital", "genomic", "transcriptomic",
     "sensor data", "lidar", "remote sensing",
+    # biological sequence domains — require real molecular data
+    "dna", "rna", "dna sequence", "rna sequence", "bioinformatics",
+    "nucleotide", "genome", "proteomics", "sequencing",
 }
 
 _SYNTHETIC_SIGNALS = {
@@ -386,7 +431,7 @@ class ExperimentDesignPhase(BasePhase):
         # rewrite before entering the validator — one attempt, hard fail if it doesn't
         # improve the chain. CONTROL absence is soft (logged, not blocking alone).
         _binding_issues = [i for i in _struct_issues if any(
-            kw in i for kw in ("METRIC not linked", "SIMULATION not grounded")
+            kw in i for kw in ("METRIC not linked", "SIMULATION not grounded", "PROXY METRIC")
         )]
         if _binding_issues:
             print(f"[EXPERIMENT_DESIGN] BINDING_GATE: {_binding_issues} — forcing binding rewrite")
