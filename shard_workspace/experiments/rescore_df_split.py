@@ -152,6 +152,9 @@ async def rescore_hypothesis(agent: StudyAgent, hyp_base: dict, n: int = 3) -> d
         "std": {
             "df_mechanism":    std_field("df_mechanism"),
             "df_data_realism": std_field("df_data_realism"),
+            "causal_link":     std_field("causal_link"),
+            "falsifiability":  std_field("falsifiability"),
+            "implementability":std_field("implementability"),
             "alignment_score": std_field("alignment_score"),
         },
         "raw_scores": scores,
@@ -173,8 +176,11 @@ async def main():
             result = await rescore_hypothesis(agent, hyp, n=N_RESCORE)
             results.append(result)
             m = result["mean"]
-            print(f"  MEAN — DF_mech={m['df_mechanism']} DF_data={m['df_data_realism']} "
-                  f"FA={m['falsifiability']} score={m['alignment_score']}")
+            s = result["std"]
+            print(f"  MEAN — DF_mech={m['df_mechanism']}±{s['df_mechanism']} "
+                  f"DF_data={m['df_data_realism']}±{s['df_data_realism']} "
+                  f"FA={m['falsifiability']}±{s['falsifiability']} "
+                  f"score={m['alignment_score']}±{s['alignment_score']}")
         except Exception as exc:
             print(f"  ERROR: {exc}")
             results.append({"hypothesis": hyp["statement"][:100], "error": str(exc)})

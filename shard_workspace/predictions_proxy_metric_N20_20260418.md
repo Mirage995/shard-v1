@@ -115,3 +115,20 @@ Output: `rescore_df_split_H1H6_20260418.json` — mean + std per hypothesis.
 This is NOT a primary outcome — used only as sanity check that split removed the circular penalty.
 
 *Launch conditions section added 2026-04-18 post-amendment, pre-run.*
+
+---
+
+## Re-scoring method clarification — 2026-04-18
+
+**Original plan:** re-score existing `minimum_experiment` texts with amended rubric.
+**Found:** `minimum_experiment` not logged in run 233916 — texts not recoverable.
+
+**Adjusted plan:** re-generate `minimum_experiment` from existing hypothesis statements, then score 3× with amended rubric. The regenerated texts are logged in `rescore_df_split_H1H5_20260418.json` for future reference.
+
+**What this measures:** combined effect of (generator re-run variance) + (new rubric) vs historical (generator + old rubric). This is NOT the isolated rubric contribution.
+
+**Interpretation caveat:** results inform "is DF_mechanism still depressed for this class of hypotheses under the new system?" but do not isolate rubric change from generator variance. Two sources of variance are superimposed.
+
+**Variance diagnostic:** per-hypothesis stdev across 3 validator calls logged. If stdev > 0.10 for DF_mechanism, temperature=0.25 is a non-negligible noise source and N=20 CIs are wider than the point estimates suggest.
+
+*This clarification committed before running rescore_df_split.py.*
