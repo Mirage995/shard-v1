@@ -856,11 +856,23 @@ CRITERION 1 — CAUSAL LINK (does the experiment test the specific mechanism?)
   Score 0.1 if it just measures a correlated variable.
   Your score: ___
 
-CRITERION 2 — DOMAIN FIDELITY (right data / structures for this domain?)
-  Score 0.9+ only if the data structure matches the hypothesis domain exactly.
-  Score 0.5 if it uses a proxy from a different domain.
-  Score 0.1 if domain is completely wrong (e.g. random classification for a geometry hypothesis).
-  Your score: ___
+CRITERION 2 — DOMAIN FIDELITY (two sub-scores required)
+
+  2a. domain_fidelity_mechanism — does the experiment instantiate the CAUSAL MECHANISM correctly?
+      Score 0.9+ if the mechanism is directly and correctly implemented.
+      Score 0.5 if a proxy mechanism is used.
+      Score 0.1 if the mechanism is completely wrong or missing.
+      Your score: ___
+
+  2b. domain_fidelity_data_realism — does the experiment use domain-appropriate data?
+      Score 0.9+ if real domain data or a faithful simulation is used.
+      Score 0.5 if synthetic stand-in data is used (numpy/scipy generated).
+      Score 0.1 if data is completely wrong for the domain.
+      Your score: ___
+
+  NOTE: if the experiment explicitly uses synthetic data (numpy/scipy generation), it is EXPECTED
+  and acceptable — do not penalize domain_fidelity_mechanism for this. Penalize only if the
+  causal structure itself is wrong.
 
 CRITERION 3 — FALSIFIABILITY (would failure specifically refute the hypothesis?)
   Score 0.9+ if a score < threshold clearly disproves the hypothesis.
@@ -909,10 +921,11 @@ CRITICAL RULES for "rewritten":
 Respond with valid JSON only:
 {{
   "causal_link": <0.0-1.0>,
-  "domain_fidelity": <0.0-1.0>,
+  "domain_fidelity_mechanism": <0.0-1.0>,
+  "domain_fidelity_data_realism": <0.0-1.0>,
   "falsifiability": <0.0-1.0>,
   "implementability": <0.0-1.0>,
-  "alignment_score": <average of above, float>,
+  "alignment_score": <leave as 0.0 — will be computed by code>,
   "verdict": "VALID" | "REWRITE" | "INVALID",
   "issues": ["specific weakness 1", "specific weakness 2"],
   "rewritten": "corrected minimum_experiment as a plain string, or null",
@@ -940,8 +953,8 @@ Respond with valid JSON only:
                     "attempt":           attempt,
                 }
 
-            # Check output contract: all 4 criteria fields must be present
-            criteria_keys = ("causal_link", "domain_fidelity", "falsifiability", "implementability")
+            # Check output contract: required fields (DF now split into two sub-scores)
+            criteria_keys = ("causal_link", "domain_fidelity_mechanism", "domain_fidelity_data_realism", "falsifiability", "implementability")
             criteria_present = all(k in result for k in criteria_keys)
 
             if not criteria_present:
@@ -952,10 +965,11 @@ Respond with valid JSON only:
                     "Return ONLY a JSON object with EXACTLY these fields (floats 0.0-1.0):\n"
                     "{\n"
                     '  "causal_link": <float>,\n'
-                    '  "domain_fidelity": <float>,\n'
+                    '  "domain_fidelity_mechanism": <float>,\n'
+                    '  "domain_fidelity_data_realism": <float>,\n'
                     '  "falsifiability": <float>,\n'
                     '  "implementability": <float>,\n'
-                    '  "alignment_score": <average of above>,\n'
+                    '  "alignment_score": 0.0,\n'
                     '  "verdict": "VALID" | "REWRITE" | "INVALID",\n'
                     '  "issues": ["..."],\n'
                     '  "rewritten": null\n'
@@ -985,8 +999,27 @@ Respond with valid JSON only:
                         "attempt":          attempt,
                     }
 
-            # Compute score from 4 criteria (authoritative)
-            criteria_scores = [float(result[k]) for k in criteria_keys]
+            # DF split: compute composite domain_fidelity from sub-scores
+            # When synthetic data is forced (capability contract), use df_mechanism only.
+            # Otherwise use 0.9/0.1 weighted composite.
+            from experiment_phases import _SYNTHETIC_SIGNALS
+            _min_exp_lower = min_exp.lower()
+            _is_synthetic = any(k in _min_exp_lower for k in _SYNTHETIC_SIGNALS)
+            df_mech = float(result.get("domain_fidelity_mechanism", result.get("domain_fidelity", 0.5)))
+            df_data = float(result.get("domain_fidelity_data_realism", result.get("domain_fidelity", 0.5)))
+            if _is_synthetic:
+                domain_fidelity = df_mech          # ignore data_realism penalty when synthetic forced
+            else:
+                domain_fidelity = df_mech * 0.9 + df_data * 0.1
+            domain_fidelity = max(0.0, min(1.0, domain_fidelity))
+
+            # Compute score from 4 criteria using composite DF (authoritative)
+            criteria_scores = [
+                float(result["causal_link"]),
+                domain_fidelity,
+                float(result["falsifiability"]),
+                float(result["implementability"]),
+            ]
             score = sum(criteria_scores) / 4.0
             score = max(0.0, min(0.99, score))   # hard-cap at 0.99, never 1.0 from code
 
@@ -1004,7 +1037,14 @@ Respond with valid JSON only:
                 if verdict == "VALID":
                     verdict = "REWRITE"  # downgrade, don't skip
 
-            criteria_dict = {k: round(float(result[k]), 3) for k in criteria_keys}
+            criteria_dict = {
+                "causal_link":                   round(float(result["causal_link"]), 3),
+                "domain_fidelity":               round(domain_fidelity, 3),
+                "domain_fidelity_mechanism":     round(df_mech, 3),
+                "domain_fidelity_data_realism":  round(df_data, 3),
+                "falsifiability":                round(float(result["falsifiability"]), 3),
+                "implementability":              round(float(result["implementability"]), 3),
+            }
             result.update({
                 "verdict":            verdict,
                 "alignment_score":    round(score, 3),
@@ -1018,7 +1058,7 @@ Respond with valid JSON only:
             issues_str = "; ".join(result.get("issues", []))[:100]
             c = criteria_dict
             print(f"[EXPERIMENT_ALIGN] attempt={attempt} {verdict} score={score:.2f} "
-                  f"CL={c['causal_link']} DF={c['domain_fidelity']} "
+                  f"CL={c['causal_link']} DF={c['domain_fidelity']}(mech={c['domain_fidelity_mechanism']}/data={c['domain_fidelity_data_realism']}) "
                   f"FA={c['falsifiability']} IM={c['implementability']} "
                   f"— {issues_str}")
             return result

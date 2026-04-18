@@ -47,3 +47,43 @@ Known confound: if the 20 cycles happen to sample "easy" cross-domain pairs (ML�
 ---
 
 *Pre-registered before any results observed. Do not modify this file after the run starts.*
+
+---
+
+## AMENDMENT — 2026-04-18 (post qualitative inspection N=6, pre-run)
+
+### Section 1 — Empirical findings from qualitative inspection
+
+Qualitative inspection of H1-H6 from run 233916 revealed **two distinct problems**, not one:
+
+- **IM** saturated at 0.95 across H2-H6. Not a bottleneck — ceiling effect, no fix needed.
+- **FA** inconsistent but not systematically low: H2-H6 scored 0.7; H1 scored 0.6. FA inconsistency appears isolated to H1.
+- **DF** systematically low (0.3–0.5) across H2-H6 with **identical penalty pattern** in validator issues: all penalized for synthetic/non-domain-specific data. This is a systematic confound, not noise.
+- **H1 is a separate problem**: structural malformation (2× INTERVENTION sections, 2 metrics, no V chain). H1's FA=0.6 is correctly low for structural reasons, unrelated to the DF confound. Treat as separate ticket — do NOT conflate with the DF fix.
+
+### Section 2 — Metric validity issue
+
+The current `domain_fidelity` score **conflates two distinct properties**:
+
+- **(a) Causal structure fidelity** — does the experiment instantiate the mechanism correctly?
+- **(b) Data realism** — does the experiment use domain-appropriate data sources?
+
+The CAPABILITY CONTRACT introduced in commit 6f3015f forces synthetic-only experiments. The validator then penalizes `domain_fidelity` because synthetic data "may not represent real-world distributions" — this is a **circular penalty**: the gate forces (b) = synthetic, then the validator lowers DF for it.
+
+Consequence: **all historical DF scores are not directly comparable post-amendment**. The pre-registered DF baseline of 0.700 conflated both components and cannot be used as a valid comparison point for post-split DF_mechanism scores.
+
+**Validator temperature = 0.25 → re-scoring is stochastic, not deterministic.** Re-scoring historical hypotheses would produce different scores on each run. Re-scoring strategy to be decided post-implementation.
+
+### Section 3 — Fix scope and new baseline definition
+
+Fix: **surgical DF split** in `_validate_experiment_alignment()`:
+
+- `domain_fidelity_mechanism` (causal fidelity, weight 1.0) — the only score that matters for synthetic-forced experiments
+- `domain_fidelity_data_realism` (data sourcing, weight 0.0 when synthetic forced)
+- Composite: `domain_fidelity = df_mechanism × 1.0` when `synthetic_declared(min_exp)` is True
+
+**Primary outcome FA is unchanged** — not affected by the DF split. The N=20 pre-registered FA > 0.68 threshold and decision rules remain valid.
+
+**New DF baseline**: will be established from the first post-amendment run (N=20). Historical DF=0.700 is **retired as a comparison baseline** for domain_fidelity_mechanism.
+
+*Amendment written before implementation. Implementation commit to follow immediately.*
