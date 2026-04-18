@@ -87,3 +87,31 @@ Fix: **surgical DF split** in `_validate_experiment_alignment()`:
 **New DF baseline**: will be established from the first post-amendment run (N=20). Historical DF=0.700 is **retired as a comparison baseline** for domain_fidelity_mechanism.
 
 *Amendment written before implementation. Implementation commit to follow immediately.*
+
+---
+
+## Launch conditions for N=20 with amended rubric
+
+**Primary outcome: FA > 0.68 (unchanged)**
+Rationale: FA measurement not affected by DF split.
+
+**Secondary outcomes (MONITORING, not decision-binding):**
+- `DF_mechanism`: no prior baseline. Report absolute value only.
+- `DF_data_realism`: reported when synthetic=False; ignored when synthetic=True by design.
+- `IM`, `CL`, `VALID%`: compared against run 233916 values, acknowledging those were pre-split measurements.
+
+**Decision rules (UPDATED — replaces originals in §Decision rules above):**
+1. FA > 0.68 AND IM not regressed > 0.10 → proxy_metric_gate ships
+2. FA in [0.61, 0.68] → inconclusive, analyze per-hypothesis
+3. FA < 0.61 → revert proxy_metric_gate
+4. Any secondary metric collapse > 0.15 below run 233916 → investigate before shipping (may indicate new confound introduced by fix)
+
+**Sample structure:** domain_pair logged per hypothesis for post-hoc stratification. No a-priori stratification available (no `--force-domain` support).
+
+**Re-scoring strategy (decided 2026-04-18):**
+Triple re-score on H1-H6 (18 validator calls, ~4-5 min) using new split rubric.
+Purpose: establish `DF_mechanism` reference baseline with variance reduced by ~√3 vs single-score.
+Output: `rescore_df_split_H1H6_20260418.json` — mean + std per hypothesis.
+This is NOT a primary outcome — used only as sanity check that split removed the circular penalty.
+
+*Launch conditions section added 2026-04-18 post-amendment, pre-run.*
