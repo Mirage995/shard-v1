@@ -586,6 +586,15 @@ Example: ["query 1", "query 2", "query 3"]"""
         if not minimum_exp.strip():
             return "invalid"
 
+        # ── Fast-path: respect explicit EXECUTION tag set by the generator ────
+        _min_lower = str(minimum_exp).lower()
+        if "execution: kaggle_gpu" in _min_lower:
+            print("[FEASIBILITY] EXECUTION tag → kaggle_gpu (fast-path)")
+            return "kaggle"
+        if "execution: sandbox" in _min_lower:
+            print("[FEASIBILITY] EXECUTION tag → sandbox (fast-path)")
+            # still run domain mismatch guard below before returning "local"
+
         # ── Domain mismatch guard ─────────────────────────────────────────────
         # A non-ML/non-CS hypothesis (physics, biology, chemistry, materials...)
         # paired with a generic ML classification proxy does NOT test the
@@ -602,6 +611,10 @@ Example: ["query 1", "query 2", "query 3"]"""
             )
             print(f"[FEASIBILITY] SKIP: non-ML hypothesis (matched: '{_matched_kw}') cannot be proxied by ML classification")
             return "invalid"
+
+        # sandbox fast-path: tag said sandbox and domain mismatch didn't fire
+        if "execution: sandbox" in _min_lower:
+            return "local"
 
         system = (
             "You are a strict sandbox feasibility checker. "
@@ -1101,8 +1114,10 @@ Respond with valid JSON only:
 
         # -------------------------------------------------------------- #
         # Domain-specific scaffolds inject precise structural requirements #
+        # Scaffolds are sandbox-only: in kaggle_mode the hypothesis drives  #
+        # the architecture directly (no forced MLP/CPU simplification).     #
         # -------------------------------------------------------------- #
-        if domain_tag == "continual_learning":
+        if domain_tag == "continual_learning" and not kaggle_mode:
             scaffold_note = """
 EXPERIMENT DOMAIN: continual learning / catastrophic forgetting.
 
@@ -1157,7 +1172,7 @@ CRITICAL RULES:
 - CPU only — no .cuda() calls.
 - Total epochs: 200+200 = 400 max. Should complete in under 60 seconds.
 """
-        elif domain_tag == "quantum_like":
+        elif domain_tag == "quantum_like" and not kaggle_mode:
             scaffold_note = """
 EXPERIMENT DOMAIN: quantum-like modeling.
 
@@ -1207,7 +1222,7 @@ IMPORTANT:
 - Do NOT use RandomForest, voting ensembles, or classical ML as the "quantum" model.
 - The quantum-like model must use interference, density matrices, or probability amplitudes.
 """
-        elif domain_tag == "classification":
+        elif domain_tag == "classification" and not kaggle_mode:
             scaffold_note = """
 EXPERIMENT DOMAIN: classification on a REAL benchmark dataset.
 
@@ -1420,6 +1435,18 @@ print('RESULT:', score)
                 "  where score is 0.0-1.0 measuring hypothesis validity\n"
                 "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
                 "- Add a summary table printed at the end comparing baseline vs technique\n"
+                "\n"
+                "ARCHITECTURAL FIDELITY (non-negotiable):\n"
+                "- If the hypothesis explicitly names an architecture or mechanism (e.g. SlotAttention,\n"
+                "  JEPA predictor, causal masking at slot level, Transformer predictor, ResNet, ViT),\n"
+                "  that architecture MUST be implemented in the code.\n"
+                "- It is FORBIDDEN to replace it with a generic CNN, MLP, or any simpler substitute.\n"
+                "  BAD: replacing SlotAttention with Conv2d + pooling.\n"
+                "  BAD: replacing a JEPA predictor with a feed-forward network.\n"
+                "- If you cannot implement the architecture fully (complexity/time), do NOT simplify it.\n"
+                "  Instead, print a warning line: 'ARCHITETTURA PARZIALE: <OriginalName> sostituita da <brief description>'\n"
+                "  and still implement the mechanism (causal masking, training loop, measurement) correctly.\n"
+                "\n"
                 "Return ONLY the Python code. No explanation, no markdown, no backticks."
             )
         else:
@@ -1431,6 +1458,25 @@ print('RESULT:', score)
                 "- sklearn.datasets.load_digits() and load_breast_cancer() ARE available (pre-bundled in sklearn)\n"
                 "- Code must complete in under 120 seconds\n"
                 "- No persistent processes, no while True, no server patterns\n"
+                "\n"
+                "API SAFETY:\n"
+                "- Use ONLY documented methods from numpy, scipy, sklearn. If uncertain whether a method exists,"
+                " prefer a simpler documented alternative. Never invent method names.\n"
+                "\n"
+                "ARRAY SHAPE DISCIPLINE:\n"
+                "- Before any operation between two arrays, add a comment stating both shapes explicitly.\n"
+                "  Example: # a: (N,), b: (N, K) — broadcasting OK\n"
+                "- Verify shapes are compatible before performing the operation.\n"
+                "\n"
+                "ASSERTION DISCIPLINE:\n"
+                "- Assertions must check structural properties (shape, dtype, non-NaN) or invariants with"
+                " mathematical justification from the experiment design.\n"
+                "- Do NOT hardcode expected value ranges in assertions without justification.\n"
+                "  If no mathematical justification exists for a threshold, skip the assertion.\n"
+                "\n"
+                "COMPLEXITY BUDGET (safety net):\n"
+                "- If the naive implementation exceeds ~10^6 basic operations, use sub-sampling or reduce"
+                " problem size to stay within a 60-second single-core runtime.\n"
                 "\n"
                 "MANDATORY OUTPUT PROTOCOL (non-negotiable):\n"
                 "Your code MUST end with EXACTLY these two print statements in this order:\n"
@@ -1731,19 +1777,35 @@ WHAT TO AVOID (these are already known, do not repeat them):
 - Any single well-known technique described in isolation.
 - Any hypothesis whose statement could appear verbatim in a textbook.
 
-SANDBOX RESOURCES AVAILABLE FOR minimum_experiment:
-- sklearn.datasets.load_digits() → 1797 real 8x8 digit images, 10 classes, no download
-- sklearn.datasets.load_breast_cancer() → 569 real samples, binary classification
-- numpy, torch (CPU), sklearn, scipy, pandas
-- NO internet, NO GPU, NO external files
+EXECUTION TRACKS — scegli quello giusto per l'ipotesi:
 
-CAPABILITY CONTRACT (hard constraints — not suggestions):
-- The experiment MUST be executable with Python + numpy/scipy only
-- NO external datasets, NO domain-specific data (fMRI, clinical records, satellite imagery,
-  EEG signals, genomic data, sensor streams, real-world time series)
-- You MUST specify explicitly HOW the phenomenon is simulated with synthetic data
-- If the hypothesis requires real-world variability to be meaningful → DO NOT propose it;
-  generate a different hypothesis instead
+TRACK A — SANDBOX (veloce, locale, senza GPU):
+  Risorse: numpy, torch (CPU), sklearn, scipy, pandas
+  Dataset disponibili: sklearn.datasets.load_digits(), load_breast_cancer() — nessun download
+  Limite: deve completarsi in meno di 60 secondi su CPU single-core
+  Usa quando: il meccanismo è verificabile con dati sintetici/piccoli, nessun hardware speciale
+  Nel minimum_experiment scrivi: "EXECUTION: sandbox"
+
+TRACK B — KAGGLE GPU (complesso, dati reali, GPU):
+  Risorse: torch (CUDA T4/P100), torchvision, PyTorch completo
+  Dataset disponibili: MNIST, CIFAR-10, split di ImageNet — scaricabili via torchvision
+  Limite: deve completarsi in meno di 2 ore su GPU T4
+  Usa quando: il meccanismo richiede dati reali, architetture profonde, training su larga scala,
+  o l'ipotesi testa proprietà che emergono solo a scala (es. catastrophic forgetting,
+  generalizzazione di world model, comportamenti di architetture neurali complesse)
+  Nel minimum_experiment scrivi: "EXECUTION: kaggle_gpu"
+
+CAPABILITY CONTRACT (vale per entrambi i track):
+- NO dati grezzi di dominio non ottenibili programmaticamente (file fMRI, cartelle cliniche,
+  immagini satellitari proprietarie, database genomici)
+- L'esperimento deve testare direttamente il meccanismo causale — non un proxy
+- Entrambi i track devono produrre uno scalare numerico V confrontabile tra condizioni
+
+IMPORTANTE: NON semplificare un'ipotesi interessante per farla stare nel TRACK A se
+appartiene al TRACK B. Un'ipotesi su world model generalization, catastrophic forgetting,
+scaling di architetture neurali, o modelli tipo JEPA/SlotAttention/Transformer predictor
+appartiene al TRACK B. Scegliere TRACK A per un'ipotesi TRACK B produce un esperimento
+toy privo di significato scientifico.
 
 CRITICAL RULES FOR minimum_experiment:
 1. Use load_digits or load_breast_cancer ONLY if the hypothesis is genuinely about
@@ -1755,7 +1817,7 @@ CRITICAL RULES FOR minimum_experiment:
 3. If the hypothesis is about ML techniques (regularization, training dynamics, continual
    learning, robustness): describe the technique applied to a real ML problem, not just
    a classification accuracy comparison.
-4. The minimum_experiment MUST be written using this EXACT 5-section structure (all 5 required):
+4. The minimum_experiment MUST be written using this EXACT 6-section structure (all 6 required):
 
    MECHANISM: [The causal mechanism. MUST include: property P of domain_from reduces/increases
                process Q in domain_to. MUST define: VARIABLE: V = <observable formula or metric name>]
@@ -1765,6 +1827,12 @@ CRITICAL RULES FOR minimum_experiment:
                  defined in MECHANISM]
    SUCCESS CRITERION: [<name_of_V> condition: e.g. "delta_V > 0.10 on held-out test set"]
    CONTROL: [1-2 confounders held constant: e.g. "random seed fixed; sample size equal across conditions"]
+   EXECUTION: [EXACTLY one of: "sandbox" or "kaggle_gpu" — no other values accepted.
+               sandbox = 60s CPU, numpy/sklearn only, synthetic data.
+               kaggle_gpu = T4 GPU, torchvision, real datasets, up to 2 hours.
+               You MUST choose kaggle_gpu if the hypothesis involves: deep neural architectures,
+               continual learning, world models, JEPA, SlotAttention, Transformer training,
+               catastrophic forgetting, or any mechanism that requires scale to manifest.]
 
    CHAIN REQUIREMENT: MECHANISM defines V → INTERVENTION computes V → MEASUREMENT reports V →
    SUCCESS CRITERION thresholds V. All 4 must reference the same observable variable.
@@ -1776,20 +1844,30 @@ CRITICAL RULES FOR minimum_experiment:
      "better results", "higher score" — these are not isolating measurements.
    REQUIRED: a named variable V that changes *because of* and *only because of* the mechanism in MECHANISM.
 
-   EXAMPLE (correct):
+   EXAMPLE (correct — TRACK A):
    MECHANISM: Dropout regularization reduces co-adaptation between neurons. VARIABLE: V = test_accuracy
    INTERVENTION: Train 2-layer MLP with dropout=0.5 vs no dropout on synthetic classification data.
                  Simulated as: X = np.random.randn(1000, 20), y = (X[:,0] > 0).astype(int)
    MEASUREMENT: Metric: test_accuracy — fraction correct on 20% held-out split
    SUCCESS CRITERION: test_accuracy(dropout) > test_accuracy(baseline) + 0.03
    CONTROL: Random seed fixed at 42; learning rate identical across conditions
+   EXECUTION: sandbox
+
+   EXAMPLE (correct — TRACK B):
+   MECHANISM: Causal masking in JEPA reduces nuisance variable influence on world model representations. VARIABLE: V = generalization_gap
+   INTERVENTION: Train JEPA encoder with/without causal mask on CIFAR-10 via torchvision.
+                 Simulated as: torchvision.datasets.CIFAR10(download=True)
+   MEASUREMENT: Metric: generalization_gap — difference in accuracy between in-distribution and OOD test sets
+   SUCCESS CRITERION: generalization_gap(causal_mask) < generalization_gap(baseline) - 0.05
+   CONTROL: Random seed fixed at 42; learning rate and batch size identical across conditions
+   EXECUTION: kaggle_gpu
 
    EXAMPLE (wrong — proxy metric, will be rejected):
    MEASUREMENT: Metric: overall model performance  ← NOT acceptable
    SUCCESS CRITERION: performance improves by >5%  ← NOT acceptable
 
-   This is NOT optional. A minimum_experiment missing the VARIABLE binding, CONTROL, or using
-   proxy metrics will be rejected.
+   This is NOT optional. A minimum_experiment missing any of the 6 sections will be rejected.
+   Missing EXECUTION section = automatic rejection.
 
 "hypothesis": {{
   "statement": "one sentence — the specific, non-obvious cross-domain claim",
@@ -1797,7 +1875,7 @@ CRITICAL RULES FOR minimum_experiment:
   "domain_to": "target domain/problem where it is applied",
   "rationale": "why this transfer is non-obvious and has NOT been widely studied (cite what IS known, explain the gap)",
   "falsifiable": true or false,
-  "minimum_experiment": "MECHANISM: ... VARIABLE: V=... INTERVENTION: ... Simulated as:... MEASUREMENT: Metric: V ... SUCCESS CRITERION: V>... CONTROL: ...",
+  "minimum_experiment": "MECHANISM: ... VARIABLE: V=... INTERVENTION: ... Simulated as:... MEASUREMENT: Metric: V ... SUCCESS CRITERION: V>... CONTROL: ... EXECUTION: sandbox",
   "confidence": 0.0 to 1.0
 }}
 

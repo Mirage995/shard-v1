@@ -685,7 +685,7 @@ class ExperimentDesignPhase(BasePhase):
             # ── Calibration record (failed path) ─────────────────────────────
             _calib_append({
                 "ts":               time.strftime("%Y-%m-%dT%H:%M:%S"),
-                "hypothesis":       (hypothesis.get("statement", "") or "")[:100],
+                "hypothesis":       (hypothesis.get("statement", "") or ""),
                 "domain_from":      hypothesis.get("domain_from", ""),
                 "domain_to":        hypothesis.get("domain_to", ""),
                 "kaggle_feasible":  is_kaggle,
@@ -712,7 +712,7 @@ class ExperimentDesignPhase(BasePhase):
         # ── Calibration record (success path) ────────────────────────────────
         _calib_append({
             "ts":               time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "hypothesis":       (hypothesis.get("statement", "") or "")[:100],
+            "hypothesis":       (hypothesis.get("statement", "") or ""),
             "domain_from":      hypothesis.get("domain_from", ""),
             "domain_to":        hypothesis.get("domain_to", ""),
             "kaggle_feasible":  is_kaggle,
@@ -724,6 +724,20 @@ class ExperimentDesignPhase(BasePhase):
             "coercions_count":  _coercions_count,
             "regressions_count": _regressions_count,
         })
+
+        # ── Log ipotesi completa (per verifica qualità / before-after) ────────
+        _min_exp_raw = (hypothesis.get("minimum_experiment") or "").lower()
+        if "execution: kaggle_gpu" in _min_exp_raw:
+            _exec_track = "kaggle_gpu"
+        elif "execution: sandbox" in _min_exp_raw:
+            _exec_track = "sandbox"
+        else:
+            _exec_track = "kaggle_gpu" if is_kaggle else "sandbox (no tag)"
+        print(f"[HYPOTHESIS] track={_exec_track} | {hypothesis.get('domain_from','')} → {hypothesis.get('domain_to','')}")
+        print(f"[HYPOTHESIS] statement: {hypothesis.get('statement','')}")
+        _min_exp = hypothesis.get('minimum_experiment', '')
+        if _min_exp:
+            print(f"[HYPOTHESIS] min_exp: {_min_exp[:300]}")
 
         # ── Generate code ─────────────────────────────────────────────────────
         await ctx.emit("EXPERIMENT_DESIGN", 0, f"Designing experiment for: '{hypothesis.get('statement','')[:60]}...'")
