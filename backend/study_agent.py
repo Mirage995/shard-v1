@@ -902,7 +902,13 @@ CRITERION 4 — IMPLEMENTABILITY (runnable: numpy/scipy/torch-CPU, no downloads,
   Score 0.0 if needs external API, RL environment, or large corpora.
   Your score: ___
 
-alignment_score = average of the 4 scores above.
+CRITERION 5 — BASELINE CLARITY (does the experiment explicitly describe what the baseline is?)
+  Score 1.0 if the baseline approach is named and described (e.g. "standard SGD without the technique").
+  Score 0.5 if a comparison is implied but baseline is not explicitly named.
+  Score 0.0 if no baseline is mentioned at all — only the technique is described.
+  Your score: ___
+
+alignment_score = average of the 5 scores above.
 
 DECISION:
   alignment_score >= 0.70 → VALID
@@ -941,6 +947,7 @@ Respond with valid JSON only:
   "domain_fidelity_data_realism": <0.0-1.0>,
   "falsifiability": <0.0-1.0>,
   "implementability": <0.0-1.0>,
+  "baseline_clarity": <0.0-1.0>,
   "alignment_score": <leave as 0.0 — will be computed by code>,
   "verdict": "VALID" | "REWRITE" | "INVALID",
   "issues": ["specific weakness 1", "specific weakness 2"],
@@ -970,7 +977,7 @@ Respond with valid JSON only:
                 }
 
             # Check output contract: required fields (DF now split into two sub-scores)
-            criteria_keys = ("causal_link", "domain_fidelity_mechanism", "domain_fidelity_data_realism", "falsifiability", "implementability")
+            criteria_keys = ("causal_link", "domain_fidelity_mechanism", "domain_fidelity_data_realism", "falsifiability", "implementability", "baseline_clarity")
             criteria_present = all(k in result for k in criteria_keys)
 
             if not criteria_present:
@@ -985,6 +992,7 @@ Respond with valid JSON only:
                     '  "domain_fidelity_data_realism": <float>,\n'
                     '  "falsifiability": <float>,\n'
                     '  "implementability": <float>,\n'
+                    '  "baseline_clarity": <float>,\n'
                     '  "alignment_score": 0.0,\n'
                     '  "verdict": "VALID" | "REWRITE" | "INVALID",\n'
                     '  "issues": ["..."],\n'
@@ -1029,14 +1037,16 @@ Respond with valid JSON only:
                 domain_fidelity = df_mech * 0.9 + df_data * 0.1
             domain_fidelity = max(0.0, min(1.0, domain_fidelity))
 
-            # Compute score from 4 criteria using composite DF (authoritative)
+            # Compute score from 5 criteria using composite DF (authoritative)
+            baseline_clarity = float(result.get("baseline_clarity", 0.5))
             criteria_scores = [
                 float(result["causal_link"]),
                 domain_fidelity,
                 float(result["falsifiability"]),
                 float(result["implementability"]),
+                baseline_clarity,
             ]
-            score = sum(criteria_scores) / 4.0
+            score = sum(criteria_scores) / 5.0
             score = max(0.0, min(0.99, score))   # hard-cap at 0.99, never 1.0 from code
 
             # Score-based verdict (override LLM's own verdict for stability)
@@ -1060,6 +1070,7 @@ Respond with valid JSON only:
                 "domain_fidelity_data_realism":  round(df_data, 3),
                 "falsifiability":                round(float(result["falsifiability"]), 3),
                 "implementability":              round(float(result["implementability"]), 3),
+                "baseline_clarity":              round(baseline_clarity, 3),
             }
             result.update({
                 "verdict":            verdict,
@@ -1421,6 +1432,8 @@ print("="*60)
 assert results["Baseline (SGD)"]["t1_before"] >= 0.90, "Task-1 pre-training too weak"
 assert 0 <= score <= 1.0, f"Score out of range: {score}"
 print('OK All assertions passed')
+print('RESULT_BASELINE:', round(float(baseline_bwt), 4))
+print('RESULT_TECHNIQUE:', round(float(technique_bwt), 4))
 print('RESULT:', score)
 """
 
@@ -1435,11 +1448,16 @@ print('RESULT:', score)
                 "- DEVICE = torch.device('cpu')  — hardcode CPU, do NOT use 'cuda'\n"
                 "  DO NOT call .cuda(), .to('cuda'), or torch.device('cuda'). CPU only.\n"
                 "- Kaggle gives you 16GB RAM and up to 9 hours — use this for larger models/datasets than sandbox\n"
-                "- print('OK All assertions passed') MUST appear before the RESULT line\n"
-                "- The FINAL line MUST be exactly:\n"
-                "    print('RESULT:', round(float(score), 4))\n"
-                "  where score is 0.0-1.0 measuring hypothesis validity\n"
-                "  (1.0 = strongly supports hypothesis, 0.0 = refutes it)\n"
+                "- print('OK All assertions passed') MUST appear before the RESULT lines\n"
+                "- Code MUST implement BOTH a BASELINE (standard approach) AND TECHNIQUE (proposed method)\n"
+                "  on the SAME data split.\n"
+                "- The FINAL output MUST be exactly these lines in this order:\n"
+                "    print('RESULT_BASELINE:', round(float(baseline_metric), 4))\n"
+                "    print('RESULT_TECHNIQUE:', round(float(technique_metric), 4))\n"
+                "    result = (technique_metric - baseline_metric) / (1.0 - baseline_metric + 1e-8)\n"
+                "    result = round(min(max(float(result), -1.0), 1.0), 4)\n"
+                "    print('RESULT:', result)\n"
+                "  where baseline_metric and technique_metric are 0.0-1.0 from real measurements\n"
                 "- Add a summary table printed at the end comparing baseline vs technique\n"
                 "\n"
                 "PYTORCH API CORRECTNESS (common mistakes that cause AttributeError):\n"
@@ -1543,15 +1561,20 @@ print('RESULT:', score)
                 " problem size to stay within a 60-second single-core runtime.\n"
                 "\n"
                 "MANDATORY OUTPUT PROTOCOL (non-negotiable):\n"
-                "Your code MUST end with EXACTLY these two print statements in this order:\n"
+                "Your code MUST implement BOTH a BASELINE (standard approach without the technique)\n"
+                "AND a TECHNIQUE (the proposed method) on the SAME data split.\n"
+                "Your code MUST end with EXACTLY these statements in this order:\n"
                 "  print('OK All assertions passed')\n"
-                "  print('RESULT:', round(float(score), 4))\n"
+                "  print('RESULT_BASELINE:', round(float(baseline_metric), 4))\n"
+                "  print('RESULT_TECHNIQUE:', round(float(technique_metric), 4))\n"
+                "  result = (technique_metric - baseline_metric) / (1.0 - baseline_metric + 1e-8)\n"
+                "  result = round(min(max(float(result), -1.0), 1.0), 4)\n"
+                "  print('RESULT:', result)\n"
                 "\n"
-                "The RESULT line is parsed by an automated system.\n"
-                "If this line is missing, the entire experiment is discarded as INCONCLUSIVE.\n"
-                "score must be a float 0.0-1.0 derived from real measurements:\n"
-                "  score = (technique_metric - baseline_metric) / (baseline_metric + 1e-8)\n"
-                "Do NOT use random numbers or constants as score.\n"
+                "All three RESULT lines are parsed by an automated system.\n"
+                "If any is missing, the experiment is discarded as INCONCLUSIVE.\n"
+                "baseline_metric and technique_metric must be floats 0.0-1.0 from real measurements.\n"
+                "Do NOT use random numbers or constants as scores.\n"
                 "Return ONLY the Python code. No explanation, no markdown, no backticks."
             )
 
@@ -1677,8 +1700,38 @@ Follow the structure above exactly. Compute score from real measurements, not ra
 
         # ── Deterministic RESULT extraction ──────────────────────────────────
         # Allow negative deltas (e.g. BWT reduction) with [-+]?
-        result_match = _re.search(r"RESULT:\s*([-+]?[\d.]+)", stdout)
+        result_match    = _re.search(r"RESULT:\s*([-+]?[\d.]+)", stdout)
+        baseline_match  = _re.search(r"RESULT_BASELINE:\s*([-+]?[\d.]+)", stdout)
+        technique_match = _re.search(r"RESULT_TECHNIQUE:\s*([-+]?[\d.]+)", stdout)
+
         result_score = float(result_match.group(1)) if result_match else None
+
+        # Baseline/technique cross-validation
+        if result_score is not None and baseline_match and technique_match:
+            baseline  = float(baseline_match.group(1))
+            technique = float(technique_match.group(1))
+            expected  = (technique - baseline) / (1.0 - baseline + 1e-8)
+            expected  = min(max(expected, -1.0), 1.0)
+            if abs(result_score - expected) > 0.05:
+                reason = (
+                    f"Result calculation mismatch: declared RESULT={result_score} "
+                    f"but RESULT_BASELINE={baseline} RESULT_TECHNIQUE={technique} "
+                    f"implies expected={round(expected, 4)}"
+                )
+                print(f"[EXPERIMENT] {reason} -- forcing INCONCLUSIVE")
+                return {
+                    "status":             "INCONCLUSIVE",
+                    "confidence_updated": conf_init,
+                    "reasoning":          reason,
+                }
+        elif result_score is not None and (not baseline_match or not technique_match):
+            reason = "Missing baseline or technique: RESULT_BASELINE and RESULT_TECHNIQUE required"
+            print(f"[EXPERIMENT] {reason} -- forcing INCONCLUSIVE")
+            return {
+                "status":             "INCONCLUSIVE",
+                "confidence_updated": conf_init,
+                "reasoning":          reason,
+            }
 
         # Fix 1: if no RESULT line → INCONCLUSIVE immediately, never ask LLM to guess
         if result_score is None:
