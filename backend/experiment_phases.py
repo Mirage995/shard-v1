@@ -398,9 +398,9 @@ class ExperimentDesignPhase(BasePhase):
         elif is_kaggle:
             await ctx.emit(
                 "EXPERIMENT_DESIGN", 0,
-                "Experiment needs external compute (GPU/data) -- generating Kaggle-ready code"
+                "Experiment needs Kaggle CPU (16GB RAM, real datasets) -- generating Kaggle-ready code (CPU-only)"
             )
-            print(f"[EXPERIMENT_DESIGN] KAGGLE_READY -- generating code for: '{hypothesis.get('statement','')[:80]}'")
+            print(f"[EXPERIMENT_DESIGN] KAGGLE_READY (CPU) -- generating code for: '{hypothesis.get('statement','')[:80]}'")
 
         # ── 4-section enforcement gate (deterministic, pre-validator) ──────────
         # If minimum_experiment is free-form, attempt one targeted LLM reformat.

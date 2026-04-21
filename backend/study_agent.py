@@ -1098,7 +1098,8 @@ Respond with valid JSON only:
         """Translate hypothesis.minimum_experiment into executable Python.
 
         kaggle_mode=False → sandbox code (numpy/sklearn/torch CPU, no downloads, <120s)
-        kaggle_mode=True  → Kaggle notebook code (GPU, torchvision, real datasets OK)
+        kaggle_mode=True  → Kaggle notebook code (CPU-only, 16GB RAM, up to 9h,
+                            torchvision datasets OK with download=True, NO CUDA)
 
         Called by ExperimentDesignPhase when research_mode=True.
         Returns raw Python code string (no markdown, no explanation).
@@ -1294,7 +1295,7 @@ import numpy as np, random, matplotlib.pyplot as plt
 from copy import deepcopy
 
 SEED = 42; torch.manual_seed(SEED); np.random.seed(SEED); random.seed(SEED)
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cpu")  # Kaggle P100 not compatible with PyTorch 2.x (sm_60 < sm_70)
 print(f"Device: {DEVICE}")
 
 --- DATA: Split-MNIST ---
@@ -1427,13 +1428,13 @@ print('RESULT:', score)
             system = (
                 "Generate self-contained Python code for a Kaggle notebook to test a scientific hypothesis.\n"
                 "CONSTRAINTS:\n"
-                "- Target: Kaggle GPU environment (Tesla T4 or P100)\n"
-                "- Available: torch (CUDA), torchvision, numpy, sklearn, scipy, pandas, matplotlib\n"
-                "- Datasets: torchvision.datasets.MNIST, CIFAR10, etc. (downloaded via torchvision)\n"
+                "- Target: Kaggle CPU environment (P100 GPU is NOT usable — PyTorch CUDA minimum is sm_70, P100 is sm_60)\n"
+                "- Available: torch (CPU only), torchvision, numpy, sklearn, scipy, pandas, matplotlib\n"
+                "- Datasets: torchvision.datasets.MNIST, CIFAR10, CIFAR100 etc. (download=True is OK)\n"
                 "- Code must be self-contained and run top-to-bottom in a single cell\n"
-                "- Use DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n"
-                "  print('Device:', DEVICE)\n"
-                "  ALL tensors and models must be moved to DEVICE.\n"
+                "- DEVICE = torch.device('cpu')  — hardcode CPU, do NOT use 'cuda'\n"
+                "  DO NOT call .cuda(), .to('cuda'), or torch.device('cuda'). CPU only.\n"
+                "- Kaggle gives you 16GB RAM and up to 9 hours — use this for larger models/datasets than sandbox\n"
                 "- print('OK All assertions passed') MUST appear before the RESULT line\n"
                 "- The FINAL line MUST be exactly:\n"
                 "    print('RESULT:', round(float(score), 4))\n"
@@ -1929,13 +1930,13 @@ TRACK A — SANDBOX (veloce, locale, senza GPU):
   Usa quando: il meccanismo è verificabile con dati sintetici/piccoli, nessun hardware speciale
   Nel minimum_experiment scrivi: "EXECUTION: sandbox"
 
-TRACK B — KAGGLE GPU (complesso, dati reali, GPU media):
-  Risorse: torch (CUDA), torchvision, PyTorch completo
+TRACK B — KAGGLE CPU (complesso, dati reali, CPU con molta RAM):
+  Risorse: torch (CPU only — NESSUNA GPU CUDA), torchvision, sklearn, scipy, pandas
   Dataset disponibili: MNIST, CIFAR-10, CIFAR-100 — scaricabili via torchvision
-  Limite: deve completarsi in meno di 2 ore su GPU T4 (16GB VRAM)
-  Usa quando: il meccanismo richiede dati reali, architetture profonde su scala media,
-  o l'ipotesi testa proprietà che emergono su MNIST/CIFAR (es. catastrophic forgetting
-  su poche classi, slot attention su immagini piccole, world model su sequenze corte)
+  RAM disponibile: 16GB. Durata: fino a 9 ore.
+  Usa quando: il meccanismo richiede dati reali (MNIST/CIFAR), architetture piccole/medie
+  che girano in tempi accettabili su CPU, o esperimenti sklearn/numpy troppo lenti per sandbox.
+  NON usare per: deep learning che richiede GPU — usa modal_gpu.
   Nel minimum_experiment scrivi: "EXECUTION: kaggle_gpu"
 
 TRACK C — MODAL GPU (grande scala, architetture massive, lunga durata):
@@ -1975,20 +1976,25 @@ CRITICAL RULES FOR minimum_experiment:
                process Q in domain_to. MUST define: VARIABLE: V = <observable formula or metric name>]
    INTERVENTION: [What is manipulated — technique vs baseline. MUST include:
                   For sandbox: "Simulated as: generate <data> using <numpy/scipy distribution or process>"
-                  For kaggle_gpu/modal_gpu: "Implemented as: use torchvision.datasets.CIFAR10/MNIST/CIFAR100 with download=True"
+                  For kaggle_gpu: "Implemented as: use torchvision.datasets.MNIST/CIFAR10 with download=True (CPU-only)"
+                  For modal_gpu: "Implemented as: use torchvision.datasets.CIFAR100/ImageNet with download=True (GPU required)"
                   Choose the correct form based on the EXECUTION field of this experiment.]
    MEASUREMENT: [Metric: <name_of_V> — computed as <exact formula>. Must use the same variable V
                  defined in MECHANISM]
    SUCCESS CRITERION: [<name_of_V> condition: e.g. "delta_V > 0.10 on held-out test set"]
    CONTROL: [1-2 confounders held constant: e.g. "random seed fixed; sample size equal across conditions"]
    EXECUTION: [EXACTLY one of: "sandbox", "kaggle_gpu", or "modal_gpu" — no other values accepted.
-               sandbox    = 60s CPU, numpy/sklearn only, synthetic data.
-               kaggle_gpu = GPU, torchvision, MNIST/CIFAR scale, up to 2 hours, max 16GB VRAM.
-               modal_gpu  = A100/H100, ImageNet scale, models > 1B params, training > 2h, > 16GB VRAM.
-               You MUST choose kaggle_gpu if: deep neural architectures on MNIST/CIFAR, continual
-               learning at small scale, JEPA/SlotAttention on small images, catastrophic forgetting.
-               You MUST choose modal_gpu if: ImageNet training, ViT-Large/GPT-2+/CLIP/DINO,
-               scaling laws across model sizes, fine-tuning large pretrained models, > 16GB VRAM.]
+               sandbox    = 60s CPU, numpy/sklearn only, synthetic data, < 120s.
+               kaggle_gpu = Kaggle CPU (16GB RAM, up to 9h), torchvision datasets OK (download=True),
+                            torch CPU only — NO CUDA. For experiments too slow for sandbox but
+                            not requiring GPU: sklearn on real data, small torchvision models on CPU,
+                            feature engineering, continual learning on MNIST with tiny MLP (CPU).
+               modal_gpu  = A100/H100 GPU, ImageNet scale, deep learning, ViT/ResNet/Transformer,
+                            models > 100M params, training > 10min, requires CUDA acceleration.
+               You MUST choose kaggle_gpu if: continual learning on MNIST (small MLP CPU),
+               sklearn on CIFAR features, feature analysis, numpy-heavy experiments > 60s.
+               You MUST choose modal_gpu if: any deep neural net needing GPU, CIFAR training with
+               ViT/ResNet, ImageNet, models > 100M params, training > 10 minutes on CPU would be too slow.]
 
    CHAIN REQUIREMENT: MECHANISM defines V → INTERVENTION computes V → MEASUREMENT reports V →
    SUCCESS CRITERION thresholds V. All 4 must reference the same observable variable.
