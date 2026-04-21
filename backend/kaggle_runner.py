@@ -58,10 +58,14 @@ def push_kernel(code: str, slug: str, title: str, username: str = "andreabonizz"
         script_path = tmp / "experiment.py"
         script_path.write_text(code, encoding="utf-8")
 
+        # Force unique title — Kaggle matches push by title and updates existing kernel
+        # if the title already exists, ignoring the new slug in the metadata id.
+        unique_title = f"{title} {time.strftime('%m%d%H%M%S')}"
+
         # Kernel metadata
         meta = {
             "id": f"{username}/{slug}",
-            "title": title,
+            "title": unique_title,
             "code_file": "experiment.py",
             "language": "python",
             "kernel_type": "script",
@@ -82,8 +86,23 @@ def push_kernel(code: str, slug: str, title: str, username: str = "andreabonizz"
         if result.returncode != 0:
             raise RuntimeError(f"kaggle kernels push failed: {result.stderr.strip()}")
 
+    # Kaggle derives the slug from the title, not from the metadata id field.
+    # List kernels and find the one just created by matching the unique title.
+    time.sleep(3)
+    list_result = subprocess.run(
+        ["kaggle", "kernels", "list", "--mine", "--page-size", "20", "--csv"],
+        capture_output=True, text=True, env=env
+    )
+    for line in list_result.stdout.strip().split("\n"):
+        parts = line.split(",")
+        if len(parts) >= 2 and parts[1].strip() == unique_title:
+            kernel_ref = parts[0].strip()
+            print(f"[KAGGLE] Pushed kernel: {kernel_ref} (title: {unique_title})")
+            return kernel_ref
+
+    # Fallback: return the slug we passed (may not be accessible)
     kernel_ref = f"{username}/{slug}"
-    print(f"[KAGGLE] Pushed kernel: {kernel_ref}")
+    print(f"[KAGGLE] WARNING: could not find kernel by title — falling back to {kernel_ref}")
     return kernel_ref
 
 
