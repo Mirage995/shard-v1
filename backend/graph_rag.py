@@ -354,6 +354,58 @@ def get_graph_stats() -> dict:
         return {"total_relations": 0, "by_type": {}}
 
 
+def get_epistemic_profile(topic: str) -> dict:
+    """Return epistemic quality metrics for a topic's causal subgraph.
+
+    freshness = (verified*1.0 + untested*0.6 + unsure*0.3) / total
+    Only counts relations with confidence >= 0.6 that are not disputed.
+    """
+    try:
+        from shard_db import query as db_query
+        keyword = topic.lower().strip()
+        rows = db_query("""
+            SELECT verified_status
+            FROM knowledge_graph
+            WHERE confidence >= 0.6
+              AND (verified_status IS NULL OR verified_status != 'disputed')
+              AND (
+                  LOWER(source_concept) LIKE ?
+                  OR LOWER(target_concept) LIKE ?
+                  OR LOWER(topic_origin) = ?
+              )
+        """, (f"%{keyword}%", f"%{keyword}%", keyword))
+
+        total = len(rows)
+        if total == 0:
+            return {"freshness": 1.0, "status": "unknown", "total": 0,
+                    "verified": 0, "unsure": 0, "untested": 0}
+
+        verified = sum(1 for r in rows if r["verified_status"] == "verified")
+        unsure   = sum(1 for r in rows if r["verified_status"] == "unsure")
+        untested = sum(1 for r in rows if r["verified_status"] is None)
+
+        freshness = (verified * 1.0 + untested * 0.6 + unsure * 0.3) / total
+
+        if freshness >= 0.7:
+            status = "strong"
+        elif freshness >= 0.5:
+            status = "moderate"
+        else:
+            status = "weak"
+
+        return {
+            "freshness": round(freshness, 3),
+            "status": status,
+            "total": total,
+            "verified": verified,
+            "unsure": unsure,
+            "untested": untested,
+        }
+    except Exception:
+        return {"freshness": 1.0, "status": "unknown", "total": 0,
+                "verified": 0, "unsure": 0, "untested": 0}
+
+
 # Run schema migration on first import
 try:
     ensure_schema()

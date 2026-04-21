@@ -1658,6 +1658,20 @@ class NightRunner:
             except Exception as _kcd_err:
                 self.logger.debug("[KCD] analyze/apply non-fatal: %s", _kcd_err)
 
+            # Epistemic penalty: weak causal subgraph → lower predicted_score
+            try:
+                from backend.graph_rag import get_epistemic_profile
+                _ep = get_epistemic_profile(topic)
+                if _ep.get("freshness", 1.0) < 0.4 and _ep.get("total", 0) > 3:
+                    _old_score = _predicted_score or 5.0
+                    _predicted_score = max(0.0, _old_score - 1.5)
+                    self.logger.info(
+                        "[EPISTEMIC] Topic '%s' sottografo debole (freshness=%.2f) — predicted_score %.1f -> %.1f",
+                        topic, _ep["freshness"], _old_score, _predicted_score,
+                    )
+            except Exception:
+                pass
+
             async def on_certify(t, s, e_data):
                 cycle_data["certified"] = True
                 cycle_data["score"] = s

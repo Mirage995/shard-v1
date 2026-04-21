@@ -621,6 +621,7 @@ class CognitionCore:
             goal=goal_data,
             real_identity=real_id,
             desire=desire_data,
+            topic=topic,
         )
         if tensions:
             lines.append("")
@@ -930,6 +931,7 @@ def _detect_tensions(
     goal: Optional[Dict] = None,
     real_identity: Optional[Dict] = None,
     desire: Optional[Dict] = None,
+    topic: str = "",
 ) -> List[str]:
     """Detect meaningful conflicts between layers.
 
@@ -1032,6 +1034,22 @@ def _detect_tensions(
             f"-- questo topic è adiacente a qualcosa che SHARD ha appena padroneggiato. "
             f"Sfrutta il momentum cognitivo recente."
         )
+
+    # Vettore 9: Epistemic quality -- causal subgraph weak for this topic
+    if topic:
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "backend"))
+            from graph_rag import get_epistemic_profile
+            ep = get_epistemic_profile(topic)
+            if ep["total"] > 3 and ep["freshness"] < 0.5:
+                tensions.append(
+                    f"Vettore 9 (Qualità Epistemica): freshness={ep['freshness']:.0%} "
+                    f"({ep['verified']}/{ep['total']} relazioni verificate) — "
+                    "il fondamento causale è debole, procedi con cautela"
+                )
+        except Exception:
+            pass
 
     # Near-miss tension: so close, yet keeps failing
     if near_miss and attempts >= 2:
