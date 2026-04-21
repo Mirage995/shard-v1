@@ -201,6 +201,7 @@ def query_causal_context(topic_or_concept: str, max_hops: int = 2) -> str:
             SELECT source_concept, target_concept, relation_type, context, confidence
             FROM knowledge_graph
             WHERE confidence >= 0.6
+              AND (verified_status IS NULL OR verified_status != 'disputed')
             ORDER BY confidence DESC
             LIMIT 50
         """)
@@ -261,6 +262,7 @@ def get_related_topics(topic: str, relation_types: list[str] | None = None, limi
             FROM knowledge_graph
             WHERE relation_type IN ({placeholders})
               AND confidence >= 0.6
+              AND (verified_status IS NULL OR verified_status != 'disputed')
             ORDER BY confidence DESC
             LIMIT 100
             """,
@@ -286,6 +288,7 @@ def get_related_topics(topic: str, relation_types: list[str] | None = None, limi
                 FROM knowledge_graph
                 WHERE relation_type IN ({placeholders})
                   AND confidence >= 0.6
+                  AND (verified_status IS NULL OR verified_status != 'disputed')
                 ORDER BY confidence DESC
                 LIMIT 100
                 """,
@@ -317,6 +320,7 @@ def count_causal_hits(topic_or_concept: str) -> int:
             SELECT source_concept, target_concept, context
             FROM knowledge_graph
             WHERE confidence >= 0.6
+              AND (verified_status IS NULL OR verified_status != 'disputed')
             LIMIT 50
         """)
         return sum(
