@@ -1444,6 +1444,12 @@ print('RESULT:', score)
                 "PYTORCH API CORRECTNESS (common mistakes that cause AttributeError):\n"
                 "- nn.MultiheadAttention(embed_dim, num_heads) — lowercase 'h', embed_dim FIRST\n"
                 "  WRONG: nn.MultiHeadAttention(num_heads, dim)  RIGHT: nn.MultiheadAttention(dim, num_heads)\n"
+                "- nn.MultiheadAttention.forward() requires 3 positional args: (query, key, value)\n"
+                "  WRONG: attn(x, x)          RIGHT: attn(x, x, x)  # self-attention: all three are the same\n"
+                "- Transformer/ViT output is (B, seq_len, dim) — MUST pool before classifier:\n"
+                "  WRONG: classifier(x)  where x is (B, seq_len, dim) → batch_size mismatch error\n"
+                "  RIGHT: x = x[:, 0]  # CLS token   OR  x = x.mean(dim=1)  # mean pooling\n"
+                "  Then: out = classifier(x)  where x is now (B, dim)\n"
                 "- nn.TransformerEncoder/Decoder — correct capitalization\n"
                 "- torch.nn.functional.scaled_dot_product_attention exists only in PyTorch >= 2.0\n"
                 "- Always verify method names against PyTorch 2.x docs before using\n"
@@ -1481,6 +1487,19 @@ print('RESULT:', score)
                 "- If you cannot implement the architecture fully (complexity/time), do NOT simplify it.\n"
                 "  Instead, print a warning line: 'ARCHITETTURA PARZIALE: <OriginalName> sostituita da <brief description>'\n"
                 "  and still implement the mechanism (causal masking, training loop, measurement) correctly.\n"
+                "\n"
+                "DATA SOURCE RULES — MANDATORY FOR GPU TRACKS (violating this = invalid experiment):\n"
+                "- NEVER use np.random.rand() or np.random.randn() to create the training/test dataset.\n"
+                "  Reason: random arrays contain no learnable signal → model gets ~1% accuracy → experiment fails assertions.\n"
+                "- ALWAYS load data from torchvision.datasets: MNIST, CIFAR10, CIFAR100, FashionMNIST, etc.\n"
+                "  Correct pattern:\n"
+                "    from torchvision import datasets, transforms\n"
+                "    transform = transforms.Compose([transforms.ToTensor()])\n"
+                "    train_ds = datasets.CIFAR100(root='.', train=True, download=True, transform=transform)\n"
+                "    test_ds  = datasets.CIFAR100(root='.', train=False, download=True, transform=transform)\n"
+                "    train_loader = DataLoader(train_ds, batch_size=128, shuffle=True)\n"
+                "- Synthetic numpy arrays are ONLY acceptable for auxiliary data: masks, indices, positional encodings.\n"
+                "  They must NEVER be the X/y inputs to your model.\n"
                 "\n"
                 "Return ONLY the Python code. No explanation, no markdown, no backticks."
             )
@@ -1549,6 +1568,70 @@ Follow the structure above exactly. Compute score from real measurements, not ra
                 l for l in lines
                 if not l.strip().startswith("```")
             ).strip()
+
+        # Deterministic API fixes — the LLM frequently gets these wrong
+        # regardless of prompt rules; fix mechanically to avoid silent failures.
+        import re as _re
+        # Fix 1: MultiHeadAttention capitalization
+        code = _re.sub(r'\bnn\.MultiHeadAttention\b', 'nn.MultiheadAttention', code)
+        # Fix 2: add batch_first=True to MultiheadAttention constructor if missing
+        code = _re.sub(
+            r'(nn\.MultiheadAttention\([^)]+\))',
+            lambda m: m.group(0)[:-1] + ', batch_first=True)'
+                if 'batch_first' not in m.group(0) else m.group(0),
+            code,
+        )
+        # Fix 3a: guard score denominators against zero division
+        code = _re.sub(r'/ \(1 - (acc\w*)\)', r'/ (1 - \1 + 1e-8)', code)
+        code = _re.sub(r'/ \((acc\w*) \+ 0\)', r'/ (\1 + 1e-8)', code)
+        code = _re.sub(r'/ (acc\w*)\b(?!\s*[\+\-])', r'/ (\1 + 1e-8)', code)
+
+        # Fix 3b: force float32 to prevent numpy float64 → PyTorch double mismatch
+        # np.random.rand/randn return float64 by default
+        code = _re.sub(
+            r'(np\.random\.rand(?:n?)\([^)]+\))',
+            r'\1.astype(np.float32)',
+            code,
+        )
+        # torch.tensor(X) preserves numpy dtype
+        code = _re.sub(
+            r'torch\.tensor\((\w*[Xx]\w*)\)(?!.*dtype)',
+            r'torch.tensor(\1, dtype=torch.float32)',
+            code,
+        )
+
+        # Validation + regeneration: GPU tracks must not use synthetic random arrays as dataset
+        if kaggle_mode:
+            _uses_synthetic = bool(_re.search(r'np\.random\.rand(?:n?)\s*\(', code))
+            _uses_real_data = bool(_re.search(r'torchvision\.datasets|datasets\.(MNIST|CIFAR|FashionMNIST|ImageNet|STL)', code))
+            if _uses_synthetic and not _uses_real_data:
+                print("[EXPERIMENT] WARNING: generated code uses synthetic random data on GPU track. Regenerating...")
+                stronger_injection = (
+                    "\n\nCRITICAL WARNING — PREVIOUS ATTEMPT FAILED:\n"
+                    "Your previous generation used np.random.rand() for the dataset.\n"
+                    "This produces noise → model learns nothing → accuracy ~1% → assertions fail.\n"
+                    "You MUST use torchvision.datasets (CIFAR10, CIFAR100, MNIST, etc.) with download=True.\n"
+                    "Do NOT use np.random.rand/randn for X or y. Load real data. No exceptions.\n"
+                )
+                code2 = await self._think(prompt + stronger_injection, system=system, temperature=0.3)
+                code2 = code2.strip()
+                if code2.startswith("```"):
+                    lines2 = code2.split("\n")
+                    code2 = "\n".join(l for l in lines2 if not l.strip().startswith("```")).strip()
+                # Apply same post-processing fixes
+                code2 = _re.sub(r'\bnn\.MultiHeadAttention\b', 'nn.MultiheadAttention', code2)
+                code2 = _re.sub(
+                    r'(nn\.MultiheadAttention\([^)]+\))',
+                    lambda m: m.group(0)[:-1] + ', batch_first=True)' if 'batch_first' not in m.group(0) else m.group(0),
+                    code2,
+                )
+                code2 = _re.sub(r'/ \(1 - (acc\w*)\)', r'/ (1 - \1 + 1e-8)', code2)
+                # Only use regenerated code if it now references real datasets
+                if _re.search(r'torchvision\.datasets|datasets\.(MNIST|CIFAR|FashionMNIST|ImageNet|STL)', code2):
+                    print("[EXPERIMENT] Regeneration successful — real dataset detected.")
+                    code = code2
+                else:
+                    print("[EXPERIMENT] Regeneration still uses synthetic data — keeping original, flagging for review.")
 
         return code
 
@@ -1868,7 +1951,9 @@ CRITICAL RULES FOR minimum_experiment:
    MECHANISM: [The causal mechanism. MUST include: property P of domain_from reduces/increases
                process Q in domain_to. MUST define: VARIABLE: V = <observable formula or metric name>]
    INTERVENTION: [What is manipulated — technique vs baseline. MUST include:
-                  Simulated as: generate <data> using <numpy/scipy distribution or process>]
+                  For sandbox: "Simulated as: generate <data> using <numpy/scipy distribution or process>"
+                  For kaggle_gpu/modal_gpu: "Implemented as: use torchvision.datasets.CIFAR10/MNIST/CIFAR100 with download=True"
+                  Choose the correct form based on the EXECUTION field of this experiment.]
    MEASUREMENT: [Metric: <name_of_V> — computed as <exact formula>. Must use the same variable V
                  defined in MECHANISM]
    SUCCESS CRITERION: [<name_of_V> condition: e.g. "delta_V > 0.10 on held-out test set"]
