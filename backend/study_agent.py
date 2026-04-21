@@ -1579,6 +1579,13 @@ Follow the structure above exactly. Compute score from real measurements, not ra
         # Deterministic API fixes — the LLM frequently gets these wrong
         # regardless of prompt rules; fix mechanically to avoid silent failures.
         import re as _re
+        # Fix -1: CNN classifier size: nn.Linear(A*B*C, N) hardcodes spatial dims after pooling,
+        # which the LLM miscounts. Replace with nn.LazyLinear(N) which infers the correct size.
+        code = _re.sub(
+            r'nn\.Linear\(\s*\d+\s*\*\s*\d+(?:\s*\*\s*\d+)?\s*,\s*(\d+)\s*\)',
+            r'nn.LazyLinear(\1)',
+            code,
+        )
         # Fix 0: ViT patch-to-sequence reshape: x.view(-1, N, D) is wrong when Conv channels ≠ D.
         # Replace with flatten(2).permute(0,2,1) which always gives (B, H*W, C) regardless of C.
         # Only apply inside forward() bodies that also contain patch_embedding (ViT pattern).
