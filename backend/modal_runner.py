@@ -81,6 +81,10 @@ def run_experiment(
 
         # Write experiment code
         (tmp / "experiment.py").write_text(code, encoding="utf-8")
+        # Save a debug copy so we can inspect what was sent
+        debug_path = Path(__file__).parent.parent / "shard_workspace" / "experiments" / f"modal_debug_{label}.py"
+        debug_path.write_text(code, encoding="utf-8")
+        print(f"[MODAL] Code saved to {debug_path.name}")
 
         # Write modal app wrapper
         runner = _RUNNER_TEMPLATE.format(
@@ -99,7 +103,8 @@ def run_experiment(
             capture_output=True, env=env, timeout=timeout_sec + 120,
         )
         output = result.stdout.decode("utf-8", errors="replace") + result.stderr.decode("utf-8", errors="replace")
-        print(f"[MODAL] Output:\n{output[-3000:]}")
+        safe_output = output.encode("ascii", errors="replace").decode("ascii")
+        print(f"[MODAL] Output:\n{safe_output[-3000:]}")
 
         if result.returncode != 0:
             print(f"[MODAL] Run failed (rc={result.returncode})")

@@ -1488,6 +1488,13 @@ print('RESULT:', score)
                 "  Instead, print a warning line: 'ARCHITETTURA PARZIALE: <OriginalName> sostituita da <brief description>'\n"
                 "  and still implement the mechanism (causal masking, training loop, measurement) correctly.\n"
                 "\n"
+                "ASSERTION RULES (critical — wrong assertions crash the experiment):\n"
+                "- NEVER assert the hypothesis outcome directly. The hypothesis may be WRONG — that's a valid result.\n"
+                "  BAD: assert acc_8heads > acc_4heads  ← crashes if hypothesis is false\n"
+                "  GOOD: assert acc_4heads >= 0.0 and acc_4heads <= 1.0  ← structural check\n"
+                "- Only assert structural properties: accuracy in [0,1], model is not None, shapes are correct.\n"
+                "- The score (0.0-1.0) is how you measure hypothesis validity, NOT assertions.\n"
+                "\n"
                 "DATA SOURCE RULES — MANDATORY FOR GPU TRACKS (violating this = invalid experiment):\n"
                 "- NEVER use np.random.rand() or np.random.randn() to create the training/test dataset.\n"
                 "  Reason: random arrays contain no learnable signal → model gets ~1% accuracy → experiment fails assertions.\n"
@@ -1572,6 +1579,15 @@ Follow the structure above exactly. Compute score from real measurements, not ra
         # Deterministic API fixes — the LLM frequently gets these wrong
         # regardless of prompt rules; fix mechanically to avoid silent failures.
         import re as _re
+        # Fix 0: ViT patch-to-sequence reshape: x.view(-1, N, D) is wrong when Conv channels ≠ D.
+        # Replace with flatten(2).permute(0,2,1) which always gives (B, H*W, C) regardless of C.
+        # Only apply inside forward() bodies that also contain patch_embedding (ViT pattern).
+        if 'patch_embedding' in code or 'patch_embed' in code:
+            code = _re.sub(
+                r'(x\s*=\s*)x\.view\(\s*-1\s*,\s*\d+\s*,\s*\d+\s*\)',
+                r'\1x.flatten(2).permute(0, 2, 1)',
+                code,
+            )
         # Fix 1: MultiHeadAttention capitalization
         code = _re.sub(r'\bnn\.MultiHeadAttention\b', 'nn.MultiheadAttention', code)
         # Fix 2: add batch_first=True to MultiheadAttention constructor if missing
