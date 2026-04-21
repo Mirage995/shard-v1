@@ -160,7 +160,7 @@ class HebbianUpdater:
         """Decay all synaptic weights 5% toward WEIGHT_INIT on frustration."""
         try:
             from shard_db import query as db_query, execute as db_exec
-            pairs = db_query("SELECT source, target, weight FROM synaptic_weights")
+            pairs = db_query("SELECT source_citizen, target_citizen, weight FROM synaptic_weights")
             updated = 0
             for p in pairs:
                 w = p["weight"]
@@ -168,8 +168,8 @@ class HebbianUpdater:
                 new_w = max(WEIGHT_MIN, min(WEIGHT_MAX, new_w))
                 if abs(new_w - w) > 0.001:
                     db_exec(
-                        "UPDATE synaptic_weights SET weight=? WHERE source=? AND target=?",
-                        (new_w, p["source"], p["target"]),
+                        "UPDATE synaptic_weights SET weight=? WHERE source_citizen=? AND target_citizen=?",
+                        (new_w, p["source_citizen"], p["target_citizen"]),
                     )
                     updated += 1
             return updated
