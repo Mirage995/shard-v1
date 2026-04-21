@@ -1,0 +1,61 @@
+[
+  {
+    "kernel_ref": "andreabonizz/shard-jepa-causal-masking-catastrophic-forgetting",
+    "slug": "shard-causal-maski-continual-le-04211137",
+    "hypothesis_statement": "Applying causal masking to SlotAttention encoders in JEPA world models trained on CIFAR-10 will reduce catastrophic forgetting.",
+    "domain_from": "causal masking / JEPA",
+    "domain_to": "continual learning",
+    "queued_at": "2026-04-21T11:37:44",
+    "status": "running",
+    "score": null
+  },
+  {
+    "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v2",
+    "slug": "shard-causal-maski-continual-le-04211144",
+    "hypothesis_statement": "Applying causal masking to SlotAttention encoders in JEPA world models trained on CIFAR-10 will reduce catastrophic forgetting.",
+    "domain_from": "causal masking / JEPA",
+    "domain_to": "continual learning / catastrophic forgetting",
+    "queued_at": "2026-04-21T11:44:25",
+    "status": "running",
+    "score": null
+  },
+  {
+    "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v3",
+    "slug": "shard-causal-maski-continual-le-04211147",
+    "hypothesis_statement": "Applying causal masking to SlotAttention encoders in JEPA world models trained on CIFAR-10 will reduce catastrophic forgetting.",
+    "domain_from": "causal masking / JEPA",
+    "domain_to": "continual learning / catastrophic forgetting",
+    "queued_at": "2026-04-21T11:47:05",
+    "status": "running",
+    "score": null
+  },
+  {
+    "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v4-cpu-safe",
+    "slug": "shard-causal-maski-continual-le-04211152",
+    "hypothesis_statement": "JEPA causal masking reduces catastrophic forgetting",
+    "domain_from": "causal_masking",
+    "domain_to": "continual_learning",
+    "queued_at": "2026-04-21T11:52:34",
+    "status": "running",
+    "score": null
+  },
+  {
+    "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v5",
+    "slug": "shard-causal-maski-continual-le-04211320",
+    "hypothesis_statement": "JEPA causal masking reduces catastrophic forgetting",
+    "domain_from": "causal_masking",
+    "domain_to": "continual_learning",
+    "queued_at": "2026-04-21T13:20:38",
+    "status": "complete",
+    "score": 0.1174,
+    "completed_at": "2026-04-21T13:25:00",
+    "raw_results": {
+      "Baseline_BWT": 0.4341,
+      "Technique_BWT": 0.4324,
+      "OGD_BWT": 0.4485,
+      "Combined_BWT": 0.3831,
+      "BWT_reduction_technique_only_pct": 0.4,
+      "BWT_reduction_combined_pct": 11.7
+    }
+  }
+]

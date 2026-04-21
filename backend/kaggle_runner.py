@@ -67,7 +67,7 @@ def push_kernel(code: str, slug: str, title: str, username: str = "andreabonizz"
             "kernel_type": "script",
             "is_private": True,
             "enable_gpu": True,
-            "accelerator": "nvidiaTeslaT4",
+            "accelerator": "NvidiaTeslaT4",
             "enable_internet": True,
             "dataset_sources": [],
             "competition_sources": [],

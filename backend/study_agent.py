@@ -588,6 +588,9 @@ Example: ["query 1", "query 2", "query 3"]"""
 
         # ── Fast-path: respect explicit EXECUTION tag set by the generator ────
         _min_lower = str(minimum_exp).lower()
+        if "execution: modal_gpu" in _min_lower:
+            print("[FEASIBILITY] EXECUTION tag → modal_gpu (fast-path)")
+            return "modal"
         if "execution: kaggle_gpu" in _min_lower:
             print("[FEASIBILITY] EXECUTION tag → kaggle_gpu (fast-path)")
             return "kaggle"
@@ -1429,6 +1432,8 @@ print('RESULT:', score)
                 "- Datasets: torchvision.datasets.MNIST, CIFAR10, etc. (downloaded via torchvision)\n"
                 "- Code must be self-contained and run top-to-bottom in a single cell\n"
                 "- Use DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n"
+                "  print('Device:', DEVICE)\n"
+                "  ALL tensors and models must be moved to DEVICE.\n"
                 "- print('OK All assertions passed') MUST appear before the RESULT line\n"
                 "- The FINAL line MUST be exactly:\n"
                 "    print('RESULT:', round(float(score), 4))\n"
@@ -1442,6 +1447,21 @@ print('RESULT:', score)
                 "- nn.TransformerEncoder/Decoder — correct capitalization\n"
                 "- torch.nn.functional.scaled_dot_product_attention exists only in PyTorch >= 2.0\n"
                 "- Always verify method names against PyTorch 2.x docs before using\n"
+                "\n"
+                "MULTIHEADATTENTION SHAPE CONTRACT (mandatory — violating this crashes silently or loudly):\n"
+                "- nn.MultiheadAttention(embed_dim, num_heads) expects input shape (B, seq_len, embed_dim) with batch_first=True,\n"
+                "  OR (seq_len, B, embed_dim) without batch_first.\n"
+                "- embed_dim in the constructor MUST EXACTLY MATCH the last dimension of the input tensor.\n"
+                "  WRONG: self.attn = nn.MultiheadAttention(256, 8); x = x.view(-1, 196, 4)  ← 4 ≠ 256, crash\n"
+                "  RIGHT: self.attn = nn.MultiheadAttention(4, 1);   x = x.view(-1, 196, 4)  ← 4 == 4, OK\n"
+                "  RIGHT: self.proj = nn.Linear(784, 256); self.attn = nn.MultiheadAttention(256, 8); x = self.proj(x).unsqueeze(1)\n"
+                "- Always add batch_first=True to MultiheadAttention unless you manually transpose to (seq_len, B, dim).\n"
+                "\n"
+                "nn.Sequential CANNOT BE SLICED (common crash source):\n"
+                "- self.net[2:] is INVALID — nn.Sequential does not support list slicing.\n"
+                "  WRONG: return self.net[2:](x)\n"
+                "  RIGHT: define separate nn.Sequential blocks (e.g. self.encoder, self.classifier) and call them explicitly.\n"
+                "  RIGHT: use self.net[2](self.net[3](x)) — only integer indexing is valid.\n"
                 "\n"
                 "IMAGE INPUT TO ATTENTION MODELS (mandatory):\n"
                 "- SlotAttention, Transformer, MultiheadAttention all expect (B, seq_len, embed_dim).\n"
@@ -1803,16 +1823,25 @@ TRACK A — SANDBOX (veloce, locale, senza GPU):
   Usa quando: il meccanismo è verificabile con dati sintetici/piccoli, nessun hardware speciale
   Nel minimum_experiment scrivi: "EXECUTION: sandbox"
 
-TRACK B — KAGGLE GPU (complesso, dati reali, GPU):
-  Risorse: torch (CUDA T4/P100), torchvision, PyTorch completo
-  Dataset disponibili: MNIST, CIFAR-10, split di ImageNet — scaricabili via torchvision
-  Limite: deve completarsi in meno di 2 ore su GPU T4
-  Usa quando: il meccanismo richiede dati reali, architetture profonde, training su larga scala,
-  o l'ipotesi testa proprietà che emergono solo a scala (es. catastrophic forgetting,
-  generalizzazione di world model, comportamenti di architetture neurali complesse)
+TRACK B — KAGGLE GPU (complesso, dati reali, GPU media):
+  Risorse: torch (CUDA), torchvision, PyTorch completo
+  Dataset disponibili: MNIST, CIFAR-10, CIFAR-100 — scaricabili via torchvision
+  Limite: deve completarsi in meno di 2 ore su GPU T4 (16GB VRAM)
+  Usa quando: il meccanismo richiede dati reali, architetture profonde su scala media,
+  o l'ipotesi testa proprietà che emergono su MNIST/CIFAR (es. catastrophic forgetting
+  su poche classi, slot attention su immagini piccole, world model su sequenze corte)
   Nel minimum_experiment scrivi: "EXECUTION: kaggle_gpu"
 
-CAPABILITY CONTRACT (vale per entrambi i track):
+TRACK C — MODAL GPU (grande scala, architetture massive, lunga durata):
+  Risorse: A100 80GB, H100 — nessun limite pratico di VRAM
+  Dataset disponibili: ImageNet, qualsiasi dataset scaricabile, dataset custom
+  Limite: nessun timeout fisso (pagamento a consumo ~$2/h su A100)
+  Usa quando: il meccanismo richiede > 16GB VRAM, o training > 2 ore, o dataset tipo
+  ImageNet/JFT, o modelli grandi (ViT-Large, GPT-2+, DINO, CLIP, LLaMA fine-tuning),
+  o esperimenti di scaling law che richiedono run multiple su scale diverse
+  Nel minimum_experiment scrivi: "EXECUTION: modal_gpu"
+
+CAPABILITY CONTRACT (vale per tutti i track):
 - NO dati grezzi di dominio non ottenibili programmaticamente (file fMRI, cartelle cliniche,
   immagini satellitari proprietarie, database genomici)
 - L'esperimento deve testare direttamente il meccanismo causale — non un proxy
@@ -1844,12 +1873,14 @@ CRITICAL RULES FOR minimum_experiment:
                  defined in MECHANISM]
    SUCCESS CRITERION: [<name_of_V> condition: e.g. "delta_V > 0.10 on held-out test set"]
    CONTROL: [1-2 confounders held constant: e.g. "random seed fixed; sample size equal across conditions"]
-   EXECUTION: [EXACTLY one of: "sandbox" or "kaggle_gpu" — no other values accepted.
-               sandbox = 60s CPU, numpy/sklearn only, synthetic data.
-               kaggle_gpu = T4 GPU, torchvision, real datasets, up to 2 hours.
-               You MUST choose kaggle_gpu if the hypothesis involves: deep neural architectures,
-               continual learning, world models, JEPA, SlotAttention, Transformer training,
-               catastrophic forgetting, or any mechanism that requires scale to manifest.]
+   EXECUTION: [EXACTLY one of: "sandbox", "kaggle_gpu", or "modal_gpu" — no other values accepted.
+               sandbox    = 60s CPU, numpy/sklearn only, synthetic data.
+               kaggle_gpu = GPU, torchvision, MNIST/CIFAR scale, up to 2 hours, max 16GB VRAM.
+               modal_gpu  = A100/H100, ImageNet scale, models > 1B params, training > 2h, > 16GB VRAM.
+               You MUST choose kaggle_gpu if: deep neural architectures on MNIST/CIFAR, continual
+               learning at small scale, JEPA/SlotAttention on small images, catastrophic forgetting.
+               You MUST choose modal_gpu if: ImageNet training, ViT-Large/GPT-2+/CLIP/DINO,
+               scaling laws across model sizes, fine-tuning large pretrained models, > 16GB VRAM.]
 
    CHAIN REQUIREMENT: MECHANISM defines V → INTERVENTION computes V → MEASUREMENT reports V →
    SUCCESS CRITERION thresholds V. All 4 must reference the same observable variable.

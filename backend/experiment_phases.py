@@ -365,9 +365,10 @@ class ExperimentDesignPhase(BasePhase):
             return
 
         # ── Feasibility gate ──────────────────────────────────────────────────
-        # Returns: "local" | "kaggle" | "invalid"
+        # Returns: "local" | "kaggle" | "modal" | "invalid"
         #   "local"   → run in sandbox as-is
-        #   "kaggle"  → valid science, needs GPU/downloads; generate code anyway
+        #   "kaggle"  → GPU needed, MNIST/CIFAR scale, up to 2h (Kaggle T4/CPU)
+        #   "modal"   → large scale: ImageNet, >16GB VRAM, >2h (Modal A100/H100)
         #   "invalid" → domain mismatch or nonsensical proxy; skip with no code
         try:
             feasibility = await ctx.agent._is_experiment_feasible(hypothesis)
@@ -384,10 +385,17 @@ class ExperimentDesignPhase(BasePhase):
             _persist_skipped(ctx, hypothesis, "SKIPPED_TOO_COMPLEX")
             return
 
-        # kaggle or local → always generate code
-        # For "kaggle", code is written for external compute and stored in DB
-        is_kaggle = (feasibility == "kaggle")
-        if is_kaggle:
+        # kaggle / modal / local → always generate code
+        # For "kaggle"/"modal", code is written for external compute and stored in DB
+        is_modal  = (feasibility == "modal")
+        is_kaggle = (feasibility == "kaggle") or is_modal  # both use GPU codegen
+        if is_modal:
+            await ctx.emit(
+                "EXPERIMENT_DESIGN", 0,
+                "Experiment needs large-scale GPU (Modal A100/H100) -- generating Modal-ready code"
+            )
+            print(f"[EXPERIMENT_DESIGN] MODAL_READY -- generating code for: '{hypothesis.get('statement','')[:80]}'")
+        elif is_kaggle:
             await ctx.emit(
                 "EXPERIMENT_DESIGN", 0,
                 "Experiment needs external compute (GPU/data) -- generating Kaggle-ready code"
@@ -727,12 +735,14 @@ class ExperimentDesignPhase(BasePhase):
 
         # ── Log ipotesi completa (per verifica qualità / before-after) ────────
         _min_exp_raw = (hypothesis.get("minimum_experiment") or "").lower()
-        if "execution: kaggle_gpu" in _min_exp_raw:
+        if "execution: modal_gpu" in _min_exp_raw:
+            _exec_track = "modal_gpu"
+        elif "execution: kaggle_gpu" in _min_exp_raw:
             _exec_track = "kaggle_gpu"
         elif "execution: sandbox" in _min_exp_raw:
             _exec_track = "sandbox"
         else:
-            _exec_track = "kaggle_gpu" if is_kaggle else "sandbox (no tag)"
+            _exec_track = "modal_gpu" if is_modal else ("kaggle_gpu" if is_kaggle else "sandbox (no tag)")
         print(f"[HYPOTHESIS] track={_exec_track} | {hypothesis.get('domain_from','')} → {hypothesis.get('domain_to','')}")
         print(f"[HYPOTHESIS] statement: {hypothesis.get('statement','')}")
         _min_exp = hypothesis.get('minimum_experiment', '')
@@ -748,7 +758,10 @@ class ExperimentDesignPhase(BasePhase):
                 logger.warning("[EXPERIMENT_DESIGN] LLM returned empty code -- skipped")
                 return
             ctx.experiment_code = code
-            if is_kaggle:
+            if is_modal:
+                ctx.experiment_status = "MODAL_READY"
+                _persist_kaggle_ready(ctx, hypothesis, code)  # reuse same DB path
+            elif is_kaggle:
                 ctx.experiment_status = "KAGGLE_READY"
                 # Persist immediately — no sandbox execution follows
                 _persist_kaggle_ready(ctx, hypothesis, code)
