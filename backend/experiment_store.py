@@ -248,3 +248,31 @@ def get_kaggle_ready() -> List[Dict]:
     except Exception as exc:
         logger.error("[EXPERIMENT_STORE] get_kaggle_ready failed: %s", exc)
         return []
+
+
+def get_pending_gpu_runs(limit: int = 5) -> List[Dict]:
+    """Return KAGGLE_READY and MODAL_READY hypotheses that have not yet produced a result.
+
+    Used by NightRunner._execute_pending_gpu_experiments() to auto-dispatch
+    experiments to Kaggle or Modal and close the science loop.
+    Capped at `limit` per call to stay within Kaggle parallel kernel limits.
+    """
+    try:
+        conn = _get_db()
+        _ensure_table()
+        rows = conn.execute(
+            """
+            SELECT * FROM research_hypotheses
+            WHERE status IN ('KAGGLE_READY', 'MODAL_READY')
+              AND (experiment_result IS NULL
+                   OR experiment_result = ''
+                   OR experiment_result = '{}')
+            ORDER BY created_at ASC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        return [_row_to_dict(r) for r in rows]
+    except Exception as exc:
+        logger.error("[EXPERIMENT_STORE] get_pending_gpu_runs failed: %s", exc)
+        return []

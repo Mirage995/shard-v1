@@ -2275,6 +2275,12 @@ class NightRunner:
         # ── Benchmark Loop: run all benchmark tasks ──────────────────────────
         await self._run_benchmarks()
 
+        # ── GPU Experiment Auto-Execution ─────────────────────────────────────
+        try:
+            await asyncio.to_thread(self._execute_pending_gpu_experiments_sync)
+        except Exception as _gpu_exc:
+            self.logger.warning("[GPU_RUNNER] Auto-execution failed: %s", _gpu_exc)
+
         # Record benchmark results in tracker and log delta
         if _bench_tracker and self.benchmark_results:
             try:
@@ -2693,6 +2699,115 @@ class NightRunner:
         with open(dump_file, "w", encoding="utf-8") as f:
             json.dump(dump_data, f, indent=4)
         self.logger.info(f"JSON dump saved to {dump_file}")
+
+    def _feed_graphrag_from_gpu_result(
+        self, hypothesis: dict, result: dict, topic: str, status: str
+    ) -> None:
+        """Insert a GPU-verified (or refuted) causal relation into knowledge_graph."""
+        try:
+            from graph_rag import insert_verified_relation
+            source   = hypothesis.get("domain_from") or "unknown"
+            target   = hypothesis.get("domain_to")   or "unknown"
+            relation = "improves" if status == "CONFIRMED" else "does_not_improve"
+            context  = (
+                f"GPU Experiment: {hypothesis.get('statement', '')}. "
+                f"Score={result.get('score')}. Status={status}. "
+                f"Platform={result.get('platform', 'GPU')}."
+            )
+            insert_verified_relation(
+                source_concept  = source,
+                target_concept  = target,
+                relation_type   = relation,
+                context         = context,
+                verified_status = "verified" if status == "CONFIRMED" else "refuted",
+                confidence      = 0.9 if status == "CONFIRMED" else 0.7,
+                topic_origin    = topic,
+                experiment_id   = str(hypothesis.get("id", "")),
+            )
+            self.logger.info(
+                "[GRAPH_FEED_GPU] %s: %s -> %s (%s)", status, source, target, relation
+            )
+        except Exception as e:
+            self.logger.warning("[GRAPH_FEED_GPU] Failed: %s", e)
+
+    def _execute_pending_gpu_experiments_sync(self) -> None:
+        """Check experiment_store for KAGGLE_READY/MODAL_READY records and execute them.
+
+        Runs synchronously (subprocess-based runners); called via asyncio.to_thread()
+        to avoid blocking the event loop.
+        """
+        from experiment_store import get_pending_gpu_runs, update_result
+
+        pending = get_pending_gpu_runs(limit=5)
+        if not pending:
+            self.logger.info("[GPU_RUNNER] No pending Kaggle/Modal experiments")
+            return
+
+        self.logger.info("[GPU_RUNNER] Found %d pending GPU experiment(s)", len(pending))
+
+        for record in pending:
+            hyp_id   = record["id"]
+            status   = record["status"]
+            code     = record.get("experiment_code") or ""
+            topic    = record.get("topic", "")
+            hypothesis = {
+                "id"          : hyp_id,
+                "statement"   : record.get("statement", ""),
+                "domain_from" : record.get("domain_from", ""),
+                "domain_to"   : record.get("domain_to", ""),
+                "confidence"  : record.get("confidence_initial", 0.5),
+            }
+
+            self.logger.info("[GPU_RUNNER] Executing %s for hypothesis id=%s", status, hyp_id)
+
+            score = None
+            try:
+                if status == "KAGGLE_READY":
+                    from kaggle_runner import push_kernel, poll_kernel, fetch_result
+
+                    slug       = f"shard-{hyp_id}"
+                    title      = f"SHARD Hypothesis {hyp_id}"
+                    kernel_ref = push_kernel(code, slug=slug, title=title)
+                    poll_status = poll_kernel(kernel_ref, timeout_hours=1.5)
+
+                    if poll_status == "complete":
+                        score = fetch_result(kernel_ref)
+                    else:
+                        self.logger.warning(
+                            "[GPU_RUNNER] Kaggle poll ended with status=%s for id=%s",
+                            poll_status, hyp_id,
+                        )
+
+                elif status == "MODAL_READY":
+                    from modal_runner import run_and_save
+
+                    score = run_and_save(code=code, hypothesis=hypothesis, gpu="T4")
+
+                if score is not None:
+                    new_status = "CONFIRMED" if score >= 0.65 else "REFUTED"
+                    platform   = "kaggle" if status == "KAGGLE_READY" else "modal"
+                    result_dict = {"score": score, "success": True, "platform": platform}
+                    update_result(
+                        hypothesis_id      = hyp_id,
+                        status             = new_status,
+                        experiment_result  = result_dict,
+                        confidence_updated = 0.9 if new_status == "CONFIRMED" else 0.3,
+                    )
+                    self.logger.info(
+                        "[GPU_RUNNER] %s complete — score=%.3f -> %s",
+                        platform.upper(), score, new_status,
+                    )
+                    self._feed_graphrag_from_gpu_result(hypothesis, result_dict, topic, new_status)
+                else:
+                    update_result(hypothesis_id=hyp_id, status="FAILED")
+                    self.logger.warning("[GPU_RUNNER] No score returned for id=%s — marked FAILED", hyp_id)
+
+            except Exception as exc:
+                self.logger.error("[GPU_RUNNER] Exception for id=%s: %s", hyp_id, exc)
+                try:
+                    update_result(hypothesis_id=hyp_id, status="FAILED")
+                except Exception:
+                    pass
 
     async def _generate_markdown_recap(self, study_agent: StudyAgent):
         date_str = datetime.now().strftime("%Y-%m-%d")
