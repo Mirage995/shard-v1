@@ -526,6 +526,30 @@ class NightRunner:
         except Exception:
             return False
 
+    def _weighted_cert_report_lines(self) -> list:
+        """Return markdown lines for simple vs weighted cert_rate for the night report."""
+        try:
+            from backend.cognition.cognition_core import get_cognition_core
+            _core = get_cognition_core()
+            _sm = getattr(_core, "_self_model", None)
+            if _sm is None or not hasattr(_sm, "get_weighted_certification_rate"):
+                return []
+            simple   = _sm.get_certification_rate()
+            weighted = _sm.get_weighted_certification_rate()
+            gap = simple - weighted
+            lines = [
+                f"- Certification rate (simple):   {simple:.1%}",
+                f"- Certification rate (weighted): {weighted:.1%}",
+            ]
+            if gap > 0.05:
+                lines.append(
+                    f"- **WARNING: Reward hacking detected** — easy topics inflating metrics by {gap:.1%}"
+                )
+            return lines
+        except Exception as _e:
+            self.logger.debug("[REPORT] weighted cert rate failed: %s", _e)
+            return []
+
     def _is_avoided(self, topic: str) -> bool:
         """True if topic matches an avoid_domain from VisionEngine (chronic failures)."""
         ve = getattr(self, "_vision_engine", None)
@@ -2909,6 +2933,7 @@ class NightRunner:
             f"- Experiments certified: {total_cert}",
             f"- Topic filter discards: {self.topic_filter_discards}",
             f"- Strategy reuse rate: {strat_reuse_rate:.1f}%",
+            *self._weighted_cert_report_lines(),
             "",
             "## Cicli di Studio"
         ]

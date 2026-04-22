@@ -77,6 +77,77 @@ class SelfModel:
             logger.warning("[SELF MODEL] get_certification_rate failed: %s", exc)
             return 0.0
 
+    def get_weighted_certification_rate(self) -> float:
+        """Difficulty-weighted cert rate — cannot be inflated by farming easy topics.
+
+        Uses sig_difficulty = 1.0 - recent_cert_rate (last 10 records per topic).
+        Weights: easy (<0.3) = 0.5x, medium = 1.0x, hard (>0.7) = 1.5x.
+        """
+        try:
+            import sys as _sys
+            _sys.path.insert(0, str(_ROOT / "backend"))
+            from shard_db import get_db
+            try:
+                from constants import (
+                    CERT_WEIGHT_EASY, CERT_WEIGHT_MEDIUM, CERT_WEIGHT_HARD,
+                    DIFFICULTY_EASY_THRESHOLD, DIFFICULTY_HARD_THRESHOLD,
+                    SUCCESS_SCORE_THRESHOLD,
+                )
+            except ImportError:
+                from backend.constants import (
+                    CERT_WEIGHT_EASY, CERT_WEIGHT_MEDIUM, CERT_WEIGHT_HARD,
+                    DIFFICULTY_EASY_THRESHOLD, DIFFICULTY_HARD_THRESHOLD,
+                    SUCCESS_SCORE_THRESHOLD,
+                )
+
+            conn = get_db()
+            topics = [
+                r["topic"] for r in conn.execute(
+                    "SELECT DISTINCT topic FROM experiments"
+                ).fetchall()
+            ]
+            if not topics:
+                return 0.0
+
+            total_weight = 0.0
+            cert_weight  = 0.0
+
+            for topic in topics:
+                # sig_difficulty from last 10 records
+                rows = conn.execute(
+                    "SELECT certified FROM experiments WHERE topic = ? ORDER BY timestamp DESC LIMIT 10",
+                    (topic,)
+                ).fetchall()
+                if rows:
+                    cert_r = sum(1 for r in rows if r["certified"]) / len(rows)
+                    sig_difficulty = round(1.0 - cert_r, 2)
+                else:
+                    sig_difficulty = 0.5
+
+                if sig_difficulty < DIFFICULTY_EASY_THRESHOLD:
+                    weight = CERT_WEIGHT_EASY
+                elif sig_difficulty > DIFFICULTY_HARD_THRESHOLD:
+                    weight = CERT_WEIGHT_HARD
+                else:
+                    weight = CERT_WEIGHT_MEDIUM
+
+                # Topic is certified if it has at least one record with certified=1 and score >= threshold
+                cert_row = conn.execute(
+                    "SELECT 1 FROM experiments WHERE topic = ? AND certified = 1 AND score >= ? LIMIT 1",
+                    (topic, SUCCESS_SCORE_THRESHOLD),
+                ).fetchone()
+                is_certified = cert_row is not None
+
+                total_weight += weight
+                if is_certified:
+                    cert_weight += weight
+
+            return round(cert_weight / total_weight, 3) if total_weight > 0 else 0.0
+
+        except Exception as exc:
+            logger.warning("[SELF MODEL] get_weighted_certification_rate failed: %s", exc)
+            return 0.0
+
     def get_avg_repair_loops(self) -> float:
         """Average number of study attempts per unique topic.
 
@@ -206,8 +277,14 @@ class SelfModel:
         caps      = self.summarize_capabilities()
         frontier  = self.summarize_frontier()
         cert_rate = self.get_certification_rate()
+        weighted  = self.get_weighted_certification_rate()
         avg_loops = self.get_avg_repair_loops()
         arch      = self.architecture_summary()
+
+        gap = cert_rate - weighted
+        print(f"[SELF] cert_rate={cert_rate:.1%} weighted={weighted:.1%} gap={gap:+.1%}")
+        if gap > 0.05:
+            print(f"[WARNING] Reward hacking gap detected: {gap:.1%}")
 
         return (
             f"I am SHARD.\n\n"
@@ -215,7 +292,8 @@ class SelfModel:
             f"Examples: {', '.join(caps['certified'][:6])}\n\n"
             f"Currently studying: {', '.join(frontier)}\n\n"
             f"Performance metrics:\n"
-            f"  Certification rate:  {cert_rate:.1%}\n"
+            f"  Certification rate (simple):   {cert_rate:.1%}\n"
+            f"  Certification rate (weighted): {weighted:.1%}\n"
             f"  Avg study attempts:  {avg_loops:.1f} loops per topic\n\n"
             f"System architecture:\n{arch}"
         ).strip()

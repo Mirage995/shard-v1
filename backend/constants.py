@@ -15,3 +15,10 @@ BENCHMARK_WEIGHT         = 0.6   # weight of benchmark score in blended final_sc
 
 # ── Topic quarantine ───────────────────────────────────────────────────────────
 MAX_TOPIC_ATTEMPTS = 20  # hard cap: after 20 total attempts the topic is permanently quarantined
+
+# ── Weighted certification rate ────────────────────────────────────────────────
+CERT_WEIGHT_EASY   = 0.5   # sig_difficulty < DIFFICULTY_EASY_THRESHOLD
+CERT_WEIGHT_MEDIUM = 1.0   # medium range
+CERT_WEIGHT_HARD   = 1.5   # sig_difficulty > DIFFICULTY_HARD_THRESHOLD
+DIFFICULTY_EASY_THRESHOLD = 0.3
+DIFFICULTY_HARD_THRESHOLD = 0.7
