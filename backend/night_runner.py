@@ -261,7 +261,7 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
@@ -271,6 +271,7 @@ class NightRunner:
         self._forced_topic: str = forced_topic.strip()
         self._research_mode: bool = research_mode
         self._no_l3: bool = no_l3
+        self._use_affective_layer: bool = use_affective_layer
 
         self.start_time = None
         self.api_calls_used = 0
@@ -1418,30 +1419,33 @@ class NightRunner:
             self.logger.warning("[SKILL_LIB] Init non-fatal: %s", _sl_err)
 
         # ── IDENTITY CORE -- inject persistent biography ───────────────────────
-        try:
-            from backend.identity_core import IdentityCore as _IC
-            _identity = _IC()
-            if _core_env:
-                _core_env.register(
-                    "identity_core", _identity,
-                    ["session_complete", "skill_certified", "skill_failed"],
-                )
-                _identity._core_env = _core_env
-            _id_block = _identity.get_context_block()
-            if _id_block:
-                _base_ctx = study_agent.session_context or ""
-                study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
-                self.logger.info(
-                    "[IDENTITY] Biography injected (%d chars) -- sessions=%d self_esteem=%.2f trajectory=%s",
-                    len(_id_block),
-                    _identity.get_status().get("sessions_lived", 0),
-                    _identity.get_status().get("self_esteem", 0.0),
-                    _identity.get_status().get("trajectory", "unknown"),
-                )
-            else:
-                self.logger.info("[IDENTITY] No biography yet -- first session.")
-        except Exception as _id_init_err:
-            self.logger.warning("[IDENTITY] Init non-fatal: %s", _id_init_err)
+        if self._use_affective_layer:
+            try:
+                from backend.identity_core import IdentityCore as _IC
+                _identity = _IC()
+                if _core_env:
+                    _core_env.register(
+                        "identity_core", _identity,
+                        ["session_complete", "skill_certified", "skill_failed"],
+                    )
+                    _identity._core_env = _core_env
+                _id_block = _identity.get_context_block()
+                if _id_block:
+                    _base_ctx = study_agent.session_context or ""
+                    study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
+                    self.logger.info(
+                        "[IDENTITY] Biography injected (%d chars) -- sessions=%d self_esteem=%.2f trajectory=%s",
+                        len(_id_block),
+                        _identity.get_status().get("sessions_lived", 0),
+                        _identity.get_status().get("self_esteem", 0.0),
+                        _identity.get_status().get("trajectory", "unknown"),
+                    )
+                else:
+                    self.logger.info("[IDENTITY] No biography yet -- first session.")
+            except Exception as _id_init_err:
+                self.logger.warning("[IDENTITY] Init non-fatal: %s", _id_init_err)
+        else:
+            self.logger.info("[IDENTITY] Skipped (use_affective_layer=False)")
 
         # ── BENCHMARK TRACKER -- log delta from previous session ───────────────
         try:
@@ -1782,7 +1786,7 @@ class NightRunner:
                         self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
 
                 # ── MOOD INJECTION -- stato affettivo -> prompt di studio ────────
-                if _mood:
+                if _mood and self._use_affective_layer:
                     try:
                         _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
                         _mood_hint = _mood.get_prompt_hint()
@@ -1795,6 +1799,8 @@ class NightRunner:
                         self.logger.info("[MOOD] Injected into study prompt: %s (%.3f)", _mood_label, _mood.get_score())
                     except Exception as _mi_err:
                         self.logger.debug("[MOOD] inject non-fatal: %s", _mi_err)
+                elif _mood and not self._use_affective_layer:
+                    self.logger.info("[MOOD] Skipped (use_affective_layer=False)")
 
                 # Compute previous_attempts for L3 gate: failed experiments on this topic
                 _prev_attempts = 0

@@ -22,3 +22,6 @@ CERT_WEIGHT_MEDIUM = 1.0   # medium range
 CERT_WEIGHT_HARD   = 1.5   # sig_difficulty > DIFFICULTY_HARD_THRESHOLD
 DIFFICULTY_EASY_THRESHOLD = 0.3
 DIFFICULTY_HARD_THRESHOLD = 0.7
+
+# ── Affective layer A/B gate ───────────────────────────────────────────────────
+AFFECTIVE_LAYER_ENABLED = True  # if False, NightRunner skips MoodEngine + IdentityCore injection
