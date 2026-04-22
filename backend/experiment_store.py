@@ -264,6 +264,7 @@ def get_pending_gpu_runs(limit: int = 5) -> List[Dict]:
             """
             SELECT * FROM research_hypotheses
             WHERE status IN ('KAGGLE_READY', 'MODAL_READY')
+              AND status != 'FAILED'
               AND (experiment_result IS NULL
                    OR experiment_result = ''
                    OR experiment_result = '{}')
