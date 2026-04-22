@@ -972,6 +972,8 @@ class NightRunner:
         self._transition(SessionState.INIT, "loading memory + capability graph")
         import uuid as _uuid
         _session_id = str(_uuid.uuid4())
+        self._current_session_id = _session_id
+        self._session_start_iso  = datetime.now().isoformat()
         self.logger.info("[SESSION] id=%s", _session_id)
         memory = ShardMemory()
         capability_graph = CapabilityGraph()
@@ -2338,6 +2340,28 @@ class NightRunner:
         self._generate_json_dump()
         self._backup_state()
         await self._generate_markdown_recap(study_agent)
+
+        # ── Epistemic Velocity Tracker ────────────────────────────────────────
+        try:
+            from backend.epistemic_tracker import EpistemicTracker
+            _ep_tracker = EpistemicTracker()
+            _ep_stats = _ep_tracker.record_session(
+                session_id       = getattr(self, "_current_session_id", _session_id),
+                session_start_iso= getattr(self, "_session_start_iso", ""),
+                topic            = topic if "topic" in dir() else "",
+                llm_calls        = getattr(self, "_llm_call_count", 0),
+                gpu_cost         = getattr(self, "_gpu_cost_usd", 0.0),
+            )
+            self.logger.info(
+                "[EPISTEMIC] Session %s — confirmed=%d/%d  velocity=%.3f  new_relations=%d",
+                _ep_stats["session_id"][:8],
+                _ep_stats["confirmed"],
+                _ep_stats["total"],
+                _ep_stats["velocity"],
+                _ep_stats["new_relations"],
+            )
+        except Exception as _ep_exc:
+            self.logger.warning("[EPISTEMIC] Tracker failed (non-fatal): %s", _ep_exc)
 
         # ── END-OF-SESSION: rebuild self model + update goal progress ─────────
         try:
