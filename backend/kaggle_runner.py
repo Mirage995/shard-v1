@@ -152,15 +152,18 @@ def fetch_result(kernel_ref: str, out_dir: Optional[str] = None) -> Optional[flo
             return None
 
         # Search all downloaded files for RESULT: line
-        for f in Path(target).rglob("*.txt"):
+        # Kaggle has no fixed extension standard — scan all files (.log, .txt, no ext)
+        for f in Path(target).rglob("*"):
+            if not f.is_file():
+                continue
             text = f.read_text(errors="ignore")
-            m = re.search(r"RESULT:\s*([\d.]+)", text)
+            m = re.search(r"RESULT:\s*([\d.eE+\-]+)", text)
             if m:
                 score = float(m.group(1))
                 print(f"[KAGGLE] RESULT found in {f.name}: {score}")
                 return score
 
-        print("[KAGGLE] RESULT line not found in output files")
+        print(f"[KAGGLE] RESULT line not found in output files (checked {list(Path(target).rglob('*'))})")
         return None
 
 
