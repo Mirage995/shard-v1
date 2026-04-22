@@ -1683,7 +1683,8 @@ Follow the structure above exactly. Compute score from real measurements, not ra
         return code
 
     async def _validate_experiment_result(
-        self, hypothesis: Dict, stdout: str, stderr: str
+        self, hypothesis: Dict, stdout: str, stderr: str,
+        replication_data: dict = None,
     ) -> Dict:
         """Ask LLM to interpret sandbox output and decide hypothesis verdict.
 
@@ -1705,6 +1706,63 @@ Follow the structure above exactly. Compute score from real measurements, not ra
         technique_match = _re.search(r"RESULT_TECHNIQUE:\s*([-+]?[\d.]+)", stdout)
 
         result_score = float(result_match.group(1)) if result_match else None
+
+        # ── Replication N=3 override (takes precedence over single result_score) ─
+        if replication_data and replication_data.get("n", 0) >= 2:
+            _rep_mean = replication_data["mean"]
+            _rep_std  = replication_data["std"]
+            _rep_n    = replication_data["n"]
+            _rep_results = replication_data.get("results", [])
+            self.logger.info(
+                "[REPLICATION] N=3 complete — mean=%.3f std=%.3f (%d valid runs)",
+                _rep_mean, _rep_std, _rep_n,
+            )
+            if _rep_mean >= 0.65 and _rep_std <= 0.1:
+                det_status = "CONFIRMED"
+            elif _rep_mean <= 0.35:
+                det_status = "REFUTED"
+            else:
+                det_status = "INCONCLUSIVE"
+            rep_prefix = f"N={_rep_n}, mean={_rep_mean:.4f}, std={_rep_std:.4f}, runs={_rep_results}. "
+            # Ask LLM only for reasoning, using replication stats
+            prompt = f"""You are writing the reasoning for an experiment verdict that has already been determined.
+
+Hypothesis:
+  Statement:   {hypothesis.get('statement', '')}
+  Domain from: {hypothesis.get('domain_from', '')}
+  Domain to:   {hypothesis.get('domain_to', '')}
+  Initial confidence: {conf_init}
+
+Replication results (N={_rep_n} independent runs):
+  Individual RESULT values: {_rep_results}
+  Mean: {_rep_mean}  Std: {_rep_std}
+  Verdict (already decided): {det_status}
+
+Write one concise sentence explaining why mean={_rep_mean} std={_rep_std} leads to {det_status}.
+Also provide a revised confidence (0.0-1.0).
+
+Return ONLY valid JSON:
+{{"status": "{det_status}", "confidence_updated": 0.0, "reasoning": "..."}}"""
+            raw = await self._think(prompt, json_mode=True, temperature=0.3)
+            from study_utils import safe_json_load
+            data = safe_json_load(raw)
+            reasoning = rep_prefix + (data.get("reasoning", "") if isinstance(data, dict) else "")
+            conf_updated = float(data.get("confidence_updated", conf_init)) if isinstance(data, dict) else conf_init
+            conf_updated = max(0.0, min(1.0, conf_updated))
+            return {
+                "status":             det_status,
+                "confidence_updated": conf_updated,
+                "reasoning":          reasoning,
+            }
+        elif replication_data and replication_data.get("n", 0) < 2:
+            _rep_n = replication_data.get("n", 0)
+            reason = f"Only {_rep_n} valid runs out of 3 — insufficient for replication verdict (need at least 2)"
+            print(f"[EXPERIMENT] {reason} -- forcing INCONCLUSIVE")
+            return {
+                "status":             "INCONCLUSIVE",
+                "confidence_updated": conf_init,
+                "reasoning":          reason,
+            }
 
         # Baseline/technique cross-validation
         if result_score is not None and baseline_match and technique_match:
