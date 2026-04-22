@@ -1441,7 +1441,17 @@ async def run_benchmark_loop(
         # -- Build prompt (or skip for swarm which builds internally) --
         prompt = ""  # swarm path does not use a flat prompt
         if attempt_num == 1:
-            prompt = _build_initial_prompt(source, readme, output_filename, experience_summary, lang=lang)
+            # Inject CognitionCore relational_context (full brain or lobotomy) if available
+            _cognition_ctx = ""
+            if _consciousness is not None:
+                try:
+                    _cognition_ctx = _consciousness.relational_context(task_dir.name)
+                    lobotomy_mode = getattr(_consciousness, "_lobotomy", False)
+                    print(f"  [cognition] relational_context injected ({'LOBOTOMY' if lobotomy_mode else 'FULL'}, {len(_cognition_ctx)} chars)")
+                except Exception as _cc_err:
+                    logger.debug("[cognition] relational_context failed: %s", _cc_err)
+            _combined_ctx = "\n\n".join(filter(None, [_cognition_ctx, experience_summary]))
+            prompt = _build_initial_prompt(source, readme, output_filename, _combined_ctx, lang=lang)
             print(f"  [LLM SOLO] Initial prompt ({len(prompt):,} chars)")
         elif mode == "SWARM":
             print(f"  [SWARM] Architect -> Coder -> Critic pipeline")

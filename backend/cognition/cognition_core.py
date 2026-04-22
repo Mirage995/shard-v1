@@ -180,6 +180,9 @@ class CognitionCore:
             "miss_causes":   {"signal_weak": 0, "model_inertia": 0, "dilution": 0, "ignored_v3": 0},
         }
 
+        # Lobotomy mode -- when True, relational_context() returns only Anchor+Executive
+        self._lobotomy: bool = False
+
         # ── Shared Environment -- module registry + event bus ──────────────────
         # Modules register here and receive broadcasts from each other.
         # CognitionCore is the environment: it routes events, never decides.
@@ -506,6 +509,24 @@ class CognitionCore:
             logger.warning("[COGNITION] query_strategy_recommendation failed: %s", exc)
         return result
 
+    # ── Lobotomy control ──────────────────────────────────────────────────────
+
+    def set_lobotomy(self, enabled: bool) -> None:
+        """Enable/disable lobotomy mode. When True, relational_context() returns only Anchor+Executive."""
+        self._lobotomy = enabled
+
+    def _anchor_executive_only(self, topic: str) -> str:
+        """Return Layer 0+1 only (Anchor + Executive Summary). Used in lobotomy mode."""
+        exec_data = self.executive()
+        anchor = exec_data["anchor"]
+        lines = [
+            f"[COGNITION CORE — LOBOTOMY] Topic: {topic}",
+            exec_data["summary"],
+            f"Anchor: cert_rate={anchor['certification_rate']:.0%} "
+            f"| last={anchor['last_topic']} -> {'PASS' if anchor['last_pass'] else 'FAIL'}({anchor['last_score']})",
+        ]
+        return "\n".join(lines)
+
     # ── Relational Context -- composite view with tensions ─────────────────────
 
     def relational_context(self, topic: str, research_mode: bool = False) -> str:
@@ -517,6 +538,9 @@ class CognitionCore:
         Used by: CertifyRetryGroup (attempt >= 2), phase_synthesize.
         research_mode=True adds Layer E (EMPIRICAL) from ExperimentStore.
         """
+        if self._lobotomy:
+            return self._anchor_executive_only(topic)
+
         lines = [f"[COGNITION CORE] Topic: {topic}"]
 
         exec_data = self.executive()
