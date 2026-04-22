@@ -817,6 +817,111 @@ Example: ["query 1", "query 2", "query 3"]"""
             return "classification"
         return "generic"
 
+    async def _antagonist_review(
+        self,
+        hypothesis: dict,
+        experiment_code: str,
+        experiment_stdout: str,
+        replication_data: dict,
+        attempt: int = 1,
+    ) -> dict:
+        """Independent skeptic that audits experiment code for cheating or bugs.
+
+        Returns one of:
+          {"verdict": "VALID", "reason": "", "corrected_code": None}
+          {"verdict": "INVALID_FATAL", "reason": str, "corrected_code": None}
+          {"verdict": "INVALID_CORRECTABLE", "reason": str, "corrected_code": str}
+        """
+        import re as _re
+
+        statement   = hypothesis.get("statement", "")
+        min_exp     = str(hypothesis.get("minimum_experiment", ""))
+        rep_summary = ""
+        if replication_data:
+            rep_summary = (
+                f"N={replication_data.get('n', 0)} runs, "
+                f"mean={replication_data.get('mean')}, std={replication_data.get('std')}, "
+                f"results={replication_data.get('results', [])}"
+            )
+
+        system = (
+            "Sei uno scettico metodologico. Il tuo compito e':\n"
+            "1. Trovare errori, trucchi, bug o calcoli scorretti nel codice esperimento.\n"
+            "2. Se trovi errori FIXABILI (bug sintattico, calcolo sbagliato, metrica mal definita,\n"
+            "   baseline non confrontabile, seed fisso che favorisce la technique), genera il CODICE CORRETTO.\n"
+            "3. Se trovi errori GRAVI NON FIXABILI (hardcoded score, dati fittizi, meccanismo\n"
+            "   completamente diverso dall'hypothesis, hypothesis non implementabile), dichiara FATAL.\n\n"
+            "Verifica:\n"
+            "- Il codice implementa DAVVERO il meccanismo descritto nel minimum_experiment?\n"
+            "- RESULT_BASELINE, RESULT_TECHNIQUE e RESULT sono calcolati dai dati reali?\n"
+            "- Ci sono hardcoded score, dati fittizi, o seed fissi che favoriscono la technique?\n"
+            "- Baseline e technique usano lo STESSO data split?\n"
+            "- Le metriche corrispondono al SUCCESS CRITERION?\n\n"
+            "Rispondi ESATTAMENTE in uno di questi 3 formati:\n\n"
+            "Formato 1 — Tutto corretto:\n"
+            "VERDICT: VALID\n\n"
+            "Formato 2 — Errore fixabile, genera codice corretto:\n"
+            "VERDICT: INVALID_CORRECTABLE\n"
+            "REASON: <descrizione breve dell'errore>\n"
+            "CORRECTED_CODE:\n"
+            "```python\n"
+            "<codice Python corretto e completo>\n"
+            "```\n\n"
+            "Formato 3 — Errore grave, non fixabile:\n"
+            "VERDICT: INVALID_FATAL\n"
+            "REASON: <descrizione dell'errore grave>\n\n"
+            "Regole per CORRECTED_CODE:\n"
+            "- Codice Python completo e runnable, non un diff.\n"
+            "- Mantieni RESULT_BASELINE, RESULT_TECHNIQUE, RESULT triple.\n"
+            "- Nessun commento esplicativo — solo codice.\n"
+            "- Se il codice originale era >3000 char, correggi solo la parte errata ma restituisci il file completo."
+        )
+
+        prompt = (
+            f"HYPOTHESIS:\n  Statement: {statement}\n  Minimum experiment: {min_exp}\n\n"
+            f"EXPERIMENT CODE (attempt {attempt}/3):\n```python\n{experiment_code[:4000]}\n```\n\n"
+            f"SANDBOX OUTPUT:\n{experiment_stdout[:800] or '(empty)'}\n\n"
+            f"REPLICATION: {rep_summary or '(not available)'}\n\n"
+            "Audit the code and respond with one of the 3 formats above."
+        )
+
+        raw = await self._think(prompt, system=system, json_mode=False, temperature=0.2)
+
+        # Parse response
+        if _re.search(r"VERDICT:\s*VALID\b", raw):
+            return {"verdict": "VALID", "reason": "", "corrected_code": None}
+
+        fatal_m = _re.search(r"VERDICT:\s*INVALID_FATAL", raw)
+        if fatal_m:
+            reason_m = _re.search(r"REASON:\s*(.+)", raw)
+            reason = reason_m.group(1).strip() if reason_m else "Unspecified fatal error"
+            return {"verdict": "INVALID_FATAL", "reason": reason, "corrected_code": None}
+
+        corr_m = _re.search(r"VERDICT:\s*INVALID_CORRECTABLE", raw)
+        if corr_m:
+            reason_m = _re.search(r"REASON:\s*(.+)", raw)
+            reason = reason_m.group(1).strip() if reason_m else "Unspecified correctable error"
+            code_m = _re.search(r"```python\s*\n([\s\S]+?)\n```", raw)
+            if code_m:
+                return {
+                    "verdict": "INVALID_CORRECTABLE",
+                    "reason": reason,
+                    "corrected_code": code_m.group(1).strip(),
+                }
+            # CORRECTABLE declared but no code block → treat as FATAL
+            return {
+                "verdict": "INVALID_FATAL",
+                "reason": f"CORRECTABLE declared but no corrected code provided: {reason}",
+                "corrected_code": None,
+            }
+
+        # Parse failure → safe fallback
+        return {
+            "verdict": "INVALID_FATAL",
+            "reason": "Antagonist parse error — treating as unsafe",
+            "corrected_code": None,
+        }
+
     async def _validate_experiment_alignment(self, hypothesis: Dict,
                                                attempt: int = 0) -> Dict:
         """LLM scientific reviewer: does minimum_experiment actually test the hypothesis?

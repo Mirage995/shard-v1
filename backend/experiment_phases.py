@@ -835,17 +835,87 @@ def _persist_skipped(ctx, hypothesis: dict, status: str) -> None:
 
 
 class ExperimentSandboxPhase(BasePhase):
-    """Execute experiment_code in Docker sandbox (DockerSandboxRunner, zero modifications).
+    """Execute experiment_code in Docker sandbox with N=3 replication and Corrective Antagonist.
 
     Gate conditions:
       - ctx.experiment_status != 'SKIPPED'
       - ctx.experiment_code is not None
 
-    On success: writes ctx.experiment_result {success, stdout, stderr, exit_code}.
-    On gate failure or error: logs and returns (experiment_status unchanged).
+    Loop: up to 3 attempts. Each attempt: sandbox N=3 → antagonist review.
+      VALID        → proceed to ExperimentValidatePhase
+      INVALID_FATAL → set ctx.experiment_status = INCONCLUSIVE, return
+      INVALID_CORRECTABLE (attempt < 3) → retry with corrected code
+      INVALID_CORRECTABLE (attempt == 3) → set INCONCLUSIVE, return
+
+    On success: writes ctx.experiment_result with replication + antagonist metadata.
     """
     name  = "EXPERIMENT_SANDBOX"
     fatal = False
+
+    async def _run_sandbox_n3(
+        self,
+        runner,
+        code: str,
+        ctx: "StudyContext",
+        attempt: int,
+    ) -> dict:
+        """Run the same experiment code 3 times independently. Returns replication dict."""
+        import re as _re
+        import math as _math
+        import time as _time
+
+        _results_collected = []
+        _run_times = []
+        _last_result = None
+
+        for _rep in range(3):
+            _t0 = _time.time()
+            _run_result = await runner.run(
+                topic=f"[EXPERIMENT attempt={attempt}] {ctx.topic}",
+                code=code,
+                progress=ctx.progress,
+            )
+            _elapsed = round(_time.time() - _t0, 1)
+            _run_times.append(_elapsed)
+            _last_result = _run_result
+            _stdout = _run_result.get("stdout", "")
+            _m = _re.search(r"RESULT:\s*([-+]?[\d.]+)", _stdout)
+            if _m and _run_result.get("success", False):
+                _val = float(_m.group(1))
+                _results_collected.append(_val)
+                print(f"[REPLICATION] Attempt {attempt}/3 run {_rep+1}/3 — RESULT={_val} ({_elapsed}s)")
+            else:
+                print(f"[REPLICATION] Attempt {attempt}/3 run {_rep+1}/3 — FAILED ({_elapsed}s)")
+
+        _n = len(_results_collected)
+        if _n >= 2:
+            _rep_mean = sum(_results_collected) / _n
+            _rep_std  = _math.sqrt(sum((r - _rep_mean) ** 2 for r in _results_collected) / _n)
+            print(
+                f"[REPLICATION] Attempt {attempt}/3 N={_n} — "
+                f"mean={_rep_mean:.3f} std={_rep_std:.3f} times={_run_times}"
+            )
+        else:
+            _rep_mean = None
+            _rep_std  = None
+            print(f"[REPLICATION] Attempt {attempt}/3 — only {_n}/3 runs valid")
+
+        replication = {
+            "results":   _results_collected,
+            "mean":      round(_rep_mean, 4) if _rep_mean is not None else None,
+            "std":       round(_rep_std, 4)  if _rep_std  is not None else None,
+            "n":         _n,
+            "run_times": _run_times,
+        }
+
+        ctx.experiment_result = {
+            "success":     _last_result.get("success", False) if _last_result else False,
+            "stdout":      _last_result.get("stdout", "")     if _last_result else "",
+            "stderr":      _last_result.get("stderr", "")     if _last_result else "",
+            "exit_code":   0 if (_last_result and _last_result.get("success")) else 1,
+            "replication": replication,
+        }
+        return replication
 
     async def run(self, ctx: "StudyContext") -> None:
         # ── Gate ─────────────────────────────────────────────────────────────
@@ -856,83 +926,119 @@ class ExperimentSandboxPhase(BasePhase):
         if ctx.experiment_status in ("SKIPPED", "KAGGLE_READY") or not ctx.experiment_code:
             return
 
-        # ── Execute (N=3 replication for scientific validity) ────────────────
-        await ctx.emit("EXPERIMENT_SANDBOX", 0, "Running experiment in Docker sandbox (N=3 replication)...")
+        # ── Setup runner ──────────────────────────────────────────────────────
+        await ctx.emit("EXPERIMENT_SANDBOX", 0, "Running experiment (N=3 replication + Antagonist)...")
         try:
             import os as _os
-            import re as _re
-            import math as _math
-            import time as _time
             from sandbox_runner import DockerSandboxRunner
             _sandbox_dir = getattr(ctx.agent, "sandbox_dir", None) or _os.path.join(_os.getcwd(), "sandbox")
-            runner = DockerSandboxRunner(
-                sandbox_dir=_sandbox_dir,
-                analysis_fn=None,   # no LLM analysis -- ExperimentValidatePhase handles it
-            )
-
-            _results_collected = []
-            _run_times = []
-            _last_result = None
-
-            for _rep in range(3):
-                _t0 = _time.time()
-                _run_result = await runner.run(
-                    topic=f"[EXPERIMENT] {ctx.topic}",
-                    code=ctx.experiment_code,
-                    progress=ctx.progress,
-                )
-                _elapsed = round(_time.time() - _t0, 1)
-                _run_times.append(_elapsed)
-                _last_result = _run_result
-                _stdout = _run_result.get("stdout", "")
-                _m = _re.search(r"RESULT:\s*([-+]?[\d.]+)", _stdout)
-                if _m and _run_result.get("success", False):
-                    _val = float(_m.group(1))
-                    _results_collected.append(_val)
-                    print(f"[REPLICATION] Run {_rep+1}/3 — RESULT={_val} ({_elapsed}s)")
-                else:
-                    print(f"[REPLICATION] Run {_rep+1}/3 — FAILED (no RESULT or error) ({_elapsed}s)")
-
-            # Compute replication stats
-            _n = len(_results_collected)
-            if _n >= 2:
-                _rep_mean = sum(_results_collected) / _n
-                _rep_std  = _math.sqrt(sum((r - _rep_mean) ** 2 for r in _results_collected) / _n)
-                print(
-                    f"[REPLICATION] N={_n} complete — mean={_rep_mean:.3f} std={_rep_std:.3f} "
-                    f"times={_run_times}"
-                )
-            else:
-                _rep_mean = None
-                _rep_std  = None
-                print(f"[REPLICATION] Only {_n}/3 runs valid — insufficient for stats")
-
-            ctx.experiment_result = {
-                "success":   _last_result.get("success", False),
-                "stdout":    _last_result.get("stdout", ""),
-                "stderr":    _last_result.get("stderr", ""),
-                "exit_code": 0 if _last_result.get("success") else 1,
-                "replication": {
-                    "results":    _results_collected,
-                    "mean":       round(_rep_mean, 4) if _rep_mean is not None else None,
-                    "std":        round(_rep_std, 4)  if _rep_std  is not None else None,
-                    "n":          _n,
-                    "run_times":  _run_times,
-                },
-            }
-            status_icon = "OK" if _last_result.get("success") else "FAIL"
-            await ctx.emit(
-                "EXPERIMENT_SANDBOX", 0,
-                f"Sandbox [{status_icon}] N={_n} — mean={_rep_mean:.3f if _rep_mean else 'N/A'} "
-                f"std={_rep_std:.3f if _rep_std else 'N/A'}"
-            )
+            runner = DockerSandboxRunner(sandbox_dir=_sandbox_dir, analysis_fn=None)
         except Exception as exc:
-            logger.error("[EXPERIMENT_SANDBOX] Sandbox execution failed: %s", exc)
+            logger.error("[EXPERIMENT_SANDBOX] Runner init failed: %s", exc)
             ctx.experiment_result = {
                 "success": False, "stdout": "", "stderr": str(exc), "exit_code": -1,
                 "replication": {"results": [], "mean": None, "std": None, "n": 0, "run_times": []},
             }
-            await ctx.emit("EXPERIMENT_SANDBOX", 0, f"Sandbox error: {exc}")
+            await ctx.emit("EXPERIMENT_SANDBOX", 0, f"Runner init error: {exc}")
+            return
+
+        # ── Corrective Antagonist loop (max 3 attempts) ───────────────────────
+        hypothesis   = (ctx.structured or {}).get("hypothesis", {})
+        current_code = ctx.experiment_code
+        max_attempts = 3
+
+        for attempt in range(1, max_attempts + 1):
+            # Step 1: N=3 sandbox runs
+            try:
+                replication = await self._run_sandbox_n3(runner, current_code, ctx, attempt)
+            except Exception as exc:
+                logger.error("[EXPERIMENT_SANDBOX] N=3 run failed at attempt %d: %s", attempt, exc)
+                ctx.experiment_result = {
+                    "success": False, "stdout": "", "stderr": str(exc), "exit_code": -1,
+                    "replication": {"results": [], "mean": None, "std": None, "n": 0, "run_times": []},
+                    "antagonist_verdict": "INVALID_FATAL",
+                    "antagonist_reason":  f"Sandbox error: {exc}",
+                    "antagonist_attempts": attempt,
+                }
+                ctx.experiment_status = "INCONCLUSIVE"
+                return
+
+            # Step 2: Antagonist review
+            try:
+                antagonist = await ctx.agent._antagonist_review(
+                    hypothesis=hypothesis,
+                    experiment_code=current_code,
+                    experiment_stdout=ctx.experiment_result.get("stdout", ""),
+                    replication_data=replication,
+                    attempt=attempt,
+                )
+            except Exception as exc:
+                logger.warning("[ANTAGONIST] Review failed at attempt %d (non-fatal): %s", attempt, exc)
+                antagonist = {"verdict": "VALID", "reason": "review_error_bypass", "corrected_code": None}
+
+            verdict = antagonist["verdict"]
+            reason  = antagonist.get("reason", "")
+            logger.info("[ANTAGONIST] Attempt %d/%d — %s: %s", attempt, max_attempts, verdict, reason[:100])
+
+            if verdict == "VALID":
+                ctx.experiment_code = current_code
+                ctx.experiment_result.update({
+                    "antagonist_verdict":  "VALID",
+                    "antagonist_reason":   "",
+                    "antagonist_attempts": attempt,
+                })
+                await ctx.emit(
+                    "EXPERIMENT_SANDBOX", 0,
+                    f"Antagonist VALID at attempt {attempt}/{max_attempts} — "
+                    f"N={replication['n']} mean={replication['mean']} std={replication['std']}"
+                )
+                return
+
+            elif verdict == "INVALID_FATAL":
+                logger.warning("[ANTAGONIST] FATAL at attempt %d: %s", attempt, reason)
+                ctx.experiment_result.update({
+                    "antagonist_verdict":  "INVALID_FATAL",
+                    "antagonist_reason":   reason,
+                    "antagonist_attempts": attempt,
+                })
+                ctx.experiment_status = "INCONCLUSIVE"
+                await ctx.emit("EXPERIMENT_SANDBOX", 0, f"Antagonist FATAL: {reason[:80]}")
+                return
+
+            elif verdict == "INVALID_CORRECTABLE":
+                if attempt >= max_attempts:
+                    logger.warning(
+                        "[ANTAGONIST] CORRECTABLE but max attempts reached at %d: %s",
+                        attempt, reason,
+                    )
+                    ctx.experiment_result.update({
+                        "antagonist_verdict":  "INVALID_CORRECTABLE",
+                        "antagonist_reason":   reason,
+                        "antagonist_attempts": attempt,
+                    })
+                    ctx.experiment_status = "INCONCLUSIVE"
+                    await ctx.emit("EXPERIMENT_SANDBOX", 0, f"Antagonist max attempts: {reason[:80]}")
+                    return
+                logger.info("[ANTAGONIST] CORRECTABLE at attempt %d, retrying: %s", attempt, reason)
+                current_code = antagonist["corrected_code"]
+                await ctx.emit(
+                    "EXPERIMENT_SANDBOX", 0,
+                    f"Antagonist CORRECTABLE at attempt {attempt}/{max_attempts} — retrying..."
+                )
+                continue
+
+            else:
+                logger.error("[ANTAGONIST] Unknown verdict '%s' at attempt %d — INCONCLUSIVE", verdict, attempt)
+                ctx.experiment_result.update({
+                    "antagonist_verdict":  verdict,
+                    "antagonist_reason":   "Unknown verdict",
+                    "antagonist_attempts": attempt,
+                })
+                ctx.experiment_status = "INCONCLUSIVE"
+                return
+
+        # Safety net: exhausted attempts without explicit return above
+        ctx.experiment_status = "INCONCLUSIVE"
 
 
 class ExperimentValidatePhase(BasePhase):
@@ -956,6 +1062,11 @@ class ExperimentValidatePhase(BasePhase):
             return
 
         if ctx.experiment_result is None:
+            return
+
+        # If ExperimentSandboxPhase already forced INCONCLUSIVE (FATAL or max attempts) → skip validate
+        if ctx.experiment_status == "INCONCLUSIVE":
+            print("[EXPERIMENT_VALIDATE] SKIPPED — already INCONCLUSIVE from antagonist")
             return
 
         hypothesis = (ctx.structured or {}).get("hypothesis")
