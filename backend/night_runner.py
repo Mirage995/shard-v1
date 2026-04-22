@@ -468,18 +468,57 @@ class NightRunner:
         return ""
 
     def _is_quarantined(self, topic: str) -> bool:
-        """Fix C: True if this topic has 3+ hard failures (max score < 6.0).
+        """True if topic is permanently blocked from further study.
 
-        Near-misses (score >= 6.0) are NOT quarantined -- they should be retried
-        with score context (Fix B).  Only truly hopeless topics get blocked.
-        Uses SQLite VIEW quarantined_topics, fallback to JSON.
+        Two conditions (checked in order, cheapest first):
+          1. Hard cap: >= MAX_TOPIC_ATTEMPTS total attempts (any score)
+          2. Hard fails: 3+ attempts with max score < 6.0 (SQLite VIEW)
+
+        Near-misses (score >= 6.0) are NOT quarantined by condition 2 --
+        they should be retried with score context (Fix B).
         """
+        from shard_db import get_db
         try:
-            from shard_db import get_db
+            from constants import MAX_TOPIC_ATTEMPTS
+        except ImportError:
+            from backend.constants import MAX_TOPIC_ATTEMPTS
+
+        topic_key = topic.lower().strip()
+
+        # Gate 1: hard cap on total attempts (cheap COUNT, no LLM)
+        try:
+            conn = get_db()
+            row = conn.execute(
+                "SELECT COUNT(*) AS n FROM experiments WHERE LOWER(topic) = ?",
+                (topic_key,)
+            ).fetchone()
+            count = int(row["n"]) if row else 0
+            if count >= MAX_TOPIC_ATTEMPTS:
+                print(f"[QUARANTINE] {topic} blocked after {count} attempts (hard cap)")
+                self.logger.warning(
+                    "[QUARANTINE] %r hard-capped after %d attempts (>= %d)",
+                    topic, count, MAX_TOPIC_ATTEMPTS,
+                )
+                # Persist to quarantine.json so ReportAgent can audit it
+                try:
+                    _qpath = Path(__file__).resolve().parents[1] / "shard_memory" / "quarantine.json"
+                    import json as _json
+                    _existing = set(_json.loads(_qpath.read_text(encoding="utf-8"))) if _qpath.exists() else set()
+                    if topic_key not in _existing:
+                        _existing.add(topic_key)
+                        _qpath.write_text(_json.dumps(sorted(_existing), indent=2), encoding="utf-8")
+                except Exception as _qe:
+                    self.logger.debug("[QUARANTINE] quarantine.json write failed: %s", _qe)
+                return True
+        except Exception as _e:
+            self.logger.debug("[QUARANTINE] attempt-cap check failed: %s", _e)
+
+        # Gate 2: 3+ hard fails (score < 6.0) via SQLite VIEW
+        try:
             conn = get_db()
             row = conn.execute(
                 "SELECT topic FROM quarantined_topics WHERE topic = ?",
-                (topic.lower().strip(),)
+                (topic_key,)
             ).fetchone()
             if row:
                 self.logger.info("[DB] Topic quarantined (SQLite VIEW): %r", topic)

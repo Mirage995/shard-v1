@@ -12,3 +12,6 @@ PROVIDERS_WITH_OAI  = ["Groq", "OpenAI", "Gemini"]  # mid-tier chain
 BENCHMARK_ENABLED        = True
 BENCHMARK_PASS_THRESHOLD = 0.6   # min pass_rate required for certification (0.0–1.0)
 BENCHMARK_WEIGHT         = 0.6   # weight of benchmark score in blended final_score
+
+# ── Topic quarantine ───────────────────────────────────────────────────────────
+MAX_TOPIC_ATTEMPTS = 20  # hard cap: after 20 total attempts the topic is permanently quarantined
