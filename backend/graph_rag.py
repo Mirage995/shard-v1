@@ -406,6 +406,46 @@ def get_epistemic_profile(topic: str) -> dict:
                 "verified": 0, "unsure": 0, "untested": 0}
 
 
+def insert_verified_relation(
+    source_concept: str,
+    target_concept: str,
+    relation_type: str,
+    context: str,
+    verified_status: str,
+    confidence: float = 0.9,
+    topic_origin: str = "",
+    experiment_id: str = "",
+) -> bool:
+    """Upsert a causally verified (or refuted) relation into knowledge_graph.
+
+    Uses ON CONFLICT DO UPDATE so duplicate triples are updated in-place.
+    Requires the UNIQUE INDEX idx_kg_pair on (source_concept, target_concept, relation_type).
+    """
+    try:
+        from shard_db import execute
+        execute("""
+            INSERT INTO knowledge_graph
+                (source_concept, target_concept, relation_type, context,
+                 confidence, verified_status, topic_origin, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(source_concept, target_concept, relation_type) DO UPDATE SET
+                context         = excluded.context,
+                confidence      = excluded.confidence,
+                verified_status = excluded.verified_status,
+                topic_origin    = excluded.topic_origin,
+                created_at      = datetime('now')
+        """, (source_concept, target_concept, relation_type,
+              context, confidence, verified_status, topic_origin))
+        logger.info(
+            "[GRAPH_RAG] insert_verified_relation: %s → %s (%s) [%s] experiment=%s",
+            source_concept, target_concept, relation_type, verified_status, experiment_id,
+        )
+        return True
+    except Exception as e:
+        logger.warning("[GRAPH_RAG] insert_verified_relation failed: %s", e)
+        return False
+
+
 # Run schema migration on first import
 try:
     ensure_schema()

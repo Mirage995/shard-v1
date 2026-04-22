@@ -1087,6 +1087,37 @@ class ExperimentValidatePhase(BasePhase):
             ctx.experiment_status           = verdict.get("status", "INCONCLUSIVE")
             ctx.hypothesis_confidence_updated = float(verdict.get("confidence_updated", hypothesis.get("confidence", 0.0)))
 
+            # ── Feed GraphRAG ──────────────────────────────────────────────────
+            if ctx.experiment_status in ("CONFIRMED", "REFUTED"):
+                try:
+                    from graph_rag import insert_verified_relation
+                    _source   = hypothesis.get("domain_from") or "unknown"
+                    _target   = hypothesis.get("domain_to")   or "unknown"
+                    _relation = "improves" if ctx.experiment_status == "CONFIRMED" else "does_not_improve"
+                    _rep      = (ctx.experiment_result or {}).get("replication", {})
+                    _ctx_str  = (
+                        f"Experiment #{getattr(ctx, '_experiment_hypothesis_id', '?')}: "
+                        f"{hypothesis.get('statement', '')}. "
+                        f"Mean={_rep.get('mean')}, Std={_rep.get('std')}. "
+                        f"Status={ctx.experiment_status}."
+                    )
+                    insert_verified_relation(
+                        source_concept  = _source,
+                        target_concept  = _target,
+                        relation_type   = _relation,
+                        context         = _ctx_str,
+                        verified_status = "verified" if ctx.experiment_status == "CONFIRMED" else "refuted",
+                        confidence      = 0.9 if ctx.experiment_status == "CONFIRMED" else 0.7,
+                        topic_origin    = ctx.topic,
+                        experiment_id   = str(getattr(ctx, "_experiment_hypothesis_id", "")),
+                    )
+                    logger.info(
+                        "[GRAPH_FEED] %s: %s → %s (%s)",
+                        ctx.experiment_status, _source, _target, _relation,
+                    )
+                except Exception as _gf_exc:
+                    logger.warning("[GRAPH_FEED] Failed: %s", _gf_exc)
+
             await ctx.emit(
                 "EXPERIMENT_VALIDATE", 0,
                 f"Verdict: {ctx.experiment_status} | "
