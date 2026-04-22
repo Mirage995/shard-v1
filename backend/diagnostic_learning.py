@@ -13,11 +13,18 @@ Update rule (fixed LR, no confidence scaling for now):
 
 One update per run at end-of-run. Duplicates are deduplicated before update.
 Atomic write (temp + rename) prevents file corruption.
+
+Rollback gate (#26): before writing new weights, _validate_weight_update() checks:
+  - cert_rate has not dropped more than 10% vs previous snapshot
+  - no single weight has shifted more than 0.5 in one update
+  If either gate fails, old weights are preserved (with rejection metadata).
 """
+import copy
 import json
 import logging
 import os
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 logger = logging.getLogger("shard.diagnostic_learning")
@@ -28,6 +35,48 @@ W_MIN, W_MAX   = 0.5, 2.0
 DEFAULT_WEIGHT = 1.0
 
 _WEIGHTS_FILE = Path(__file__).resolve().parent.parent / "shard_memory" / "diagnostic_weights.json"
+
+
+def _get_current_cert_rate() -> float:
+    """Read cert_rate from experiments table. Returns 0.0 on any error."""
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from shard_db import query
+        rows = query("SELECT COUNT(*) AS total, SUM(certified) AS cert FROM experiments")
+        if rows:
+            total = int(rows[0]["total"] or 0)
+            cert  = int(rows[0]["cert"]  or 0)
+            return round(cert / total, 4) if total else 0.0
+    except Exception as e:
+        logger.debug("[LEARNING] cert_rate fetch failed: %s", e)
+    return 0.0
+
+
+def _validate_weight_update(
+    old_data: dict, new_data: dict, cert_rate: float
+) -> tuple[bool, str]:
+    """Rollback gate: returns (True, "") if update is safe, (False, reason) otherwise."""
+    # Gate 1: cert_rate must not drop more than 10% vs previous snapshot
+    old_cert = old_data.get("_meta", {}).get("cert_rate", cert_rate)
+    if old_cert > 0 and cert_rate < old_cert * 0.9:
+        return False, f"cert_rate drop {old_cert:.1%} -> {cert_rate:.1%} exceeds 10% threshold"
+
+    # Gate 2: no single weight may shift more than 0.5 in one update
+    max_delta = 0.0
+    for key in set(old_data.keys()) | set(new_data.keys()):
+        if key.startswith("_"):
+            continue
+        old_w = old_data.get(key, {}).get("weight", DEFAULT_WEIGHT) if isinstance(old_data.get(key), dict) else DEFAULT_WEIGHT
+        new_w = new_data.get(key, {}).get("weight", DEFAULT_WEIGHT) if isinstance(new_data.get(key), dict) else DEFAULT_WEIGHT
+        delta = abs(new_w - old_w)
+        if delta > max_delta:
+            max_delta = delta
+
+    if max_delta > 0.5:
+        return False, f"max weight delta {max_delta:.3f} exceeds threshold 0.5"
+
+    return True, f"delta_max={max_delta:.3f} cert_rate={cert_rate:.1%}"
 
 
 def _load() -> dict:
@@ -78,6 +127,7 @@ def update_weights(diagnostics_triggered: list[dict], success: bool) -> None:
             seen[name] = entry
 
     data = _load()
+    old_data = copy.deepcopy(data)
 
     for name in seen:
         if name not in data:
@@ -107,6 +157,29 @@ def update_weights(diagnostics_triggered: list[dict], success: bool) -> None:
         except Exception:
             pass
 
+    # Rollback gate — validate before committing new weights
+    now = datetime.now().isoformat()
+    cert_rate = _get_current_cert_rate()
+    data["_meta"] = {
+        "cert_rate":  cert_rate,
+        "updated_at": now,
+    }
+
+    ok, detail = _validate_weight_update(old_data, data, cert_rate)
+    if not ok:
+        logger.warning("[DIAGNOSTIC] Weights REJECTED: %s. Keeping previous.", detail)
+        print(f"  [diagnostic] Weights: REJECTED ({detail}). Keeping previous.")
+        old_data.setdefault("_meta", {})
+        old_data["_meta"]["last_rejected_reason"] = detail
+        old_data["_meta"]["last_rejected_at"] = now
+        try:
+            _atomic_write(old_data)
+        except Exception as e:
+            logger.warning("[LEARNING] atomic write (reject path) failed: %s", e)
+        return
+
+    logger.info("[DIAGNOSTIC] Weights ACCEPTED. %s", detail)
+    print(f"  [diagnostic] Weights: ACCEPTED ({detail})")
     try:
         _atomic_write(data)
     except Exception as e:
