@@ -1,0 +1,570 @@
+{
+  "run_id": "20260418_145804",
+  "n_target": 20,
+  "n_reached": 17,
+  "n_topics_run": 80,
+  "n_errors": 0,
+  "calib_log": "C:\\Users\\andre\\Desktop\\shard_v1\\shard_workspace\\experiments\\alignment_log_20260418_145930.jsonl",
+  "topic_log": [
+    {
+      "topic": "transfer learning in protein folding",
+      "status": "done",
+      "elapsed_s": 396.4,
+      "n_hyp_total": 1,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "attention mechanisms in fluid dynamics simulation",
+      "status": "done",
+      "elapsed_s": 184.2,
+      "n_hyp_total": 2,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "reinforcement learning for chemical synthesis planning",
+      "status": "done",
+      "elapsed_s": 153.3,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "graph neural networks for materials discovery",
+      "status": "done",
+      "elapsed_s": 11.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "contrastive learning in climate modeling",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "dynamic programming in phylogenetics",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "monte carlo methods in financial risk modeling",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "spectral methods in network epidemiology",
+      "status": "done",
+      "elapsed_s": 1.5,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "gradient descent variants in geophysics inversion",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "sparse recovery in astronomical imaging",
+      "status": "done",
+      "elapsed_s": 11.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "entropy minimization in neural coding",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "kolmogorov complexity in biological sequence analysis",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "rate-distortion theory in video compression for robotics",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "channel capacity bounds in sensor fusion",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "mutual information in causal inference for economics",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "wavelet transforms in EEG artifact removal",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "compressed sensing in functional MRI",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "matched filter theory in neural spike sorting",
+      "status": "done",
+      "elapsed_s": 11.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "time-frequency analysis in bat echolocation modeling",
+      "status": "done",
+      "elapsed_s": 11.2,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "source separation in gene expression microarrays",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "convex relaxation in power grid scheduling",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "stochastic approximation in queueing network control",
+      "status": "done",
+      "elapsed_s": 11.1,
+      "n_hyp_total": 3,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "interior point methods in structural topology optimization",
+      "status": "done",
+      "elapsed_s": 162.0,
+      "n_hyp_total": 4,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "semidefinite programming in robot motion planning",
+      "status": "done",
+      "elapsed_s": 188.6,
+      "n_hyp_total": 5,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "proximal gradient methods in radar beamforming",
+      "status": "done",
+      "elapsed_s": 174.9,
+      "n_hyp_total": 6,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "probabilistic method in network coding",
+      "status": "done",
+      "elapsed_s": 153.6,
+      "n_hyp_total": 7,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "expander graphs in distributed storage systems",
+      "status": "done",
+      "elapsed_s": 117.0,
+      "n_hyp_total": 8,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "derandomization techniques in approximate counting",
+      "status": "done",
+      "elapsed_s": 106.5,
+      "n_hyp_total": 9,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "ramsey theory applications in communication complexity",
+      "status": "done",
+      "elapsed_s": 147.6,
+      "n_hyp_total": 10,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "extremal combinatorics in database query optimization",
+      "status": "done",
+      "elapsed_s": 339.4,
+      "n_hyp_total": 11,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "quantum walk algorithms in graph isomorphism",
+      "status": "done",
+      "elapsed_s": 145.3,
+      "n_hyp_total": 12,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "statistical mechanics of boolean satisfiability",
+      "status": "done",
+      "elapsed_s": 149.2,
+      "n_hyp_total": 13,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "percolation theory in network resilience",
+      "status": "done",
+      "elapsed_s": 111.9,
+      "n_hyp_total": 14,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "renormalization group in neural network generalization",
+      "status": "done",
+      "elapsed_s": 253.8,
+      "n_hyp_total": 15,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "phase transition phenomena in constraint satisfaction",
+      "status": "done",
+      "elapsed_s": 153.9,
+      "n_hyp_total": 16,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "predictive coding in reinforcement learning",
+      "status": "done",
+      "elapsed_s": 11.1,
+      "n_hyp_total": 16,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "working memory models for transformer architectures",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 16,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "sparse coding principles in dictionary learning",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 16,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "hierarchical temporal memory in sequence prediction",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 16,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "active inference in autonomous navigation",
+      "status": "done",
+      "elapsed_s": 311.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "lyapunov stability in gene regulatory networks",
+      "status": "done",
+      "elapsed_s": 11.1,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "feedback linearization in metabolic pathway engineering",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "optimal control of epidemiological SIR models",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "model predictive control for glucose regulation",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "H-infinity robust control in neural prosthetics",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "riemannian geometry in latent space interpolation",
+      "status": "done",
+      "elapsed_s": 1.1,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "persistent homology in time-series classification",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "discrete differential geometry in mesh deformation networks",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "information geometry in natural gradient optimization",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "hyperbolic embeddings in hierarchical text classification",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "auction theory in federated learning",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "mechanism design in recommendation systems",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "game theory in multi-agent reinforcement learning",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "voting theory in ensemble learning",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "contract theory in privacy-preserving machine learning",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "topology data analysis in motion capture",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "algebraic coding theory in DNA storage",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "number theory in cryptographic hash functions",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "analytic combinatorics in algorithm average-case analysis",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "ergodic theory in stochastic gradient descent convergence",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "measure theory in generative model evaluation",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "functional analysis in kernel methods",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "operator theory in quantum machine learning",
+      "status": "done",
+      "elapsed_s": 1.1,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "category theory in functional programming optimization",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "sheaf theory in multi-sensor data fusion",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "matroid theory in submodular optimization for ML",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "tropical geometry in phylogenetic tree reconstruction",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "non-commutative geometry in signal processing",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "p-adic analysis in neural network weight initialization",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "cohomology theory in topological data analysis",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "stochastic geometry in wireless network analysis",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "point process theory in neural spike train analysis",
+      "status": "done",
+      "elapsed_s": 11.1,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "branching processes in viral spread modeling",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "fluid-structure interaction in cardiac simulation",
+      "status": "done",
+      "elapsed_s": 1.2,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "vortex dynamics in microfluidic mixing",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "granular media mechanics in powder pharmaceutical processing",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "dislocation dynamics in crystal plasticity modeling",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "coagulation equations in atmospheric aerosol modeling",
+      "status": "done",
+      "elapsed_s": 11.0,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "kinetic theory in traffic flow simulation",
+      "status": "done",
+      "elapsed_s": 10.9,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    },
+    {
+      "topic": "mean field games in crowd dynamics",
+      "status": "done",
+      "elapsed_s": 1.3,
+      "n_hyp_total": 17,
+      "last_verdict": "VALID"
+    }
+  ]
+}

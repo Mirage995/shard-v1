@@ -22,8 +22,11 @@ import sys
 import statistics
 import time
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/../../backend")
-os.chdir(os.path.dirname(os.path.abspath(__file__)) + "/../../backend")
+_root = os.path.dirname(os.path.abspath(__file__)) + "/../.."
+_backend = _root + "/backend"
+sys.path.insert(0, _backend)
+sys.path.insert(0, _root)
+os.chdir(_backend)
 
 from study_agent import StudyAgent
 

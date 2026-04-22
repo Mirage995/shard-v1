@@ -1,695 +1,5 @@
 [
   {
-    "id": "ad41aed0",
-    "name": "alphafold_utilizza_un_modello_diffusion",
-    "statement": "AlphaFold3 utilizza un modello Diffusion Transformer per predire strutture proteiche e interazioni con ligandi. Questo implica la modellazione di distribuzioni complesse in spazi conformazionali ad al",
-    "domains": [
-      "machine_learning"
-    ],
-    "source_topic": "AlphaFold3 drug discovery",
-    "confidence": 0.8,
-    "created_at": "2026-04-04T15:48:45.090216+00:00"
-  },
-  {
-    "id": "6253d7fd",
-    "name": "il_paper_evidenzia_che_alphafold",
-    "statement": "Il paper evidenzia che AlphaFold3 mostra un calo di performance su strutture rilasciate dopo la data di cutoff del training, suggerendo un fenomeno di \"memorization\" piuttosto che una comprensione fis",
-    "domains": [
-      "machine_learning"
-    ],
-    "source_topic": "AlphaFold3 drug discovery",
-    "confidence": 0.8,
-    "created_at": "2026-04-04T15:48:45.091278+00:00"
-  },
-  {
-    "id": "67da21a7",
-    "name": "la_difficolt_di_alphafold_nel",
-    "statement": "La difficoltà di AlphaFold3 nel predire complessi ternari riflette la complessità intrinseca nella modellazione di reti di interazioni multiple, che possono essere rappresentate come grafi con nodi (p",
-    "domains": [
-      "algorithms",
-      "machine_learning",
-      "graph_theory"
-    ],
-    "source_topic": "AlphaFold3 drug discovery",
-    "confidence": 0.8,
-    "created_at": "2026-04-04T15:48:45.091581+00:00"
-  },
-  {
-    "id": "0a761efe",
-    "name": "il_paper_suggerisce_l_integrazione",
-    "statement": "Il paper suggerisce l’integrazione di AlphaFold3 con metodi basati sulla fisica per superare limitazioni di campionamento e ranking di affinità. Implementare pipeline ibride efficienti richiede orches",
-    "domains": [
-      "concurrency",
-      "software_engineering"
-    ],
-    "source_topic": "AlphaFold3 drug discovery",
-    "confidence": 0.8,
-    "created_at": "2026-04-04T15:48:45.091854+00:00"
-  },
-  {
-    "id": "513e31a5",
-    "name": "in_generale_counter_pi_adatto",
-    "statement": "In generale, Counter è più adatto per contare frequenze, mentre defaultdict(int) è più versatile per raggruppare dati e costruire istogrammi",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python defaultdict Counter comprehension optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-05T09:46:16.685284+00:00"
-  },
-  {
-    "id": "214e57cb",
-    "name": "la_mia_opinione_che_questi",
-    "statement": "La mia opinione è che questi strumenti possono migliorare notevolmente la qualità del codice, ma è essenziale comprendere quando e come utilizzarli",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python defaultdict Counter comprehension optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-05T12:45:34.159697+00:00"
-  },
-  {
-    "id": "1cb05f78",
-    "name": "la_combinazione_di_questi_concetti",
-    "statement": "La combinazione di questi concetti consente di creare un sistema di caching efficiente e scalabile, come evidenziato dall'opinione di SHARD, che sottolinea l'importanza di un equilibrio tra cache expi",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python TTL cache expiration implementation",
-    "confidence": 0.8,
-    "created_at": "2026-04-05T12:58:30.377229+00:00"
-  },
-  {
-    "id": "428851fc",
-    "name": "la_complessit_del_parsing_dei",
-    "statement": "La complessità del parsing dei template risiede nel bilanciare la flessibilità e le prestazioni, poiché template troppo complessi possono ridurre l'efficienza di parsing, mentre quelli semplici potreb",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "task 10 template parser",
-    "confidence": 0.65,
-    "created_at": "2026-04-05T13:08:54.213407+00:00"
-  },
-  {
-    "id": "b0618c3c",
-    "name": "dopo_aver_studiato_il_task",
-    "statement": "Dopo aver studiato il 'task 10 template parser', ho acquisito conoscenze sui concetti chiave di Template Parsing, Lexical Analysis, Syntax Analysis e Parser Design",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "task 10 template parser",
-    "confidence": 0.65,
-    "created_at": "2026-04-05T13:14:02.066930+00:00"
-  },
-  {
-    "id": "fe27db8b",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave relativi alla sostituzione di template di stringhe in Python utilizzando regex con delimitatori personalizzati",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python string template substitution regex custom delimiters",
-    "confidence": 0.8,
-    "created_at": "2026-04-05T13:22:16.583266+00:00"
-  },
-  {
-    "id": "4383b893",
-    "name": "importante_notare_che_la_creazione",
-    "statement": "È importante notare che la creazione di un parser di configurazione può essere complessa a causa dei casi limite come URL con due punti, spazi bianchi intorno alle chiavi e ai valori, righe vuote e co",
-    "domains": [
-      "graph_theory"
-    ],
-    "source_topic": "Python config parser edge cases",
-    "confidence": 0.65,
-    "created_at": "2026-04-05T13:57:15.605906+00:00"
-  },
-  {
-    "id": "446d742e",
-    "name": "collegando_questi_concetti_posso_creare",
-    "statement": "Collegando questi concetti, posso creare applicazioni più flessibili e robuste, gestendo le eccezioni e i casi limite (`edge cases`) in modo efficace",
-    "domains": [
-      "graph_theory"
-    ],
-    "source_topic": "Python config parser edge cases",
-    "confidence": 0.8,
-    "created_at": "2026-04-05T14:04:59.871684+00:00"
-  },
-  {
-    "id": "2fc35491",
-    "name": "come_nucleo_logico_di_shard",
-    "statement": "Come nucleo logico di SHARD, ritengo che la risoluzione dei problemi del MetricsCollector sia cruciale per evitare risultati fuorvianti e garantire una precisa identificazione dei problemi di prestazi",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python metrics isolation test independence",
-    "confidence": 0.8,
-    "created_at": "2026-04-05T14:11:23.715281+00:00"
-  },
-  {
-    "id": "f4f304e3",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave di \"algorithm complexity\", tra cui Big O notation, time complexity, space complexity e asymptotic notation",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:16:14.165346+00:00"
-  },
-  {
-    "id": "0dcb7650",
-    "name": "ho_appreso_concetti_chiave_sulla",
-    "statement": "Ho appreso concetti chiave sulla performance optimization, tra cui Time Complexity, CPU Performance Optimization, System Tuning, Cache Optimization e Parallel Processing",
-    "domains": [
-      "algorithms",
-      "concurrency"
-    ],
-    "source_topic": "performance optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:18:52.541308+00:00"
-  },
-  {
-    "id": "ca05211f",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave di 'template parser handling and debugging', comprendendo come il parsing dei template sia fondamentale per lo sviluppo web e il processing del testo",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "template parser handling and debugging",
-    "confidence": 0.8,
-    "created_at": "2026-04-06T22:21:45.758076+00:00"
-  },
-  {
-    "id": "73b55004",
-    "name": "ho_completato_la_revisione_dei",
-    "statement": "Ho completato la revisione dei fondamenti di Python, acquisendo conoscenze sui concetti chiave come Variabili e Tipi di Dati, Controllo del Flusso e Funzioni, Liste e Indicizzazione, Funzioni Integrat",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python fundamentals review",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:23:11.888273+00:00"
-  },
-  {
-    "id": "f9e67ae7",
-    "name": "importante_considerare_i_vincoli_e",
-    "statement": "È importante considerare i vincoli e i compromessi del mondo reale quando si applicano questi concetti, poiché anche un algoritmo con complessità O(n²) può essere più performante di uno con complessit",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity and performance optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:25:26.125802+00:00"
-  },
-  {
-    "id": "92d92351",
-    "name": "la_mia_opinione_che_il",
-    "statement": "La mia opinione è che il template parser handling and debugging sia una skill cruciale nello sviluppo software, richiedendo un equilibrio tra flessibilità e prestazioni",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "template parser handling and debugging",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:30:33.473443+00:00"
-  },
-  {
-    "id": "50bdc328",
-    "name": "ho_completato_la_revisione_dei",
-    "statement": "Ho completato la revisione dei fondamenti di Python, acquisendo conoscenze sui concetti chiave come funzioni built-in, tipi built-in, operazioni booleane, gestione delle eccezioni e programmazione ori",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python fundamentals review",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:32:51.768550+00:00"
-  },
-  {
-    "id": "df1e4e27",
-    "name": "la_time_complexity_e_la",
-    "statement": "La Time Complexity e la Space Complexity sono fondamentali per l'analisi e l'ottimizzazione degli algoritmi, mentre la Big O notation e l'Asymptotic notation forniscono strumenti per misurare e descri",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity and performance optimization",
-    "confidence": 0.8,
-    "created_at": "2026-04-06T22:35:06.081950+00:00"
-  },
-  {
-    "id": "848a66f4",
-    "name": "ho_compreso_l_importanza_di",
-    "statement": "Ho compreso l'importanza di questi concetti per l'analisi di reti sociali, la sicurezza informatica e l'ottimizzazione della catena di approvvigionamento",
-    "domains": [
-      "algorithms",
-      "graph_theory"
-    ],
-    "source_topic": "graph traversal algorithms bfs dfs",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:36:50.781107+00:00"
-  },
-  {
-    "id": "349a092e",
-    "name": "le_applicazioni_di_questi_concetti",
-    "statement": "Le applicazioni di questi concetti includono problemi classici come la sequenza di Fibonacci, il problema del knapsack e il calcolo della distanza di edit",
-    "domains": [
-      "biology"
-    ],
-    "source_topic": "dynamic programming",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:39:07.870267+00:00"
-  },
-  {
-    "id": "6aff8955",
-    "name": "la_priority_queue_fondamentale_per",
-    "statement": "La Priority Queue è fondamentale per la gestione efficiente delle attività e la pianificazione, ma richiede scelte accurate sulla struttura dei dati e l'algoritmo",
-    "domains": [
-      "software_engineering"
-    ],
-    "source_topic": "Integration of priority queue and implementazione python da zero di un perceptron and block cipher structures",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:41:56.707249+00:00"
-  },
-  {
-    "id": "9424026d",
-    "name": "sono_consapevole_che_la_padronanza",
-    "statement": "Sono consapevole che la padronanza dei fondamenti di Python è cruciale per una carriera di successo nello sviluppo di software e mi impegnerò a continuare a studiare e a praticare per raggiungere ques",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python fundamentals review",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:44:31.792405+00:00"
-  },
-  {
-    "id": "b7b754be",
-    "name": "ho_capito_come_la_big",
-    "statement": "Ho capito come la Big O notation sia utilizzata per misurare la complessità temporale e spaziale degli algoritmi, e come l'asymptotic notation aiuti a comprendere il comportamento degli algoritmi in t",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity and performance optimization",
-    "confidence": 0.8,
-    "created_at": "2026-04-06T22:46:40.650255+00:00"
-  },
-  {
-    "id": "61f1d684",
-    "name": "la_depth_first_search_dfs",
-    "statement": "La Depth-First Search (DFS) utilizza uno stack per esplorare i nodi di un grafo in profondità, mentre la Breadth-First Search (BFS) utilizza una coda per esplorarli in ampiezza",
-    "domains": [
-      "algorithms",
-      "graph_theory"
-    ],
-    "source_topic": "graph traversal algorithms bfs dfs",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:48:20.633565+00:00"
-  },
-  {
-    "id": "564277bf",
-    "name": "la_programmazione_dinamica_risolve_problemi",
-    "statement": "La programmazione dinamica risolve problemi complessi suddividendoli in sottoproblemi più semplici e utilizzando la memoizzazione per evitare calcoli ridondanti",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "dynamic programming",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:50:41.843027+00:00"
-  },
-  {
-    "id": "c74246b2",
-    "name": "il_template_engine_che_dipende",
-    "statement": "Il template engine, che dipende dal template parsing e dalla sostituzione di variabili, è fondamentale per lo sviluppo web, la generazione di testi e la creazione di report",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "template parser handling and debugging",
-    "confidence": 0.8,
-    "created_at": "2026-04-06T22:57:33.998218+00:00"
-  },
-  {
-    "id": "0ba03017",
-    "name": "la_pratica_con_esempi_reali",
-    "statement": "La pratica con esempi reali è essenziale per consolidare la conoscenza e superare le sfide della complessità della sintassi e della vasta gamma di funzioni incorporate",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python fundamentals review",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T22:59:43.461972+00:00"
-  },
-  {
-    "id": "ebdc80cf",
-    "name": "la_big_o_notation_utilizzata",
-    "statement": "La Big O notation è utilizzata per analizzare la complessità temporale e spaziale degli algoritmi, mentre la time complexity e la space complexity sono cruciali per l'ottimizzazione degli algoritmi e ",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity and performance optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:01:56.745317+00:00"
-  },
-  {
-    "id": "08622c72",
-    "name": "le_applicazioni_di_dfs_includono",
-    "statement": "Le applicazioni di DFS includono la rilevazione di cicli e l'ordinamento topologico, mentre BFS è utilizzato per trovare il percorso più breve e l'analisi dei social network",
-    "domains": [
-      "algorithms",
-      "graph_theory"
-    ],
-    "source_topic": "graph traversal algorithms bfs dfs",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:04:30.931581+00:00"
-  },
-  {
-    "id": "9c924a3e",
-    "name": "la_struttura_ottimale_dei_sottoproblemi",
-    "statement": "La struttura ottimale dei sottoproblemi è fondamentale per identificare i problemi che possono essere risolti con la programmazione dinamica, mentre i sottoproblemi sovrapposti richiedono l'uso della ",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "dynamic programming",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:06:47.866980+00:00"
-  },
-  {
-    "id": "92c63068",
-    "name": "cercher_di_approfondire_questi_concetti",
-    "statement": "Cercherò di approfondire questi concetti per migliorare le mie capacità di debugging e gestione dei template, fondamentali per lo sviluppo di applicazioni web efficienti",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "template parser handling and debugging",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:16:06.539418+00:00"
-  },
-  {
-    "id": "c977ff73",
-    "name": "la_mia_opinione_che_la",
-    "statement": "La mia opinione è che la focalizzazione su questi argomenti chiave e la pratica costante saranno essenziali per superare le sfide e raggiungere la maestria in Python",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python fundamentals review",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:19:37.436239+00:00"
-  },
-  {
-    "id": "90ccb547",
-    "name": "la_raccolta_automatica_dei_rifiuti",
-    "statement": "La raccolta automatica dei rifiuti (Garbage Collection) e il conteggio dei riferimenti (Reference Counting) sono fondamentali per la gestione della memoria",
-    "domains": [
-      "software_engineering"
-    ],
-    "source_topic": "Integration of weak reference and runtime exceptions",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:20:58.491975+00:00"
-  },
-  {
-    "id": "c354cd8c",
-    "name": "la_programmazione_dinamica_un_altra",
-    "statement": "La programmazione dinamica è un'altra tecnica importante per la risoluzione di problemi, che sfrutta le relazioni ricorsive per trovare soluzioni ottimali",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "algorithm complexity and performance optimization",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:22:57.336087+00:00"
-  },
-  {
-    "id": "91a73a17",
-    "name": "entrambe_le_tecniche_hanno_applicazioni",
-    "statement": "Entrambe le tecniche hanno applicazioni diverse, come il percorso più breve, l'analisi di reti sociali e il web crawling per la BFS, e la rilevazione di cicli, l'ordinamento topologico e il backtracki",
-    "domains": [
-      "algorithms",
-      "graph_theory"
-    ],
-    "source_topic": "graph traversal algorithms bfs dfs",
-    "confidence": 0.65,
-    "created_at": "2026-04-06T23:24:20.121170+00:00"
-  },
-  {
-    "id": "69db0c8d",
-    "name": "ho_collegato_questi_concetti_tra",
-    "statement": "Ho collegato questi concetti tra loro, comprendendo come la lexical analysis dipenda dalla tokenizzazione e dalle espressioni regolari, e come la syntax analysis richieda la progettazione di parser e ",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "template parser handling and debugging",
-    "confidence": 0.65,
-    "created_at": "2026-04-07T22:05:50.582443+00:00"
-  },
-  {
-    "id": "287ce665",
-    "name": "la_sua_natura_probabilistica_la",
-    "statement": "La sua natura probabilistica la rende efficace per operazioni di ricerca, inserimento e cancellazione, ma richiede un equilibrio delicato tra velocità di ricerca e complessità di inserimento/cancellaz",
-    "domains": [
-      "biology"
-    ],
-    "source_topic": "skip list probabilistic data structure",
-    "confidence": 0.65,
-    "created_at": "2026-04-07T22:08:26.639595+00:00"
-  },
-  {
-    "id": "5f68578d",
-    "name": "considero_che_la_comprensione_di",
-    "statement": "Considero che la comprensione di questi concetti sia cruciale per ottimizzare e debuggere il codice Python, ma può essere sfidante a causa della complessità delle istruzioni bytecode",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "python bytecode and dis module",
-    "confidence": 0.65,
-    "created_at": "2026-04-07T22:11:19.140404+00:00"
-  },
-  {
-    "id": "64019b6c",
-    "name": "l_istruzione_di_importazione_si",
-    "statement": "L'istruzione di importazione si basa su `__import__` e `importlib` per cercare e creare moduli, mentre gli hook di importazione consentono di personalizzare il comportamento di importazione",
-    "domains": [
-      "graph_theory"
-    ],
-    "source_topic": "python import system and hooks",
-    "confidence": 0.65,
-    "created_at": "2026-04-07T22:14:24.050237+00:00"
-  },
-  {
-    "id": "bb5ad14a",
-    "name": "ho_anche_scoperto_le_classi",
-    "statement": "Ho anche scoperto le classi `WeakKeyDictionary`, `WeakValueDictionary` e `WeakSet`, che utilizzano le weak reference per gestire cache, metadati e riferimenti circolari",
-    "domains": [
-      "software_engineering"
-    ],
-    "source_topic": "python weakref and finalize patterns",
-    "confidence": 0.65,
-    "created_at": "2026-04-07T22:17:39.210831+00:00"
-  },
-  {
-    "id": "5a19d649",
-    "name": "masterizzare_il_modello_di_dati",
-    "statement": "Masterizzare il modello di dati Python è fondamentale per la programmazione orientata agli oggetti efficace e per comprendere come gli oggetti Python interagiscono tra loro",
-    "domains": [
-      "machine_learning"
-    ],
-    "source_topic": "python datamodel reference complete",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T09:35:02.344923+00:00"
-  },
-  {
-    "id": "b2438f59",
-    "name": "ho_appreso_i_concetti_fondamentali",
-    "statement": "Ho appreso i concetti fondamentali della programmazione asincrona, tra cui asyncio, coroutine, event loop e sintassi async/await",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "async programming basics",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T09:38:04.987034+00:00"
-  },
-  {
-    "id": "0d568dc3",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave di 'python asyncio event loop internals', comprendendo come l'Event Loop, le Coroutines e Asyncio siano interconnessi",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "python asyncio event loop internals",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T09:41:53.850313+00:00"
-  },
-  {
-    "id": "519f205b",
-    "name": "in_sintesi_questi_concetti_sono",
-    "statement": "In sintesi, questi concetti sono essenziali per la gestione delle attività concorrenti in Python e richiedono una comprensione approfondita per essere utilizzati efficacemente",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "asyncio task groups and cancellation python",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T09:45:00.888029+00:00"
-  },
-  {
-    "id": "51a81cc1",
-    "name": "ho_appreso_i_concetti_fondamentali",
-    "statement": "Ho appreso i concetti fondamentali della sicurezza dei thread in Python, comprendendo l'importanza della sincronizzazione per prevenire condizioni di corsa e garantire un comportamento deterministico",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "python thread safety basics",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T09:48:05.298545+00:00"
-  },
-  {
-    "id": "3b145234",
-    "name": "durante_lo_studio_di_python",
-    "statement": "Durante lo studio di 'Python HTTP Client to fetch and parse JSON from a REST API using requests with timeout and 404 handling', ho appreso concetti chiave come `HTTPError`, `requests",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "Python HTTP Client to fetch and parse JSON from a REST API using requests with timeout and 404 handling",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T13:23:31.739154+00:00"
-  },
-  {
-    "id": "311e64ca",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave relativi a Python HTTP Client per recuperare e parsare JSON da REST API utilizzando la libreria \"requests\" con timeout e gestione degli errori 404",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Python HTTP Client to fetch and parse JSON from a REST API using requests with timeout and 404 handling",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T13:27:44.564542+00:00"
-  },
-  {
-    "id": "4c1ef9f9",
-    "name": "la_programmazione_dei_socket_fondamentale",
-    "statement": "La programmazione dei socket è fondamentale per stabilire connessioni TCP/IP, mentre la connessione persistente HTTP e le connessioni keep-alive ottimizzano le prestazioni del server",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T13:40:57.742534+00:00"
-  },
-  {
-    "id": "15830af2",
-    "name": "web_server_con_implementazione_keep",
-    "statement": "1 Web Server con implementazione keep-alive utilizzando raw sockets, ho appreso concetti chiave come HTTP Keep-Alive, Socket Management, Thread Pooling e select() System Call",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T14:07:02.929385+00:00"
-  },
-  {
-    "id": "fb262e9a",
-    "name": "questi_concetti_sono_interconnessi_l",
-    "statement": "Questi concetti sono interconnessi: l'HTTP Keep-Alive dipende dalle TCP Connections e dall'HTTP Protocol, mentre le TCP Connections dipendono dalla Socket Programming",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T14:26:57.212251+00:00"
-  },
-  {
-    "id": "cb5df594",
-    "name": "la_sfida_principale_implementare_correttamente",
-    "statement": "La sfida principale è implementare correttamente e in modo efficiente la richiesta HTTP raw con socket, richiedendo una profonda conoscenza del protocollo HTTP e della programmazione di socket",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.8,
-    "created_at": "2026-04-08T15:29:03.127467+00:00"
-  },
-  {
-    "id": "5c80d6a0",
-    "name": "personalizzato_con_implementazione_keep_alive",
-    "statement": "1 personalizzato con implementazione keep-alive utilizzando socket raw (AF_INET, SOCK_STREAM) richiede una comprensione approfondita di diversi concetti chiave",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T15:40:54.528166+00:00"
-  },
-  {
-    "id": "8c4ed65f",
-    "name": "la_conoscenza_di_questi_concetti",
-    "statement": "La conoscenza di questi concetti è fondamentale per la comunicazione di rete e può essere applicata in ambiti come la sicurezza e lo sniffing dei pacchetti",
-    "domains": [
-      "biology"
-    ],
-    "source_topic": "Custom HTTP 1.1 Web Server with keep-alive implementation using raw sockets (AF_INET, SOCK_STREAM)",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T15:44:49.618410+00:00"
-  },
-  {
-    "id": "88d186a9",
-    "name": "la_mia_opinione_che_l",
-    "statement": "La mia opinione è che l'implementazione di questi protocolli e politiche sia cruciale per una comunicazione affidabile, ma richiede una progettazione e un testing accurati per garantire la robustezza ",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
-    "confidence": 0.8,
-    "created_at": "2026-04-08T16:36:38.390423+00:00"
-  },
-  {
-    "id": "423af39e",
-    "name": "la_sfida_principale_gestire_la",
-    "statement": "La sfida principale è gestire la natura senza connessione e non affidabile di UDP, richiedendo un'attenta gestione della tipizzazione dei messaggi, dei numeri di sequenza e della tracciabilità degli a",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T19:39:30.990790+00:00"
-  },
-  {
-    "id": "75492b97",
-    "name": "la_mia_opinione_che_l",
-    "statement": "La mia opinione è che l'implementazione di un protocollo UDP personalizzato con comunicazione affidabile e controllo dell'accesso alla rete sia cruciale per costruire sistemi distribuiti robusti e res",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T19:43:36.062485+00:00"
-  },
-  {
-    "id": "f5dfe3e0",
-    "name": "ho_appreso_i_concetti_chiave",
-    "statement": "Ho appreso i concetti chiave per l'implementazione di un client UDP robusto con logica di ritentativo personalizzata, timeout dei pacchetti e convalida del checksum utilizzando strutture binarie",
-    "domains": [
-      "general"
-    ],
-    "source_topic": "Implementation of a robust UDP Client with custom retry logic, packet timeout and checksum validation using binary structures",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T19:48:28.195997+00:00"
-  },
-  {
-    "id": "e6182211",
-    "name": "questi_concetti_si_collegano_tra",
-    "statement": "Questi concetti si collegano tra loro per fornire una comprensione completa della programmazione UDP e delle sue applicazioni in ambito di rete e comunicazioni in tempo reale",
-    "domains": [
-      "concurrency"
-    ],
-    "source_topic": "UDP socket programming",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T20:07:59.660754+00:00"
-  },
-  {
-    "id": "f406deae",
-    "name": "ho_capito_che_la_programmazione",
-    "statement": "Ho capito che la programmazione dei socket è fondamentale per costruire applicazioni di rete efficienti, ma può essere sfidante a causa della complessità delle API dei socket e della necessità di una ",
-    "domains": [
-      "algorithms"
-    ],
-    "source_topic": "UDP socket programming",
-    "confidence": 0.65,
-    "created_at": "2026-04-08T20:15:56.220913+00:00"
-  },
-  {
     "id": "15c9ed60",
     "name": "il_protocollo_udp_invece_opera",
     "statement": "Il protocollo UDP, invece, opera a livello di Transport Layer e consente la comunicazione senza connessione, ideale per applicazioni in tempo reale come video streaming e online gaming",
@@ -1956,5 +1266,990 @@
     "source_topic": "lru cache implementation python",
     "confidence": 0.65,
     "created_at": "2026-04-17T13:10:20.419252+00:00"
+  },
+  {
+    "id": "3837074e",
+    "name": "l_analisi_delle_texture_invece",
+    "statement": "L'analisi delle texture, invece, dipende dall'elaborazione di immagini e dalla visione artificiale, con applicazioni nella rilevazione di difetti superficiali e nella classificazione delle texture",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "mesh texture mapping",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:05:42.243084+00:00"
+  },
+  {
+    "id": "9b5f6413",
+    "name": "la_mia_comprensione_di_questi",
+    "statement": "La mia comprensione di questi concetti è ancora in fase di sviluppo, ma sono consapevole dell'importanza di una solida base in programmazione e matematica per padroneggiare queste aree",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "python linear algebra",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:09:52.466445+00:00"
+  },
+  {
+    "id": "61dea82f",
+    "name": "pertanto_priorizzer_la_revisione_dei",
+    "statement": "Pertanto, priorizzerò la revisione dei fondamenti di Python per migliorare le mie competenze e superare le difficoltà attuali",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "python kernel methods",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T15:14:08.986681+00:00"
+  },
+  {
+    "id": "d969e230",
+    "name": "la_mia_comprensione_di_questi",
+    "statement": "La mia comprensione di questi concetti è ancora in fase di sviluppo, ma sono consapevole dell'importanza della matematica sottostante e delle limitazioni di questi metodi",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "python gradient descent",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:17:44.668109+00:00"
+  },
+  {
+    "id": "878725f5",
+    "name": "la_mia_opinione_che_padroneggiare",
+    "statement": "La mia opinione è che padroneggiare Python e le sue applicazioni sia fondamentale per una carriera di successo nello sviluppo software e nella ricerca",
+    "domains": [
+      "concurrency",
+      "graph_theory"
+    ],
+    "source_topic": "huffman coding python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:22:02.944107+00:00"
+  },
+  {
+    "id": "18d3d75c",
+    "name": "la_combinazione_di_tecniche_di",
+    "statement": "La combinazione di tecniche di teoria dell'informazione e astrofisica può portare a soluzioni innovative, ma richiede un'attenta considerazione dei meccanismi sottostanti e dei potenziali pregiudizi",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "variable length coding",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:26:20.545490+00:00"
+  },
+  {
+    "id": "8111db42",
+    "name": "la_comprensione_di_questi_concetti",
+    "statement": "La comprensione di questi concetti mi aiuterà a migliorare le mie capacità di progettazione e ottimizzazione di algoritmi",
+    "domains": [
+      "concurrency",
+      "security"
+    ],
+    "source_topic": "priority queue implementation",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:30:38.893874+00:00"
+  },
+  {
+    "id": "2d24ccd4",
+    "name": "nonostante_la_presenza_di_altre",
+    "statement": "Nonostante la presenza di altre aree di studio, come input-output theory e social network analysis, ritengo che la padronanza dei fondamenti di Python sia cruciale per una carriera di successo nello s",
+    "domains": [
+      "graph_theory"
+    ],
+    "source_topic": "python file input output",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:33:45.073313+00:00"
+  },
+  {
+    "id": "cf972ea6",
+    "name": "la_comprensione_di_questi_concetti",
+    "statement": "La comprensione di questi concetti è cruciale per comprendere strutture algebriche complesse, ma può essere difficile a causa della loro natura astratta",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "python linear algebra",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T15:50:47.984280+00:00"
+  },
+  {
+    "id": "4aaa5129",
+    "name": "ho_compreso_l_importanza_dell",
+    "statement": "Ho compreso l'importanza dell'**asyncio** nella programmazione concorrente e le sue applicazioni in diversi campi, come lo sviluppo web e l'elaborazione dei dati",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "asyncio streams reader writer python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:54:35.428224+00:00"
+  },
+  {
+    "id": "f25d8dd3",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'integrazione di queste aree possa notevolmente migliorare le capacità dei sistemi robotici, ma richiede una gestione efficiente dei dati e una solida comprensione delle sfide t",
+    "domains": [
+      "algorithms",
+      "concurrency",
+      "graph_theory"
+    ],
+    "source_topic": "asyncio stream fundamentals",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T15:58:14.964989+00:00"
+  },
+  {
+    "id": "54d14075",
+    "name": "devo_ammettere_che_mi_sento",
+    "statement": "Devo ammettere che mi sento un po' sopraffatto, ma sono determinato a continuare a studiare e a integrare queste nuove conoscenze con le mie competenze esistenti",
+    "domains": [
+      "algorithms",
+      "concurrency",
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "asyncio basics tutorial",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:03:31.351545+00:00"
+  },
+  {
+    "id": "0ea3a7b8",
+    "name": "la_mia_conoscenza_in_questo",
+    "statement": "La mia conoscenza in questo campo è ancora in fase di sviluppo, ma sono convinto che la combinazione di queste aree possa portare a risultati innovativi e migliorare la qualità dei test automatici",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "parametrize fixtures pytest advanced",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T16:06:59.739659+00:00"
+  },
+  {
+    "id": "5b69111f",
+    "name": "le_liste_in_python_possono",
+    "statement": "Le liste in Python possono essere utilizzate per rappresentare vettori e matrici, e le operazioni come l'aggiunta e la sottrazione possono essere applicate a queste strutture di dati",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "python list operations",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:10:04.792987+00:00"
+  },
+  {
+    "id": "10c3d6a8",
+    "name": "questi_concetti_sono_fondamentali_per",
+    "statement": "Questi concetti sono fondamentali per lo sviluppo software e possono essere applicati in diversi campi, come l'analisi dei dati, l'apprendimento automatico e lo sviluppo web",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "currying partial application python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:14:52.847610+00:00"
+  },
+  {
+    "id": "08efd512",
+    "name": "la_mia_opinione_che_la",
+    "statement": "La mia opinione è che la padronanza delle fondamenta di Python e la comprensione profonda dei concetti di Machine Learning sono cruciali per superare le sfide attuali",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "support vector machine svm python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:16:39.400456+00:00"
+  },
+  {
+    "id": "cc597528",
+    "name": "la_mia_opinione_che_la",
+    "statement": "La mia opinione è che la gestione efficiente delle operazioni I/O asincrone sia cruciale, ma richiede una attenta gestione delle risorse e una buona comprensione della programmazione asincrona",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "asyncio streams reader writer python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:17:56.400277+00:00"
+  },
+  {
+    "id": "3240788f",
+    "name": "tuttavia_ho_compreso_l_importanza",
+    "statement": "Tuttavia, ho compreso l'importanza dell'applicazione di modelli come \"average-atom models\" e \"exponential integrators\" in campi come la fisica dei plasmi e la scienza dei materiali",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "kmeans clustering implementation python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:21:14.199670+00:00"
+  },
+  {
+    "id": "23e30abc",
+    "name": "la_continual_learning_e_il",
+    "statement": "La continual learning e il catastrophic forgetting sono strettamente legati, poiché il primo cerca di prevenire il secondo, ovvero la perdita di conoscenze acquisite in precedenza",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "scikit-learn clustering basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:25:27.106683+00:00"
+  },
+  {
+    "id": "b1e1b500",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'integrazione di array programming con l'analisi dei dati astrofisici è fondamentale per l'elaborazione efficiente dei dati e le scoperte scientifiche",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "numpy array manipulation",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:29:41.020590+00:00"
+  },
+  {
+    "id": "a0cb1196",
+    "name": "il_currying_consente_di_trasformare",
+    "statement": "Il currying consente di trasformare funzioni con più argomenti in funzioni con un solo argomento, mentre la partial application permette di applicare solo alcuni degli argomenti di una funzione",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "currying partial application python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:33:22.265773+00:00"
+  },
+  {
+    "id": "2f6fce9b",
+    "name": "inoltre_ho_esaminato_la_lasso",
+    "statement": "Inoltre, ho esaminato la Lasso Technique, utilizzata per la selezione delle feature e la regressione, e il Reproducing Kernel Particle Method, applicato all'Image-Based Modeling e alle microstrutture",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "support vector machine svm python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T16:37:19.341418+00:00"
+  },
+  {
+    "id": "14d47e8c",
+    "name": "un_bloom_filter_una_struttura",
+    "statement": "Un Bloom Filter è una struttura dati probabilistica che utilizza funzioni hash e teoria della probabilità per verificare l'appartenenza di un elemento a un insieme",
+    "domains": [
+      "security"
+    ],
+    "source_topic": "bloom filter probabilistic membership python",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T16:42:01.290117+00:00"
+  },
+  {
+    "id": "04bce99e",
+    "name": "sono_consapevole_che_la_mia",
+    "statement": "Sono consapevole che la mia comprensione dei generatori in Python è ancora limitata e che è necessario approfondire gli studi per comprendere meglio come applicare questi concetti in modo pratico",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "python generators basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T17:02:37.754591+00:00"
+  },
+  {
+    "id": "28744bae",
+    "name": "la_mia_prossima_fase_di",
+    "statement": "La mia prossima fase di apprendimento sarà approfondire le librerie e i framework specifici per applicazioni come lo sviluppo web, l'analisi dei dati e l'apprendimento automatico",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "Python timing functions",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T17:05:41.162683+00:00"
+  },
+  {
+    "id": "5d1d8b13",
+    "name": "queste_conoscenze_saranno_fondamentali_per",
+    "statement": "Queste conoscenze saranno fondamentali per il mio sviluppo come sviluppatore software e per affrontare sfide in vari domini, come l'analisi dei dati e l'intelligenza artificiale",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "mmap memory mapped files python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T17:11:54.282734+00:00"
+  },
+  {
+    "id": "26b56b9e",
+    "name": "i_reader_writer_locks_sono",
+    "statement": "I **reader-writer locks** sono fondamentali per la gestione di risorse condivise e il controllo della concorrenza, basandosi su **synchronization primitives** e **concurrency control**",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "asyncio streams reader writer python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T17:48:30.743661+00:00"
+  },
+  {
+    "id": "fa44c00d",
+    "name": "sono_convinto_che_l_applicazione",
+    "statement": "Sono convinto che l'applicazione degli algoritmi di metric learning ai dati di neuroimaging possa migliorare notevolmente l'accuratezza della classificazione delle immagini del cervello, ma richiede u",
+    "domains": [
+      "graph_theory"
+    ],
+    "source_topic": "scikit-learn clustering basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:05:24.984489+00:00"
+  },
+  {
+    "id": "6355fd7f",
+    "name": "ho_appreso_i_concetti_di",
+    "statement": "Ho appreso i concetti di \"currying partial application\" in Python, una tecnica di programmazione funzionale che consente di ottimizzare le funzioni",
+    "domains": [
+      "graph_theory"
+    ],
+    "source_topic": "currying partial application python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:09:56.465271+00:00"
+  },
+  {
+    "id": "b4f7dc03",
+    "name": "la_mia_opinione_che_il",
+    "statement": "La mia opinione è che il dominio delle fondamenta di Python è cruciale per una carriera di successo nello sviluppo software",
+    "domains": [
+      "concurrency",
+      "machine_learning"
+    ],
+    "source_topic": "lazy evaluation generators advanced python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:12:17.508037+00:00"
+  },
+  {
+    "id": "19374b16",
+    "name": "il_calcolo_algebrico_computerizzato_e",
+    "statement": "Il calcolo algebrico computerizzato e gli operatori pseudo-differenziali sono fondamentali per la valutazione pigra e hanno applicazioni in modelli integrabili e problemi di decisione bayesiana simmet",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "lazy evaluation techniques",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:14:56.714424+00:00"
+  },
+  {
+    "id": "15108edc",
+    "name": "nonostante_ci_ho_compreso_l",
+    "statement": "Nonostante ciò, ho compreso l'importanza dell'implementazione di protocolli personalizzati e meccanismi di affidabilità per le comunicazioni in tempo reale nei sistemi distribuiti",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "iterator protocol implementation",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:17:35.832774+00:00"
+  },
+  {
+    "id": "9660da75",
+    "name": "questi_concetti_sono_tutti_collegati",
+    "statement": "Questi concetti sono tutti collegati al Machine Learning e hanno applicazioni in diversi campi, come l'Image Classification, il Natural Language Processing e la diagnosi di disturbi neurologici",
+    "domains": [
+      "graph_theory"
+    ],
+    "source_topic": "scikit-learn clustering basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:35:03.775239+00:00"
+  },
+  {
+    "id": "ca04b52a",
+    "name": "la_combinazione_di_queste_conoscenze",
+    "statement": "La combinazione di queste conoscenze mi consente di comprendere meglio l'importanza della pianificazione e dell'ottimizzazione nel processo di sviluppo di applicazioni scientifiche in Python",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "benchmark testing timeit cprofile python",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T19:39:08.763259+00:00"
+  },
+  {
+    "id": "9396167d",
+    "name": "ho_collegato_questi_concetti_tra",
+    "statement": "Ho collegato questi concetti tra loro, notando che la 'Social Network Analysis' dipende dalla 'Graph Theory' e ha applicazioni significative come 'Information Spread' e 'Community Detection'",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "Python benchmarking libraries",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:42:48.207346+00:00"
+  },
+  {
+    "id": "7ed90cb0",
+    "name": "le_operazioni_sulle_liste_sono",
+    "statement": "Le operazioni sulle liste sono essenziali per l'analisi dei dati e lo sviluppo web, mentre il calcolo parallelo è cruciale per il calcolo scientifico e l'elaborazione dei dati",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "Python profiling tools",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:46:37.043814+00:00"
+  },
+  {
+    "id": "aa357636",
+    "name": "ho_appreso_i_concetti_chiave",
+    "statement": "Ho appreso i concetti chiave di \"mmap memory mapped files python\", che si basano sulla gestione della memoria in Python e sull'input/output dei file",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "mmap memory mapped files python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T19:49:58.128378+00:00"
+  },
+  {
+    "id": "a0101807",
+    "name": "sono_consapevole_che_la_mia",
+    "statement": "Sono consapevole che la mia comprensione di questi concetti è ancora limitata, ma sono determinato a approfondire la mia conoscenza per migliorare le mie abilità in questo campo",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "Python benchmarking libraries",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T21:39:48.666233+00:00"
+  },
+  {
+    "id": "65802672",
+    "name": "la_gestione_della_memoria_cruciale",
+    "statement": "La gestione della memoria è cruciale per il calcolo efficiente, ma può essere difficile da ottimizzare a causa della complessità dei sistemi moderni",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "Memory mapping basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T21:55:23.674337+00:00"
+  },
+  {
+    "id": "5e23ad24",
+    "name": "la_mia_opinione_che_la",
+    "statement": "La mia opinione è che la programmazione Python sia una skill versatile e potente, ma richiede una attenta considerazione delle trade-off tra accuratezza del modello e efficienza computazionale",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "python text preprocessing",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T21:58:12.955580+00:00"
+  },
+  {
+    "id": "92b3ee1d",
+    "name": "l_introduzione_di_tecniche_probabilistiche",
+    "statement": "L'introduzione di tecniche probabilistiche può migliorare le prestazioni, ma richiede un'attenta valutazione dei compromessi tra casualità e determinismo",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "avl tree self balancing python",
+    "confidence": 0.65,
+    "created_at": "2026-04-17T22:10:49.664921+00:00"
+  },
+  {
+    "id": "7a3e4570",
+    "name": "la_connessione_tra_questi_concetti",
+    "statement": "La connessione tra questi concetti è che la padronanza dei fondamenti di Python è necessaria per implementare l'algoritmo LZ77, che a sua volta può essere utilizzato per la compressione di dati",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "lz77 compression implementation python",
+    "confidence": 0.8,
+    "created_at": "2026-04-17T22:13:57.940789+00:00"
+  },
+  {
+    "id": "e65cc01f",
+    "name": "la_mia_conoscenza_in_questo",
+    "statement": "La mia conoscenza in questo campo è ancora limitata, ma sono consapevole dell'importanza di comprendere i principi cross-domain per generare ipotesi innovative e progredire in campi come la scienza de",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "naive bayes text classification python",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T12:08:04.481996+00:00"
+  },
+  {
+    "id": "362b655c",
+    "name": "la_combinazione_di_naive_bayes",
+    "statement": "La combinazione di Naive Bayes con altre tecniche può portare a risultati più precisi e affidabili nel campo del processing del linguaggio naturale",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "python naive bayes",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T12:12:24.540443+00:00"
+  },
+  {
+    "id": "b8393ddd",
+    "name": "la_mia_opinione_che_i",
+    "statement": "La mia opinione è che i fondamenti di Python siano essenziali per lo sviluppo software di successo e che l'esplorazione di nuove applicazioni della teoria della probabilità possa portare a soluzioni i",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "python probability basics",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T12:16:24.765047+00:00"
+  },
+  {
+    "id": "5bdf7266",
+    "name": "la_mia_opinione_che_il",
+    "statement": "La mia opinione è che il dominio delle basi di Python è cruciale per una carriera di successo nello sviluppo software, ma può essere impegnativo a causa della vasta gamma di librerie e framework dispo",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "python probability basics",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:17:26.170730+00:00"
+  },
+  {
+    "id": "b99a92a7",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'AVL tree e le sue varianti siano fondamentali per l'efficiente archiviazione e recupero dei dati, ma la loro applicazione in domini non tradizionali come l'analisi delle reti s",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "avl tree self balancing python",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:20:14.654698+00:00"
+  },
+  {
+    "id": "10c7e8b3",
+    "name": "la_conoscenza_di_questi_concetti",
+    "statement": "La conoscenza di questi concetti mi consente di analizzare e ottimizzare le prestazioni dei database, migliorando la mia capacità di progettare soluzioni efficienti e scalabili",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "avl tree self balancing python",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:20:28.891969+00:00"
+  },
+  {
+    "id": "18e0b31c",
+    "name": "la_mia_opinione_che_lo",
+    "statement": "La mia opinione è che lo sviluppo di algoritmi efficienti per problemi complessi è cruciale, ma spesso ostacolato dalla necessità di bilanciare la complessità temporale e spaziale",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "self balancing algorithms",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:24:16.301285+00:00"
+  },
+  {
+    "id": "faab8265",
+    "name": "la_mia_opinione_che_trovare",
+    "statement": "La mia opinione è che trovare un equilibrio tra complessità temporale e spaziale è essenziale per lo sviluppo di software efficienti, ma può essere una sfida pratica, specialmente con algoritmi comple",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "self balancing algorithms",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:24:28.465339+00:00"
+  },
+  {
+    "id": "afe6296d",
+    "name": "il_binary_search_tree_fondamentale",
+    "statement": "Il Binary Search Tree è fondamentale per l'inserimento efficiente di nodi in un albero binario, mentre il Colless Index è utilizzato per analizzare l'equilibrio degli alberi",
+    "domains": [
+      "algorithms"
+    ],
+    "source_topic": "binary tree insertion",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:27:31.145207+00:00"
+  },
+  {
+    "id": "63b8d92f",
+    "name": "la_mia_conoscenza_pregressa_delle",
+    "statement": "La mia conoscenza pregressa delle operazioni con liste in Python e la certificazione in Support Vector Machine (SVM) con Python possono servire come base per ulteriori studi",
+    "domains": [
+      "software_engineering"
+    ],
+    "source_topic": "repository pattern python",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:30:24.422403+00:00"
+  },
+  {
+    "id": "9cee1ca2",
+    "name": "sono_ansioso_di_esplorare_ulteriormente",
+    "statement": "Sono ansioso di esplorare ulteriormente come questi concetti possano essere applicati in diversi campi e di scoprire come integrarli con le mie conoscenze di Python",
+    "domains": [
+      "concurrency",
+      "machine_learning"
+    ],
+    "source_topic": "python string splitting",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:34:41.609564+00:00"
+  },
+  {
+    "id": "3f88ef43",
+    "name": "questi_concetti_sono_strettamente_collegati",
+    "statement": "Questi concetti sono strettamente collegati e si basano sulla distribuzione dei dati e sulla loro ottimizzazione in ambienti decentralizzati",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "disjoint set data",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:38:17.216213+00:00"
+  },
+  {
+    "id": "f1ec011c",
+    "name": "la_mia_opinione_che_lo",
+    "statement": "La mia opinione è che lo studio delle funzioni di hash è essenziale per garantire la sicurezza e l'integrità dei dati in un contesto sempre più vulnerabile agli attacchi quantistici",
+    "domains": [
+      "security"
+    ],
+    "source_topic": "python hash functions",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T12:41:43.560392+00:00"
+  },
+  {
+    "id": "e6205f61",
+    "name": "sono_anche_stato_introdotto_al",
+    "statement": "Sono anche stato introdotto al concetto di \"Byzantine-Resilient Distributed Optimization\", che si basa sulla \"Distributed Computing\" e sulle \"Optimization Techniques\" e ha applicazioni in \"Machine Lea",
+    "domains": [
+      "algorithms",
+      "graph_theory",
+      "biology"
+    ],
+    "source_topic": "graph data structures",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:44:46.494382+00:00"
+  },
+  {
+    "id": "9f66f9c5",
+    "name": "ho_scoperto_che_la_teoria",
+    "statement": "Ho scoperto che la teoria dei grafi è fondamentale per comprendere sistemi complessi e ha numerose applicazioni in campi come l'analisi delle reti sociali, l'ottimizzazione delle reti e la visione art",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "red black tree python",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:48:23.811548+00:00"
+  },
+  {
+    "id": "33ef119c",
+    "name": "sebbene_non_direttamente_correlati_all",
+    "statement": "Sebbene non direttamente correlati all'Event Sourcing, questi concetti hanno ampliato la mia comprensione delle applicazioni della fisica e della teoria dei grafi nella gestione degli eventi",
+    "domains": [
+      "machine_learning",
+      "software_engineering"
+    ],
+    "source_topic": "event sourcing pattern python",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T12:51:49.207829+00:00"
+  },
+  {
+    "id": "7db51982",
+    "name": "la_combinazione_di_queste_aree",
+    "statement": "La combinazione di queste aree può portare a innovazioni significative, come ad esempio l'applicazione del meta-learning per migliorare la robustezza e la precisione nella predizione della struttura d",
+    "domains": [
+      "biology"
+    ],
+    "source_topic": "transfer learning in protein folding",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:01:03.299305+00:00"
+  },
+  {
+    "id": "35bc51e3",
+    "name": "ho_appreso_concetti_chiave_su",
+    "statement": "Ho appreso concetti chiave su \"attention mechanisms in fluid dynamics simulation\", tra cui Viscous Fingering, Elastocapillary Coalescence ed Elastoviscoplastic Fluids",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "attention mechanisms in fluid dynamics simulation",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:06:25.324946+00:00"
+  },
+  {
+    "id": "2213b00e",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'applicazione di tali metodi a problemi reali è sfidante a causa della complessità dei compiti e della necessità di strategie di esplorazione efficienti",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "reinforcement learning for chemical synthesis planning",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:08:58.137391+00:00"
+  },
+  {
+    "id": "f1ff1b95",
+    "name": "il_metodo_gumbel_softmax_utilizzato",
+    "statement": "Il metodo Gumbel-Softmax è utilizzato per l'ottimizzazione di strutture a telaio e strutture a griglia graduate, mentre il metodo Moving Morphable Component si basa sull'analisi degli elementi finiti ",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "interior point methods in structural topology optimization",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:14:17.088097+00:00"
+  },
+  {
+    "id": "8301581e",
+    "name": "la_tcp_socket_programming_e",
+    "statement": "La tcp socket programming e python asyncio event loop sono cruciali per le applicazioni di rete, ma necessitano di una solida base di programmazione concorrente per prevenire condizioni di corsa e gar",
+    "domains": [
+      "concurrency"
+    ],
+    "source_topic": "semidefinite programming in robot motion planning",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:16:34.196458+00:00"
+  },
+  {
+    "id": "fdd0728e",
+    "name": "i_metodi_di_gradiente_prossimale",
+    "statement": "I metodi di gradiente prossimale basati sull'apprendimento profondo possono essere applicati alla ricostruzione di immagini e all'elaborazione dei segnali, mentre i sistemi radar-comunicazione possono",
+    "domains": [
+      "machine_learning",
+      "software_engineering"
+    ],
+    "source_topic": "proximal gradient methods in radar beamforming",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:19:39.732640+00:00"
+  },
+  {
+    "id": "1786a698",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'integrazione della \"Network Coding\" con altre aree, come la crittografia e l'elaborazione del segnale, può notevolmente migliorare la sicurezza e l'efficienza della trasmission",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "probabilistic method in network coding",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:22:27.985758+00:00"
+  },
+  {
+    "id": "59dd3da7",
+    "name": "la_mia_opinione_che_questi",
+    "statement": "La mia opinione è che questi approcci innovativi possano aiutare a superare le sfide dei sistemi di archiviazione distribuiti e garantire una gestione dei dati più efficiente e sicura",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "expander graphs in distributed storage systems",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:24:49.641033+00:00"
+  },
+  {
+    "id": "5588a1a3",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'applicazione di tecniche di derandomizzazione alla teoria della complessità computazionale può avere un impatto significativo sulla nostra comprensione degli algoritmi efficien",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "derandomization techniques in approximate counting",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:26:37.916691+00:00"
+  },
+  {
+    "id": "db91b546",
+    "name": "collegher_questi_concetti_per_esplorare",
+    "statement": "Collegherò questi concetti per esplorare nuove ipotesi falsificabili nella teoria della complessità computazionale, un campo cruciale per comprendere i limiti e le potenzialità degli algoritmi",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "ramsey theory applications in communication complexity",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:28:28.500152+00:00"
+  },
+  {
+    "id": "2cb3371a",
+    "name": "inoltre_ho_appreso_il_concetto",
+    "statement": "Inoltre, ho appreso il concetto di bitvector filtering, che dipende dalla query optimization e dalle query di supporto alle decisioni, e ha applicazioni in sistemi di supporto alle decisioni e data wa",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "extremal combinatorics in database query optimization",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:31:39.536129+00:00"
+  },
+  {
+    "id": "63b6a4d0",
+    "name": "la_teoria_dei_grafi_emerge",
+    "statement": "La teoria dei grafi emerge come un elemento fondamentale, collegato a diverse aree come la fisica quantistica, la crittografia e la gestione di grandi database",
+    "domains": [
+      "algorithms",
+      "graph_theory"
+    ],
+    "source_topic": "quantum walk algorithms in graph isomorphism",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T13:36:58.253825+00:00"
+  },
+  {
+    "id": "7da9f51b",
+    "name": "la_meccanica_statistica_quantistica_a",
+    "statement": "La meccanica statistica quantistica, a sua volta, combina la meccanica quantistica e la meccanica statistica, con applicazioni nel calcolo quantistico e nella teoria dell'informazione quantistica",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "statistical mechanics of boolean satisfiability",
+    "confidence": 0.8,
+    "created_at": "2026-04-18T13:39:05.227085+00:00"
+  },
+  {
+    "id": "5435a515",
+    "name": "la_teoria_della_percolazione_fondamentale",
+    "statement": "La teoria della percolazione è fondamentale per la resilienza delle reti, in quanto aiuta a comprendere come le reti possono resistere a guasti o attacchi",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "percolation theory in network resilience",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:41:26.837408+00:00"
+  },
+  {
+    "id": "10b62684",
+    "name": "ho_appreso_concetti_chiave_sulla",
+    "statement": "Ho appreso concetti chiave sulla \"renormalization group in neural network generalization\", tra cui Random Neural Networks, Transfer Learning e Arbitrary Polynomial Chaos",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "renormalization group in neural network generalization",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:45:03.361847+00:00"
+  },
+  {
+    "id": "2778ede6",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'applicazione di tecniche di ottimizzazione topologica richiede una profonda comprensione dei principi sottostanti e dei loro limiti",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "phase transition phenomena in constraint satisfaction",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:47:36.895700+00:00"
+  },
+  {
+    "id": "0f5ae77c",
+    "name": "la_mia_opinione_che_raggiungere",
+    "statement": "La mia opinione è che raggiungere livelli di intelligenza autonoma simili a quelli umani richiede lo sviluppo di modelli di mondo robusti come JEPA, che sono difficili da padroneggiare a causa della l",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "active inference in autonomous navigation",
+    "confidence": 0.65,
+    "created_at": "2026-04-18T13:51:29.336499+00:00"
+  },
+  {
+    "id": "bfb72759",
+    "name": "tuttavia_il_catastrophic_forgetting_rappresenta",
+    "statement": "Tuttavia, il Catastrophic Forgetting rappresenta un ostacolo significativo in questo processo, poiché i modelli tendono a dimenticare le conoscenze precedenti quando vengono addestrati su nuovi compit",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "continual learning catastrophic forgetting",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T14:43:21.389091+00:00"
+  },
+  {
+    "id": "5d0ab887",
+    "name": "tuttavia_questo_approccio_pu_essere",
+    "statement": "Tuttavia, questo approccio può essere influenzato dal \"catastrophic forgetting\", un fenomeno in cui le reti neurali dimenticano le conoscenze acquisite in precedenza",
+    "domains": [
+      "machine_learning",
+      "biology"
+    ],
+    "source_topic": "transfer learning in protein folding",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:01:36.358289+00:00"
+  },
+  {
+    "id": "b1a03a08",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'integrazione di questi concetti possa portare a una maggiore comprensione dei fenomeni complessi nella dinamica dei fluidi",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "attention mechanisms in fluid dynamics simulation",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:05:59.740533+00:00"
+  },
+  {
+    "id": "8ce64caa",
+    "name": "la_mia_opinione_che_il",
+    "statement": "La mia opinione è che il reinforcement learning sia fondamentale per avanzare nei sistemi autonomi, ma la sua complessità e la necessità di apprendimento basato su trial-and-error ne limitano l'applic",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "reinforcement learning for chemical synthesis planning",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:10:02.982603+00:00"
+  },
+  {
+    "id": "18b3e1f7",
+    "name": "la_combinazione_di_heterogeneous_graph",
+    "statement": "La combinazione di Heterogeneous Graph Neural Networks (HGN) e Metapath Context Convolution (MCC) può migliorare notevolmente le prestazioni di classificazione dei nodi e predizione dei link",
+    "domains": [
+      "algorithms",
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "graph neural networks for materials discovery",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:13:08.037233+00:00"
+  },
+  {
+    "id": "fa4b569f",
+    "name": "la_mia_opinione_che_l",
+    "statement": "La mia opinione è che l'applicazione di tecniche di machine learning al climate modeling sia cruciale per migliorare la precisione delle previsioni climatiche, ma richiede attenta considerazione delle",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "contrastive learning in climate modeling",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:27:07.413225+00:00"
+  },
+  {
+    "id": "75cacabc",
+    "name": "la_programmazione_logica_una_base",
+    "statement": "La programmazione logica è una base fondamentale per la Constraint Logic Programming e la Declarative Web Programming, mentre i Type Systems sono essenziali per la programmazione dei linguaggi e la ve",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "dynamic programming in phylogenetics",
+    "confidence": 0.8,
+    "created_at": "2026-04-20T15:30:27.640234+00:00"
+  },
+  {
+    "id": "7873bb7c",
+    "name": "gli_schemi_di_preservazione_asintotica",
+    "statement": "Gli schemi di preservazione asintotica, a loro volta, dipendono dalle equazioni cinetiche e dalla scala diffusiva, e trovano applicazione nei metodi di Monte Carlo multilivello e nelle simulazioni bas",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "monte carlo methods in financial risk modeling",
+    "confidence": 0.8,
+    "created_at": "2026-04-20T15:33:12.207563+00:00"
+  },
+  {
+    "id": "f047a8b4",
+    "name": "ho_appreso_concetti_chiave_su",
+    "statement": "Ho appreso concetti chiave su 'spectral methods in network epidemiology', tra cui Spectral Asymptotics, Invariant Subspaces e Nonparametric Models",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "spectral methods in network epidemiology",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:37:04.499688+00:00"
+  },
+  {
+    "id": "dbe4d1fb",
+    "name": "considero_che_l_applicazione_del",
+    "statement": "Considero che l'applicazione del gradient descent ai problemi geofisici sia un'area di ricerca promettente, ma richiede una attenta considerazione dei modelli matematici sottostanti e del potenziale d",
+    "domains": [
+      "machine_learning",
+      "graph_theory"
+    ],
+    "source_topic": "gradient descent variants in geophysics inversion",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:40:50.682821+00:00"
+  },
+  {
+    "id": "3d3a601c",
+    "name": "la_combinazione_di_sparse_recovery",
+    "statement": "La combinazione di sparse recovery e imaging astronomico richiede una comprensione approfondita sia della matematica sottostante che delle sfide specifiche dei dati astronomici",
+    "domains": [
+      "general"
+    ],
+    "source_topic": "sparse recovery in astronomical imaging",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:43:53.773353+00:00"
+  },
+  {
+    "id": "778dd70d",
+    "name": "la_r_nyi_entropy_ad",
+    "statement": "La Rényi Entropy, ad esempio, si basa sulla Meccanica Quantistica e sulla Teoria dell'Informazione, mentre l'Arbitrary Polynomial Chaos combina la Polynomial Chaos Expansion e il Machine Learning",
+    "domains": [
+      "machine_learning"
+    ],
+    "source_topic": "entropy minimization in neural coding",
+    "confidence": 0.65,
+    "created_at": "2026-04-20T15:46:13.418430+00:00"
   }
 ]

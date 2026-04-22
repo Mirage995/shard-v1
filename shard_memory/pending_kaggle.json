@@ -6,8 +6,9 @@
     "domain_from": "causal masking / JEPA",
     "domain_to": "continual learning",
     "queued_at": "2026-04-21T11:37:44",
-    "status": "running",
-    "score": null
+    "status": "error",
+    "score": null,
+    "completed_at": "2026-04-21T23:53:32"
   },
   {
     "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v2",
@@ -16,8 +17,9 @@
     "domain_from": "causal masking / JEPA",
     "domain_to": "continual learning / catastrophic forgetting",
     "queued_at": "2026-04-21T11:44:25",
-    "status": "running",
-    "score": null
+    "status": "error",
+    "score": null,
+    "completed_at": "2026-04-21T23:53:34"
   },
   {
     "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v3",
@@ -26,8 +28,9 @@
     "domain_from": "causal masking / JEPA",
     "domain_to": "continual learning / catastrophic forgetting",
     "queued_at": "2026-04-21T11:47:05",
-    "status": "running",
-    "score": null
+    "status": "error",
+    "score": null,
+    "completed_at": "2026-04-21T23:53:36"
   },
   {
     "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v4-cpu-safe",
@@ -36,8 +39,9 @@
     "domain_from": "causal_masking",
     "domain_to": "continual_learning",
     "queued_at": "2026-04-21T11:52:34",
-    "status": "running",
-    "score": null
+    "status": "error",
+    "score": null,
+    "completed_at": "2026-04-21T23:53:38"
   },
   {
     "kernel_ref": "andreabonizz/shard-jepa-causal-masking-v5",
@@ -57,5 +61,15 @@
       "BWT_reduction_technique_only_pct": 0.4,
       "BWT_reduction_combined_pct": 11.7
     }
+  },
+  {
+    "kernel_ref": "andreabonizz/shard-attention-cifar100-04211634",
+    "slug": "shard-attention-cifar100-04211634",
+    "hypothesis_statement": "test vit heads",
+    "domain_from": "attention",
+    "domain_to": "cifar100",
+    "queued_at": "2026-04-21T16:34:13",
+    "status": "running",
+    "score": null
   }
 ]

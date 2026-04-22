@@ -1,0 +1,293 @@
+{
+  "run_id": "rescore_df_split_20260418_145738",
+  "source_run": "233916",
+  "n_hypotheses": 5,
+  "n_rescore_per_hyp": 3,
+  "results": [
+    {
+      "hypothesis": "Applying dynamic ensemble selection techniques to time series forecasting can improve the accuracy o",
+      "domain_from": "Machine Learning",
+      "domain_to": "Time Series Forecasting",
+      "minimum_experiment": "MECHANISM: Applying dynamic ensemble selection techniques to time series forecasting can improve the accuracy of predictions. VARIABLE: V = (ensemble_prediction - actual_value) / actual_value\n\nINTERVENTION: Dynamic ensemble selection technique vs baseline autoregressive integrated moving average (ARIMA) model. Simulated as: generate 1000 time series data points using numpy/scipy with a mix of trends and seasonality.\n\nMEASUREMENT: Metric: Mean Absolute Percentage Error (MAPE), computed as (1/n) * Σ|((ensemble_prediction - actual_value) / actual_value)| * 100\n\nSUCCESS CRITERION: MAPE condition with numeric threshold: MAPE < 10%\n\nCONTROL: Two confounders held constant - the length of the time series (n=1000) and the number of ensemble models (k=5)",
+      "n_scores": 3,
+      "mean": {
+        "df_mechanism": 0.9,
+        "df_data_realism": 0.5,
+        "domain_fidelity": 0.9,
+        "causal_link": 0.7,
+        "falsifiability": 0.8,
+        "implementability": 0.9,
+        "alignment_score": 0.825
+      },
+      "std": {
+        "df_mechanism": 0.0,
+        "df_data_realism": 0.0,
+        "causal_link": 0.0,
+        "falsifiability": 0.0,
+        "implementability": 0.0,
+        "alignment_score": 0.0
+      },
+      "raw_scores": [
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        }
+      ]
+    },
+    {
+      "hypothesis": "Applying memory mapping techniques to transactional memory systems can improve performance.",
+      "domain_from": "Memory Management",
+      "domain_to": "Transactional Memory Systems",
+      "minimum_experiment": "MECHANISM: Applying memory mapping techniques to transactional memory systems can reduce memory access latency, VARIABLE: V = transaction_time\n\nINTERVENTION: We compare a transactional memory system using memory mapping (technique) against a baseline system without memory mapping. Simulated as: generate transaction_times using numpy/scipy, with technique group having a lower mean transaction time.\n\nMEASUREMENT: Metric: average_transaction_time, computed as (sum_of_transaction_times / total_transactions)\n\nSUCCESS CRITERION: average_transaction_time < 0.5 seconds, indicating a significant improvement in performance.\n\nCONTROL: We hold constant the number of concurrent transactions and the size of the transactional memory to isolate the effect of memory mapping on performance.",
+      "n_scores": 3,
+      "mean": {
+        "df_mechanism": 0.9,
+        "df_data_realism": 0.5,
+        "domain_fidelity": 0.9,
+        "causal_link": 0.7,
+        "falsifiability": 0.767,
+        "implementability": 0.9,
+        "alignment_score": 0.817
+      },
+      "std": {
+        "df_mechanism": 0.0,
+        "df_data_realism": 0.0,
+        "causal_link": 0.0,
+        "falsifiability": 0.058,
+        "implementability": 0.0,
+        "alignment_score": 0.014
+      },
+      "raw_scores": [
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.7,
+          "implementability": 0.9,
+          "alignment_score": 0.8,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        }
+      ]
+    },
+    {
+      "hypothesis": "Applying techniques from social network analysis to average-atom models can improve the accuracy of ",
+      "domain_from": "Social Network Analysis",
+      "domain_to": "Average-Atom Models",
+      "minimum_experiment": "MECHANISM: Applying social network analysis techniques to average-atom models can improve simulation accuracy by capturing complex interactions between atoms. VARIABLE: V = average_atom_interaction_energy\n\nINTERVENTION: Social network analysis technique (e.g. community detection) vs baseline (mean-field approximation). Simulated as: generate 1000 average-atom models using numpy/scipy with varying interaction energies and community structures.\n\nMEASUREMENT: Metric: average_atom_interaction_energy, computed as (1/N) * sum(i=1 to N) (ei * xi), where ei is the interaction energy and xi is the community assignment of atom i.\n\nSUCCESS CRITERION: average_atom_interaction_energy condition with numeric threshold: average_atom_interaction_energy > 0.8 * baseline_average_atom_interaction_energy.\n\nCONTROL: 1-2 confounders held constant: total number of atoms (N) and average atom degree (k) are fixed across all simulations.",
+      "n_scores": 3,
+      "mean": {
+        "df_mechanism": 0.8,
+        "df_data_realism": 0.5,
+        "domain_fidelity": 0.8,
+        "causal_link": 0.7,
+        "falsifiability": 0.6,
+        "implementability": 0.9,
+        "alignment_score": 0.75
+      },
+      "std": {
+        "df_mechanism": 0.0,
+        "df_data_realism": 0.0,
+        "causal_link": 0.0,
+        "falsifiability": 0.0,
+        "implementability": 0.0,
+        "alignment_score": 0.0
+      },
+      "raw_scores": [
+        {
+          "df_mechanism": 0.8,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.8,
+          "causal_link": 0.7,
+          "falsifiability": 0.6,
+          "implementability": 0.9,
+          "alignment_score": 0.75,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.8,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.8,
+          "causal_link": 0.7,
+          "falsifiability": 0.6,
+          "implementability": 0.9,
+          "alignment_score": 0.75,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.8,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.8,
+          "causal_link": 0.7,
+          "falsifiability": 0.6,
+          "implementability": 0.9,
+          "alignment_score": 0.75,
+          "verdict": "VALID"
+        }
+      ]
+    },
+    {
+      "hypothesis": "The introduction of probabilistic balancing in AVL trees can reduce the average rotation count per i",
+      "domain_from": "Probabilistic Data Structures",
+      "domain_to": "Database Indexing",
+      "minimum_experiment": "MECHANISM: The introduction of probabilistic balancing in AVL trees reduces the average rotation count per insertion, VARIABLE: V = (rotation_count / insertion_count)\n\nINTERVENTION: We compare the standard AVL tree insertion technique (baseline) with the probabilistic balancing technique (intervention). Simulated as: generate 1000 random insertion sequences using numpy, with keys uniformly distributed between 0 and 1000.\n\nMEASUREMENT: Metric: average_rotation_count, computed as (total_rotation_count / total_insertion_count) = (sum(rotation_count_per_insertion) / 1000)\n\nSUCCESS CRITERION: average_rotation_count < 0.25, indicating a significant reduction in rotation count per insertion.\n\nCONTROL: Tree height and insertion sequence length are held constant, with tree height set to 10 and insertion sequence length set to 1000.",
+      "n_scores": 3,
+      "mean": {
+        "df_mechanism": 0.9,
+        "df_data_realism": 0.5,
+        "domain_fidelity": 0.9,
+        "causal_link": 0.7,
+        "falsifiability": 0.8,
+        "implementability": 0.9,
+        "alignment_score": 0.825
+      },
+      "std": {
+        "df_mechanism": 0.0,
+        "df_data_realism": 0.0,
+        "causal_link": 0.0,
+        "falsifiability": 0.0,
+        "implementability": 0.0,
+        "alignment_score": 0.0
+      },
+      "raw_scores": [
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        }
+      ]
+    },
+    {
+      "hypothesis": "Applying the LZ77 compression algorithm to DNA sequences can achieve a higher compression ratio than",
+      "domain_from": "data compression",
+      "domain_to": "bioinformatics",
+      "minimum_experiment": "MECHANISM: Causal mechanism — VARIABLE: V = compression_ratio = (1 - (compressed_size / original_size))\n\nINTERVENTION: Technique vs baseline, simulated as: generate random DNA sequences using numpy and apply LZ77 compression algorithm vs standard Huffman coding, with sequence lengths ranging from 100 to 1000.\n\nMEASUREMENT: Metric: compression_ratio, computed as (1 - (compressed_size / original_size)), where compressed_size is the size of the compressed DNA sequence and original_size is the size of the original DNA sequence.\n\nSUCCESS CRITERION: compression_ratio > 0.7, indicating a higher compression ratio than standard methods.\n\nCONTROL: Sequence composition (e.g., GC-content) and sequence length distribution are held constant across both techniques.",
+      "n_scores": 3,
+      "mean": {
+        "df_mechanism": 0.9,
+        "df_data_realism": 0.5,
+        "domain_fidelity": 0.9,
+        "causal_link": 0.7,
+        "falsifiability": 0.8,
+        "implementability": 0.9,
+        "alignment_score": 0.825
+      },
+      "std": {
+        "df_mechanism": 0.0,
+        "df_data_realism": 0.0,
+        "causal_link": 0.0,
+        "falsifiability": 0.0,
+        "implementability": 0.0,
+        "alignment_score": 0.0
+      },
+      "raw_scores": [
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        },
+        {
+          "df_mechanism": 0.9,
+          "df_data_realism": 0.5,
+          "domain_fidelity": 0.9,
+          "causal_link": 0.7,
+          "falsifiability": 0.8,
+          "implementability": 0.9,
+          "alignment_score": 0.825,
+          "verdict": "VALID"
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "df_mechanism_mean": 0.88,
+    "df_data_realism_mean": 0.5,
+    "falsifiability_mean": 0.753
+  }
+}

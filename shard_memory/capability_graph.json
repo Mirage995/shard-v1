@@ -4617,5 +4617,775 @@
     ],
     "acquired": "2026-04-17T15:10:32.287841",
     "source_topic": "lru cache implementation python"
+  },
+  "mesh texture mapping": {
+    "requires": [],
+    "acquired": "2026-04-17T17:06:26.373874",
+    "source_topic": "mesh texture mapping"
+  },
+  "texture analysis": {
+    "requires": [
+      "mesh texture mapping"
+    ],
+    "acquired": "2026-04-17T17:06:26.388833",
+    "source_topic": "mesh texture mapping"
+  },
+  "python kernel methods": {
+    "requires": [],
+    "acquired": "2026-04-17T17:14:18.610507",
+    "source_topic": "python kernel methods"
+  },
+  "python gradient descent": {
+    "requires": [],
+    "acquired": "2026-04-17T17:18:36.732041",
+    "source_topic": "python gradient descent"
+  },
+  "proximal gradient descent": {
+    "requires": [
+      "python gradient descent"
+    ],
+    "acquired": "2026-04-17T17:18:36.746287",
+    "source_topic": "python gradient descent"
+  },
+  "huffman coding python": {
+    "requires": [],
+    "acquired": "2026-04-17T17:22:47.693957",
+    "source_topic": "huffman coding python"
+  },
+  "python parallel computing": {
+    "requires": [
+      "huffman coding python"
+    ],
+    "acquired": "2026-04-17T17:22:47.706943",
+    "source_topic": "huffman coding python"
+  },
+  "rank-metric codes": {
+    "requires": [
+      "huffman coding python"
+    ],
+    "acquired": "2026-04-17T17:22:47.725599",
+    "source_topic": "huffman coding python"
+  },
+  "quantum-inspired huffman coding": {
+    "requires": [
+      "huffman coding python"
+    ],
+    "acquired": "2026-04-17T17:22:47.739096",
+    "source_topic": "huffman coding python"
+  },
+  "variable length coding": {
+    "requires": [],
+    "acquired": "2026-04-17T17:27:07.559047",
+    "source_topic": "variable length coding"
+  },
+  "fixed-to-variable length resolution coding": {
+    "requires": [
+      "variable length coding"
+    ],
+    "acquired": "2026-04-17T17:27:07.583421",
+    "source_topic": "variable length coding"
+  },
+  "variable star detection": {
+    "requires": [
+      "variable length coding"
+    ],
+    "acquired": "2026-04-17T17:27:07.608291",
+    "source_topic": "variable length coding"
+  },
+  "priority queue implementation": {
+    "requires": [],
+    "acquired": "2026-04-17T17:30:47.972997",
+    "source_topic": "priority queue implementation"
+  },
+  "adversarial scheduling": {
+    "requires": [
+      "priority queue implementation"
+    ],
+    "acquired": "2026-04-17T17:30:47.985350",
+    "source_topic": "priority queue implementation"
+  },
+  "double-ended priority queue": {
+    "requires": [
+      "priority queue implementation"
+    ],
+    "acquired": "2026-04-17T17:30:47.998069",
+    "source_topic": "priority queue implementation"
+  },
+  "input-output theory": {
+    "requires": [
+      "python file input output"
+    ],
+    "acquired": "2026-04-17T17:33:54.407396",
+    "source_topic": "python file input output"
+  },
+  "asyncio basics tutorial": {
+    "requires": [],
+    "acquired": "2026-04-17T18:03:41.876276",
+    "source_topic": "asyncio basics tutorial"
+  },
+  "graph attention architectures": {
+    "requires": [
+      "asyncio basics tutorial"
+    ],
+    "acquired": "2026-04-17T18:03:41.889095",
+    "source_topic": "asyncio basics tutorial"
+  },
+  "multimodal models": {
+    "requires": [
+      "asyncio basics tutorial"
+    ],
+    "acquired": "2026-04-17T18:03:41.901855",
+    "source_topic": "asyncio basics tutorial"
+  },
+  "parametrize fixtures pytest advanced": {
+    "requires": [],
+    "acquired": "2026-04-17T18:07:12.637549",
+    "source_topic": "parametrize fixtures pytest advanced"
+  },
+  "fixture awareness": {
+    "requires": [
+      "parametrize fixtures pytest advanced"
+    ],
+    "acquired": "2026-04-17T18:07:12.650546",
+    "source_topic": "parametrize fixtures pytest advanced"
+  },
+  "test generation": {
+    "requires": [
+      "parametrize fixtures pytest advanced"
+    ],
+    "acquired": "2026-04-17T18:07:12.663690",
+    "source_topic": "parametrize fixtures pytest advanced"
+  },
+  "python list operations": {
+    "requires": [],
+    "acquired": "2026-04-17T18:10:51.966165",
+    "source_topic": "python list operations"
+  },
+  "currying partial application python": {
+    "requires": [],
+    "acquired": "2026-04-17T18:15:00.974250",
+    "source_topic": "currying partial application python"
+  },
+  "python file input/output": {
+    "requires": [
+      "currying partial application python"
+    ],
+    "acquired": "2026-04-17T18:15:00.989271",
+    "source_topic": "currying partial application python"
+  },
+  "object-oriented programming in python": {
+    "requires": [
+      "currying partial application python"
+    ],
+    "acquired": "2026-04-17T18:15:01.004641",
+    "source_topic": "currying partial application python"
+  },
+  "kmeans clustering implementation python": {
+    "requires": [],
+    "acquired": "2026-04-17T18:23:07.952298",
+    "source_topic": "kmeans clustering implementation python"
+  },
+  "exponential integrators": {
+    "requires": [
+      "kmeans clustering implementation python"
+    ],
+    "acquired": "2026-04-17T18:23:07.966808",
+    "source_topic": "kmeans clustering implementation python"
+  },
+  "numpy array manipulation": {
+    "requires": [],
+    "acquired": "2026-04-17T18:30:23.467573",
+    "source_topic": "numpy array manipulation"
+  },
+  "array programming": {
+    "requires": [
+      "numpy array manipulation"
+    ],
+    "acquired": "2026-04-17T18:30:23.480310",
+    "source_topic": "numpy array manipulation"
+  },
+  "telescope array": {
+    "requires": [
+      "numpy array manipulation"
+    ],
+    "acquired": "2026-04-17T18:30:23.492952",
+    "source_topic": "numpy array manipulation"
+  },
+  "partial application": {
+    "requires": [
+      "currying partial application python"
+    ],
+    "acquired": "2026-04-17T18:33:31.085230",
+    "source_topic": "currying partial application python"
+  },
+  "support vector machine svm python": {
+    "requires": [],
+    "acquired": "2026-04-17T18:38:14.946279",
+    "source_topic": "support vector machine svm python"
+  },
+  "support vector machines": {
+    "requires": [
+      "support vector machine svm python"
+    ],
+    "acquired": "2026-04-17T18:38:14.959776",
+    "source_topic": "support vector machine svm python"
+  },
+  "lasso technique": {
+    "requires": [
+      "support vector machine svm python"
+    ],
+    "acquired": "2026-04-17T18:38:14.973451",
+    "source_topic": "support vector machine svm python"
+  },
+  "reproducing kernel particle method": {
+    "requires": [
+      "support vector machine svm python"
+    ],
+    "acquired": "2026-04-17T18:38:14.987100",
+    "source_topic": "support vector machine svm python"
+  },
+  "bloom filter probabilistic membership python": {
+    "requires": [],
+    "acquired": "2026-04-17T19:00:46.996880",
+    "source_topic": "bloom filter probabilistic membership python"
+  },
+  "python generators basics": {
+    "requires": [],
+    "acquired": "2026-04-17T19:03:22.219423",
+    "source_topic": "python generators basics"
+  },
+  "python timing functions": {
+    "requires": [],
+    "acquired": "2026-04-17T19:05:54.135702",
+    "source_topic": "Python timing functions"
+  },
+  "concurrent programming": {
+    "requires": [
+      "python timing functions"
+    ],
+    "acquired": "2026-04-17T19:05:54.151170",
+    "source_topic": "Python timing functions"
+  },
+  "mmap memory mapped files python": {
+    "requires": [],
+    "acquired": "2026-04-17T19:12:37.817510",
+    "source_topic": "mmap memory mapped files python"
+  },
+  "parallel programming": {
+    "requires": [
+      "mmap memory mapped files python"
+    ],
+    "acquired": "2026-04-17T19:12:37.831317",
+    "source_topic": "mmap memory mapped files python"
+  },
+  "currying partial application": {
+    "requires": [
+      "currying partial application python"
+    ],
+    "acquired": "2026-04-17T21:10:06.365433",
+    "source_topic": "currying partial application python"
+  },
+  "plasma physics": {
+    "requires": [
+      "currying partial application python"
+    ],
+    "acquired": "2026-04-17T21:10:06.384995",
+    "source_topic": "currying partial application python"
+  },
+  "lazy evaluation generators advanced python": {
+    "requires": [],
+    "acquired": "2026-04-17T21:12:28.264334",
+    "source_topic": "lazy evaluation generators advanced python"
+  },
+  "lazy evaluation": {
+    "requires": [
+      "lazy evaluation generators advanced python"
+    ],
+    "acquired": "2026-04-17T21:12:28.277373",
+    "source_topic": "lazy evaluation generators advanced python"
+  },
+  "lazy evaluation techniques": {
+    "requires": [],
+    "acquired": "2026-04-17T21:15:06.143140",
+    "source_topic": "lazy evaluation techniques"
+  },
+  "computer algebra": {
+    "requires": [
+      "lazy evaluation techniques"
+    ],
+    "acquired": "2026-04-17T21:15:06.156819",
+    "source_topic": "lazy evaluation techniques"
+  },
+  "pseudo-differential operators": {
+    "requires": [
+      "lazy evaluation techniques"
+    ],
+    "acquired": "2026-04-17T21:15:06.171023",
+    "source_topic": "lazy evaluation techniques"
+  },
+  "iterator protocol implementation": {
+    "requires": [],
+    "acquired": "2026-04-17T21:17:44.598255",
+    "source_topic": "iterator protocol implementation"
+  },
+  "quic protocol": {
+    "requires": [
+      "iterator protocol implementation"
+    ],
+    "acquired": "2026-04-17T21:17:44.612026",
+    "source_topic": "iterator protocol implementation"
+  },
+  "scikit-learn clustering basics": {
+    "requires": [],
+    "acquired": "2026-04-17T21:36:15.986274",
+    "source_topic": "scikit-learn clustering basics"
+  },
+  "metric learning": {
+    "requires": [
+      "scikit-learn clustering basics"
+    ],
+    "acquired": "2026-04-17T21:36:16.002413",
+    "source_topic": "scikit-learn clustering basics"
+  },
+  "dynamic selection": {
+    "requires": [
+      "scikit-learn clustering basics"
+    ],
+    "acquired": "2026-04-17T21:36:16.018163",
+    "source_topic": "scikit-learn clustering basics"
+  },
+  "benchmark testing timeit cprofile python": {
+    "requires": [],
+    "acquired": "2026-04-17T21:39:53.036861",
+    "source_topic": "benchmark testing timeit cprofile python"
+  },
+  "performance_evaluation": {
+    "requires": [
+      "benchmark testing timeit cprofile python"
+    ],
+    "acquired": "2026-04-17T21:39:53.051943",
+    "source_topic": "benchmark testing timeit cprofile python"
+  },
+  "python benchmarking libraries": {
+    "requires": [],
+    "acquired": "2026-04-17T21:42:58.770024",
+    "source_topic": "Python benchmarking libraries"
+  },
+  "graph theory": {
+    "requires": [
+      "python benchmarking libraries"
+    ],
+    "acquired": "2026-04-17T21:42:58.783317",
+    "source_topic": "Python benchmarking libraries"
+  },
+  "python programming": {
+    "requires": [
+      "python benchmarking libraries"
+    ],
+    "acquired": "2026-04-17T21:42:58.796452",
+    "source_topic": "Python benchmarking libraries"
+  },
+  "parallel_computing": {
+    "requires": [
+      "python benchmarking libraries"
+    ],
+    "acquired": "2026-04-17T21:43:32.987680",
+    "source_topic": "Python benchmarking libraries"
+  },
+  "python profiling tools": {
+    "requires": [],
+    "acquired": "2026-04-17T21:47:12.642345",
+    "source_topic": "Python profiling tools"
+  },
+  "python memory management": {
+    "requires": [
+      "mmap memory mapped files python"
+    ],
+    "acquired": "2026-04-17T21:50:14.265096",
+    "source_topic": "mmap memory mapped files python"
+  },
+  "mmap memory mapped files": {
+    "requires": [
+      "mmap memory mapped files python"
+    ],
+    "acquired": "2026-04-17T21:50:14.280751",
+    "source_topic": "mmap memory mapped files python"
+  },
+  "dynamic ensemble selection": {
+    "requires": [
+      "python benchmarking libraries"
+    ],
+    "acquired": "2026-04-17T23:39:59.131407",
+    "source_topic": "Python benchmarking libraries"
+  },
+  "memory mapping basics": {
+    "requires": [],
+    "acquired": "2026-04-17T23:55:33.489260",
+    "source_topic": "Memory mapping basics"
+  },
+  "memory mapping": {
+    "requires": [
+      "memory mapping basics"
+    ],
+    "acquired": "2026-04-17T23:55:33.510128",
+    "source_topic": "Memory mapping basics"
+  },
+  "transactional memory": {
+    "requires": [
+      "memory mapping basics"
+    ],
+    "acquired": "2026-04-17T23:55:33.526837",
+    "source_topic": "Memory mapping basics"
+  },
+  "python text preprocessing": {
+    "requires": [],
+    "acquired": "2026-04-17T23:58:48.943128",
+    "source_topic": "python text preprocessing"
+  },
+  "avl tree self balancing python": {
+    "requires": [],
+    "acquired": "2026-04-18T00:11:00.034599",
+    "source_topic": "avl tree self balancing python"
+  },
+  "probabilistic avl trees": {
+    "requires": [
+      "avl tree self balancing python"
+    ],
+    "acquired": "2026-04-18T00:11:00.067400",
+    "source_topic": "avl tree self balancing python"
+  },
+  "amortized rotation cost": {
+    "requires": [
+      "avl tree self balancing python"
+    ],
+    "acquired": "2026-04-18T00:11:00.094316",
+    "source_topic": "avl tree self balancing python"
+  },
+  "naive bayes text classification python": {
+    "requires": [],
+    "acquired": "2026-04-18T14:08:18.019951",
+    "source_topic": "naive bayes text classification python"
+  },
+  "naive bayes classifier": {
+    "requires": [
+      "naive bayes text classification python"
+    ],
+    "acquired": "2026-04-18T14:08:18.036015",
+    "source_topic": "naive bayes text classification python"
+  },
+  "python naive bayes": {
+    "requires": [],
+    "acquired": "2026-04-18T14:13:05.425234",
+    "source_topic": "python naive bayes"
+  },
+  "naive bayes": {
+    "requires": [
+      "python naive bayes"
+    ],
+    "acquired": "2026-04-18T14:13:05.444992",
+    "source_topic": "python naive bayes"
+  },
+  "locally weighted naive bayes": {
+    "requires": [
+      "python naive bayes"
+    ],
+    "acquired": "2026-04-18T14:13:05.463839",
+    "source_topic": "python naive bayes"
+  },
+  "python probability basics": {
+    "requires": [],
+    "acquired": "2026-04-18T14:17:34.662081",
+    "source_topic": "python probability basics"
+  },
+  "avl tree": {
+    "requires": [
+      "avl tree self balancing python"
+    ],
+    "acquired": "2026-04-18T14:20:24.576485",
+    "source_topic": "avl tree self balancing python"
+  },
+  "probabilistic avl tree": {
+    "requires": [
+      "avl tree self balancing python"
+    ],
+    "acquired": "2026-04-18T14:20:24.602696",
+    "source_topic": "avl tree self balancing python"
+  },
+  "self balancing algorithms": {
+    "requires": [],
+    "acquired": "2026-04-18T14:25:04.924557",
+    "source_topic": "self balancing algorithms"
+  },
+  "self-balancing binary search trees": {
+    "requires": [
+      "self balancing algorithms"
+    ],
+    "acquired": "2026-04-18T14:25:04.938319",
+    "source_topic": "self balancing algorithms"
+  },
+  "submodular function maximization": {
+    "requires": [
+      "self balancing algorithms"
+    ],
+    "acquired": "2026-04-18T14:25:04.952392",
+    "source_topic": "self balancing algorithms"
+  },
+  "binary tree insertion": {
+    "requires": [],
+    "acquired": "2026-04-18T14:27:53.612879",
+    "source_topic": "binary tree insertion"
+  },
+  "repository pattern python": {
+    "requires": [],
+    "acquired": "2026-04-18T14:31:42.408077",
+    "source_topic": "repository pattern python"
+  },
+  "python string splitting": {
+    "requires": [],
+    "acquired": "2026-04-18T14:35:45.980542",
+    "source_topic": "python string splitting"
+  },
+  "disjoint set data": {
+    "requires": [],
+    "acquired": "2026-04-18T14:38:56.115994",
+    "source_topic": "disjoint set data"
+  },
+  "python hash functions": {
+    "requires": [],
+    "acquired": "2026-04-18T14:42:06.814026",
+    "source_topic": "python hash functions"
+  },
+  "hash functions": {
+    "requires": [
+      "python hash functions"
+    ],
+    "acquired": "2026-04-18T14:42:06.830674",
+    "source_topic": "python hash functions"
+  },
+  "dual universal hash functions": {
+    "requires": [
+      "python hash functions"
+    ],
+    "acquired": "2026-04-18T14:42:06.847662",
+    "source_topic": "python hash functions"
+  },
+  "graph data structures": {
+    "requires": [],
+    "acquired": "2026-04-18T14:45:22.768528",
+    "source_topic": "graph data structures"
+  },
+  "red black tree python": {
+    "requires": [],
+    "acquired": "2026-04-18T14:48:54.141330",
+    "source_topic": "red black tree python"
+  },
+  "event sourcing pattern python": {
+    "requires": [],
+    "acquired": "2026-04-18T14:52:56.421572",
+    "source_topic": "event sourcing pattern python"
+  },
+  "complex event processing": {
+    "requires": [
+      "event sourcing pattern python"
+    ],
+    "acquired": "2026-04-18T14:52:56.435619",
+    "source_topic": "event sourcing pattern python"
+  },
+  "semidefinite programming in robot motion planning": {
+    "requires": [],
+    "acquired": "2026-04-18T15:17:24.882441",
+    "source_topic": "semidefinite programming in robot motion planning"
+  },
+  "python asyncio event loop": {
+    "requires": [
+      "semidefinite programming in robot motion planning"
+    ],
+    "acquired": "2026-04-18T15:17:24.901445",
+    "source_topic": "semidefinite programming in robot motion planning"
+  },
+  "ramsey theory applications in communication complexity": {
+    "requires": [],
+    "acquired": "2026-04-18T15:29:07.603488",
+    "source_topic": "ramsey theory applications in communication complexity"
+  },
+  "metric ramsey theory": {
+    "requires": [
+      "ramsey theory applications in communication complexity"
+    ],
+    "acquired": "2026-04-18T15:29:07.623592",
+    "source_topic": "ramsey theory applications in communication complexity"
+  },
+  "geometric complexity theory": {
+    "requires": [
+      "ramsey theory applications in communication complexity"
+    ],
+    "acquired": "2026-04-18T15:29:07.639594",
+    "source_topic": "ramsey theory applications in communication complexity"
+  },
+  "statistical mechanics of boolean satisfiability": {
+    "requires": [],
+    "acquired": "2026-04-18T15:39:41.693316",
+    "source_topic": "statistical mechanics of boolean satisfiability"
+  },
+  "statistical mechanics": {
+    "requires": [
+      "statistical mechanics of boolean satisfiability"
+    ],
+    "acquired": "2026-04-18T15:39:41.706285",
+    "source_topic": "statistical mechanics of boolean satisfiability"
+  },
+  "quantum statistical mechanics": {
+    "requires": [
+      "statistical mechanics of boolean satisfiability"
+    ],
+    "acquired": "2026-04-18T15:39:41.719284",
+    "source_topic": "statistical mechanics of boolean satisfiability"
+  },
+  "transfer learning in protein folding": {
+    "requires": [],
+    "acquired": "2026-04-20T17:02:19.910018",
+    "source_topic": "transfer learning in protein folding"
+  },
+  "catastrophic forgetting": {
+    "requires": [
+      "transfer learning in protein folding"
+    ],
+    "acquired": "2026-04-20T17:02:19.935453",
+    "source_topic": "transfer learning in protein folding"
+  },
+  "protein folding": {
+    "requires": [
+      "transfer learning in protein folding"
+    ],
+    "acquired": "2026-04-20T17:02:19.960023",
+    "source_topic": "transfer learning in protein folding"
+  },
+  "graph neural networks for materials discovery": {
+    "requires": [],
+    "acquired": "2026-04-20T17:13:18.887714",
+    "source_topic": "graph neural networks for materials discovery"
+  },
+  "metapath context convolution": {
+    "requires": [
+      "graph neural networks for materials discovery"
+    ],
+    "acquired": "2026-04-20T17:13:18.912787",
+    "source_topic": "graph neural networks for materials discovery"
+  },
+  "heterogeneous graph neural networks": {
+    "requires": [
+      "graph neural networks for materials discovery"
+    ],
+    "acquired": "2026-04-20T17:13:18.936306",
+    "source_topic": "graph neural networks for materials discovery"
+  },
+  "dynamic programming in phylogenetics": {
+    "requires": [],
+    "acquired": "2026-04-20T17:30:38.379081",
+    "source_topic": "dynamic programming in phylogenetics"
+  },
+  "constraint logic programming": {
+    "requires": [
+      "dynamic programming in phylogenetics"
+    ],
+    "acquired": "2026-04-20T17:30:38.417931",
+    "source_topic": "dynamic programming in phylogenetics"
+  },
+  "declarative web programming": {
+    "requires": [
+      "dynamic programming in phylogenetics"
+    ],
+    "acquired": "2026-04-20T17:30:38.443227",
+    "source_topic": "dynamic programming in phylogenetics"
+  },
+  "type systems": {
+    "requires": [
+      "dynamic programming in phylogenetics"
+    ],
+    "acquired": "2026-04-20T17:30:38.468642",
+    "source_topic": "dynamic programming in phylogenetics"
+  },
+  "monte carlo methods in financial risk modeling": {
+    "requires": [],
+    "acquired": "2026-04-20T17:34:17.670197",
+    "source_topic": "monte carlo methods in financial risk modeling"
+  },
+  "multilevel monte carlo": {
+    "requires": [
+      "monte carlo methods in financial risk modeling"
+    ],
+    "acquired": "2026-04-20T17:34:17.696058",
+    "source_topic": "monte carlo methods in financial risk modeling"
+  },
+  "asymptotic-preserving schemes": {
+    "requires": [
+      "monte carlo methods in financial risk modeling"
+    ],
+    "acquired": "2026-04-20T17:34:17.726123",
+    "source_topic": "monte carlo methods in financial risk modeling"
+  },
+  "gradient descent variants in geophysics inversion": {
+    "requires": [],
+    "acquired": "2026-04-20T17:41:34.741457",
+    "source_topic": "gradient descent variants in geophysics inversion"
+  },
+  "variational inference": {
+    "requires": [
+      "gradient descent variants in geophysics inversion"
+    ],
+    "acquired": "2026-04-20T17:41:34.758626",
+    "source_topic": "gradient descent variants in geophysics inversion"
+  },
+  "small-world networks": {
+    "requires": [
+      "gradient descent variants in geophysics inversion"
+    ],
+    "acquired": "2026-04-20T17:41:34.777322",
+    "source_topic": "gradient descent variants in geophysics inversion"
+  },
+  "sparse recovery in astronomical imaging": {
+    "requires": [],
+    "acquired": "2026-04-20T17:44:02.275896",
+    "source_topic": "sparse recovery in astronomical imaging"
+  },
+  "sparse recovery": {
+    "requires": [
+      "sparse recovery in astronomical imaging"
+    ],
+    "acquired": "2026-04-20T17:44:02.292452",
+    "source_topic": "sparse recovery in astronomical imaging"
+  },
+  "astronomical imaging": {
+    "requires": [
+      "sparse recovery in astronomical imaging"
+    ],
+    "acquired": "2026-04-20T17:44:02.309675",
+    "source_topic": "sparse recovery in astronomical imaging"
+  },
+  "entropy minimization in neural coding": {
+    "requires": [],
+    "acquired": "2026-04-20T17:46:48.247276",
+    "source_topic": "entropy minimization in neural coding"
+  },
+  "rényi entropy": {
+    "requires": [
+      "entropy minimization in neural coding"
+    ],
+    "acquired": "2026-04-20T17:46:48.263427",
+    "source_topic": "entropy minimization in neural coding"
+  },
+  "arbitrary polynomial chaos": {
+    "requires": [
+      "entropy minimization in neural coding"
+    ],
+    "acquired": "2026-04-20T17:46:48.279851",
+    "source_topic": "entropy minimization in neural coding"
+  },
+  "range entropy": {
+    "requires": [
+      "entropy minimization in neural coding"
+    ],
+    "acquired": "2026-04-20T17:46:48.297703",
+    "source_topic": "entropy minimization in neural coding"
   }
 }

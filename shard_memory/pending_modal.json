@@ -1,0 +1,92 @@
+[
+  {
+    "label": "modal-scaling_la-vision_tra-04211512",
+    "hypothesis_statement": "ViT attention heads scaling on CIFAR-100",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:14:54",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211516",
+    "hypothesis_statement": "ViT attention heads scaling on CIFAR-100",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:17:03",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211519",
+    "hypothesis_statement": "ViT attention heads scaling CIFAR-100",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:20:27",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211521",
+    "hypothesis_statement": "ViT attention heads scaling CIFAR-100",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:21:50",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211522",
+    "hypothesis_statement": "Doubling attention heads in a ViT on CIFAR-100 improves accuracy by >2%",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:22:46",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211523",
+    "hypothesis_statement": "Doubling attention heads in a ViT on CIFAR-100 improves accuracy by >2%",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:24:08",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211528",
+    "hypothesis_statement": "Doubling attention heads in a ViT on CIFAR-100 improves accuracy by >2%",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:28:58",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211529",
+    "hypothesis_statement": "Doubling attention heads in a ViT on CIFAR-100 improves accuracy by >2%",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:29:51",
+    "status": "running",
+    "score": null
+  },
+  {
+    "label": "modal-scaling_la-vision_tra-04211532",
+    "hypothesis_statement": "Doubling attention heads in a ViT on CIFAR-100 improves accuracy by >2%",
+    "domain_from": "scaling_laws",
+    "domain_to": "vision_transformers",
+    "gpu": "T4",
+    "queued_at": "2026-04-21T15:33:27",
+    "status": "running",
+    "score": null
+  }
+]

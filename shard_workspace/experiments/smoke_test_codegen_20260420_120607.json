@@ -1,0 +1,35 @@
+{
+  "run_id": "20260420_120607",
+  "results": [
+    {
+      "h_idx": 1,
+      "result": "success",
+      "signal_class": "no_signal",
+      "error_type": null,
+      "metric_value": 0.0,
+      "runtime_s": 41.0,
+      "stdout": "OK All assertions passed\nRESULT: 0.0",
+      "stderr": ""
+    },
+    {
+      "h_idx": 2,
+      "result": "success",
+      "signal_class": "strong_signal",
+      "error_type": null,
+      "metric_value": 0.5311,
+      "runtime_s": 5.0,
+      "stdout": "OK All assertions passed\nRESULT: 0.5311",
+      "stderr": ""
+    },
+    {
+      "h_idx": 3,
+      "result": "success",
+      "signal_class": "weak_signal",
+      "error_type": null,
+      "metric_value": 0.1796,
+      "runtime_s": 4.9,
+      "stdout": "OK All assertions passed\nRESULT: 0.1796",
+      "stderr": ""
+    }
+  ]
+}

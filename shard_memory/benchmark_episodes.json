@@ -1,76 +1,6 @@
 {
   "task_03_dirty_data": [
     {
-      "run_id": "686fa6c5",
-      "timestamp": "2026-04-16T18:49:23",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d10422c3",
-      "timestamp": "2026-04-16T19:15:39",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "cc8ac829",
-      "timestamp": "2026-04-16T19:47:25",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "358999a8",
-      "timestamp": "2026-04-16T19:59:14",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "bb00212c",
-      "timestamp": "2026-04-16T20:04:51",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "aad3e3b9",
-      "timestamp": "2026-04-16T20:10:26",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "2bf3d0fb",
-      "timestamp": "2026-04-16T20:14:45",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
       "run_id": "b06d6bb4",
       "timestamp": "2026-04-17T12:04:21",
       "success": true,
@@ -99,79 +29,113 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "e1b5158f",
+      "timestamp": "2026-04-17T17:34:44",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3ad2c392",
+      "timestamp": "2026-04-17T19:13:26",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "012faeff",
+      "timestamp": "2026-04-17T19:49:55",
+      "success": true,
+      "total_attempts": 1,
+      "kb_used": true,
+      "kb_chars": 4873,
+      "attempts": [
+        {
+          "attempt": 1,
+          "mode": "LLM SOLO",
+          "syntax_valid": true,
+          "passed": [
+            "test_total_completed",
+            "test_avg_completed",
+            "test_by_category",
+            "test_by_month",
+            "test_unique_merchants",
+            "test_top_merchants",
+            "test_duplicate_ids",
+            "test_flagged_negative",
+            "test_currency_totals",
+            "test_return_type_and_keys",
+            "test_faster_than_legacy",
+            "test_scales_linearly",
+            "test_string_amount",
+            "test_missing_merchant",
+            "test_epoch_timestamp",
+            "test_whitespace_category",
+            "test_empty_category",
+            "test_negative_completed_flagged",
+            "test_duplicate_ids_detected",
+            "test_zero_amount_completed",
+            "test_unicode_merchant",
+            "test_has_process_transactions",
+            "test_no_excessive_try_except",
+            "test_uses_modern_patterns"
+          ],
+          "failed": [],
+          "error_summary": ""
+        }
+      ],
+      "winning_hint": "Solved on attempt 1. Passing tests: test_total_completed, test_avg_completed, test_by_category, test_by_month, test_unique_merchants, test_top_merchants"
+    },
+    {
+      "run_id": "ed632672",
+      "timestamp": "2026-04-17T21:18:21",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "08a0da39",
+      "timestamp": "2026-04-17T21:50:53",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "2296cc58",
+      "timestamp": "2026-04-18T00:15:34",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c30c604f",
+      "timestamp": "2026-04-18T14:25:15",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_02_ghost_bug": [
-    {
-      "run_id": "c1b73d89",
-      "timestamp": "2026-04-16T18:49:20",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c3df05dd",
-      "timestamp": "2026-04-16T19:15:36",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d37e23f4",
-      "timestamp": "2026-04-16T19:47:22",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "b4112460",
-      "timestamp": "2026-04-16T19:59:11",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "eb53ab0a",
-      "timestamp": "2026-04-16T20:04:49",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "243ea954",
-      "timestamp": "2026-04-16T20:10:23",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "b0363794",
-      "timestamp": "2026-04-16T20:14:43",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "3947086a",
       "timestamp": "2026-04-17T12:04:18",
@@ -201,79 +165,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "e6718100",
+      "timestamp": "2026-04-17T17:34:41",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "4ba21ab3",
+      "timestamp": "2026-04-17T19:13:23",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3733c76e",
+      "timestamp": "2026-04-17T19:49:46",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "596c1a1b",
+      "timestamp": "2026-04-17T21:18:18",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "9dace669",
+      "timestamp": "2026-04-17T21:50:50",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "03d0dc42",
+      "timestamp": "2026-04-18T00:15:31",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "0619c275",
+      "timestamp": "2026-04-18T14:25:12",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_04_race_condition": [
-    {
-      "run_id": "566dc70b",
-      "timestamp": "2026-04-16T18:49:24",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "775882c1",
-      "timestamp": "2026-04-16T19:15:40",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "cc1a9894",
-      "timestamp": "2026-04-16T19:47:26",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "3c6b3bf9",
-      "timestamp": "2026-04-16T19:59:15",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "f5911dab",
-      "timestamp": "2026-04-16T20:04:53",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "3b7b10de",
-      "timestamp": "2026-04-16T20:10:27",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "e2726137",
-      "timestamp": "2026-04-16T20:14:47",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "735e72eb",
       "timestamp": "2026-04-17T12:04:22",
@@ -303,79 +267,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "f5900ad4",
+      "timestamp": "2026-04-17T17:34:46",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "4bd60e45",
+      "timestamp": "2026-04-17T19:13:27",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "e830e7dc",
+      "timestamp": "2026-04-17T19:49:57",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "bdab9571",
+      "timestamp": "2026-04-17T21:18:22",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a27253fd",
+      "timestamp": "2026-04-17T21:50:54",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f9ee3496",
+      "timestamp": "2026-04-18T00:15:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f2ca22cf",
+      "timestamp": "2026-04-18T14:25:17",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_01_html_trap": [
-    {
-      "run_id": "c96baad5",
-      "timestamp": "2026-04-16T18:49:19",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "beab789b",
-      "timestamp": "2026-04-16T19:15:35",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d31ce0dd",
-      "timestamp": "2026-04-16T19:47:21",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "6b16e048",
-      "timestamp": "2026-04-16T19:59:10",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "e0d4997d",
-      "timestamp": "2026-04-16T20:04:47",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "2ea14702",
-      "timestamp": "2026-04-16T20:10:22",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "b0318082",
-      "timestamp": "2026-04-16T20:14:41",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "0cf6f462",
       "timestamp": "2026-04-17T12:04:16",
@@ -405,79 +369,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "7e83369f",
+      "timestamp": "2026-04-17T17:34:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "60d35f11",
+      "timestamp": "2026-04-17T19:13:21",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3e4397ab",
+      "timestamp": "2026-04-17T19:49:44",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "aa36d2d0",
+      "timestamp": "2026-04-17T21:18:16",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "4d3556f2",
+      "timestamp": "2026-04-17T21:50:49",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c8963723",
+      "timestamp": "2026-04-18T00:15:29",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "e147874a",
+      "timestamp": "2026-04-18T14:25:10",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_05_state_mutation": [
-    {
-      "run_id": "18470093",
-      "timestamp": "2026-04-16T18:49:26",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "aec7e8ac",
-      "timestamp": "2026-04-16T19:15:42",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "25954c77",
-      "timestamp": "2026-04-16T19:47:28",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "cdc4eb3c",
-      "timestamp": "2026-04-16T19:59:16",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "b8f5fc93",
-      "timestamp": "2026-04-16T20:04:54",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "76c9a0da",
-      "timestamp": "2026-04-16T20:10:29",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "3ba677aa",
-      "timestamp": "2026-04-16T20:14:48",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "c1332265",
       "timestamp": "2026-04-17T12:04:24",
@@ -507,79 +471,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "6d6c391f",
+      "timestamp": "2026-04-17T17:34:47",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "56c99514",
+      "timestamp": "2026-04-17T19:13:29",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "6613c20e",
+      "timestamp": "2026-04-17T19:49:58",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b2543f1e",
+      "timestamp": "2026-04-17T21:18:24",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "d66c2af4",
+      "timestamp": "2026-04-17T21:50:56",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "8df6b301",
+      "timestamp": "2026-04-18T00:15:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c750f91a",
+      "timestamp": "2026-04-18T14:25:19",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_07_metrics_bleed": [
-    {
-      "run_id": "42bc5703",
-      "timestamp": "2026-04-16T18:49:28",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "24d58ad8",
-      "timestamp": "2026-04-16T19:15:44",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "608290b3",
-      "timestamp": "2026-04-16T19:47:30",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "13272efa",
-      "timestamp": "2026-04-16T19:59:19",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "e254f704",
-      "timestamp": "2026-04-16T20:04:57",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c129bb2e",
-      "timestamp": "2026-04-16T20:10:31",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "936793fd",
-      "timestamp": "2026-04-16T20:14:50",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "2ff0063a",
       "timestamp": "2026-04-17T12:04:27",
@@ -609,79 +573,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "e97ae5d4",
+      "timestamp": "2026-04-17T17:34:50",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "7213c96b",
+      "timestamp": "2026-04-17T19:13:31",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "e9e4a62a",
+      "timestamp": "2026-04-17T19:50:01",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "299f9c27",
+      "timestamp": "2026-04-17T21:18:26",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "8218d0b3",
+      "timestamp": "2026-04-17T21:50:58",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "9630e242",
+      "timestamp": "2026-04-18T00:15:40",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a73a26ad",
+      "timestamp": "2026-04-18T14:25:22",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_06_ttl_cache": [
-    {
-      "run_id": "e100863f",
-      "timestamp": "2026-04-16T18:49:27",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "f9bc66f1",
-      "timestamp": "2026-04-16T19:15:43",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "8c273419",
-      "timestamp": "2026-04-16T19:47:29",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "6728db64",
-      "timestamp": "2026-04-16T19:59:18",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "917a7e30",
-      "timestamp": "2026-04-16T20:04:56",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "bfb3d624",
-      "timestamp": "2026-04-16T20:10:30",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c949b871",
-      "timestamp": "2026-04-16T20:14:50",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "6edbfedc",
       "timestamp": "2026-04-17T12:04:26",
@@ -711,79 +675,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "317cb39b",
+      "timestamp": "2026-04-17T17:34:49",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "0c5835a2",
+      "timestamp": "2026-04-17T19:13:30",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "ae86b294",
+      "timestamp": "2026-04-17T19:50:00",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "68ed4e05",
+      "timestamp": "2026-04-17T21:18:25",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "14154508",
+      "timestamp": "2026-04-17T21:50:57",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a620fbf6",
+      "timestamp": "2026-04-18T00:15:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "48778b2d",
+      "timestamp": "2026-04-18T14:25:20",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_08_multi_file_labyrinth": [
-    {
-      "run_id": "4e607804",
-      "timestamp": "2026-04-16T18:49:28",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "2abd4952",
-      "timestamp": "2026-04-16T19:15:45",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "4bf80b37",
-      "timestamp": "2026-04-16T19:47:31",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "f952ee5a",
-      "timestamp": "2026-04-16T19:59:19",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "53f706d1",
-      "timestamp": "2026-04-16T20:04:58",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "9c1d5a3d",
-      "timestamp": "2026-04-16T20:10:32",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "a21a2529",
-      "timestamp": "2026-04-16T20:14:51",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "fc82f418",
       "timestamp": "2026-04-17T12:04:28",
@@ -813,79 +777,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "4b567571",
+      "timestamp": "2026-04-17T17:34:51",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "3de43a43",
+      "timestamp": "2026-04-17T19:13:32",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f752855e",
+      "timestamp": "2026-04-17T19:50:02",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "298c0c92",
+      "timestamp": "2026-04-17T21:18:27",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "5d13e4f7",
+      "timestamp": "2026-04-17T21:50:59",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "fdfb0171",
+      "timestamp": "2026-04-18T00:15:41",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a08dba74",
+      "timestamp": "2026-04-18T14:25:23",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_09_ghost_mutation": [
-    {
-      "run_id": "af2e0e38",
-      "timestamp": "2026-04-16T18:49:30",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "8c643ce2",
-      "timestamp": "2026-04-16T19:15:46",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "e68a3ee1",
-      "timestamp": "2026-04-16T19:47:32",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "afa84fe7",
-      "timestamp": "2026-04-16T19:59:21",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "0550e5d0",
-      "timestamp": "2026-04-16T20:04:59",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "9a600334",
-      "timestamp": "2026-04-16T20:10:33",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d52d36f6",
-      "timestamp": "2026-04-16T20:14:53",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "37037c80",
       "timestamp": "2026-04-17T12:04:29",
@@ -915,79 +879,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "647e9894",
+      "timestamp": "2026-04-17T17:34:53",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "74918840",
+      "timestamp": "2026-04-17T19:13:34",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "5de24f02",
+      "timestamp": "2026-04-17T19:50:04",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "731f6eb3",
+      "timestamp": "2026-04-17T21:18:29",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "42b3dd5f",
+      "timestamp": "2026-04-17T21:51:01",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a06bbcc5",
+      "timestamp": "2026-04-18T00:15:43",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "7eb53de2",
+      "timestamp": "2026-04-18T14:25:24",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_10_template_parser": [
-    {
-      "run_id": "e5410e37",
-      "timestamp": "2026-04-16T18:49:31",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "cb68877a",
-      "timestamp": "2026-04-16T19:15:47",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c7b06c2a",
-      "timestamp": "2026-04-16T19:47:33",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "423f4968",
-      "timestamp": "2026-04-16T19:59:22",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "5abcab00",
-      "timestamp": "2026-04-16T20:05:00",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "bf5489b8",
-      "timestamp": "2026-04-16T20:10:34",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "6bfb6f94",
-      "timestamp": "2026-04-16T20:14:53",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "b7e4a128",
       "timestamp": "2026-04-17T12:04:30",
@@ -1017,79 +981,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "216269b4",
+      "timestamp": "2026-04-17T17:34:54",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "6e992fa0",
+      "timestamp": "2026-04-17T19:13:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "821c65a1",
+      "timestamp": "2026-04-17T19:50:05",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "96325acd",
+      "timestamp": "2026-04-17T21:18:30",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "713ef647",
+      "timestamp": "2026-04-17T21:51:02",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a2a4483d",
+      "timestamp": "2026-04-18T00:15:44",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "eca08620",
+      "timestamp": "2026-04-18T14:25:26",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_11_stream_decoder": [
-    {
-      "run_id": "444b63f3",
-      "timestamp": "2026-04-16T18:49:32",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c0812163",
-      "timestamp": "2026-04-16T19:15:48",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "a0fe13ab",
-      "timestamp": "2026-04-16T19:47:34",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "64dccc91",
-      "timestamp": "2026-04-16T19:59:23",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "eea5785b",
-      "timestamp": "2026-04-16T20:05:01",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "1532637c",
-      "timestamp": "2026-04-16T20:10:35",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "fc5a3f66",
-      "timestamp": "2026-04-16T20:14:54",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "d0e89109",
       "timestamp": "2026-04-17T12:04:31",
@@ -1119,79 +1083,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "cf478ba0",
+      "timestamp": "2026-04-17T17:34:55",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "02f00a27",
+      "timestamp": "2026-04-17T19:13:36",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a24c7eec",
+      "timestamp": "2026-04-17T19:50:06",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "ea999dd3",
+      "timestamp": "2026-04-17T21:18:31",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "437a208c",
+      "timestamp": "2026-04-17T21:51:03",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "822935ea",
+      "timestamp": "2026-04-18T00:15:45",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "29931888",
+      "timestamp": "2026-04-18T14:25:27",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_12_note_tag": [
-    {
-      "run_id": "43133605",
-      "timestamp": "2026-04-16T18:49:32",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "83bdcf9d",
-      "timestamp": "2026-04-16T19:15:49",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "bea337c3",
-      "timestamp": "2026-04-16T19:47:35",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "e8b454fb",
-      "timestamp": "2026-04-16T19:59:23",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "7fdf726c",
-      "timestamp": "2026-04-16T20:05:02",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "a97ada4a",
-      "timestamp": "2026-04-16T20:10:36",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "84ed022c",
-      "timestamp": "2026-04-16T20:14:55",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "15010f61",
       "timestamp": "2026-04-17T12:04:32",
@@ -1215,6 +1179,76 @@
     {
       "run_id": "22965862",
       "timestamp": "2026-04-17T15:12:09",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f238f392",
+      "timestamp": "2026-04-17T17:34:56",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "04fcd344",
+      "timestamp": "2026-04-17T19:13:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "ff7b5d5c",
+      "timestamp": "2026-04-17T19:50:07",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b311b31e",
+      "timestamp": "2026-04-17T21:18:32",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "43ec3ddb",
+      "timestamp": "2026-04-17T21:51:04",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "eb68a771",
+      "timestamp": "2026-04-18T00:15:46",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c5234843",
+      "timestamp": "2026-04-18T14:25:28",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,
@@ -3742,76 +3776,6 @@
   ],
   "task_13_config_parser": [
     {
-      "run_id": "7496a8a7",
-      "timestamp": "2026-04-16T18:49:33",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "0adf1446",
-      "timestamp": "2026-04-16T19:15:50",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "7fcd7617",
-      "timestamp": "2026-04-16T19:47:35",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "85d7e1a6",
-      "timestamp": "2026-04-16T19:59:24",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "4498a236",
-      "timestamp": "2026-04-16T20:05:02",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "47afdc00",
-      "timestamp": "2026-04-16T20:10:36",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "9d6cb7bf",
-      "timestamp": "2026-04-16T20:14:56",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
       "run_id": "54d1ddcd",
       "timestamp": "2026-04-17T12:04:33",
       "success": true,
@@ -3840,79 +3804,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "774e1ceb",
+      "timestamp": "2026-04-17T17:34:57",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b8716202",
+      "timestamp": "2026-04-17T19:13:38",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f390254c",
+      "timestamp": "2026-04-17T19:50:08",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "004d261b",
+      "timestamp": "2026-04-17T21:18:33",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "206413f4",
+      "timestamp": "2026-04-17T21:51:05",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "98b81312",
+      "timestamp": "2026-04-18T00:15:47",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "2baa071c",
+      "timestamp": "2026-04-18T14:25:29",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_14_boundary_check": [
-    {
-      "run_id": "a06cabdc",
-      "timestamp": "2026-04-16T18:49:34",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "f30b1b63",
-      "timestamp": "2026-04-16T19:15:50",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "2705e77c",
-      "timestamp": "2026-04-16T19:47:36",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "a411c033",
-      "timestamp": "2026-04-16T19:59:25",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d4807570",
-      "timestamp": "2026-04-16T20:05:03",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d11e4408",
-      "timestamp": "2026-04-16T20:10:37",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "eda474cf",
-      "timestamp": "2026-04-16T20:14:57",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "9c98a46d",
       "timestamp": "2026-04-17T12:04:34",
@@ -3942,79 +3906,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "5b60d8ba",
+      "timestamp": "2026-04-17T17:34:58",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "5551bac2",
+      "timestamp": "2026-04-17T19:13:39",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c9cf5255",
+      "timestamp": "2026-04-17T19:50:09",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "86b0511b",
+      "timestamp": "2026-04-17T21:18:34",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "96794166",
+      "timestamp": "2026-04-17T21:51:06",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "7ea8de58",
+      "timestamp": "2026-04-18T00:15:49",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "7edcd478",
+      "timestamp": "2026-04-18T14:25:30",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_forge_20260413_154422_python_abstract_base_x_flyweight_pattern_me": [
-    {
-      "run_id": "162ddae7",
-      "timestamp": "2026-04-16T18:49:35",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "83f413c6",
-      "timestamp": "2026-04-16T19:15:51",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "d12a890f",
-      "timestamp": "2026-04-16T19:47:37",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "14a0cb8a",
-      "timestamp": "2026-04-16T19:59:26",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "80148ee7",
-      "timestamp": "2026-04-16T20:05:04",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "49c28250",
-      "timestamp": "2026-04-16T20:10:38",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "961ea243",
-      "timestamp": "2026-04-16T20:14:58",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "b670362d",
       "timestamp": "2026-04-17T12:04:35",
@@ -4044,79 +4008,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "238d281c",
+      "timestamp": "2026-04-17T17:34:59",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "292b11d3",
+      "timestamp": "2026-04-17T19:13:40",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a0b8d4e5",
+      "timestamp": "2026-04-17T19:50:10",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "2579af82",
+      "timestamp": "2026-04-17T21:18:35",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b289fd98",
+      "timestamp": "2026-04-17T21:51:07",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "e54e73a6",
+      "timestamp": "2026-04-18T00:15:50",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "06842404",
+      "timestamp": "2026-04-18T14:25:32",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_forge_20260414_114631_binary_search_implem_x_binary_search_implem": [
-    {
-      "run_id": "7e858cc1",
-      "timestamp": "2026-04-16T18:49:36",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "76b5c419",
-      "timestamp": "2026-04-16T19:15:52",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "ec30ba3f",
-      "timestamp": "2026-04-16T19:47:38",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "95f23c52",
-      "timestamp": "2026-04-16T19:59:27",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "3638562a",
-      "timestamp": "2026-04-16T20:05:05",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "b81d5dcb",
-      "timestamp": "2026-04-16T20:10:39",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "a9dbba48",
-      "timestamp": "2026-04-16T20:14:58",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "c50b9c17",
       "timestamp": "2026-04-17T12:04:36",
@@ -4146,59 +4110,79 @@
       "kb_chars": 0,
       "attempts": [],
       "winning_hint": ""
+    },
+    {
+      "run_id": "c4adca49",
+      "timestamp": "2026-04-17T17:35:00",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f465ac3f",
+      "timestamp": "2026-04-17T19:13:41",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "c3e2eb80",
+      "timestamp": "2026-04-17T19:50:11",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "e8356a18",
+      "timestamp": "2026-04-17T21:18:36",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "f9457d85",
+      "timestamp": "2026-04-17T21:51:08",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "64da1a07",
+      "timestamp": "2026-04-18T00:15:51",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "9728f2b2",
+      "timestamp": "2026-04-18T14:25:33",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
     }
   ],
   "task_forge_20260416_191607_3d_geometry_fundamen_x_polygon_mesh_creatio": [
-    {
-      "run_id": "630ae660",
-      "timestamp": "2026-04-16T19:47:39",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "c3928729",
-      "timestamp": "2026-04-16T19:59:28",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "8eaae2e5",
-      "timestamp": "2026-04-16T20:05:06",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "3b99f1fd",
-      "timestamp": "2026-04-16T20:10:40",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
-    {
-      "run_id": "061eccb1",
-      "timestamp": "2026-04-16T20:14:59",
-      "success": true,
-      "total_attempts": 0,
-      "kb_used": false,
-      "kb_chars": 0,
-      "attempts": [],
-      "winning_hint": ""
-    },
     {
       "run_id": "178a73c7",
       "timestamp": "2026-04-17T12:04:37",
@@ -4222,6 +4206,108 @@
     {
       "run_id": "bcd04bec",
       "timestamp": "2026-04-17T15:12:14",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "da2568c6",
+      "timestamp": "2026-04-17T17:35:02",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "a2160ec7",
+      "timestamp": "2026-04-17T19:13:42",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "b931ed0f",
+      "timestamp": "2026-04-17T19:50:12",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "8219a8d5",
+      "timestamp": "2026-04-17T21:18:37",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "179c8ca5",
+      "timestamp": "2026-04-17T21:51:09",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "2e9c8d14",
+      "timestamp": "2026-04-18T00:15:52",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "fa361930",
+      "timestamp": "2026-04-18T14:25:34",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    }
+  ],
+  "task_forge_20260417_211850_lazy_evaluation_tech_x_iterator_protocol_im": [
+    {
+      "run_id": "2a5989f3",
+      "timestamp": "2026-04-17T21:51:10",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "fd6ca46b",
+      "timestamp": "2026-04-18T00:15:53",
+      "success": true,
+      "total_attempts": 0,
+      "kb_used": false,
+      "kb_chars": 0,
+      "attempts": [],
+      "winning_hint": ""
+    },
+    {
+      "run_id": "6be73496",
+      "timestamp": "2026-04-18T14:25:35",
       "success": true,
       "total_attempts": 0,
       "kb_used": false,

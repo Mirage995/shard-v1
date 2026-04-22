@@ -1,13 +1,14 @@
 {
-  "sessions_lived": 167,
+  "sessions_lived": 176,
   "narrative": "",
-  "total_attempts": 1776,
-  "total_certified": 1027,
-  "cert_rate_overall": 0.5661,
+  "total_attempts": 1872,
+  "total_certified": 1083,
+  "cert_rate_overall": 0.5652,
   "strong_domains": [
     "algorithms",
     "data",
-    "debugging"
+    "debugging",
+    "systems"
   ],
   "weak_domains": [],
   "peak_skills": [
@@ -15,10 +16,10 @@
     "python descriptor protocol",
     "dynamic programming",
     "concurrent futures threadpool processpool",
-    "python object oriented programming",
-    "race condition handling and debugging",
-    "json parsing and serialization python",
-    "python context managers and resource management"
+    "python linear algebra",
+    "naive bayes text classification python",
+    "avl tree self balancing python",
+    "python object oriented programming"
   ],
   "chronic_blocks": [
     "convolutional neural networks (cnns) applied to sorting algorithm tier 1",
@@ -32,7 +33,7 @@
     "dns resolution python",
     "message queue rabbitmq python"
   ],
-  "self_esteem": 0.3404,
+  "self_esteem": 0.3384,
   "trajectory": "growing",
-  "updated_at": "2026-04-17T15:12:19.442001"
+  "updated_at": "2026-04-18T14:25:40.233989"
 }

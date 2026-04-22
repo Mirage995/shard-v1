@@ -1,12 +1,17 @@
 {
   "pending_queue": [
-    "mesh texture mapping",
-    "support vector machine svm python",
-    "python kernel methods",
-    "python gradient descent",
-    "huffman coding python",
-    "variable length coding",
-    "priority queue implementation"
+    "benchmark testing timeit cprofile python",
+    "asyncio streams reader writer python",
+    "tokenizer lexer implementation python",
+    "lexical analysis algorithms",
+    "regular expression matching",
+    "minimum spanning tree kruskal python",
+    "kruskal algorithm implementation",
+    "graph edge sorting",
+    "rabin karp rolling hash python",
+    "rolling hash techniques",
+    "string searching algorithms",
+    "dijkstra shortest path python"
   ],
   "processed_ticket_ids": [
     "cf_async_io_with_python_selectors",
@@ -27,6 +32,6 @@
     "cf_[missed_emergence]_rest_api_design_patte",
     "cf_dns_resolution_python"
   ],
-  "total_topics_ever_queued": 449,
+  "total_topics_ever_queued": 484,
   "last_run_at": "2026-04-09T15:26:18.246843"
 }

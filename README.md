@@ -214,7 +214,7 @@ Full architecture reference: [ARCHITECTURE.md](ARCHITECTURE.md)
 ## Current Traction
 
 - **Running continuously** on local hardware since SSJ11 — no cloud, no GPU, no babysitting
-- **35+ major architecture iterations** (SSJ1–SSJ35+) across 6 months of solo development
+- **35+ major architecture iterations** (SSJ1–SSJ35+) across 3 months of solo development
 - **2135+ causal relations** in GraphRAG, accumulated from real failure analysis
 - **55 certified skills** in the capability graph, each validated empirically
 - **Experiment engine active**: generating, validating, and running real scientific hypotheses nightly

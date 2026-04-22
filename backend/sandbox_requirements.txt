@@ -29,3 +29,7 @@ aiohttp
 tensorflow
 OpenGL
 pyopencl
+mmh3
+bitarray
+nltk
+torch_geometric

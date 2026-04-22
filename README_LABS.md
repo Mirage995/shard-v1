@@ -3,7 +3,7 @@
 # SHARD LABS
 **Autonomous Scientific Discovery via Multi-Layer Meta-Cognitive Orchestration.**
 
-SHARD (System of Hybrid Autonomous Reasoning and Design) is an independent research agent that transitions LLMs from stateless text generators into **persistent agentic systems** with self-calibration, recursive debugging, and cross-domain scientific reasoning. Built on a 14-module cognitive scaffold, behavior emerges from module interaction — not hand-written rules.
+SHARD (System of Hybrid Autonomous Reasoning and Design) is an independent research agent that transitions LLMs from stateless text generators into **persistent agentic systems** with self-calibration, recursive debugging, and cross-domain scientific reasoning. Built on a **14-module cognitive scaffold**, behavior emerges from module interaction — not hand-written rules.
 
 > **Origin:** Built on a $300 GEEKOM A5 mini-PC (16GB RAM, no GPU) between shifts in a family pizza shop in Verona, Italy. Proof that capital-efficient architecture can compete with brute-force compute.
 
@@ -40,7 +40,7 @@ SHARD closes the loop between literature ingestion and empirical validation:
 - **Novelty Filtering:** 3-stage ArXiv ingestion pipeline — word overlap filter + LLM semantic check + LLM novelty judge — blocks well-known results before they waste a compute cycle
 - **Hypothesis Synthesis:** Generates falsifiable cross-domain hypotheses with explicit structure: `MECHANISM / INTERVENTION / MEASUREMENT / SUCCESS CRITERION`
 - **Alignment Validation:** Each hypothesis scored on `causal_link`, `domain_fidelity`, `falsifiability`, `implementability` before any experiment runs. Current protocol compliance: **100%** (13/13 attempts). Average alignment score: **0.65**
-- **Automated Experimentation:** Generates domain-aware Python experiments, executes in hardened sandbox, evaluates empirical deltas
+- **Automated Experimentation:** Generates domain-aware Python experiments across a pool of **58+ autonomously generated hypotheses**, executes in hardened sandbox, and evaluates empirical deltas
 
 ### 2. CognitionCore — Meta-Cognitive Architecture
 
