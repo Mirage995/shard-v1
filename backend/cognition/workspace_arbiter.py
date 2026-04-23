@@ -147,6 +147,14 @@ class WorkspaceArbiter:
             return None
         return max(self._last_winners, key=lambda p: p.computed_bid)
 
+    def get_proposals(self) -> List[WorkspaceProposal]:
+        """Return current proposals (for safety guard pre-processing)."""
+        return self._proposals
+
+    def set_proposals(self, proposals: List[WorkspaceProposal]) -> None:
+        """Replace proposals (for safety guard post-processing)."""
+        self._proposals = proposals
+
     def clear(self) -> None:
         self._proposals = []
         self._last_winners = []

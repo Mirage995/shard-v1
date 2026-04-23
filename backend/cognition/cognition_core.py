@@ -26,6 +26,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
+from backend.cognition.workspace_safety import WorkspaceSafetyGuard
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("shard.cognition_core")
@@ -194,6 +195,9 @@ class CognitionCore:
         self._arbiter = WorkspaceArbiter(max_tokens=500, ignition_threshold=0.4)
         self._workspace_winner: Optional[_WP] = None
 
+        # ── GWT Workspace Safety Guards ───────────────────────────────────────
+        self._safety = WorkspaceSafetyGuard()
+
     # ── Shared Environment -- register / broadcast ─────────────────────────────
 
     def register(self, name: str, module, interests: List[str]) -> None:
@@ -275,11 +279,62 @@ class CognitionCore:
     def resolve_workspace(self, topic: str, mood_score: float = 0.0) -> str:
         """Run competition, select winners, broadcast the top proposal globally.
 
+        Safety guards integrated:
+          - Anti-monopoly: boost non-dominant modules if same winner repeats
+          - Ignition fallback: return anchor+executive if workspace is empty
+          - Winner tracking + telemetry for Shadow Diagnostic
+          - Mood death-spiral detection (logged, override applied by caller)
+
         Returns the joined text of all winning proposals in stable reading order.
         """
+        # --- Safety Guard 1: Anti-monopoly pre-competition boost ---
+        if self._safety.is_monopoly():
+            self._arbiter.set_proposals(
+                self._safety.force_diversity_boost(self._arbiter.get_proposals())
+            )
+
         selected = self._arbiter.run_competition(mood_score)
         self._workspace_winner = self._arbiter.get_winner()
 
+        # --- Safety Guard 2: Ignition fallback ---
+        if self._safety.check_ignition_failure(selected):
+            logger.warning(
+                "[SAFETY] Ignition failure on '%s' — falling back to anchor+executive",
+                topic,
+            )
+            self._safety.track_winner(None, selected)
+            fallback = self._safety.get_fallback_context(self)
+            self._broadcast_log.append({
+                "event":      "workspace_safety",
+                "source":     "safety_guard",
+                "data_keys":  ["ignition_failure", "telemetry"],
+                "recipients": 0,
+                "timestamp":  datetime.now().isoformat(),
+                "telemetry":  self._safety.get_telemetry(),
+            })
+            return fallback
+
+        # --- Safety Guard 3: Track winner & mood spiral detection ---
+        winner_module = (
+            self._workspace_winner.module_name if self._workspace_winner else None
+        )
+        self._safety.track_winner(winner_module, selected)
+        self._safety.track_mood(mood_score)
+
+        telemetry = self._safety.get_telemetry()
+        if telemetry["mood_spiral_active"]:
+            logger.warning(
+                "[SAFETY] Mood death-spiral detected on '%s' — "
+                "consider clear_context + experience boost",
+                topic,
+            )
+        if telemetry["monopoly_active"]:
+            logger.warning(
+                "[SAFETY] Monopoly active — consecutive wins: %s",
+                telemetry["consecutive_wins"],
+            )
+
+        # --- GWT Global Broadcast (existing) ---
         if self._workspace_winner:
             self.broadcast(
                 "workspace_winner",
@@ -292,6 +347,18 @@ class CognitionCore:
                 source="workspace_arbiter",
                 force_global=True,
             )
+
+        # Log telemetry to Shadow Diagnostic
+        self._broadcast_log.append({
+            "event":      "workspace_telemetry",
+            "source":     "safety_guard",
+            "data_keys":  list(telemetry.keys()),
+            "recipients": 0,
+            "timestamp":  datetime.now().isoformat(),
+            "telemetry":  telemetry,
+        })
+        if len(self._broadcast_log) > 50:
+            self._broadcast_log = self._broadcast_log[-50:]
 
         return "\n\n".join(p.content for p in selected).strip()
 
