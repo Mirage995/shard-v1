@@ -1954,6 +1954,9 @@ class NightRunner:
                     no_l3=self._no_l3,
                 )
 
+                # Capture actual LLM calls BEFORE resetting (used by A/B test metrics)
+                cycle_data["topic_llm_calls"] = study_agent._topic_llm_calls
+
                 # Reset per-topic budget so in-cycle overhead (proactive refactor on
                 # failure) can call _think_fast without hitting the study budget.
                 study_agent._topic_llm_calls = 0

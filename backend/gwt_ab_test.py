@@ -59,9 +59,9 @@ async def run_one(topic: str, use_affective_layer: bool) -> dict:
             "llm_calls": 0, "time_seconds": round(time.time() - t0, 1),
         }
 
-    elapsed    = round(time.time() - t0, 1)
-    cycle      = runner.session_data[-1] if runner.session_data else {}
-    llm_calls  = getattr(runner, "api_calls_used", 0)
+    elapsed   = round(time.time() - t0, 1)
+    cycle     = runner.session_data[-1] if runner.session_data else {}
+    llm_calls = int(cycle.get("topic_llm_calls", 0))  # actual _think/_think_fast calls
 
     return {
         "score":        float(cycle.get("score", 0.0)),
@@ -74,9 +74,9 @@ async def run_one(topic: str, use_affective_layer: bool) -> dict:
 # ── Condition runner ──────────────────────────────────────────────────────────
 
 async def run_condition(use_affective_layer: bool, label: str) -> dict:
-    print(f"\n{'─'*60}")
+    print(f"\n{'-'*60}")
     print(f"[{label}] use_affective_layer={use_affective_layer}")
-    print(f"{'─'*60}")
+    print(f"{'-'*60}")
 
     topic_results = []
     session_start = time.time()
