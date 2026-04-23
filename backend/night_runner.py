@@ -44,7 +44,14 @@ from backend.study_personas import select_persona, record_outcome
 # --- COSTANTI DI DEFAULT ---
 MAX_CYCLES_DEFAULT = 5
 MAX_RUNTIME_MINUTES_DEFAULT = 120
-MAX_API_CALLS_DEFAULT = 50
+
+# Import budget defaults from constants (single source of truth)
+try:
+    from constants import DEFAULT_SESSION_API_LIMIT, DEFAULT_TOPIC_BUDGET
+except ImportError:
+    from backend.constants import DEFAULT_SESSION_API_LIMIT, DEFAULT_TOPIC_BUDGET
+
+MAX_API_CALLS_DEFAULT = DEFAULT_SESSION_API_LIMIT
 PAUSE_BETWEEN_CYCLES_MINUTES_DEFAULT = 1
 
 # ── TASK 3: Topic Quality Filtering ───────────────────────────────────────────
@@ -261,7 +268,7 @@ class SessionState(Enum):
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = 50, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = DEFAULT_TOPIC_BUDGET, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
@@ -1829,6 +1836,10 @@ class NightRunner:
                     no_l3=self._no_l3,
                 )
 
+                # Reset per-topic budget so in-cycle overhead (proactive refactor on
+                # failure) can call _think_fast without hitting the study budget.
+                study_agent._topic_llm_calls = 0
+
                 # Restore session_context -- strip mood and skill lib prefixes
                 _ctx = study_agent.session_context or ""
                 if _mood and "[AFFECTIVE STATE:" in _ctx:
@@ -2483,6 +2494,10 @@ class NightRunner:
                 )
         except Exception as exc:
             self.logger.warning("[WATCHDOG] Error watchdog crashed: %s", exc)
+
+        # Reset per-topic budget counter so post-loop overhead (proactive, reflection,
+        # identity rebuild, report) can call _think_fast without hitting the study budget.
+        study_agent._topic_llm_calls = 0
 
         # ── Proactive Self-Optimization (SSJ4 Phase 3) ───────────────────────────
         self.logger.info("[PROACTIVE] Starting proactive refactoring analysis...")
