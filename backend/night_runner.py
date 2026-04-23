@@ -1114,6 +1114,8 @@ class NightRunner:
         self._vision_engine = None
         _session_reflection = None
         _bench_tracker     = None
+        _session_base_ctx  = ""   # reflection block kept for ContextArbiter (constant per session)
+        _id_block          = ""   # identity block kept for ContextArbiter
         # Session-level resolved errors: shared across all topics in this session.
         # Passed by reference — mutations in CertifyRetryGroup propagate back here.
         _session_resolved_errors: set = set()
@@ -1392,6 +1394,7 @@ class NightRunner:
                         "[REFLECTION] Past context loaded (%d chars) -- injecting into study_agent system prompt.",
                         len(_full_context),
                     )
+                    _session_base_ctx = _full_context
                     study_agent.session_context = _full_context
                 else:
                     self.logger.info("[REFLECTION] No past context -- first session.")
@@ -1438,15 +1441,26 @@ class NightRunner:
                     _identity._core_env = _core_env
                 _id_block = _identity.get_context_block()
                 if _id_block:
-                    _base_ctx = study_agent.session_context or ""
-                    study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
-                    self.logger.info(
-                        "[IDENTITY] Biography injected (%d chars) -- sessions=%d self_esteem=%.2f trajectory=%s",
-                        len(_id_block),
-                        _identity.get_status().get("sessions_lived", 0),
-                        _identity.get_status().get("self_esteem", 0.0),
-                        _identity.get_status().get("trajectory", "unknown"),
-                    )
+                    _id_status = _identity.get_status()
+                    if self._use_affective_layer:
+                        # With ContextArbiter: biography competes per-cycle, not injected here
+                        self.logger.info(
+                            "[IDENTITY] Biography loaded (%d chars) sessions=%d self_esteem=%.2f trajectory=%s -- will compete via ContextArbiter",
+                            len(_id_block),
+                            _id_status.get("sessions_lived", 0),
+                            _id_status.get("self_esteem", 0.0),
+                            _id_status.get("trajectory", "unknown"),
+                        )
+                    else:
+                        _base_ctx = study_agent.session_context or ""
+                        study_agent.session_context = "\n\n".join(b for b in [_id_block, _base_ctx] if b)
+                        self.logger.info(
+                            "[IDENTITY] Biography injected (%d chars) -- sessions=%d self_esteem=%.2f trajectory=%s",
+                            len(_id_block),
+                            _id_status.get("sessions_lived", 0),
+                            _id_status.get("self_esteem", 0.0),
+                            _id_status.get("trajectory", "unknown"),
+                        )
                 else:
                     self.logger.info("[IDENTITY] No biography yet -- first session.")
             except Exception as _id_init_err:
@@ -1776,73 +1790,142 @@ class NightRunner:
                 self._transition(SessionState.STUDY, topic)
                 self.api_calls_used += 3
 
-                # ── SKILL LIBRARY INJECTION -- past certified solutions ────────
+                # ── SKILL LIBRARY -- collect block for ContextArbiter ────────
                 _sl_injected = False
+                _combined    = ""
                 if _skill_lib is not None:
                     try:
-                        _sl_block = _skill_lib.get_injection_block(topic, capability_graph)
-                        # Also inject past working implementation if available
+                        _sl_block   = _skill_lib.get_injection_block(topic, capability_graph)
                         _impl_block = _skill_lib.get_implementation_block(topic)
-                        _combined = "\n\n".join(b for b in [_sl_block, _impl_block] if b)
+                        _combined   = "\n\n".join(b for b in [_sl_block, _impl_block] if b)
                         if _combined:
-                            _base_ctx = study_agent.session_context or ""
-                            study_agent.session_context = "\n\n".join(b for b in [_combined, _base_ctx] if b)
                             _sl_injected = True
-                            self.logger.info("[SKILL_LIB] Injected %d chars for topic '%s'", len(_combined), topic)
+                            self.logger.info("[SKILL_LIB] Loaded %d chars for topic '%s'", len(_combined), topic)
                     except Exception as _sl_inj_err:
                         self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
 
-                # ── MOOD INJECTION + BEHAVIOR ADAPTER ────────────────────────────
-                if _mood and self._use_affective_layer:
+                # ── MOOD COMPUTE (always) + CONTEXT ARBITER (if affective layer ON) ──
+                _mood_score = 0.0
+                _mood_label = "neutral"
+                _mood_hint  = ""
+                _directives: dict = {}
+                _domain_dir = ""
+                if _mood:
                     try:
                         _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
-                        _mood_label  = _mood.get_label()
-                        _mood_hint   = _mood.get_prompt_hint()
-                        _directives  = _mood.get_behavior_directives()
+                        _mood_label = _mood.get_label()
+                        _mood_hint  = _mood.get_prompt_hint()
+                        _directives = _mood.get_behavior_directives() if self._use_affective_layer else {}
+                        _mood_score = _mood.get_score() if self._use_affective_layer else 0.0
+                        self.logger.info(
+                            "[MOOD] %s (%.3f) directives=%s",
+                            _mood_label, _mood.get_score(), list(_directives.keys()),
+                        )
+                    except Exception as _mi_err:
+                        self.logger.debug("[MOOD] compute non-fatal: %s", _mi_err)
 
-                        if _directives.get("clear_context"):
-                            # Frustrated/strained: drop accumulated history.
-                            # Injecting "ignore prior strategies" on top of prior strategies is contradictory.
+                if _identity is not None and self._use_affective_layer:
+                    try:
+                        _domain_dir = _identity.get_domain_directive(topic)
+                    except Exception:
+                        pass
+
+                if self._use_affective_layer:
+                    # ── AROUSAL-THRESHOLD COUPLING (Yerkes-Dodson) ────────────
+                    _arousal = abs(_mood_score)
+                    _valence = _mood_score
+                    _base_budget = self.topic_budget
+                    if _valence < -0.3 and _arousal > 0.4:
+                        _effective_budget = max(5, round(_base_budget * 0.7))
+                    elif _valence > 0.3 and _arousal > 0.4:
+                        _effective_budget = round(_base_budget * 1.3)
+                    else:
+                        _effective_budget = _base_budget
+                    _remaining_session = self.max_api_calls - self.api_calls_used
+                    _effective_budget = min(_effective_budget, _remaining_session - 5)
+                    study_agent._topic_llm_budget = max(5, _effective_budget)
+                    self.logger.info(
+                        "[ARBITER] Budget adjusted: base=%d -> effective=%d (mood=%.2f, arousal=%.2f)",
+                        _base_budget, study_agent._topic_llm_budget, _valence, _arousal,
+                    )
+
+                    # ── CONTEXT ARBITER: competitive prompt assembly ──────────
+                    from backend.context_arbiter import ContextArbiter as _CA
+                    _ctx_arb = _CA(max_tokens=500)
+
+                    if not _directives.get("clear_context"):
+                        if _session_base_ctx:
+                            _ctx_arb.add_block(_session_base_ctx, "past_context", 0.75)
+                    else:
+                        self.logger.info("[MOOD] Behavior: clear_context → fresh start for '%s'", topic)
+
+                    if _id_block:
+                        _ctx_arb.add_block(_id_block, "identity_block", 0.70)
+
+                    if _combined:
+                        _sl_affinity = 1.0 if _sl_injected else 0.5
+                        _ctx_arb.add_block(_combined, "skill_library", 0.60, topic_affinity=_sl_affinity)
+
+                    if _mood_hint:
+                        _ctx_arb.add_block(_mood_hint, "mood_hint", 0.90)
+
+                    if _directives.get("decompose_first"):
+                        _ctx_arb.add_block(
+                            "[BEHAVIOR DIRECTIVE] Break this topic into sub-problems first. "
+                            "Do NOT jump to a solution before decomposing.",
+                            "behavior_directive", 0.85,
+                        )
+                    elif _directives.get("push_deeper"):
+                        _ctx_arb.add_block(
+                            "[BEHAVIOR DIRECTIVE] You are performing well on this domain. "
+                            "Focus on advanced mechanisms and edge cases, not basics.",
+                            "behavior_directive", 0.85,
+                        )
+
+                    if _domain_dir:
+                        _ctx_arb.add_block(_domain_dir, "domain_directive", 0.80)
+
+                    study_agent.session_context = _ctx_arb.select(_mood_score)
+
+                else:
+                    # ── AFFECTIVE LAYER OFF: old sequential injection ─────────
+                    if _combined:
+                        _base_ctx = study_agent.session_context or ""
+                        study_agent.session_context = "\n\n".join(b for b in [_combined, _base_ctx] if b)
+                        self.logger.info("[SKILL_LIB] Injected %d chars for topic '%s'", len(_combined), topic)
+
+                    if _mood and _mood_hint:
+                        if _mood.get_behavior_directives().get("clear_context"):
                             study_agent.session_context = ""
                             self.logger.info("[MOOD] Behavior: clear_context → fresh start for '%s'", topic)
-
                         _base_ctx = study_agent.session_context or ""
                         study_agent.session_context = (
                             f"[AFFECTIVE STATE: {_mood_label.upper()}] {_mood_hint}\n\n{_base_ctx}"
                         ).strip()
-
-                        if _directives.get("decompose_first"):
+                        _old_dirs = _mood.get_behavior_directives()
+                        if _old_dirs.get("decompose_first"):
                             _ctx = study_agent.session_context or ""
                             study_agent.session_context = (
                                 "[BEHAVIOR DIRECTIVE] Break this topic into sub-problems first. "
                                 "Do NOT jump to a solution before decomposing.\n\n" + _ctx
                             ).strip()
-                        elif _directives.get("push_deeper"):
+                        elif _old_dirs.get("push_deeper"):
                             _ctx = study_agent.session_context or ""
                             study_agent.session_context = (
                                 "[BEHAVIOR DIRECTIVE] You are performing well on this domain. "
                                 "Focus on advanced mechanisms and edge cases, not basics.\n\n" + _ctx
                             ).strip()
-
                         self.logger.info(
                             "[MOOD] Injected: %s (%.3f) directives=%s",
-                            _mood_label, _mood.get_score(), list(_directives.keys()),
+                            _mood_label, _mood.get_score(), list(_old_dirs.keys()),
                         )
-                    except Exception as _mi_err:
-                        self.logger.debug("[MOOD] inject non-fatal: %s", _mi_err)
-                elif _mood and not self._use_affective_layer:
-                    self.logger.info("[MOOD] Skipped (use_affective_layer=False)")
+                    elif _mood:
+                        self.logger.info("[MOOD] Skipped (use_affective_layer=False)")
 
-                # ── IDENTITY DOMAIN DIRECTIVE -- per-topic strategy ───────────────
-                if _identity is not None and self._use_affective_layer:
-                    try:
-                        _domain_dir = _identity.get_domain_directive(topic)
-                        if _domain_dir:
-                            _ctx = study_agent.session_context or ""
-                            study_agent.session_context = (_domain_dir + "\n\n" + _ctx).strip()
-                            self.logger.info("[IDENTITY] Domain directive injected for topic '%s'", topic)
-                    except Exception:
-                        pass
+                    if _identity is not None and _domain_dir:
+                        _ctx = study_agent.session_context or ""
+                        study_agent.session_context = (_domain_dir + "\n\n" + _ctx).strip()
+                        self.logger.info("[IDENTITY] Domain directive injected for topic '%s'", topic)
 
                 # Compute previous_attempts for L3 gate: failed experiments on this topic
                 _prev_attempts = 0
@@ -1875,20 +1958,25 @@ class NightRunner:
                 # failure) can call _think_fast without hitting the study budget.
                 study_agent._topic_llm_calls = 0
 
-                # Restore session_context -- strip mood and skill lib prefixes
-                _ctx = study_agent.session_context or ""
-                if _mood and "[AFFECTIVE STATE:" in _ctx:
-                    _ctx = "\n\n".join(
-                        p for p in _ctx.split("\n\n")
-                        if not p.startswith("[AFFECTIVE STATE:")
-                    ).strip()
-                if _sl_injected and ("=== SHARD SKILL LIBRARY" in _ctx or "[PAST WORKING CODE" in _ctx):
-                    _ctx = "\n\n".join(
-                        p for p in _ctx.split("\n\n")
-                        if not p.startswith("=== SHARD SKILL LIBRARY")
-                        and not p.startswith("[PAST WORKING CODE")
-                    ).strip()
-                study_agent.session_context = _ctx
+                # Reset session_context for next topic
+                if self._use_affective_layer:
+                    # ContextArbiter rebuilds from _session_base_ctx each cycle
+                    study_agent.session_context = ""
+                else:
+                    # Old behavior: strip mood and skill lib prefixes
+                    _ctx = study_agent.session_context or ""
+                    if _mood and "[AFFECTIVE STATE:" in _ctx:
+                        _ctx = "\n\n".join(
+                            p for p in _ctx.split("\n\n")
+                            if not p.startswith("[AFFECTIVE STATE:")
+                        ).strip()
+                    if _sl_injected and ("=== SHARD SKILL LIBRARY" in _ctx or "[PAST WORKING CODE" in _ctx):
+                        _ctx = "\n\n".join(
+                            p for p in _ctx.split("\n\n")
+                            if not p.startswith("=== SHARD SKILL LIBRARY")
+                            and not p.startswith("[PAST WORKING CODE")
+                        ).strip()
+                    study_agent.session_context = _ctx
                 # study_topic returns a dict {"score": float, "certified": bool, ...}
                 _study_score = best_score.get("score", 0.0) if isinstance(best_score, dict) else (best_score or 0.0)
                 if not cycle_data["certified"] and _study_score:
