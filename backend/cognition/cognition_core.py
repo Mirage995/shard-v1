@@ -189,6 +189,11 @@ class CognitionCore:
         self._registry: Dict[str, Dict] = {}   # name -> {module, interests}
         self._broadcast_log: List[Dict] = []   # last 50 events (Shadow Diagnostic)
 
+        # ── GWT Workspace Arbiter (Phase 1) ───────────────────────────────────
+        from backend.cognition.workspace_arbiter import WorkspaceArbiter, WorkspaceProposal as _WP
+        self._arbiter = WorkspaceArbiter(max_tokens=500, ignition_threshold=0.4)
+        self._workspace_winner: Optional[_WP] = None
+
     # ── Shared Environment -- register / broadcast ─────────────────────────────
 
     def register(self, name: str, module, interests: List[str]) -> None:
@@ -202,21 +207,22 @@ class CognitionCore:
         self._registry[name] = {"module": module, "interests": set(interests)}
         logger.info("[CORE ENV] Registered '%s' -- interests: %s", name, interests)
 
-    def broadcast(self, event_type: str, data: Dict, source: str = "system") -> int:
-        """Broadcast an event to all registered modules that declared interest.
+    def broadcast(self, event_type: str, data: Dict, source: str = "system",
+                  force_global: bool = False) -> int:
+        """Broadcast an event to registered modules.
 
-        CognitionCore routes the event -- it does NOT decide what to do with it.
-        Each module reacts autonomously via its on_event() method.
+        force_global=True bypasses interest filtering — all modules receive the
+        event. Used by resolve_workspace() to implement true GWT global broadcast
+        of the workspace winner.
 
         Returns the number of modules that received the event.
-        The event is logged in the Shadow Diagnostic broadcast_log.
         """
         recipients = 0
         for name, entry in self._registry.items():
             if name == source:
                 continue  # never echo back to the source
             interests = entry["interests"]
-            if event_type in interests or "*" in interests:
+            if force_global or event_type in interests or "*" in interests:
                 try:
                     entry["module"].on_event(event_type, data, source)
                     recipients += 1
@@ -243,6 +249,51 @@ class CognitionCore:
     def get_broadcast_log(self, last_n: int = 10) -> List[Dict]:
         """Return the last N environment events (for telemetry / debugging)."""
         return self._broadcast_log[-last_n:]
+
+    # ── GWT Workspace API ─────────────────────────────────────────────────────
+
+    def propose_to_workspace(
+        self,
+        module_name: str,
+        content: str,
+        base_salience: float,
+        block_type: str,
+        topic_affinity: float = 1.0,
+    ) -> None:
+        """Submit a context block as a candidate for the global workspace."""
+        if not content:
+            return
+        from backend.cognition.workspace_arbiter import WorkspaceProposal
+        self._arbiter.add_proposal(WorkspaceProposal(
+            module_name=module_name,
+            content=content,
+            base_salience=base_salience,
+            topic_affinity=topic_affinity,
+            block_type=block_type,
+        ))
+
+    def resolve_workspace(self, topic: str, mood_score: float = 0.0) -> str:
+        """Run competition, select winners, broadcast the top proposal globally.
+
+        Returns the joined text of all winning proposals in stable reading order.
+        """
+        selected = self._arbiter.run_competition(mood_score)
+        self._workspace_winner = self._arbiter.get_winner()
+
+        if self._workspace_winner:
+            self.broadcast(
+                "workspace_winner",
+                {
+                    "module":     self._workspace_winner.module_name,
+                    "block_type": self._workspace_winner.block_type,
+                    "bid":        round(self._workspace_winner.computed_bid, 3),
+                    "topic":      topic,
+                },
+                source="workspace_arbiter",
+                force_global=True,
+            )
+
+        return "\n\n".join(p.content for p in selected).strip()
 
     # ── Initialization ────────────────────────────────────────────────────────
 
@@ -529,113 +580,131 @@ class CognitionCore:
 
     # ── Relational Context -- composite view with tensions ─────────────────────
 
-    def relational_context(self, topic: str, research_mode: bool = False) -> str:
-        """Compose all relevant layers into a tension-aware context string.
+    def relational_context(self, topic: str, research_mode: bool = False,
+                           mood_score: float = 0.0) -> str:
+        """Compose relevant layers into a tension-aware context string via GWT competition.
 
-        This is the key CognitionCore output: not raw data, but TENSIONS
-        between layers. Target: ~500 tokens max.
+        Each layer proposes a content block with a base_salience score. The
+        WorkspaceArbiter applies ValenceField modulation (mood_score) and selects
+        the top proposals that fit within 500 tokens. Only the winners are returned.
 
+        Target: ~500 tokens max. Signature is additive — mood_score=0.0 is backward-compatible.
         Used by: CertifyRetryGroup (attempt >= 2), phase_synthesize.
         research_mode=True adds Layer E (EMPIRICAL) from ExperimentStore.
         """
         if self._lobotomy:
             return self._anchor_executive_only(topic)
 
-        lines = [f"[COGNITION CORE] Topic: {topic}"]
+        self._arbiter.clear()
 
         exec_data = self.executive()
         anchor    = exec_data["anchor"]
 
-        # Layer 2: Identity
+        # ── Layer 2: Identity ─────────────────────────────────────────────────
         identity = self.query_identity()
         if "error" not in identity:
             gaps_str = ", ".join(identity.get("critical_gaps", [])[:3]) or "none"
-            lines.append(
+            id_text = (
                 f"Identità: cert_rate={identity['certification_rate']:.0%} "
                 f"| gap_severity={identity['gap_severity']} "
                 f"| critical_gaps=[{gaps_str}] "
                 f"| avg_repair_loops={identity['avg_repair_loops']:.1f}"
             )
+            self.propose_to_workspace("identity", id_text, 0.70, "identity")
 
-        # Layer 4: Experience
+        # ── Layer 4: Experience ───────────────────────────────────────────────
         exp = self.query_experience(topic)
-        if "error" not in exp and exp.get("attempt_count", 0) > 0:
-            lines.append(
-                f"Esperienza: attempts={exp['attempt_count']} "
-                f"| best={exp['best_score']} avg={exp['avg_score']}/10 "
-                f"| strategies_tried={', '.join(exp['strategies_used'][:2]) or 'none'}"
-            )
-            if exp.get("failure_reasons"):
-                lines.append(f"  Failure pattern: {exp['failure_reasons'][0]}")
-        else:
-            lines.append("Esperienza: nessuna storia per questo topic")
+        if "error" not in exp:
+            if exp.get("attempt_count", 0) > 0:
+                exp_lines = [
+                    f"Esperienza: attempts={exp['attempt_count']} "
+                    f"| best={exp['best_score']} avg={exp['avg_score']}/10 "
+                    f"| strategies_tried={', '.join(exp['strategies_used'][:2]) or 'none'}"
+                ]
+                if exp.get("failure_reasons"):
+                    exp_lines.append(f"  Failure pattern: {exp['failure_reasons'][0]}")
+                exp_text = "\n".join(exp_lines)
+                self.propose_to_workspace("experience", exp_text, 0.80, "experience",
+                                          topic_affinity=1.0)
+            else:
+                self.propose_to_workspace("experience",
+                                          "Esperienza: nessuna storia per questo topic",
+                                          0.40, "experience", topic_affinity=0.3)
 
-        # Layer 3: Knowledge (structural complexity)
+        # ── Layer 3: Knowledge ────────────────────────────────────────────────
         know = self.query_knowledge(topic)
         if "error" not in know:
-            lines.append(
+            know_lines = [
                 f"Conoscenza: complessità_strutturale={know['complexity_level']} "
                 f"({know['topic_complexity']} relazioni causali dirette) "
                 f"| KB totale: {know['total_relations']} relazioni"
-            )
+            ]
             if know.get("causal_context") and know["causal_context"] != "No causal relations found.":
-                # Trim to 2 lines max
                 causal_lines = know["causal_context"].strip().split("\n")
-                lines.extend(causal_lines[:3])
+                know_lines.extend(causal_lines[:3])
+            know_affinity = min(1.0, 0.4 + know.get("topic_complexity", 0) * 0.1)
+            self.propose_to_workspace("knowledge", "\n".join(know_lines), 0.60, "knowledge",
+                                      topic_affinity=know_affinity)
 
-        # Vettore 3: MetaLearning directed strategy recommendation
+        # ── Vettore 3: MetaLearning directed strategy recommendation ──────────
         strat_rec = self.query_strategy_recommendation(topic)
         if strat_rec.get("has_history"):
             cat = strat_rec["category"]
             cr  = strat_rec["category_cert_rate"]
             avg = strat_rec["category_avg_score"]
-            lines.append(
-                f"MetaLearning [{cat}]: cert_rate={cr:.0%} avg={avg:.1f}/10"
-            )
-            lines.append(
+            strat_text = (
+                f"MetaLearning [{cat}]: cert_rate={cr:.0%} avg={avg:.1f}/10\n"
                 f"[VETTORE 3 -- DIRECTED PIVOT]: {strat_rec['best_strategy_text']}"
             )
+            self.propose_to_workspace("strategy", strat_text, 0.75, "knowledge")
         else:
             strat_rec = {}
 
-        # Layer W: World model signal
+        # ── Layer W: World model ──────────────────────────────────────────────
         world_data = self.query_world(topic)
         if "error" not in world_data and world_data.get("relevance", 0) > 0.3:
-            lines.append(
+            world_text = (
                 f"Mondo: rilevanza={world_data['relevance']:.0%}  "
                 f"dominio={world_data['domain']}  "
                 f"noto={'si' if world_data.get('is_known') else 'no'}"
             )
+            self.propose_to_workspace("world", world_text, 0.55, "world",
+                                      topic_affinity=world_data.get("relevance", 0.5))
 
-        # Layer G: Goal signal
+        # ── Layer G: Goal signal ──────────────────────────────────────────────
         goal_data = self.query_goal(topic)
         if "error" not in goal_data and goal_data.get("active_goal"):
-            lines.append(
+            goal_text = (
                 f"Goal: '{goal_data['active_goal']}' | "
                 f"alignment={goal_data['alignment']:.0%} | "
                 f"progress={goal_data.get('goal_progress', 0):.0%}"
             )
+            self.propose_to_workspace("goal", goal_text, 0.65, "goal",
+                                      topic_affinity=max(0.3, goal_data.get("alignment", 0.5)))
 
-        # Layer R: Real identity (from data-driven SelfModel)
+        # ── Layer R: Real identity (data-driven SelfModel) ────────────────────
         real_id = self.query_real_identity()
         if "error" not in real_id:
             bs_str = ", ".join(real_id.get("blind_spots", [])[:2]) or "none"
-            lines.append(
+            real_id_text = (
                 f"Identità reale: momentum={real_id['momentum']} | "
                 f"cert_rate={real_id['real_cert_rate']:.0%} | "
                 f"blind_spots=[{bs_str}]"
             )
+            self.propose_to_workspace("real_identity", real_id_text, 0.60, "identity")
 
-        # Layer D: Desire signal
+        # ── Layer D: Desire signal ────────────────────────────────────────────
         desire_data = self.query_desire(topic)
         if "error" not in desire_data:
             if desire_data.get("frustration_hits", 0) >= 2 or desire_data.get("curiosity_pull", 0) > 0.2:
-                lines.append(
+                desire_text = (
                     f"Desiderio: frustrazione={desire_data['frustration_hits']} sessioni | "
                     f"curiosità={desire_data['curiosity_pull']:.0%} | "
                     f"engagement_medio={desire_data['avg_engagement']:.0%} | "
                     f"desire_score={desire_data['desire_score']:.2f}"
                 )
+                self.propose_to_workspace("desire", desire_text, 0.65, "desire",
+                                          topic_affinity=min(1.0, desire_data.get("desire_score", 0.5) + 0.5))
 
         # ── Tension Detection ─────────────────────────────────────────────────
         tensions = _detect_tensions(
@@ -648,19 +717,20 @@ class CognitionCore:
             topic=topic,
         )
         if tensions:
-            lines.append("")
-            lines.append("[TENSIONI RILEVATE]")
-            for t in tensions:
-                lines.append(f"  >> {t}")
+            tensions_text = "[TENSIONI RILEVATE]\n" + "\n".join(f"  >> {t}" for t in tensions)
+            self.propose_to_workspace("tensions", tensions_text, 0.85, "behavior_directive")
 
-        # Layer E: EMPIRICAL -- only in research_mode, ~50 tokens max
+        # ── Layer E: EMPIRICAL -- only in research_mode ───────────────────────
         if research_mode:
             empirical = self.query_empirical(topic)
             if empirical:
-                lines.append("")
-                lines.append(empirical)
+                self.propose_to_workspace("empirical", empirical, 0.70, "knowledge")
 
-        return "\n".join(lines)
+        # ── Resolve: run competition, broadcast winner, return workspace text ─
+        workspace_text = self.resolve_workspace(topic, mood_score)
+
+        header = f"[COGNITION CORE] Topic: {topic}"
+        return (header + "\n" + workspace_text) if workspace_text else header
 
     # ── Layer E -- EMPIRICAL (Experiment Engine) ──────────────────────────────
 

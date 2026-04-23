@@ -1,0 +1,152 @@
+"""workspace_arbiter.py -- GWT Phase 1: competitive workspace selection.
+
+Modules propose content blocks with a base_salience score. The ValenceField
+modulates each bid using the current mood_score before the competition runs.
+Only proposals that exceed the ignition_threshold enter the workspace; the
+rest are silently suppressed.
+
+This implements the core Global Workspace Theory insight: emotion modulates
+competition FROM OUTSIDE -- it does not compete for workspace entry itself.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import List, Optional
+
+# Stable output order: context reads naturally regardless of bid ranking
+_STABLE_ORDER: List[str] = [
+    "experience",
+    "knowledge",
+    "identity",
+    "goal",
+    "desire",
+    "world",
+    "mood_hint",
+    "behavior_directive",
+]
+_ORDER_MAP = {bt: i for i, bt in enumerate(_STABLE_ORDER)}
+
+
+@dataclass
+class WorkspaceProposal:
+    module_name: str        # e.g. "identity", "experience", "goal"
+    content: str            # text to inject into prompt
+    base_salience: float    # 0.0-1.0 intrinsic importance
+    topic_affinity: float   # 0.0-1.0 relevance to the current topic
+    block_type: str         # one of the types in _STABLE_ORDER
+    computed_bid: float = field(default=0.0, compare=False)
+
+
+class ValenceField:
+    """Translate mood_score into per-block bid multipliers.
+
+    The limbic system does NOT compete with cognitive modules -- it modulates
+    their bids from outside (Feinberg & Mallatt; Dehaene GNW).
+    """
+
+    @staticmethod
+    def mod(block_type: str, mood_score: float) -> float:
+        arousal = abs(mood_score)
+        valence = mood_score
+
+        if block_type == "mood_hint":
+            return 1.0
+        if block_type == "behavior_directive":
+            return 1.2 if arousal > 0.3 else 0.8
+        if block_type == "identity":
+            # Frustrated: suppress identity noise; agent needs fresh start, not self-history
+            return 0.5 if valence < -0.3 else 1.0
+        if block_type == "experience":
+            # Frustrated: boost experience to avoid repeating failed strategies
+            return 1.3 if valence < -0.3 else 1.0
+        if block_type == "knowledge":
+            return 1.0
+        if block_type == "goal":
+            # Confident: pursue goals more aggressively
+            return 1.2 if valence > 0.3 else 0.9
+        if block_type == "desire":
+            # Strong emotion (either sign) surfaces desires
+            return 1.2 if arousal > 0.3 else 0.9
+        if block_type == "world":
+            return 1.0
+        return 1.0
+
+
+class WorkspaceArbiter:
+    """Run competitive workspace selection on a set of proposals.
+
+    Each call cycle:
+      1. add_proposal() for each candidate block
+      2. run_competition(mood_score) -> selected proposals
+      3. clear() before the next topic
+    """
+
+    def __init__(self, max_tokens: int = 500, ignition_threshold: float = 0.4):
+        self._max_tokens = max_tokens
+        self._ignition_threshold = ignition_threshold
+        self._proposals: List[WorkspaceProposal] = []
+        self._last_winners: List[WorkspaceProposal] = []
+
+    def add_proposal(self, p: WorkspaceProposal) -> None:
+        self._proposals.append(p)
+
+    def run_competition(self, mood_score: float) -> List[WorkspaceProposal]:
+        """Select the best proposals that fit within the token budget.
+
+        Steps:
+        1. Compute bid = base_salience × ValenceField.mod × topic_affinity
+        2. Filter: bid >= ignition_threshold  (all-or-none ignition)
+        3. Sort by bid descending
+        4. Greedily select until max_tokens exhausted (1 token ≈ 4 chars)
+        5. Fallback: if nothing passes ignition, return highest-bid single proposal
+        6. Re-sort selected proposals in stable reading order before returning
+        """
+        if not self._proposals:
+            self._last_winners = []
+            return []
+
+        # Step 1 — compute bids
+        for p in self._proposals:
+            p.computed_bid = (
+                p.base_salience
+                * ValenceField.mod(p.block_type, mood_score)
+                * p.topic_affinity
+            )
+
+        # Step 2+3 — filter and sort
+        above = sorted(
+            [p for p in self._proposals if p.computed_bid >= self._ignition_threshold],
+            key=lambda p: p.computed_bid,
+            reverse=True,
+        )
+
+        # Step 4 — greedy token selection
+        selected: List[WorkspaceProposal] = []
+        char_budget = self._max_tokens * 4
+        used_chars = 0
+        for p in above:
+            cost = len(p.content)
+            if used_chars + cost <= char_budget:
+                selected.append(p)
+                used_chars += cost
+
+        # Step 5 — fallback: nothing passed ignition
+        if not selected:
+            all_sorted = sorted(self._proposals, key=lambda p: p.computed_bid, reverse=True)
+            selected = [all_sorted[0]]
+
+        # Step 6 — stable reading order
+        selected.sort(key=lambda p: _ORDER_MAP.get(p.block_type, len(_STABLE_ORDER)))
+
+        self._last_winners = selected
+        return selected
+
+    def get_winner(self) -> Optional[WorkspaceProposal]:
+        """Return the proposal with the highest bid from the last competition."""
+        if not self._last_winners:
+            return None
+        return max(self._last_winners, key=lambda p: p.computed_bid)
+
+    def clear(self) -> None:
+        self._proposals = []
+        self._last_winners = []
