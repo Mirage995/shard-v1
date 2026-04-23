@@ -190,9 +190,17 @@ class CognitionCore:
         self._registry: Dict[str, Dict] = {}   # name -> {module, interests}
         self._broadcast_log: List[Dict] = []   # last 50 events (Shadow Diagnostic)
 
-        # ── GWT Workspace Arbiter (Phase 1) ───────────────────────────────────
+        # ── GWT Workspace Arbiter (Phase 1 + Phase 3 Reentrant Loop) ─────────
         from backend.cognition.workspace_arbiter import WorkspaceArbiter, WorkspaceProposal as _WP
-        self._arbiter = WorkspaceArbiter(max_tokens=500, ignition_threshold=0.4)
+        try:
+            from backend.constants import AFFECTIVE_LAYER_ENABLED as _AFL
+        except ImportError:
+            from constants import AFFECTIVE_LAYER_ENABLED as _AFL
+        self._arbiter = WorkspaceArbiter(
+            max_tokens=500,
+            ignition_threshold=0.4,
+            enable_feedback=_AFL,
+        )
         self._workspace_winner: Optional[_WP] = None
 
         # ── GWT Workspace Safety Guards ───────────────────────────────────────

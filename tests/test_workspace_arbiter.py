@@ -201,3 +201,26 @@ def test_relational_context_neutral_mood_includes_identity():
 
     # Identity bid = 0.70 × 1.0 × 1.0 = 0.70 >= 0.4 — should appear
     assert "Identità: cert_rate" in ctx
+
+
+# ── 10. Phase 3: feedback decay reduces repeat-winner bid ────────────────────
+
+def test_feedback_decay_reduces_repeat_winner_bid():
+    """Same module winning twice should have lower computed_bid on the second run."""
+    arb = _make_arbiter(threshold=0.0)
+
+    # First competition
+    p1 = _proposal("module_a", "content", 0.8, "experience")
+    arb.add_proposal(p1)
+    winners_1 = arb.run_competition(mood_score=0.0)
+    bid_after_first = arb.get_winner().computed_bid
+    arb.clear()
+
+    # Second competition — same module, same base bid
+    p2 = _proposal("module_a", "content", 0.8, "experience")
+    arb.add_proposal(p2)
+    winners_2 = arb.run_competition(mood_score=0.0)
+    bid_after_second = arb.get_winner().computed_bid
+
+    # Decay: 0.95× after first win → second bid should be lower
+    assert bid_after_second < bid_after_first

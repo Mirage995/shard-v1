@@ -79,13 +79,30 @@ class WorkspaceArbiter:
       1. add_proposal() for each candidate block
       2. run_competition(mood_score) -> selected proposals
       3. clear() before the next topic
+
+    Phase 3 — Reentrant Loop: with enable_feedback=True, a FeedbackField
+    modulates bids using win/loss history, preventing static monopolies.
     """
 
-    def __init__(self, max_tokens: int = 500, ignition_threshold: float = 0.4):
+    def __init__(
+        self,
+        max_tokens: int = 500,
+        ignition_threshold: float = 0.4,
+        enable_feedback: bool = True,
+    ):
         self._max_tokens = max_tokens
         self._ignition_threshold = ignition_threshold
         self._proposals: List[WorkspaceProposal] = []
         self._last_winners: List[WorkspaceProposal] = []
+
+        if enable_feedback:
+            try:
+                from backend.cognition.feedback_field import FeedbackField
+            except ImportError:
+                from cognition.feedback_field import FeedbackField
+            self._feedback = FeedbackField()
+        else:
+            self._feedback = None
 
     def add_proposal(self, p: WorkspaceProposal) -> None:
         self._proposals.append(p)
@@ -105,13 +122,18 @@ class WorkspaceArbiter:
             self._last_winners = []
             return []
 
-        # Step 1 — compute bids
+        # Step 1 — compute bids (ValenceField × topic_affinity)
         for p in self._proposals:
             p.computed_bid = (
                 p.base_salience
                 * ValenceField.mod(p.block_type, mood_score)
                 * p.topic_affinity
             )
+
+        # Phase 3: apply FeedbackField multipliers (history-aware)
+        if self._feedback:
+            for p in self._proposals:
+                p.computed_bid = self._feedback.apply(p.module_name, p.computed_bid)
 
         # Step 2+3 — filter and sort
         above = sorted(
@@ -139,6 +161,13 @@ class WorkspaceArbiter:
         selected.sort(key=lambda p: _ORDER_MAP.get(p.block_type, len(_STABLE_ORDER)))
 
         self._last_winners = selected
+
+        # Phase 3: update FeedbackField for next cycle (after winners are decided)
+        if self._feedback and self._last_winners:
+            winner_names = [w.module_name for w in self._last_winners]
+            all_names = list(dict.fromkeys(p.module_name for p in self._proposals))
+            self._feedback.update(winner_names, all_names)
+
         return selected
 
     def get_winner(self) -> Optional[WorkspaceProposal]:
