@@ -1792,22 +1792,57 @@ class NightRunner:
                     except Exception as _sl_inj_err:
                         self.logger.debug("[SKILL_LIB] inject non-fatal: %s", _sl_inj_err)
 
-                # ── MOOD INJECTION -- stato affettivo -> prompt di studio ────────
+                # ── MOOD INJECTION + BEHAVIOR ADAPTER ────────────────────────────
                 if _mood and self._use_affective_layer:
                     try:
                         _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
-                        _mood_hint = _mood.get_prompt_hint()
-                        _mood_label = _mood.get_label()
-                        # Prepend mood hint to session_context (non-destructive)
+                        _mood_label  = _mood.get_label()
+                        _mood_hint   = _mood.get_prompt_hint()
+                        _directives  = _mood.get_behavior_directives()
+
+                        if _directives.get("clear_context"):
+                            # Frustrated/strained: drop accumulated history.
+                            # Injecting "ignore prior strategies" on top of prior strategies is contradictory.
+                            study_agent.session_context = ""
+                            self.logger.info("[MOOD] Behavior: clear_context → fresh start for '%s'", topic)
+
                         _base_ctx = study_agent.session_context or ""
                         study_agent.session_context = (
                             f"[AFFECTIVE STATE: {_mood_label.upper()}] {_mood_hint}\n\n{_base_ctx}"
                         ).strip()
-                        self.logger.info("[MOOD] Injected into study prompt: %s (%.3f)", _mood_label, _mood.get_score())
+
+                        if _directives.get("decompose_first"):
+                            _ctx = study_agent.session_context or ""
+                            study_agent.session_context = (
+                                "[BEHAVIOR DIRECTIVE] Break this topic into sub-problems first. "
+                                "Do NOT jump to a solution before decomposing.\n\n" + _ctx
+                            ).strip()
+                        elif _directives.get("push_deeper"):
+                            _ctx = study_agent.session_context or ""
+                            study_agent.session_context = (
+                                "[BEHAVIOR DIRECTIVE] You are performing well on this domain. "
+                                "Focus on advanced mechanisms and edge cases, not basics.\n\n" + _ctx
+                            ).strip()
+
+                        self.logger.info(
+                            "[MOOD] Injected: %s (%.3f) directives=%s",
+                            _mood_label, _mood.get_score(), list(_directives.keys()),
+                        )
                     except Exception as _mi_err:
                         self.logger.debug("[MOOD] inject non-fatal: %s", _mi_err)
                 elif _mood and not self._use_affective_layer:
                     self.logger.info("[MOOD] Skipped (use_affective_layer=False)")
+
+                # ── IDENTITY DOMAIN DIRECTIVE -- per-topic strategy ───────────────
+                if _identity is not None and self._use_affective_layer:
+                    try:
+                        _domain_dir = _identity.get_domain_directive(topic)
+                        if _domain_dir:
+                            _ctx = study_agent.session_context or ""
+                            study_agent.session_context = (_domain_dir + "\n\n" + _ctx).strip()
+                            self.logger.info("[IDENTITY] Domain directive injected for topic '%s'", topic)
+                    except Exception:
+                        pass
 
                 # Compute previous_attempts for L3 gate: failed experiments on this topic
                 _prev_attempts = 0

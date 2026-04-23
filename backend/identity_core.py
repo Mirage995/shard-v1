@@ -168,6 +168,28 @@ class IdentityCore:
 
         return "\n".join(lines)
 
+    def get_domain_directive(self, topic: str) -> str:
+        """Return a concrete study strategy based on historical domain performance.
+
+        Translates weak/strong domain knowledge into an actionable directive injected
+        per-topic (not once at session start), so the study agent gets specific guidance.
+        """
+        domain = _infer_domain(topic)
+        strong = self._data.get("strong_domains", [])
+        weak   = self._data.get("weak_domains", [])
+        if domain in weak:
+            return (
+                f"[IDENTITY DIRECTIVE] Historically weak in {domain}. "
+                "Decompose to first principles. Avoid pattern-matching. "
+                "Assume prior strategies may be wrong."
+            )
+        if domain in strong:
+            return (
+                f"[IDENTITY DIRECTIVE] Proven strong in {domain}. "
+                "Push into advanced mechanisms and edge cases rather than basics."
+            )
+        return ""
+
     def get_status(self) -> dict:
         return dict(self._data)
 

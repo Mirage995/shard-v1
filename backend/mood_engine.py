@@ -120,6 +120,20 @@ class MoodEngine:
         label = self.get_label()
         return MOOD_PROMPT_HINTS.get(label, MOOD_PROMPT_HINTS["neutral"])
 
+    def get_behavior_directives(self) -> dict:
+        """Convert current mood label into concrete behavioral directives for NightRunner.
+
+        Returns a dict of flags — callers act on them, not on the mood label directly.
+        """
+        label = self.get_label()
+        if label == "frustrated":
+            return {"clear_context": True, "skip_after_n_fails": 2}
+        if label == "strained":
+            return {"decompose_first": True, "skip_after_n_fails": 3}
+        if label == "confident":
+            return {"push_deeper": True}
+        return {}
+
     def get_status(self) -> dict:
         return dict(self._state)
 
