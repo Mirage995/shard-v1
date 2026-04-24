@@ -63,10 +63,11 @@ class MoodEngine:
 
     # ── Public API ────────────────────────────────────────────────────────────
 
-    def compute(self, desire_engine=None, momentum: str = "stable") -> float:
+    def compute(self, desire_engine=None, momentum: str = "stable", workspace_bias: float = 0.0) -> float:
         """Recompute mood_score from live data. Persists result.
 
         Returns mood_score in [-1.0, +1.0].
+        workspace_bias: decaying valence bias from MoodWorkspaceCoupling (GWT Phase 5).
         """
         frustration_signal = self._frustration_signal(desire_engine)
         cert_signal        = self._cert_rate_signal()
@@ -75,7 +76,8 @@ class MoodEngine:
         score = round(
             - FRUSTRATION_WEIGHT * frustration_signal
             + CERT_RATE_WEIGHT   * cert_signal
-            + MOMENTUM_WEIGHT    * momentum_signal,
+            + MOMENTUM_WEIGHT    * momentum_signal
+            + workspace_bias,
             4,
         )
         score = max(-1.0, min(1.0, score))

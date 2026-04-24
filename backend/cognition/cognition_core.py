@@ -207,6 +207,13 @@ class CognitionCore:
         # ── GWT Workspace Safety Guards ───────────────────────────────────────
         self._safety = WorkspaceSafetyGuard()
 
+    # ── Public accessors ──────────────────────────────────────────────────────
+
+    @property
+    def last_workspace_winner(self) -> Optional[str]:
+        """Module name of the last workspace winner (None if ignition failed)."""
+        return self._workspace_winner.module_name if self._workspace_winner else None
+
     # ── Shared Environment -- register / broadcast ─────────────────────────────
 
     def register(self, name: str, module, interests: List[str]) -> None:

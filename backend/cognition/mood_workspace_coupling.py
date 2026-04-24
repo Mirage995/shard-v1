@@ -1,0 +1,84 @@
+"""mood_workspace_coupling.py -- GWT Phase 5: Bidirectional Mood Coupling.
+
+Closes the feedback loop:
+  Mood → ValenceField → Workspace Arbiter (Phases 1-4)
+  Workspace Winner → MoodWorkspaceCoupling → MoodEngine bias (Phase 5)
+
+After each study cycle, the workspace winner is fed back as a decaying
+valence bias that nudges the next MoodEngine.compute() call.
+"""
+from __future__ import annotations
+
+from typing import Dict, Optional, Tuple
+
+# Winner module → (valence_delta, arousal_delta)
+# Only valence_delta is consumed by MoodEngine (get_bias()), but arousal_delta
+# is stored for future extensions (e.g. arousal-threshold coupling).
+_WINNER_BIAS: Dict[str, Tuple[float, float]] = {
+    "experience":         (+0.10, +0.05),  # "I learned something" → confident
+    "identity":           (+0.05, -0.10),  # "I know who I am" → grounded, calm
+    "goal":               (+0.05, +0.15),  # "I have purpose" → motivated
+    "behavior_directive": ( 0.00,  0.00),  # "Following instructions" → neutral
+}
+_IGNITION_FAILURE_BIAS: Tuple[float, float] = (-0.15, +0.10)  # frustrated, anxious
+
+
+class MoodWorkspaceCoupling:
+    """Accumulates workspace winner events as decaying mood biases.
+
+    Usage per cycle (NightRunner):
+      1. on_workspace_result(winner, ignition_failed) — after relational_context()
+      2. get_bias() → float — passed as workspace_bias to MoodEngine.compute()
+
+    Decay rule: every on_workspace_result() call multiplies existing biases
+    by self.decay (0.9) before applying the new event delta. A single event
+    has negligible effect after ~10 cycles (0.9^10 ≈ 0.35), preventing
+    permanent emotional scarring from isolated incidents.
+    """
+
+    def __init__(self, decay: float = 0.9):
+        self.decay = decay
+        self._valence_bias: float = 0.0
+        self._arousal_bias: float = 0.0
+
+    # ── Core interface ────────────────────────────────────────────────────────
+
+    def on_workspace_result(
+        self,
+        winner_module: Optional[str],
+        ignition_failed: bool,
+    ) -> None:
+        """Record a workspace result and update internal biases.
+
+        Args:
+            winner_module:  module_name of the workspace winner (or None).
+            ignition_failed: True if no proposal passed ignition threshold.
+        """
+        # Decay first — represents one cycle passing
+        self._valence_bias *= self.decay
+        self._arousal_bias *= self.decay
+
+        if ignition_failed:
+            v_delta, a_delta = _IGNITION_FAILURE_BIAS
+        else:
+            v_delta, a_delta = _WINNER_BIAS.get(winner_module or "", (0.0, 0.0))
+
+        self._valence_bias += v_delta
+        self._arousal_bias += a_delta
+
+        # Hard clamp to avoid runaway accumulation
+        self._valence_bias = max(-1.0, min(1.0, self._valence_bias))
+        self._arousal_bias = max(-1.0, min(1.0, self._arousal_bias))
+
+    def get_bias(self) -> float:
+        """Return net valence bias for the next MoodEngine.compute() call."""
+        return self._valence_bias
+
+    def get_arousal_bias(self) -> float:
+        """Return net arousal bias (for future use / telemetry)."""
+        return self._arousal_bias
+
+    def reset(self) -> None:
+        """Hard reset — use between sessions if needed."""
+        self._valence_bias = 0.0
+        self._arousal_bias = 0.0

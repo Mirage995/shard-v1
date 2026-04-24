@@ -1345,6 +1345,16 @@ class NightRunner:
         except Exception as _mood_err:
             self.logger.warning("[MOOD] Init non-fatal: %s", _mood_err)
 
+        # ── MOOD-WORKSPACE COUPLING (GWT Phase 5) ─────────────────────────────
+        _mood_coupling = None
+        if self._use_affective_layer:
+            try:
+                from backend.cognition.mood_workspace_coupling import MoodWorkspaceCoupling as _MWC
+                _mood_coupling = _MWC()
+                self.logger.info("[GWT-P5] MoodWorkspaceCoupling initialised")
+            except Exception as _mwc_err:
+                self.logger.warning("[GWT-P5] MoodWorkspaceCoupling init non-fatal: %s", _mwc_err)
+
         # ── VISION LAYER ──────────────────────────────────────────────────────
         try:
             from backend.vision import get_vision as _get_vision
@@ -1812,7 +1822,8 @@ class NightRunner:
                 _domain_dir = ""
                 if _mood:
                     try:
-                        _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"))
+                        _wb = _mood_coupling.get_bias() if _mood_coupling else 0.0
+                        _mood.compute(desire_engine=_desire, momentum=getattr(self, "_last_momentum", "stable"), workspace_bias=_wb)
                         _mood_label = _mood.get_label()
                         _mood_hint  = _mood.get_prompt_hint()
                         _directives = _mood.get_behavior_directives() if self._use_affective_layer else {}
@@ -1960,6 +1971,14 @@ class NightRunner:
                 # Reset per-topic budget so in-cycle overhead (proactive refactor on
                 # failure) can call _think_fast without hitting the study budget.
                 study_agent._topic_llm_calls = 0
+
+                # ── GWT Phase 5: feed workspace winner back into MoodWorkspaceCoupling ──
+                if _mood_coupling and _core_env is not None:
+                    _ignition_failed = _core_env.last_workspace_winner is None
+                    _mood_coupling.on_workspace_result(
+                        winner_module=_core_env.last_workspace_winner,
+                        ignition_failed=_ignition_failed,
+                    )
 
                 # Reset session_context for next topic
                 if self._use_affective_layer:
