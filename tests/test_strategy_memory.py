@@ -2,6 +2,7 @@
 import sys
 import os
 import unittest
+from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 # Mock chromadb before importing
@@ -130,6 +131,98 @@ class TestExtractStrategy(unittest.TestCase):
         result = StrategyMemory.extract_strategy(experiment)
         self.assertIsNotNone(result)
         self.assertIn("closures", result["strategy"])
+
+
+class TestRecencyBoost(unittest.TestCase):
+    def test_recent_timestamp_near_one(self):
+        ts = datetime.now().isoformat()
+        boost = StrategyMemory._recency_boost(ts)
+        self.assertGreater(boost, 0.99)
+
+    def test_half_life_at_168h(self):
+        ts = (datetime.now() - timedelta(hours=168)).isoformat()
+        boost = StrategyMemory._recency_boost(ts)
+        self.assertAlmostEqual(boost, 0.5, places=2)
+
+    def test_invalid_timestamp_returns_default(self):
+        boost = StrategyMemory._recency_boost("not-a-date")
+        self.assertEqual(boost, 0.5)
+
+
+class TestUtilityScoreRanking(unittest.TestCase):
+    def _make_sm_with_results(self, docs, metas, distances):
+        """Return a StrategyMemory whose collection.query() returns controlled data."""
+        sm = StrategyMemory.__new__(StrategyMemory)
+        mock_col = MagicMock()
+        mock_col.count.return_value = len(docs)
+        mock_col.query.return_value = {
+            "documents": [docs],
+            "metadatas": [metas],
+            "ids": [[f"id_{i}" for i in range(len(docs))]],
+            "distances": [distances],
+        }
+        sm.collection = mock_col
+        return sm
+
+    def test_high_success_rate_ranked_first(self):
+        sm = self._make_sm_with_results(
+            docs=["strategy A", "strategy B"],
+            metas=[
+                {"topic": "t", "outcome": "success", "score": "8.0", "success_rate": 0.9, "timestamp": datetime.now().isoformat()},
+                {"topic": "t", "outcome": "success", "score": "8.0", "success_rate": 0.1, "timestamp": datetime.now().isoformat()},
+            ],
+            distances=[0.1, 0.1],  # same similarity
+        )
+        results = sm.query("test topic", k=2)
+        self.assertEqual(results[0]["strategy"], "strategy A")
+        self.assertGreater(results[0]["utility_score"], results[1]["utility_score"])
+
+    def test_recent_strategy_ranked_above_old(self):
+        sm = self._make_sm_with_results(
+            docs=["recent", "old"],
+            metas=[
+                {"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.7, "timestamp": datetime.now().isoformat()},
+                {"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.7, "timestamp": (datetime.now() - timedelta(days=30)).isoformat()},
+            ],
+            distances=[0.1, 0.1],
+        )
+        results = sm.query("test topic", k=2)
+        self.assertEqual(results[0]["strategy"], "recent")
+
+    def test_utility_score_present_in_result(self):
+        sm = self._make_sm_with_results(
+            docs=["strat"],
+            metas=[{"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.8, "timestamp": datetime.now().isoformat()}],
+            distances=[0.2],
+        )
+        results = sm.query("test topic", k=1)
+        self.assertIn("utility_score", results[0])
+        self.assertIsInstance(results[0]["utility_score"], float)
+
+    def test_zero_success_rate_ranked_last(self):
+        sm = self._make_sm_with_results(
+            docs=["good", "bad"],
+            metas=[
+                {"topic": "t", "outcome": "s", "score": "8.0", "success_rate": 0.8, "timestamp": datetime.now().isoformat()},
+                {"topic": "t", "outcome": "f", "score": "0.0", "success_rate": 0.0, "timestamp": datetime.now().isoformat()},
+            ],
+            distances=[0.15, 0.15],
+        )
+        results = sm.query("test topic", k=2)
+        self.assertEqual(results[0]["strategy"], "good")
+
+    def test_results_capped_at_k(self):
+        sm = self._make_sm_with_results(
+            docs=["a", "b", "c"],
+            metas=[
+                {"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.7, "timestamp": datetime.now().isoformat()},
+                {"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.7, "timestamp": datetime.now().isoformat()},
+                {"topic": "t", "outcome": "s", "score": "7.0", "success_rate": 0.7, "timestamp": datetime.now().isoformat()},
+            ],
+            distances=[0.1, 0.2, 0.3],
+        )
+        results = sm.query("test topic", k=2)
+        self.assertLessEqual(len(results), 2)
 
 
 if __name__ == '__main__':

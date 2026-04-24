@@ -213,6 +213,16 @@ class StrategyMemory:
         print(f"  [strategy] Stored from diff: '{strategy_text}' (score={score})")
 
     @staticmethod
+    def _recency_boost(timestamp_str: str) -> float:
+        """Decays from 1.0 (just used) toward 0 over time. Half-life = 168h (1 week)."""
+        try:
+            ts = datetime.fromisoformat(timestamp_str)
+            hours = (datetime.now() - ts).total_seconds() / 3600.0
+            return 1.0 / (1.0 + hours / 168.0)
+        except Exception:
+            return 0.5
+
+    @staticmethod
     def _filter_by_protocol(strategies: List[Dict], query_protocol: str) -> List[Dict]:
         """Hard-filter strategies by protocol, with controlled fallback.
 
@@ -249,23 +259,34 @@ class StrategyMemory:
         query_protocol = _infer_protocol(topic)
         results = self.collection.query(
             query_texts=[topic],
-            n_results=min(k, self.collection.count())
+            n_results=min(k, self.collection.count()),
+            include=["documents", "metadatas", "ids", "distances"],
         )
 
         strategies = []
         seen_ids: set = set()
 
         if results and results["documents"]:
-            ids = results.get("ids", [[]])[0]
+            ids       = results.get("ids",       [[]])[0]
+            distances = results.get("distances", [[]])[0]
             for i, doc in enumerate(results["documents"][0]):
-                doc_id = ids[i] if i < len(ids) else None
-                meta = results["metadatas"][0][i] if results["metadatas"] else {}
+                doc_id   = ids[i] if i < len(ids) else None
+                meta     = results["metadatas"][0][i] if results["metadatas"] else {}
+                dist     = distances[i] if i < len(distances) else 1.0
+                sem_sim  = max(0.0, 1.0 - dist)
+                s_rate   = float(meta.get("success_rate", meta.get("score", 5.0)) or 0.0)
+                # Normalise success_rate: stored as 0-1 fraction OR 0-10 score
+                if s_rate > 1.0:
+                    s_rate = s_rate / 10.0
+                recency  = self._recency_boost(meta.get("timestamp", ""))
+                utility  = round(sem_sim * 0.5 + s_rate * 0.3 + recency * 0.2, 4)
                 strategies.append({
-                    "strategy": doc,
-                    "topic": meta.get("topic", ""),
-                    "outcome": meta.get("outcome", ""),
-                    "score": float(meta.get("score", 0)),
-                    "protocol": meta.get("protocol", "ANY"),
+                    "strategy":      doc,
+                    "topic":         meta.get("topic", ""),
+                    "outcome":       meta.get("outcome", ""),
+                    "score":         float(meta.get("score", 0)),
+                    "protocol":      meta.get("protocol", "ANY"),
+                    "utility_score": utility,
                 })
                 if doc_id:
                     seen_ids.add(doc_id)
@@ -278,6 +299,10 @@ class StrategyMemory:
                 results["documents"][0].__len__() if results and results["documents"] else 0,
             )
 
+        # Re-rank by utility score (ACT-R production utility)
+        strategies.sort(key=lambda s: s.get("utility_score", 0.0), reverse=True)
+        strategies = strategies[:k]
+
         # #22 Cross-inject: fetch up to 2 results per extra query, deduplicate by id
         if cross_inject_queries:
             for cq in cross_inject_queries:
@@ -285,19 +310,29 @@ class StrategyMemory:
                     cq_results = self.collection.query(
                         query_texts=[cq],
                         n_results=min(2, self.collection.count()),
+                        include=["documents", "metadatas", "ids", "distances"],
                     )
                     if cq_results and cq_results["documents"]:
-                        cq_ids = cq_results.get("ids", [[]])[0]
+                        cq_ids  = cq_results.get("ids",       [[]])[0]
+                        cq_dists = cq_results.get("distances", [[]])[0]
                         for j, doc in enumerate(cq_results["documents"][0]):
                             doc_id = cq_ids[j] if j < len(cq_ids) else None
                             if doc_id and doc_id in seen_ids:
-                                continue  # already in results
-                            meta = cq_results["metadatas"][0][j] if cq_results.get("metadatas") else {}
+                                continue
+                            meta    = cq_results["metadatas"][0][j] if cq_results.get("metadatas") else {}
+                            dist    = cq_dists[j] if j < len(cq_dists) else 1.0
+                            sem_sim = max(0.0, 1.0 - dist)
+                            s_rate  = float(meta.get("success_rate", meta.get("score", 5.0)) or 0.0)
+                            if s_rate > 1.0:
+                                s_rate = s_rate / 10.0
+                            recency = self._recency_boost(meta.get("timestamp", ""))
+                            utility = round(sem_sim * 0.5 + s_rate * 0.3 + recency * 0.2, 4)
                             strategies.append({
-                                "strategy": doc,
-                                "topic": meta.get("topic", ""),
-                                "outcome": meta.get("outcome", ""),
-                                "score": float(meta.get("score", 0)),
+                                "strategy":      doc,
+                                "topic":         meta.get("topic", ""),
+                                "outcome":       meta.get("outcome", ""),
+                                "score":         float(meta.get("score", 0)),
+                                "utility_score": utility,
                             })
                             if doc_id:
                                 seen_ids.add(doc_id)
