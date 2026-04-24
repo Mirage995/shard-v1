@@ -70,17 +70,26 @@ class ContextArbiter:
                 ContextBlock(content, block_type, base_salience, topic_affinity)
             )
 
-    def select(self, mood_score: float) -> str:
+    def select(self, mood_score: float, task_type: str = "strategic") -> str:
         """Return winning blocks joined by double newline in stable reading order.
+
+        task_type: "strategic" (default) | "tactical"
+          strategic → all blocks compete normally via ValenceField
+          tactical  → skill_library/past_context boosted 1.3×;
+                      identity_block/behavior_directive/mood_hint suppressed 0.6×
 
         Steps:
         1. bid = base_salience * ValenceField.mod(block_type, mood_score) * topic_affinity
-        2. Filter: bid >= threshold
-        3. Sort descending by bid
-        4. Greedy token selection (1 token ≈ 4 chars)
-        5. Re-sort selected in stable reading order
-        6. Return joined with "\\n\\n"
+        2. Task-type post-modulation (tactical only)
+        3. Filter: bid >= threshold
+        4. Sort descending by bid
+        5. Greedy token selection (1 token ≈ 4 chars)
+        6. Re-sort selected in stable reading order
+        7. Return joined with "\\n\\n"
         """
+        if task_type not in ("strategic", "tactical"):
+            task_type = "strategic"
+
         if not self.blocks:
             return ""
 
@@ -91,6 +100,13 @@ class ContextArbiter:
                 * ValenceField.mod(vf_type, mood_score)
                 * b.topic_affinity
             )
+
+        if task_type == "tactical":
+            for b in self.blocks:
+                if b.block_type in ("skill_library", "past_context"):
+                    b.computed_bid *= 1.3
+                elif b.block_type in ("identity_block", "behavior_directive", "mood_hint"):
+                    b.computed_bid *= 0.6
 
         above = sorted(
             [b for b in self.blocks if b.computed_bid >= self.threshold],

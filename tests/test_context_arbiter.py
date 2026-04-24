@@ -170,3 +170,43 @@ def test_arousal_coupling_never_below_5():
     topic_budget = 5
     effective = max(5, round(topic_budget * 0.7))
     assert effective == 5
+
+
+# ── Task-aware selection (GWT tactical mode) ─────────────────────────────────
+
+def test_tactical_suppresses_identity_below_threshold():
+    # identity_block base_salience=0.4 → after 0.6× = 0.24 < threshold 0.3 → excluded
+    # skill_library base_salience=0.4 → after 1.3× = 0.52 > threshold 0.3 → included
+    arb = _arb(threshold=0.3)
+    arb.add_block("skill content here", "skill_library", 0.4)
+    arb.add_block("identity content here", "identity_block", 0.4)
+    result = arb.select(mood_score=0.0, task_type="tactical")
+    assert "skill content" in result
+    assert "identity content" not in result
+
+
+def test_tactical_suppresses_mood_hint():
+    arb = _arb(threshold=0.25)
+    # mood_hint base_salience=0.3 → after 0.6× suppression = 0.18 < threshold
+    arb.add_block("mood hint text", "mood_hint", 0.3)
+    arb.add_block("skill content", "skill_library", 0.4)
+    result = arb.select(mood_score=0.0, task_type="tactical")
+    assert "skill content" in result
+    assert "mood hint text" not in result
+
+
+def test_strategic_unchanged_behavior():
+    arb1 = _arb()
+    arb2 = _arb()
+    for arb in (arb1, arb2):
+        arb.add_block("past ctx", "past_context", 0.75)
+        arb.add_block("identity block", "identity_block", 0.70)
+        arb.add_block("mood hint", "mood_hint", 0.90)
+    assert arb1.select(mood_score=0.0) == arb2.select(mood_score=0.0, task_type="strategic")
+
+
+def test_unknown_task_type_falls_back_to_strategic():
+    arb = _arb()
+    arb.add_block("content", "past_context", 0.75)
+    result = arb.select(mood_score=0.0, task_type="unknown_value")
+    assert "content" in result

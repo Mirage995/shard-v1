@@ -37,6 +37,7 @@ from night_runner import (
     BAD_TOKENS,
     OFF_TOPIC_KEYWORDS,
     _MAX_INTEGRATION_DEPTH,
+    _classify_topic,
 )
 
 
@@ -332,6 +333,32 @@ class TestKnowledgeContradictionHook:
         assert source == "curiosity"
         assert reason == "original"
         assert predicted == 6.5
+
+
+class TestClassifyTopic:
+    def test_decorators_is_tactical(self):
+        assert _classify_topic("python decorators and metaclasses") == "tactical"
+
+    def test_refactoring_is_strategic(self):
+        assert _classify_topic("refactoring legacy code without tests") == "strategic"
+
+    def test_heisenbugs_is_strategic(self):
+        assert _classify_topic("debugging heisenbugs without reproduction") == "strategic"
+
+    def test_asyncio_is_tactical(self):
+        assert _classify_topic("asyncio advanced patterns") == "tactical"
+
+    def test_exception_handling_is_tactical(self):
+        assert _classify_topic("exception handling techniques") == "tactical"
+
+    def test_sequence_modeling_is_strategic(self):
+        assert _classify_topic("sequence modeling basics") == "tactical"  # "basics" indicator
+
+    def test_case_insensitive(self):
+        assert _classify_topic("PYTHON DECORATORS") == "tactical"
+
+    def test_unknown_topic_defaults_to_strategic(self):
+        assert _classify_topic("distributed consensus protocols") == "strategic"
 
 
 if __name__ == "__main__":

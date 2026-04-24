@@ -267,6 +267,22 @@ class SessionState(Enum):
     DONE     = auto()  # session finished (limit reached or all cycles done)
 
 
+_TACTICAL_INDICATORS = (
+    "basics", "patterns", "handling", "logging", "unit test",
+    "decorators", "exception", "asyncio", "coroutines", "generators",
+    "hashing", "sorting", "search", "parser", "template",
+    "iterator", "comprehension", "f-string", "typing", "dataclass",
+)
+
+
+def _classify_topic(topic: str) -> str:
+    """Heuristic: tactical = closed implementation task; strategic = open design/analysis."""
+    t = topic.lower()
+    if any(ind in t for ind in _TACTICAL_INDICATORS):
+        return "tactical"
+    return "strategic"
+
+
 class NightRunner:
     def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = DEFAULT_TOPIC_BUDGET, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True):
         self.max_cycles = cycles
@@ -1896,7 +1912,8 @@ class NightRunner:
                     if _domain_dir:
                         _ctx_arb.add_block(_domain_dir, "domain_directive", 0.80)
 
-                    study_agent.session_context = _ctx_arb.select(_mood_score)
+                    _task_type = _classify_topic(topic)
+                    study_agent.session_context = _ctx_arb.select(_mood_score, task_type=_task_type)
 
                 else:
                     # ── AFFECTIVE LAYER OFF: old sequential injection ─────────
