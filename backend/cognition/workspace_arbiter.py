@@ -89,6 +89,7 @@ class WorkspaceArbiter:
         max_tokens: int = 500,
         ignition_threshold: float = 0.4,
         enable_feedback: bool = True,
+        persist_feedback: bool = False,
     ):
         self._max_tokens = max_tokens
         self._ignition_threshold = ignition_threshold
@@ -100,7 +101,7 @@ class WorkspaceArbiter:
                 from backend.cognition.feedback_field import FeedbackField
             except ImportError:
                 from cognition.feedback_field import FeedbackField
-            self._feedback = FeedbackField()
+            self._feedback = FeedbackField(persist=persist_feedback)
         else:
             self._feedback = None
 

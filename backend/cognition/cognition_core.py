@@ -200,6 +200,7 @@ class CognitionCore:
             max_tokens=500,
             ignition_threshold=0.4,
             enable_feedback=_AFL,
+            persist_feedback=_AFL,
         )
         self._workspace_winner: Optional[_WP] = None
 

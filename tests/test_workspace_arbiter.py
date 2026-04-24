@@ -22,7 +22,8 @@ def _proposal(name, content, salience, block_type, affinity=1.0):
 
 
 def _make_arbiter(max_tokens=500, threshold=0.4):
-    return WorkspaceArbiter(max_tokens=max_tokens, ignition_threshold=threshold)
+    # enable_feedback=True but persist_feedback=False → in-memory only, no DB writes
+    return WorkspaceArbiter(max_tokens=max_tokens, ignition_threshold=threshold, enable_feedback=True, persist_feedback=False)
 
 
 def _make_cognition_core(**kwargs):
@@ -224,3 +225,18 @@ def test_feedback_decay_reduces_repeat_winner_bid():
 
     # Decay: 0.95× after first win → second bid should be lower
     assert bid_after_second < bid_after_first
+
+
+# ── Phase 4: FeedbackField persistence wired in WorkspaceArbiter ─────────────
+
+def test_arbiter_feedback_persist_enabled():
+    """WorkspaceArbiter(persist_feedback=True) must create FeedbackField with persist=True."""
+    arb = WorkspaceArbiter(enable_feedback=True, persist_feedback=True)
+    assert arb._feedback is not None
+    assert arb._feedback._persist is True
+
+
+def test_arbiter_feedback_persist_disabled():
+    """WorkspaceArbiter(enable_feedback=False) must have no FeedbackField."""
+    arb = WorkspaceArbiter(enable_feedback=False)
+    assert arb._feedback is None

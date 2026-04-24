@@ -1,4 +1,4 @@
-"""Tests for FeedbackField -- GWT Phase 3 Reentrant Loop."""
+"""Tests for FeedbackField -- GWT Phase 3+4 Reentrant Loop + Persistence."""
 import sys
 import os
 import pytest
@@ -102,3 +102,56 @@ def test_alternating_winner_stays_near_one():
     # Both should be close to 1.0 (within 0.2) — no runaway monopoly
     assert abs(ma - 1.0) < 0.2
     assert abs(mb - 1.0) < 0.2
+
+
+# ── Phase 4: Persistence tests ───────────────────────────────────────────────
+
+def test_feedback_persist_loads_previous_state():
+    """FeedbackField(persist=True) should load multipliers written to DB."""
+    from shard_db import execute
+    # Clean slate: remove any stale value left by earlier tests (e.g. test_cognition_core)
+    execute("DELETE FROM feedback_field_state WHERE module_name = ?", ("experience",))
+    execute(
+        "INSERT OR REPLACE INTO feedback_field_state (module_name, multiplier, updated_at) "
+        "VALUES (?, ?, datetime('now'))",
+        ("experience", 1.25),
+    )
+    try:
+        ff = FeedbackField(persist=True)
+        assert abs(ff.apply("experience", 10.0) - 12.5) < 1e-9
+    finally:
+        execute("DELETE FROM feedback_field_state WHERE module_name = ?", ("experience",))
+
+
+def test_feedback_persist_saves_on_update():
+    """After update(), a persist=True FeedbackField should write to DB."""
+    from shard_db import query_one, execute
+    # Clean slate so _load() starts neutral regardless of prior test/session state
+    execute("DELETE FROM feedback_field_state WHERE module_name IN (?, ?)", ("identity", "experience"))
+    ff = FeedbackField(persist=True)
+    ff.update(winners=["identity"], all_modules=["identity", "experience"])
+    try:
+        row = query_one(
+            "SELECT multiplier FROM feedback_field_state WHERE module_name = ?",
+            ("identity",),
+        )
+        assert row is not None
+        assert abs(row["multiplier"] - 0.95) < 0.001
+    finally:
+        execute(
+            "DELETE FROM feedback_field_state WHERE module_name IN (?, ?)",
+            ("identity", "experience"),
+        )
+
+
+def test_feedback_no_persist_is_pure_memory():
+    """persist=False must never write to the database."""
+    from shard_db import query, execute
+    # Remove any stale rows for these module names so the post-check is reliable
+    execute("DELETE FROM feedback_field_state WHERE module_name IN (?, ?)", ("a", "b"))
+    ff = FeedbackField(persist=False)
+    ff.update(winners=["a"], all_modules=["a", "b"])
+    rows = query(
+        "SELECT * FROM feedback_field_state WHERE module_name IN (?, ?)", ("a", "b")
+    )
+    assert len(rows) == 0
