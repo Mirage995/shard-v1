@@ -9,7 +9,7 @@ saved after each update(), so module reputations survive across sessions.
 """
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 class FeedbackField:
@@ -65,18 +65,20 @@ class FeedbackField:
         except Exception:
             pass  # DB unavailable at test time or first run — start fresh
 
-    def _save(self) -> None:
-        """Persist current multipliers to SQLite (Phase 4)."""
+    def _save(self, changed: Optional[List[str]] = None) -> None:
+        """Persist multipliers to SQLite. If changed is given, only save those rows."""
         if not self._multipliers:
             return
         try:
             db = self._get_shard_db()
-            data = list(self._multipliers.items())
-            db.executemany(
-                "INSERT OR REPLACE INTO feedback_field_state "
-                "(module_name, multiplier, updated_at) VALUES (?, ?, datetime('now'))",
-                data,
-            )
+            names = changed if changed is not None else list(self._multipliers.keys())
+            data = [(n, self._multipliers[n]) for n in names if n in self._multipliers]
+            if data:
+                db.executemany(
+                    "INSERT OR REPLACE INTO feedback_field_state "
+                    "(module_name, multiplier, updated_at) VALUES (?, ?, datetime('now'))",
+                    data,
+                )
         except Exception:
             pass  # non-fatal: in-memory state is still correct
 
@@ -90,16 +92,20 @@ class FeedbackField:
             all_modules: all module_names that proposed this cycle
         """
         winner_set = set(winners)
+        changed: List[str] = []
         for name in all_modules:
             if name in winner_set:
                 current = self._multipliers.get(name, 1.0)
-                self._multipliers[name] = current * self.decay
+                new_val = current * self.decay
             else:
                 current = self._multipliers.get(name, 1.0)
-                self._multipliers[name] = min(current * self.boost, self.max_multiplier)
+                new_val = min(current * self.boost, self.max_multiplier)
+            if new_val != self._multipliers.get(name):
+                self._multipliers[name] = new_val
+                changed.append(name)
 
-        if self._persist:
-            self._save()
+        if self._persist and changed:
+            self._save(changed)
 
     def apply(self, module_name: str, base_bid: float) -> float:
         """Return base_bid scaled by this module's current multiplier."""

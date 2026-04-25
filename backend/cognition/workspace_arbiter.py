@@ -159,7 +159,17 @@ class WorkspaceArbiter:
         if not selected:
             self._last_ignition_was_fallback = True
             all_sorted = sorted(self._proposals, key=lambda p: p.computed_bid, reverse=True)
-            selected = [all_sorted[0]]
+            top = all_sorted[0]
+            # Truncate fallback content to stay within token budget
+            if len(top.content) > char_budget:
+                top = WorkspaceProposal(
+                    module_name=top.module_name,
+                    content=top.content[:char_budget],
+                    base_salience=top.base_salience,
+                    topic_affinity=top.topic_affinity,
+                    block_type=top.block_type,
+                )
+            selected = [top]
 
         # Step 6 — stable reading order
         selected.sort(key=lambda p: _ORDER_MAP.get(p.block_type, len(_STABLE_ORDER)))

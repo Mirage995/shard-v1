@@ -125,7 +125,11 @@ class ContextArbiter:
 
         if not selected and self.blocks:
             all_sorted = sorted(self.blocks, key=lambda b: b.computed_bid, reverse=True)
-            selected = [all_sorted[0]]
+            top = all_sorted[0]
+            # Truncate fallback content to stay within budget
+            if len(top.content) > char_budget:
+                top = ContextBlock(top.content[:char_budget], top.block_type, top.base_salience)
+            selected = [top]
 
         selected.sort(key=lambda b: _ORDER_MAP.get(b.block_type, len(_STABLE_ORDER)))
 

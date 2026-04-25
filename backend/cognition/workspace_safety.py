@@ -119,10 +119,12 @@ class WorkspaceSafetyGuard:
         """Return module name if it has won consecutively >= max_consecutive_wins."""
         for module, count in self._consecutive_counts.items():
             if count >= self.config.max_consecutive_wins:
-                logger.warning(
-                    "[SAFETY] Monopoly detected: '%s' won %d consecutive times",
-                    module, count,
-                )
+                # Log only on the first detection (count == threshold), not every call
+                if count == self.config.max_consecutive_wins:
+                    logger.warning(
+                        "[SAFETY] Monopoly detected: '%s' won %d consecutive times",
+                        module, count,
+                    )
                 return module
         return None
 

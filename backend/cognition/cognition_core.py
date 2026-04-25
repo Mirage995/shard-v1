@@ -780,7 +780,7 @@ class CognitionCore:
                 f"cert_rate={real_id['real_cert_rate']:.0%} | "
                 f"blind_spots=[{bs_str}]"
             )
-            self.propose_to_workspace("real_identity", real_id_text, 0.60, "identity")
+            self.propose_to_workspace("real_identity", real_id_text, 0.60, "real_identity")
 
         # ── Layer D: Desire signal ────────────────────────────────────────────
         desire_data = self.query_desire(topic)
