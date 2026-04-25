@@ -112,3 +112,9 @@ class FeedbackField:
     def reset(self) -> None:
         """Hard reset all multipliers (use between sessions if needed)."""
         self._multipliers.clear()
+        if self._persist:
+            try:
+                db = self._get_shard_db()
+                db.execute("DELETE FROM feedback_field_state")
+            except Exception:
+                pass

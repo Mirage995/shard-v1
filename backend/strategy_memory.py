@@ -260,7 +260,7 @@ class StrategyMemory:
         results = self.collection.query(
             query_texts=[topic],
             n_results=min(k, self.collection.count()),
-            include=["documents", "metadatas", "ids", "distances"],
+            include=["documents", "metadatas", "distances"],
         )
 
         strategies = []
@@ -310,7 +310,7 @@ class StrategyMemory:
                     cq_results = self.collection.query(
                         query_texts=[cq],
                         n_results=min(2, self.collection.count()),
-                        include=["documents", "metadatas", "ids", "distances"],
+                        include=["documents", "metadatas", "distances"],
                     )
                     if cq_results and cq_results["documents"]:
                         cq_ids  = cq_results.get("ids",       [[]])[0]
@@ -338,6 +338,11 @@ class StrategyMemory:
                                 seen_ids.add(doc_id)
                 except Exception as exc:
                     logger.debug("[strategy] cross-inject query failed for '%s': %s", cq[:40], exc)
+
+        # Re-rank and cap after cross-inject additions (cross-inject bypassed initial sort)
+        if cross_inject_queries:
+            strategies.sort(key=lambda s: s.get("utility_score", 0.0), reverse=True)
+            strategies = strategies[:k]
 
         return strategies
 

@@ -310,10 +310,12 @@ class CognitionCore:
             )
 
         selected = self._arbiter.run_competition(mood_score)
-        self._workspace_winner = self._arbiter.get_winner()
 
         # --- Safety Guard 2: Ignition fallback ---
-        if self._safety.check_ignition_failure(selected):
+        # Use the arbiter flag: run_competition() always returns ≥1 proposal (internal
+        # fallback), so check_ignition_failure(selected) would never fire on len==0.
+        if self._arbiter.last_ignition_was_fallback:
+            self._workspace_winner = None  # no genuine winner — prevent stale state
             logger.warning(
                 "[SAFETY] Ignition failure on '%s' — falling back to anchor+executive",
                 topic,
@@ -328,7 +330,11 @@ class CognitionCore:
                 "timestamp":  datetime.now().isoformat(),
                 "telemetry":  self._safety.get_telemetry(),
             })
+            if len(self._broadcast_log) > 50:
+                self._broadcast_log = self._broadcast_log[-50:]
             return fallback
+
+        self._workspace_winner = self._arbiter.get_winner()
 
         # --- Safety Guard 3: Track winner & mood spiral detection ---
         winner_module = (

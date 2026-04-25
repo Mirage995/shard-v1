@@ -1869,8 +1869,8 @@ class NightRunner:
                     else:
                         _effective_budget = _base_budget
                     _remaining_session = self.max_api_calls - self.api_calls_used
-                    _effective_budget = min(_effective_budget, _remaining_session - 5)
-                    study_agent._topic_llm_budget = max(5, _effective_budget)
+                    _effective_budget = min(_effective_budget, max(1, _remaining_session - 2))
+                    study_agent._topic_llm_budget = max(1, _effective_budget)
                     self.logger.info(
                         "[ARBITER] Budget adjusted: base=%d -> effective=%d (mood=%.2f, arousal=%.2f)",
                         _base_budget, study_agent._topic_llm_budget, _valence, _arousal,
@@ -1930,22 +1930,13 @@ class NightRunner:
                         study_agent.session_context = (
                             f"[AFFECTIVE STATE: {_mood_label.upper()}] {_mood_hint}\n\n{_base_ctx}"
                         ).strip()
-                        _old_dirs = _mood.get_behavior_directives()
-                        if _old_dirs.get("decompose_first"):
-                            _ctx = study_agent.session_context or ""
-                            study_agent.session_context = (
-                                "[BEHAVIOR DIRECTIVE] Break this topic into sub-problems first. "
-                                "Do NOT jump to a solution before decomposing.\n\n" + _ctx
-                            ).strip()
-                        elif _old_dirs.get("push_deeper"):
-                            _ctx = study_agent.session_context or ""
-                            study_agent.session_context = (
-                                "[BEHAVIOR DIRECTIVE] You are performing well on this domain. "
-                                "Focus on advanced mechanisms and edge cases, not basics.\n\n" + _ctx
-                            ).strip()
+                        # Behavior directives intentionally NOT injected in OFF mode:
+                        # GWT_OFF is a clean sequential-injection baseline. Injecting
+                        # directives in both conditions would conflate directive effect
+                        # with ContextArbiter effect in A/B comparisons.
                         self.logger.info(
-                            "[MOOD] Injected: %s (%.3f) directives=%s",
-                            _mood_label, _mood.get_score(), list(_old_dirs.keys()),
+                            "[MOOD] Injected: %s (%.3f) [no directives — OFF baseline]",
+                            _mood_label, _mood.get_score(),
                         )
                     elif _mood:
                         self.logger.info("[MOOD] Skipped (use_affective_layer=False)")

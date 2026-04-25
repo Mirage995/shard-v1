@@ -12,13 +12,20 @@ from __future__ import annotations
 from typing import Dict, Optional, Tuple
 
 # Winner module → (valence_delta, arousal_delta)
+# Keys are the module_name values passed to propose_to_workspace() in relational_context().
 # Only valence_delta is consumed by MoodEngine (get_bias()), but arousal_delta
 # is stored for future extensions (e.g. arousal-threshold coupling).
 _WINNER_BIAS: Dict[str, Tuple[float, float]] = {
-    "experience":         (+0.10, +0.05),  # "I learned something" → confident
-    "identity":           (+0.05, -0.10),  # "I know who I am" → grounded, calm
-    "goal":               (+0.05, +0.15),  # "I have purpose" → motivated
-    "behavior_directive": ( 0.00,  0.00),  # "Following instructions" → neutral
+    "experience":    (+0.10, +0.05),  # "I learned something" → confident
+    "identity":      (+0.05, -0.10),  # "I know who I am" → grounded, calm
+    "real_identity": (+0.05, -0.10),  # same semantic as identity
+    "goal":          (+0.05, +0.15),  # "I have purpose" → motivated
+    "desire":        (+0.03, +0.10),  # desire activated → mild uplift
+    "tensions":      ( 0.00,  0.00),  # "Following directives" → neutral
+    "knowledge":     (+0.08, +0.05),  # knowledge surfaced → mildly confident
+    "strategy":      (+0.08, +0.05),  # strategy recalled → mildly confident
+    "world":         ( 0.00, -0.05),  # world model grounding → calming
+    "empirical":     (+0.06, +0.03),  # empirical result → slight uplift
 }
 _IGNITION_FAILURE_BIAS: Tuple[float, float] = (-0.15, +0.10)  # frustrated, anxious
 

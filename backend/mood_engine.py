@@ -86,9 +86,10 @@ class MoodEngine:
         self._state["label"]        = self._label(score)
         self._state["updated_at"]   = datetime.now().isoformat()
         self._state["components"]   = {
-            "frustration": round(frustration_signal, 3),
-            "cert_rate":   round(cert_signal, 3),
-            "momentum":    round(momentum_signal, 3),
+            "frustration":    round(frustration_signal, 3),
+            "cert_rate":      round(cert_signal, 3),
+            "momentum":       round(momentum_signal, 3),
+            "workspace_bias": round(workspace_bias, 4),
         }
         self._save()
 

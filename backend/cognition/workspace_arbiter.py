@@ -95,6 +95,7 @@ class WorkspaceArbiter:
         self._ignition_threshold = ignition_threshold
         self._proposals: List[WorkspaceProposal] = []
         self._last_winners: List[WorkspaceProposal] = []
+        self._last_ignition_was_fallback: bool = False
 
         if enable_feedback:
             try:
@@ -153,8 +154,10 @@ class WorkspaceArbiter:
                 selected.append(p)
                 used_chars += cost
 
-        # Step 5 — fallback: nothing passed ignition
+        # Step 5 — fallback: nothing passed ignition (tracked for caller)
+        self._last_ignition_was_fallback = False
         if not selected:
+            self._last_ignition_was_fallback = True
             all_sorted = sorted(self._proposals, key=lambda p: p.computed_bid, reverse=True)
             selected = [all_sorted[0]]
 
@@ -176,6 +179,11 @@ class WorkspaceArbiter:
         if not self._last_winners:
             return None
         return max(self._last_winners, key=lambda p: p.computed_bid)
+
+    @property
+    def last_ignition_was_fallback(self) -> bool:
+        """True if the last run_competition() used the fallback (no genuine ignition)."""
+        return self._last_ignition_was_fallback
 
     def get_proposals(self) -> List[WorkspaceProposal]:
         """Return current proposals (for safety guard pre-processing)."""
