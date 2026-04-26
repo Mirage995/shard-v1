@@ -28,11 +28,13 @@ class FeedbackField:
         decay: float = 0.95,
         boost: float = 1.05,
         max_multiplier: float = 1.5,
+        min_multiplier: float = 0.1,
         persist: bool = False,
     ):
         self.decay = decay
         self.boost = boost
         self.max_multiplier = max_multiplier
+        self.min_multiplier = min_multiplier
         self._multipliers: Dict[str, float] = {}
         self._persist = persist
 
@@ -96,7 +98,7 @@ class FeedbackField:
         for name in all_modules:
             if name in winner_set:
                 current = self._multipliers.get(name, 1.0)
-                new_val = current * self.decay
+                new_val = max(current * self.decay, self.min_multiplier)
             else:
                 current = self._multipliers.get(name, 1.0)
                 new_val = min(current * self.boost, self.max_multiplier)
