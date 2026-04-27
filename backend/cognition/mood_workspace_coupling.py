@@ -47,6 +47,7 @@ class MoodWorkspaceCoupling:
         self.decay = decay
         self._valence_bias: float = 0.0
         self._arousal_bias: float = 0.0
+        self._last_momentum: str = "neutral"
 
     # ── Core interface ────────────────────────────────────────────────────────
 
@@ -76,6 +77,22 @@ class MoodWorkspaceCoupling:
         # Hard clamp to avoid runaway accumulation
         self._valence_bias = max(-1.0, min(1.0, self._valence_bias))
         self._arousal_bias = max(-1.0, min(1.0, self._arousal_bias))
+
+        if self._arousal_bias > 0.20:
+            self._last_momentum = "active"
+        elif self._arousal_bias < -0.20:
+            self._last_momentum = "stagnating"
+        else:
+            self._last_momentum = "neutral"
+
+    @property
+    def last_momentum(self) -> str:
+        """Current momentum label derived from arousal_bias: 'active' | 'neutral' | 'stagnating'."""
+        return self._last_momentum
+
+    def propagate_to_desire(self, topic: str, desire_engine) -> None:
+        """Push current valence/arousal biases into DesireEngine for the given topic."""
+        desire_engine.apply_workspace_bias(topic, self._valence_bias, self._arousal_bias)
 
     def get_bias(self) -> float:
         """Return net valence bias for the next MoodEngine.compute() call."""

@@ -1987,6 +1987,8 @@ class NightRunner:
                         winner_module=_core_env.last_workspace_winner,
                         ignition_failed=_ignition_failed,
                     )
+                    if _desire:
+                        _mood_coupling.propagate_to_desire(topic, _desire)
 
                 # Reset session_context for next topic
                 if self._use_affective_layer:

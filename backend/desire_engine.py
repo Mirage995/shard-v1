@@ -428,6 +428,38 @@ class DesireEngine:
                 if changed:
                     self._save()
 
+    # ── Workspace coupling (GWT Phase 5 → Desire) ─────────────────────────────
+
+    def apply_workspace_bias(self, topic: str, valence_bias: float, arousal_bias: float) -> None:
+        """Called by MoodWorkspaceCoupling after each workspace cycle.
+
+        Nudges the topic's curiosity_pull (valence) and base_priority (arousal).
+        No-op when both signals are below threshold — avoids noise amplification.
+        Never touches frustration_hits — that field is owned by update_frustration().
+        """
+        _VALENCE_THRESHOLD = 0.15
+        _AROUSAL_THRESHOLD = 0.20
+        _CURIOSITY_BOOST   = 0.05
+        _CURIOSITY_DECAY   = 0.9
+        _PRIORITY_BOOST    = 1.05
+
+        if abs(valence_bias) < _VALENCE_THRESHOLD and abs(arousal_bias) < _AROUSAL_THRESHOLD:
+            return
+        ds = self._get_or_create(topic)
+        changed = False
+        if valence_bias > _VALENCE_THRESHOLD:
+            ds.curiosity_pull = round(min(1.0, ds.curiosity_pull + _CURIOSITY_BOOST), 4)
+            changed = True
+        elif valence_bias < -_VALENCE_THRESHOLD:
+            ds.curiosity_pull = round(ds.curiosity_pull * _CURIOSITY_DECAY, 4)
+            changed = True
+        if arousal_bias > _AROUSAL_THRESHOLD and ds.frustration_hits == 0:
+            ds.base_priority = round(min(1.0, ds.base_priority * _PRIORITY_BOOST), 4)
+            changed = True
+        if changed:
+            ds.last_updated = _now()
+            self._save()
+
     def summary(self) -> str:
         top = self.top_desire_topics(3)
         if not top:
