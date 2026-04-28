@@ -203,6 +203,10 @@ class CognitionCore:
             persist_feedback=_AFL,
         )
         self._workspace_winner: Optional[_WP] = None
+        # GWT Phase 5 fix: accumulate every winner across all retries within a
+        # single topic so MoodWorkspaceCoupling sees the full cognitive history.
+        # NightRunner drains this list at end-of-topic via drain_session_winners().
+        self._session_winners: List[Dict] = []
 
         # ── GWT Workspace Safety Guards ───────────────────────────────────────
         self._safety = WorkspaceSafetyGuard()
@@ -213,6 +217,17 @@ class CognitionCore:
     def last_workspace_winner(self) -> Optional[str]:
         """Module name of the last workspace winner (None if ignition failed)."""
         return self._workspace_winner.module_name if self._workspace_winner else None
+
+    def drain_session_winners(self) -> List[Dict]:
+        """Return and clear all winners accumulated since last drain (GWT Phase 5).
+
+        Each entry: {"module": Optional[str], "ignition_failed": bool}.
+        Called by NightRunner at end-of-topic to feed every cognitive cycle
+        (synthesize + each retry) into MoodWorkspaceCoupling.
+        """
+        out = list(self._session_winners)
+        self._session_winners.clear()
+        return out
 
     # ── Shared Environment -- register / broadcast ─────────────────────────────
 
@@ -316,6 +331,7 @@ class CognitionCore:
         # fallback), so check_ignition_failure(selected) would never fire on len==0.
         if self._arbiter.last_ignition_was_fallback:
             self._workspace_winner = None  # no genuine winner — prevent stale state
+            self._session_winners.append({"module": None, "ignition_failed": True})
             logger.warning(
                 "[SAFETY] Ignition failure on '%s' — falling back to anchor+executive",
                 topic,
@@ -335,6 +351,10 @@ class CognitionCore:
             return fallback
 
         self._workspace_winner = self._arbiter.get_winner()
+        self._session_winners.append({
+            "module": self._workspace_winner.module_name if self._workspace_winner else None,
+            "ignition_failed": False,
+        })
 
         # --- Safety Guard 3: Track winner & mood spiral detection ---
         winner_module = (

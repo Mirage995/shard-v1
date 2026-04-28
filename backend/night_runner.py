@@ -1342,6 +1342,11 @@ class NightRunner:
             _core_env = None
             self.logger.warning("[CORE ENV] Registration non-fatal: %s", _env_err)
 
+        # Wire CognitionCore into StudyAgent so study_phases.py can call relational_context()
+        if _core_env is not None and self._use_affective_layer:
+            study_agent.cognition_core = _core_env
+            self.logger.info("[CORE ENV] CognitionCore injected into study_agent")
+
         # ── MOOD ENGINE ───────────────────────────────────────────────────────
         try:
             from backend.mood_engine import MoodEngine as _ME
@@ -1981,12 +1986,22 @@ class NightRunner:
                 study_agent._topic_llm_calls = 0
 
                 # ── GWT Phase 5: feed workspace winner back into MoodWorkspaceCoupling ──
+                # Drain ALL winners accumulated during this topic (synthesize + retries)
+                # so the decay/bias loop sees the full cognitive history, not just the last cycle.
                 if _mood_coupling and _core_env is not None:
-                    _ignition_failed = _core_env.last_workspace_winner is None
-                    _mood_coupling.on_workspace_result(
-                        winner_module=_core_env.last_workspace_winner,
-                        ignition_failed=_ignition_failed,
-                    )
+                    _winners = _core_env.drain_session_winners()
+                    if not _winners:
+                        # No competition fired this topic (e.g. GWT_OFF) — preserve old single-shot
+                        # behavior so callers that never invoke the workspace still get a tick.
+                        _winners = [{
+                            "module": _core_env.last_workspace_winner,
+                            "ignition_failed": _core_env.last_workspace_winner is None,
+                        }]
+                    for _w in _winners:
+                        _mood_coupling.on_workspace_result(
+                            winner_module=_w["module"],
+                            ignition_failed=_w["ignition_failed"],
+                        )
                     if _desire:
                         _mood_coupling.propagate_to_desire(topic, _desire)
 
