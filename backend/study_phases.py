@@ -459,6 +459,11 @@ class CrossPollinatePhase(BasePhase):
     fatal = False
 
     async def run(self, ctx: StudyContext) -> None:
+        from constants import CROSS_POLLINATION_ENABLED
+        if not CROSS_POLLINATION_ENABLED:
+            print("[CROSS-POLLINATE] Skipped (CROSS_POLLINATION_ENABLED=False)")
+            return
+
         await ctx.emit("CROSS_POLLINATE", 0, "Generating Integration Report...")
         ctx.integration_report = await ctx.agent.phase_cross_pollinate(
             ctx.topic, ctx.raw_text, ctx.structured,
@@ -1655,19 +1660,22 @@ Rules:
             critique_block = f"\n\nCRITICAL SELF-EVALUATION (read carefully -- this is what you keep getting wrong):\n{ctx.critic_meta_critique}\n"
             print(f"[CRITIC-LLM] Injecting meta-critique into retry prompt for '{ctx.topic}'")
 
-        # Vettore 1+2 -- CognitionCore relational_context on attempt >= 2
+        # Vettore 1+2 -- CognitionCore relational_context on every retry
         # Full tension-aware context: Identity vs Experience vs Knowledge
         # Skipped when ctx.no_l3 is True (#45 A/B gate)
+        # Note: this method only runs during retry, so ctx.attempt is always >= 1.
+        # The previous explicit guard was redundant and is removed for clarity.
         core_block = ""
         core = getattr(ctx.agent, "cognition_core", None)
-        if core is not None and ctx.attempt >= 2 and not ctx.no_l3:
+        if core is not None and not ctx.no_l3:
             try:
                 ctx.core_relational_ctx = core.relational_context(ctx.topic, research_mode=ctx.research_mode)
                 core_block = f"\n\n[COGNITION CORE -- INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
                 print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
             except Exception as _cre:
-                pass  # non-fatal
-        elif ctx.no_l3 and ctx.attempt >= 2:
+                print(f"[VETTORE 1+2] relational_context FAILED at attempt {ctx.attempt}: {_cre}")
+                import traceback; traceback.print_exc()
+        elif ctx.no_l3:
             print(f"[NO-L3] relational_context skipped at attempt {ctx.attempt} (#45 A/B baseline)")
 
         # Track previous strategy for audit_emergence
