@@ -82,6 +82,17 @@ def main():
             print(f"    {k:<16} mean={statistics.mean(vals):+.3f}  std={statistics.stdev(vals) if len(vals)>1 else 0.0:.3f}")
     print()
 
+    # Coupling-inactive hint: workspace_bias stuck at 0.0 across all samples
+    wb_vals = components_acc.get("workspace_bias") or []
+    if wb_vals and all(abs(v) < 1e-6 for v in wb_vals):
+        print("  HINT: workspace_bias is flat at 0.0 across all samples.")
+        print("        Expected in easy/no-retry regimes -- MoodWorkspaceCoupling")
+        print("        only accumulates bias when workspace winner events are")
+        print("        propagated through on_workspace_result(). Run a stress/")
+        print("        frustration benchmark (D2) before concluding the coupling")
+        print("        is inactive.")
+        print()
+
     # Decision hint
     print("=" * 70)
     print("DECISION HINT (D1 calibration vs D2 frustration benchmark)")

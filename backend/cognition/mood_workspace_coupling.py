@@ -95,7 +95,18 @@ class MoodWorkspaceCoupling:
         desire_engine.apply_workspace_bias(topic, self._valence_bias, self._arousal_bias)
 
     def get_bias(self) -> float:
-        """Return net valence bias for the next MoodEngine.compute() call."""
+        """Return net valence bias for the next MoodEngine.compute() call.
+
+        NOTE -- natural/easy regime:
+        workspace_bias may remain 0.0 during easy benchmark runs where topics
+        certify without post-failure workspace cycles. This is expected:
+        MoodWorkspaceCoupling only accumulates bias after workspace winner
+        events are propagated through on_workspace_result(). A zero
+        workspace_bias in natural runs is therefore not evidence that the GWT
+        layer is broken; it usually means the benchmark did not enter the
+        stress/retry regime where the coupling is designed to activate.
+        See backend/mood_histogram.py for distribution diagnostics.
+        """
         return self._valence_bias
 
     def get_arousal_bias(self) -> float:
