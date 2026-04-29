@@ -377,18 +377,6 @@ class SynthesizePhase(BasePhase):
             except Exception:
                 pass  # non-fatal
 
-        # Vettore 1+2 -- Full GWT relational_context at attempt 0 (synthesize-time).
-        # Closes the 50%-coverage gap: previously GWT only fired on retry, so topics
-        # that certified at attempt 0 (mostly tactical) never exercised the workspace.
-        core_relational = ""
-        if core is not None and not ctx.no_l3:
-            try:
-                core_relational = core.relational_context(ctx.topic, research_mode=ctx.research_mode)
-                ctx.core_relational_ctx = core_relational
-                print(f"[VETTORE 1+2] CognitionCore relational_context injected at synthesize (attempt {ctx.attempt})")
-            except Exception as _cre:
-                print(f"[VETTORE 1+2] relational_context FAILED at synthesize: {_cre}")
-
         ctx.structured = await ctx.agent.phase_synthesize(
             ctx.topic, ctx.raw_text,
             strategy_hint=ctx.best_strategy,
@@ -398,7 +386,6 @@ class SynthesizePhase(BasePhase):
             research_mode=ctx.research_mode,
             sources=ctx.sources if ctx.research_mode else None,
             empirical_context=empirical_context,
-            core_relational_ctx=core_relational,
         )
         print(f"[SYNTHESIZE] Phase completed. {len(ctx.structured.get('concepts', []))} concepts extracted.")
         # Persist diversity block for calibration logging in ExperimentDesignPhase

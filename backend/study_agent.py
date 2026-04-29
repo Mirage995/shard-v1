@@ -2014,8 +2014,7 @@ Return ONLY valid JSON:
                                pivot_directive: str = None,
                                research_mode: bool = False,
                                sources: list = None,
-                               empirical_context: str = "",
-                               core_relational_ctx: str = "") -> Dict:
+                               empirical_context: str = "") -> Dict:
         """SHARD processes, connects and reasons on raw content (Metodo Feynman)."""
         print(f"[SYNTHESIZE] Building structured knowledge (Metodo Feynman) for: {topic}")
         self.progress.set_phase("SYNTHESIZE", 0.0)
@@ -2038,11 +2037,6 @@ Return ONLY valid JSON:
         pivot_line = (
             f"\n[COGNITION CORE -- STRUCTURAL PIVOT]\n{pivot_directive}\n"
             if pivot_directive else ""
-        )
-        # Vettore 1+2 -- Full GWT relational context (attempt 0 / synthesize-time)
-        core_line = (
-            f"\n[COGNITION CORE -- INTERNAL STATE]\n{core_relational_ctx}\n"
-            if core_relational_ctx else ""
         )
 
         # GraphRAG: inject causal relations already known about this topic
@@ -2268,7 +2262,7 @@ Do NOT set "falsifiable": true for vague claims that cannot be measured numerica
 """
 
         prompt = f"""
-You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{core_line}{causal_line}{memory_line}{hypothesis_instruction}
+You must extract structured concepts from the text and form a personal opinion.{meta_line}{score_line}{episodic_line}{pivot_line}{causal_line}{memory_line}{hypothesis_instruction}
 Return ONLY valid JSON.
 
 Do not include explanations.
