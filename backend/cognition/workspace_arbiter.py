@@ -18,6 +18,7 @@ _STABLE_ORDER: List[str] = [
     "experience",
     "knowledge",
     "identity",
+    "real_identity",
     "goal",
     "desire",
     "world",
@@ -53,7 +54,7 @@ class ValenceField:
             return 1.0
         if block_type == "behavior_directive":
             return 1.2 if arousal > 0.3 else 0.8
-        if block_type == "identity":
+        if block_type in ("identity", "real_identity"):
             # Frustrated: suppress identity noise; agent needs fresh start, not self-history
             return 0.5 if valence < -0.3 else 1.0
         if block_type == "experience":
