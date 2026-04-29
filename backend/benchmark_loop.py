@@ -1445,9 +1445,16 @@ async def run_benchmark_loop(
             _cognition_ctx = ""
             if _consciousness is not None:
                 try:
-                    _cognition_ctx = _consciousness.relational_context(task_dir.name)
+                    _mood_score = 0.0
+                    try:
+                        _mood_mod = _consciousness._registry.get("mood_engine", {}).get("module")
+                        if _mood_mod is not None:
+                            _mood_score = float(_mood_mod.get_score())
+                    except Exception:
+                        _mood_score = 0.0
+                    _cognition_ctx = _consciousness.relational_context(task_dir.name, mood_score=_mood_score)
                     lobotomy_mode = getattr(_consciousness, "_lobotomy", False)
-                    print(f"  [cognition] relational_context injected ({'LOBOTOMY' if lobotomy_mode else 'FULL'}, {len(_cognition_ctx)} chars)")
+                    print(f"  [cognition] relational_context injected ({'LOBOTOMY' if lobotomy_mode else 'FULL'}, {len(_cognition_ctx)} chars, mood_score={_mood_score:+.3f})")
                 except Exception as _cc_err:
                     logger.debug("[cognition] relational_context failed: %s", _cc_err)
             _combined_ctx = "\n\n".join(filter(None, [_cognition_ctx, experience_summary]))

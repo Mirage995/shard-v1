@@ -1669,9 +1669,23 @@ Rules:
         core = getattr(ctx.agent, "cognition_core", None)
         if core is not None and not ctx.no_l3:
             try:
-                ctx.core_relational_ctx = core.relational_context(ctx.topic, research_mode=ctx.research_mode)
+                # Close mood-to-workspace loop: fetch live mood_score from registry so
+                # ValenceField can actually modulate bids. Without this, mood_score
+                # defaults to 0.0 and the affective layer is inert.
+                _mood_score = 0.0
+                try:
+                    _mood_mod = core._registry.get("mood_engine", {}).get("module")
+                    if _mood_mod is not None:
+                        _mood_score = float(_mood_mod.get_score())
+                except Exception:
+                    _mood_score = 0.0
+                ctx.core_relational_ctx = core.relational_context(
+                    ctx.topic,
+                    research_mode=ctx.research_mode,
+                    mood_score=_mood_score,
+                )
                 core_block = f"\n\n[COGNITION CORE -- INTERNAL STATE]\n{ctx.core_relational_ctx}\n"
-                print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt}")
+                print(f"[VETTORE 1+2] CognitionCore relational_context injected at attempt {ctx.attempt} (mood_score={_mood_score:+.3f})")
             except Exception as _cre:
                 print(f"[VETTORE 1+2] relational_context FAILED at attempt {ctx.attempt}: {_cre}")
                 import traceback; traceback.print_exc()

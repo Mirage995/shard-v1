@@ -126,16 +126,30 @@ class WorkspaceArbiter:
 
         # Step 1 — compute bids (ValenceField × topic_affinity)
         for p in self._proposals:
+            _vmod = ValenceField.mod(p.block_type, mood_score)
+            p._valence_mod = _vmod
             p.computed_bid = (
                 p.base_salience
-                * ValenceField.mod(p.block_type, mood_score)
+                * _vmod
                 * p.topic_affinity
             )
 
         # Phase 3: apply FeedbackField multipliers (history-aware)
         if self._feedback:
             for p in self._proposals:
+                _pre = p.computed_bid
                 p.computed_bid = self._feedback.apply(p.module_name, p.computed_bid)
+                p._feedback_mult = (p.computed_bid / _pre) if _pre else 1.0
+
+        # GWT_BID_TRACE: per-proposal breakdown so we can verify mood actually moves bids
+        try:
+            print(f"[GWT_BID_TRACE] mood_score={mood_score:+.3f}  threshold={self._ignition_threshold:.2f}")
+            for p in self._proposals:
+                _vmod = getattr(p, "_valence_mod", 1.0)
+                _fmult = getattr(p, "_feedback_mult", 1.0)
+                print(f"[GWT_BID_TRACE]   {p.module_name:<14} block={p.block_type:<18} base={p.base_salience:.2f} val={_vmod:.2f} fb={_fmult:.2f} aff={p.topic_affinity:.2f} -> bid={p.computed_bid:.3f}")
+        except Exception:
+            pass
 
         # Step 2+3 — filter and sort
         above = sorted(
