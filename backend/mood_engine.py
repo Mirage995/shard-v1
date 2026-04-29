@@ -23,8 +23,9 @@ from typing import Optional
 
 logger = logging.getLogger("shard.mood")
 
-_ROOT      = Path(__file__).parent.parent.resolve()
-_MOOD_FILE = _ROOT / "shard_memory" / "mood_state.json"
+_ROOT         = Path(__file__).parent.parent.resolve()
+_MOOD_FILE    = _ROOT / "shard_memory" / "mood_state.json"
+_MOOD_HISTORY = _ROOT / "shard_memory" / "mood_history.jsonl"
 
 # ── Tunables ──────────────────────────────────────────────────────────────────
 
@@ -92,6 +93,21 @@ class MoodEngine:
             "workspace_bias": round(workspace_bias, 4),
         }
         self._save()
+
+        # Append to mood_history.jsonl for distribution analysis (D1/D2 prep).
+        # Captures every compute(), not just label changes, so we keep the full
+        # internal dynamic between thresholds.
+        try:
+            _MOOD_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+            with _MOOD_HISTORY.open("a", encoding="utf-8") as _hf:
+                _hf.write(json.dumps({
+                    "timestamp":   self._state["updated_at"],
+                    "mood_score":  score,
+                    "label":       self._state["label"],
+                    "components":  self._state["components"],
+                }, ensure_ascii=False) + "\n")
+        except Exception as _hist_err:
+            logger.debug("[MOOD] history append non-fatal: %s", _hist_err)
 
         # Broadcast mood_shift if label changed -- other modules react
         new_label = self._state["label"]
