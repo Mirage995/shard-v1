@@ -49,6 +49,14 @@ shard_workspace/longitudinal_snapshot/
 # SHARD mood instrumentation history (local experimental data, not versioned)
 shard_memory/mood_history.jsonl
 
+# D2 frustration benchmark runtime artifacts (raw logs / per-run snapshots).
+# Scientific summaries live under docs/experiments/ instead.
+shard_workspace/d2_*.log
+shard_workspace/d2_*.json
+shard_workspace/d2_analysis_*.md
+shard_workspace/d2_baseline_snapshot/
+shard_workspace/d2_mood_history/
+
 # Misc root-level junk created by sandbox cwd bug
 /weight
 
