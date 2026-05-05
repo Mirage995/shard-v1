@@ -144,7 +144,7 @@ D2.1D assigns "tensions" non-zero bias.
 ARM_ON then shows non-zero next-cycle workspace_bias.
 ```
 
-This is a calibration result for internal signal propagation. It does not show that GWT improves SHARD performance.
+This is a calibration result for internal signal propagation. It does not support an outcome-level performance claim.
 
 ## Allowed Claim
 
