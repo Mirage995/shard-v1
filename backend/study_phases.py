@@ -975,6 +975,28 @@ class CertifyRetryGroup(BasePhase):
             except Exception as bench_phase_err:
                 print(f"[BENCHMARK] Non-fatal phase error -- skipping: {bench_phase_err}")
 
+            # ── D2.1B STRESS INJECTION (env-gated) ───────────────────
+            # When D2_STRESS_MODE=1 and D2_STRESS_PROFILE=controlled_validation_failure,
+            # cap the first-attempt score below SUCCESS_SCORE_THRESHOLD so the agent
+            # is forced into retry/recovery. This induces stress AT THE COGNITIVE
+            # LAYER without breaking the harness (no I/O failure, no fake exception).
+            # Default behavior (env unset) is unchanged.
+            import os as _d2_os
+            if (_d2_os.environ.get("D2_STRESS_MODE") == "1"
+                and _d2_os.environ.get("D2_STRESS_PROFILE") == "controlled_validation_failure"
+                and ctx.attempt == 1):
+                _cap = 5.0
+                _orig = ctx.score
+                if ctx.eval_data is None:
+                    ctx.eval_data = {}
+                ctx.eval_data["d2_stress_injected"] = True
+                ctx.eval_data["d2_stress_reason"]   = "D2_CONTROLLED_STRESS_INJECTION"
+                ctx.eval_data["d2_stress_orig_score"] = _orig
+                ctx.eval_data["score"] = _cap
+                ctx.score = _cap
+                print(f"[D2_STRESS] attempt=1 score capped {_orig} -> {_cap} "
+                      f"(profile=controlled_validation_failure)")
+
             # ── CERTIFY ──────────────────────────────────────────────
             ctx.certified = await ctx.agent.phase_certify(ctx.topic, ctx.eval_data)
 

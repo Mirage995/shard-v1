@@ -55,6 +55,7 @@ CACHE_DIR = _ROOT / "shard_workspace" / "d2_cached_sources"
 D2_TOPICS = [
     "sql injection prevention python",
     "asyncio advanced patterns",
+    "python OOP design patterns",
 ]
 
 
