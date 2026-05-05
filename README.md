@@ -67,7 +67,11 @@ GWT activation is alive under forced mood. `python backend/gwt_mood_microtest.py
 
 The D2.0 frustration benchmark is explicitly inconclusive. `docs/experiments/d2_0_frustration_benchmark.md` reports `INCONCLUSIVE_HARNESS`: both arms degraded together, external service instability exceeded contamination thresholds, mood never crossed -0.3, and workspace bias stayed at 0.0.
 
-D2.1A is now a harness-only PASS. `docs/experiments/d2_1a_harness_validation.md` documents cached MAP/AGGREGATE, subprocess isolation, paired replica, 4/4 subprocess exits at 0, zero DDGS/Brave/Playwright calls, and cache hash equality per topic. This unlocks D2.1B stress validation but is not itself a GWT outcome claim.
+D2.1A is a harness-only PASS. `docs/experiments/d2_1a_harness_validation.md` documents cached MAP/AGGREGATE, subprocess isolation, paired replica, 4/4 subprocess exits at 0, zero DDGS/Brave/Playwright calls, and cache hash equality per topic. This validated the harness but is not itself a GWT outcome claim.
+
+D2.1B failed its pre-registered single-topic stress prediction: `workspace_bias` stayed at zero everywhere. The useful finding was protocol-level: a single-cycle benchmark cannot observe a next-cycle coupling if winners are drained only after the topic ends.
+
+D2.1C is now classified as `INCONCLUSIVE_MECHANISM_DISCONNECTED`. The sequential protocol produced an inverted pattern: ARM_OFF showed `workspace_bias=-0.15`, while ARM_ON stayed at zero. Log/code inspection shows ARM_OFF was synthetic ignition-failure fallback bias, while ARM_ON reached the GWT path but the stress-dominant `tensions` winner maps to zero in `MoodWorkspaceCoupling`. See `docs/experiments/d2_1c_sequential_validation.md`.
 
 Mood histogram work is active instrumentation, not proof. The current repo has persistent `mood_history.jsonl`; D2.0 showed the natural/easy regime often undersolicits mood coupling, while forced-mood microtests show the valence path can work when stress is present.
 
@@ -145,7 +149,7 @@ python backend/d2_1a_benchmark.py
 python backend/d2_1a_analyze.py
 ```
 
-D2.1B stress validation code exists in `backend/d2_1b_benchmark.py` and `backend/d2_1b_analyze.py`; it should be interpreted separately from D2.1A.
+D2.1B/D2.1C stress validation code exists in `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, and `backend/d2_1c_analyze.py`. D2.1C documents a mechanism-disconnected finding; it does not include the proposed D2.1D calibration patch.
 
 ## Stack
 
@@ -158,9 +162,10 @@ D2.1B stress validation code exists in `backend/d2_1b_benchmark.py` and `backend
 
 ## Open Questions
 
-- Does GWT activation improve outcomes under controlled stress once D2.1B runs with validated harness isolation?
+- Does D2.1D confirm that assigning non-zero bias to the stress-dominant `tensions` winner makes ARM_ON next-cycle `workspace_bias` observable?
+- After provenance is tracked, does GWT activation improve outcomes under controlled stress, rather than only changing internal mood signals?
 - What policy should translate workspace winner shifts into concrete action changes, instead of only prompt context changes?
-- How often does natural operation enter the stress regime where `MoodWorkspaceCoupling` matters?
+- How often does natural operation enter the stress regime where `MoodWorkspaceCoupling` matters, and how often is the observed bias synthetic fallback rather than real workspace-winner bias?
 - Are CONFIRMED/REFUTED rows in `research_hypotheses` reliable enough to support external scientific claims, or only internal prompt guidance?
 - Should the Experiment Engine's REFUTED-to-GraphRAG relation use a valid current relation type? The DB has 2 legacy `does_not_improve` rows while the current `GraphRAG` valid set does not include that relation.
 - Which GraphRAG relations are stale or disputed enough to hurt future prompts?
@@ -171,6 +176,8 @@ D2.1B stress validation code exists in `backend/d2_1b_benchmark.py` and `backend
 
 - `docs/experiments/d2_0_frustration_benchmark.md`: D2.0 inconclusive harness analysis.
 - `docs/experiments/d2_1a_harness_validation.md`: D2.1A harness validation PASS.
+- `docs/experiments/d2_1b_stress_validation.md`: D2.1B single-cycle stress validation FAIL with next-cycle observability diagnosis.
+- `docs/experiments/d2_1c_sequential_validation.md`: D2.1C sequential validation, `INCONCLUSIVE_MECHANISM_DISCONNECTED`.
 - `shard_gwt_ultrareview.md`: local GWT review notes.
 - `shard_theoretical_mapping.md`: theoretical mapping notes.
 - `README_LABS.md`: SHARD Labs material, intentionally not removed or rewritten here.

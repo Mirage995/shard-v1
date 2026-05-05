@@ -59,11 +59,11 @@ Phase 2 is per-topic context arbitration in `backend/context_arbiter.py`. It reu
 
 Phase 3 is bid modulation in `backend/cognition/feedback_field.py`. Winners decay, losers receive recovery boost, multipliers are capped, and optional persistence writes to `feedback_field_state`. The table exists in SQLite but currently has 0 rows, so persistent feedback should be described as available code, not active inspected state.
 
-Phase 4 is mood-to-workspace coupling in `backend/cognition/mood_workspace_coupling.py` plus `backend/night_runner.py`. `NightRunner` initializes the coupling path, computes mood with `workspace_bias`, drains session winners, and calls `on_workspace_result(...)` for each winner. D2.0 showed this can be undersolicited in easy natural runs; the forced-mood microtest isolates the mechanism and shows winner shifts when mood is forced.
+Phase 4 is mood-to-workspace coupling in `backend/cognition/mood_workspace_coupling.py` plus `backend/night_runner.py`. `NightRunner` initializes the coupling path, computes mood with `workspace_bias`, drains session winners, and calls `on_workspace_result(...)` for each winner. D2.0 showed this can be undersolicited in easy natural runs; the forced-mood microtest isolates the mechanism and shows winner shifts when mood is forced. D2.1C adds a sharper caveat: `workspace_bias` needs provenance, because non-zero bias can come from synthetic ignition-failure fallback, while real winners can be silent if their configured coupling delta is zero.
 
 Layer E is the empirical block used only in research mode. `CognitionCore.relational_context(topic, research_mode=True, mood_score=...)` calls `query_empirical(topic)`, reads `research_hypotheses`, includes up to 3 relevant non-pending rows, and excludes `PENDING` and `INCONCLUSIVE` rows from prompt evidence. This block enters retry/synthesis context as knowledge, not as a proof claim.
 
-Two baselines are explicitly supported in code. `--no-l3` disables L3 relational context for A/B comparison, and `GWT_OFF` in `backend/night_runner.py` preserves a sequential-injection baseline. Commit `343687e` matters here: attempt-0 synthesize-time cognitive injection was reverted because it poisoned the prompt; the current strongest path is retry/stress context rather than unconditional injection.
+Two baselines are explicitly supported in code. `--no-l3` disables L3 relational context for A/B comparison, and `GWT_OFF` in `backend/night_runner.py` preserves a sequential-injection baseline. Commit `343687e` matters here: attempt-0 synthesize-time cognitive injection was reverted because it poisoned the prompt; the current strongest path is retry/stress context rather than unconditional injection. D2.1D should test the `tensions` calibration hypothesis separately; D2.1C intentionally does not change `_WINNER_BIAS`.
 
 ## Module Reference
 
@@ -111,7 +111,7 @@ Two baselines are explicitly supported in code. `--no-l3` disables L3 relational
 
 `NightRunner` (`backend/night_runner.py`) is the main session loop: topic selection, forced topic mode, cognitive registration, mood computation, context arbitration, study execution, activation logging, and D2 subprocess entry. Status: `experimental`: it is the integration path, but full end-to-end behavior is too broad to claim from unit tests alone.
 
-`D2 harness` (`backend/d2_1a_cache_sources.py`, `backend/d2_1a_benchmark.py`, `backend/d2_1a_analyze.py`, `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`) isolates sources, subprocesses, paired replicas, manifests, and analysis for frustration/GWT experiments. Status: `verified` for D2.1A harness validation by `docs/experiments/d2_1a_harness_validation.md`; D2.1B stress validation remains WIP until a documented verdict exists.
+`D2 harness` (`backend/d2_1a_cache_sources.py`, `backend/d2_1a_benchmark.py`, `backend/d2_1a_analyze.py`, `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, `backend/d2_1c_analyze.py`) isolates sources, subprocesses, paired replicas, manifests, sequential topics, and analysis for frustration/GWT experiments. Status: `verified` for D2.1A harness validation by `docs/experiments/d2_1a_harness_validation.md`; `experimental` for D2.1B/D2.1C GWT stress interpretation. D2.1C is documented as `INCONCLUSIVE_MECHANISM_DISCONNECTED`, not as a performance result.
 
 `DockerSandboxRunner` (`backend/sandbox_runner.py`) runs generated study code inside a `shard-sandbox:latest` Docker image with non-root execution, memory/PID limits, network disabled, path validation, timeouts, and cleanup handling. Status: `verified` by tests in design, but current full-suite execution errors around temp permissions prevent using the full sandbox test file as a clean green signal in this run.
 
@@ -144,7 +144,7 @@ Two baselines are explicitly supported in code. `--no-l3` disables L3 relational
 
 ### GWT Loop
 
-The GWT path is currently strongest in retry/stress contexts. Proposals enter `WorkspaceArbiter`, `ValenceField` modulates bids using `mood_score`, `FeedbackField` applies winner/loser history, winners are broadcast globally, and `MoodWorkspaceCoupling` can turn winner history into a mood bias. D2.0 showed that easy/natural runs can leave this path undersolicited; the forced-mood microtest shows the valence lever itself is alive.
+The GWT path is currently strongest in retry/stress contexts. Proposals enter `WorkspaceArbiter`, `ValenceField` modulates bids using `mood_score`, `FeedbackField` applies winner/loser history, winners are broadcast globally, and `MoodWorkspaceCoupling` can turn winner history into a mood bias. D2.0 showed that easy/natural runs can leave this path undersolicited; the forced-mood microtest shows the valence lever itself is alive. D2.1C showed that the stress-dominant winner can be `tensions`, which is semantically plausible but currently numerically silent because `_WINNER_BIAS["tensions"] == (0.00, 0.00)`.
 
 ### Scientific Research Loop
 
@@ -228,9 +228,13 @@ Known gaps remain. `backend/server.py` has event-level auth checks but can auto-
 
 SHARD uses A/B and paired-replica thinking rather than one-off demos. The D2.0 result is explicitly `INCONCLUSIVE_HARNESS`, not a hidden negative or positive result: both arms degraded together, external-service anomalies were above threshold, mood never crossed -0.3, and `workspace_bias` stayed at 0.0.
 
-D2.1A fixed the harness first: cached/fixed sources, subprocess isolation per arm, identical config replicas, manifest-per-run, mood sample archiving, and strict contamination rules. The documented outcome is harness-only PASS on 2026-05-05. It does not claim GWT improves performance; it only says D2.1B is unblocked.
+D2.1A fixed the harness first: cached/fixed sources, subprocess isolation per arm, identical config replicas, manifest-per-run, mood sample archiving, and strict contamination rules. The documented outcome is harness-only PASS on 2026-05-05. It is not an outcome-level performance claim.
 
-Forced-mood microtesting is used to isolate mechanism from outcome. `backend/gwt_mood_microtest.py` bypasses the full pipeline and checks whether mood values change bids/winners. It currently returns ESITO A, which means the GWT lever is alive under forced conditions. Outcome causality still requires D2.1B or an equivalent stress protocol.
+D2.1B failed the pre-registered single-topic stress prediction, but it exposed an observability issue: winner bias is drained after a topic, so a single-cycle protocol cannot reliably observe next-cycle coupling.
+
+D2.1C used a sequential two-topic protocol and is classified as `INCONCLUSIVE_MECHANISM_DISCONNECTED`. ARM_OFF produced non-zero synthetic ignition-failure fallback bias, while ARM_ON reached real workspace competition but the dominant stress winner `tensions` had zero configured MoodWorkspaceCoupling bias. The next valid step is D2.1D: pre-register a calibration patch and rerun the same protocol.
+
+Forced-mood microtesting is used to isolate mechanism from outcome. `backend/gwt_mood_microtest.py` bypasses the full pipeline and checks whether mood values change bids/winners. It currently returns ESITO A, which means the GWT lever is alive under forced conditions. Outcome causality still requires a later stress protocol with bias provenance and behavior-level metrics.
 
 Scientific research mode uses the same falsification posture. CONFIRMED and REFUTED rows in `research_hypotheses` are internal experimental records gated by novelty, feasibility, spec validation, sandbox replication, and review. They should not be promoted to external scientific claims unless the experiment artifact, source assumptions, and result interpretation have been reviewed independently.
 
