@@ -73,6 +73,8 @@ D2.1B failed its pre-registered single-topic stress prediction: `workspace_bias`
 
 D2.1C is now classified as `INCONCLUSIVE_MECHANISM_DISCONNECTED`. The sequential protocol produced an inverted pattern: ARM_OFF showed `workspace_bias=-0.15`, while ARM_ON stayed at zero. Log/code inspection shows ARM_OFF was synthetic ignition-failure fallback bias, while ARM_ON reached the GWT path but the stress-dominant `tensions` winner maps to zero in `MoodWorkspaceCoupling`. See `docs/experiments/d2_1c_sequential_validation.md`.
 
+D2.1D tests the single pre-registered calibration hypothesis from D2.1C: `_WINNER_BIAS["tensions"] = (-0.05, +0.15)`. It returned `PASS_STRONG`: ARM_ON showed non-zero cycle-2 `workspace_bias=-0.095` with `tensions` bid traces, while ARM_OFF `workspace_bias=-0.15` was classified as synthetic fallback artifact and excluded from the GWT signal. This is an internal signal-propagation result, not an outcome-level performance claim.
+
 Mood histogram work is active instrumentation, not proof. The current repo has persistent `mood_history.jsonl`; D2.0 showed the natural/easy regime often undersolicits mood coupling, while forced-mood microtests show the valence path can work when stress is present.
 
 ### GWT And Scientific Research Mode
@@ -149,7 +151,7 @@ python backend/d2_1a_benchmark.py
 python backend/d2_1a_analyze.py
 ```
 
-D2.1B/D2.1C stress validation code exists in `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, and `backend/d2_1c_analyze.py`. D2.1C documents a mechanism-disconnected finding; it does not include the proposed D2.1D calibration patch.
+D2.1B/D2.1C/D2.1D stress validation code exists in `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, `backend/d2_1c_analyze.py`, `backend/d2_1d_benchmark.py`, and `backend/d2_1d_analyze.py`. D2.1D includes the pre-registered `tensions` calibration patch and remains limited to next-cycle signal propagation.
 
 ## Stack
 
@@ -162,8 +164,8 @@ D2.1B/D2.1C stress validation code exists in `backend/d2_1b_benchmark.py`, `back
 
 ## Open Questions
 
-- Does D2.1D confirm that assigning non-zero bias to the stress-dominant `tensions` winner makes ARM_ON next-cycle `workspace_bias` observable?
-- After provenance is tracked, does GWT activation improve outcomes under controlled stress, rather than only changing internal mood signals?
+- Does the D2.1D internal signal propagation survive repeated runs and structured provenance logging?
+- After provenance is tracked, do GWT-induced internal mood signals correlate with better recovery/certification behavior under controlled stress?
 - What policy should translate workspace winner shifts into concrete action changes, instead of only prompt context changes?
 - How often does natural operation enter the stress regime where `MoodWorkspaceCoupling` matters, and how often is the observed bias synthetic fallback rather than real workspace-winner bias?
 - Are CONFIRMED/REFUTED rows in `research_hypotheses` reliable enough to support external scientific claims, or only internal prompt guidance?
@@ -178,6 +180,7 @@ D2.1B/D2.1C stress validation code exists in `backend/d2_1b_benchmark.py`, `back
 - `docs/experiments/d2_1a_harness_validation.md`: D2.1A harness validation PASS.
 - `docs/experiments/d2_1b_stress_validation.md`: D2.1B single-cycle stress validation FAIL with next-cycle observability diagnosis.
 - `docs/experiments/d2_1c_sequential_validation.md`: D2.1C sequential validation, `INCONCLUSIVE_MECHANISM_DISCONNECTED`.
+- `docs/experiments/d2_1d_tensions_bias_calibration.md`: D2.1D pre-registered `tensions` calibration, `PASS_STRONG` for signal propagation.
 - `shard_gwt_ultrareview.md`: local GWT review notes.
 - `shard_theoretical_mapping.md`: theoretical mapping notes.
 - `README_LABS.md`: SHARD Labs material, intentionally not removed or rewritten here.

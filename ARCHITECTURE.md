@@ -63,7 +63,7 @@ Phase 4 is mood-to-workspace coupling in `backend/cognition/mood_workspace_coupl
 
 Layer E is the empirical block used only in research mode. `CognitionCore.relational_context(topic, research_mode=True, mood_score=...)` calls `query_empirical(topic)`, reads `research_hypotheses`, includes up to 3 relevant non-pending rows, and excludes `PENDING` and `INCONCLUSIVE` rows from prompt evidence. This block enters retry/synthesis context as knowledge, not as a proof claim.
 
-Two baselines are explicitly supported in code. `--no-l3` disables L3 relational context for A/B comparison, and `GWT_OFF` in `backend/night_runner.py` preserves a sequential-injection baseline. Commit `343687e` matters here: attempt-0 synthesize-time cognitive injection was reverted because it poisoned the prompt; the current strongest path is retry/stress context rather than unconditional injection. D2.1D should test the `tensions` calibration hypothesis separately; D2.1C intentionally does not change `_WINNER_BIAS`.
+Two baselines are explicitly supported in code. `--no-l3` disables L3 relational context for A/B comparison, and `GWT_OFF` in `backend/night_runner.py` preserves a sequential-injection baseline. Commit `343687e` matters here: attempt-0 synthesize-time cognitive injection was reverted because it poisoned the prompt; the current strongest path is retry/stress context rather than unconditional injection. D2.1D tests the `tensions` calibration hypothesis separately from D2.1C.
 
 ## Module Reference
 
@@ -111,7 +111,7 @@ Two baselines are explicitly supported in code. `--no-l3` disables L3 relational
 
 `NightRunner` (`backend/night_runner.py`) is the main session loop: topic selection, forced topic mode, cognitive registration, mood computation, context arbitration, study execution, activation logging, and D2 subprocess entry. Status: `experimental`: it is the integration path, but full end-to-end behavior is too broad to claim from unit tests alone.
 
-`D2 harness` (`backend/d2_1a_cache_sources.py`, `backend/d2_1a_benchmark.py`, `backend/d2_1a_analyze.py`, `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, `backend/d2_1c_analyze.py`) isolates sources, subprocesses, paired replicas, manifests, sequential topics, and analysis for frustration/GWT experiments. Status: `verified` for D2.1A harness validation by `docs/experiments/d2_1a_harness_validation.md`; `experimental` for D2.1B/D2.1C GWT stress interpretation. D2.1C is documented as `INCONCLUSIVE_MECHANISM_DISCONNECTED`, not as a performance result.
+`D2 harness` (`backend/d2_1a_cache_sources.py`, `backend/d2_1a_benchmark.py`, `backend/d2_1a_analyze.py`, `backend/d2_1b_benchmark.py`, `backend/d2_1b_analyze.py`, `backend/d2_1c_benchmark.py`, `backend/d2_1c_analyze.py`, `backend/d2_1d_benchmark.py`, `backend/d2_1d_analyze.py`) isolates sources, subprocesses, paired replicas, manifests, sequential topics, and analysis for frustration/GWT experiments. Status: `verified` for D2.1A harness validation by `docs/experiments/d2_1a_harness_validation.md`; `experimental` for GWT stress interpretation. D2.1C is documented as `INCONCLUSIVE_MECHANISM_DISCONNECTED`; D2.1D is documented as `PASS_STRONG` for calibrated next-cycle signal propagation, not as a performance result.
 
 `DockerSandboxRunner` (`backend/sandbox_runner.py`) runs generated study code inside a `shard-sandbox:latest` Docker image with non-root execution, memory/PID limits, network disabled, path validation, timeouts, and cleanup handling. Status: `verified` by tests in design, but current full-suite execution errors around temp permissions prevent using the full sandbox test file as a clean green signal in this run.
 
@@ -144,7 +144,7 @@ Two baselines are explicitly supported in code. `--no-l3` disables L3 relational
 
 ### GWT Loop
 
-The GWT path is currently strongest in retry/stress contexts. Proposals enter `WorkspaceArbiter`, `ValenceField` modulates bids using `mood_score`, `FeedbackField` applies winner/loser history, winners are broadcast globally, and `MoodWorkspaceCoupling` can turn winner history into a mood bias. D2.0 showed that easy/natural runs can leave this path undersolicited; the forced-mood microtest shows the valence lever itself is alive. D2.1C showed that the stress-dominant winner can be `tensions`, which is semantically plausible but currently numerically silent because `_WINNER_BIAS["tensions"] == (0.00, 0.00)`.
+The GWT path is currently strongest in retry/stress contexts. Proposals enter `WorkspaceArbiter`, `ValenceField` modulates bids using `mood_score`, `FeedbackField` applies winner/loser history, winners are broadcast globally, and `MoodWorkspaceCoupling` can turn winner history into a mood bias. D2.0 showed that easy/natural runs can leave this path undersolicited; the forced-mood microtest shows the valence lever itself is alive. D2.1C showed that the stress-dominant winner can be `tensions`, which was semantically plausible but numerically silent. D2.1D assigns `tensions` a non-zero experimental coupling bias and observes ARM_ON next-cycle `workspace_bias=-0.095`.
 
 ### Scientific Research Loop
 
@@ -232,7 +232,9 @@ D2.1A fixed the harness first: cached/fixed sources, subprocess isolation per ar
 
 D2.1B failed the pre-registered single-topic stress prediction, but it exposed an observability issue: winner bias is drained after a topic, so a single-cycle protocol cannot reliably observe next-cycle coupling.
 
-D2.1C used a sequential two-topic protocol and is classified as `INCONCLUSIVE_MECHANISM_DISCONNECTED`. ARM_OFF produced non-zero synthetic ignition-failure fallback bias, while ARM_ON reached real workspace competition but the dominant stress winner `tensions` had zero configured MoodWorkspaceCoupling bias. The next valid step is D2.1D: pre-register a calibration patch and rerun the same protocol.
+D2.1C used a sequential two-topic protocol and is classified as `INCONCLUSIVE_MECHANISM_DISCONNECTED`. ARM_OFF produced non-zero synthetic ignition-failure fallback bias, while ARM_ON reached real workspace competition but the dominant stress winner `tensions` had zero configured MoodWorkspaceCoupling bias.
+
+D2.1D applies the pre-registered `tensions` calibration patch and reruns the same protocol. The verdict is `PASS_STRONG`: ARM_ON shows non-zero cycle-2 `workspace_bias=-0.095` with `tensions` bid traces, while ARM_OFF fallback bias is classified separately and excluded from the GWT signal. This confirms signal propagation after calibration; it does not claim behavior-level improvement.
 
 Forced-mood microtesting is used to isolate mechanism from outcome. `backend/gwt_mood_microtest.py` bypasses the full pipeline and checks whether mood values change bids/winners. It currently returns ESITO A, which means the GWT lever is alive under forced conditions. Outcome causality still requires a later stress protocol with bias provenance and behavior-level metrics.
 

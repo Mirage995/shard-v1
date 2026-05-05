@@ -21,7 +21,7 @@ _WINNER_BIAS: Dict[str, Tuple[float, float]] = {
     "real_identity": (+0.05, -0.10),  # same semantic as identity
     "goal":          (+0.05, +0.15),  # "I have purpose" → motivated
     "desire":        (+0.03, +0.10),  # desire activated → mild uplift
-    "tensions":      ( 0.00,  0.00),  # "Following directives" → neutral
+    "tensions":      (-0.05, +0.15),  # D2.1D hypothesis: stress directive -> frustration/urgency
     "knowledge":     (+0.08, +0.05),  # knowledge surfaced → mildly confident
     "strategy":      (+0.08, +0.05),  # strategy recalled → mildly confident
     "world":         ( 0.00, -0.05),  # world model grounding → calming
