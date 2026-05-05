@@ -110,6 +110,32 @@ from constants import (
 os.makedirs(SANDBOX_DIR, exist_ok=True)
 
 
+# ── D2.1A: cached-sources hook (env-gated, default disabled) ──────────────────
+# Set D2_CACHED_SOURCES_PATH=/abs/path/to/cache.json to bypass live MAP/AGGREGATE.
+# Schema: {topic, sources, all_text, hash} -- see backend/d2_1a_cache_sources.py
+def _d2_load_cache() -> Optional[Dict]:
+    """Return parsed cache dict or None if env var not set / file missing."""
+    path = os.environ.get("D2_CACHED_SOURCES_PATH")
+    if not path:
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as exc:
+        print(f"[D2_CACHE] Failed to read {path}: {exc}")
+        return None
+
+
+def _d2_cached_sources(cache: Dict) -> List[Dict]:
+    """Return phase_map-shaped list[dict] from cache."""
+    return list(cache.get("sources", []))
+
+
+def _d2_cached_all_text(cache: Dict) -> str:
+    """Return phase_aggregate-shaped str from cache."""
+    return str(cache.get("all_text", ""))
+
+
 class StudyAgent:
     def __init__(self, goal_engine: GoalEngine = None):
         # LLM calls go through llm_router (Gemini -> Groq -> Claude fallback chain)
@@ -370,6 +396,17 @@ class StudyAgent:
 
     async def phase_map(self, topic: str, tier: int) -> List[Dict]:
         """Search sources with multiple targeted queries for better relevance."""
+        # D2.1A: cached-source bypass (env-gated). When D2_CACHED_SOURCES_PATH
+        # is set, phase_map returns the frozen sources list with ZERO network
+        # calls. Default behavior unchanged when env var is unset.
+        _d2_cache = _d2_load_cache()
+        if _d2_cache is not None:
+            _cached = _d2_cached_sources(_d2_cache)
+            print(f"[D2_CACHE_HIT_MAP] topic={topic!r}  sources={len(_cached)}  "
+                  f"hash={_d2_cache.get('hash', '?')[:23]}...")
+            self.progress.set_phase("MAP", 0.0)
+            self.progress.complete_phase("MAP")
+            return _cached
         print(f"[MAP] Searching sources for: {topic} (Tier {tier})")
         self.progress.set_phase("MAP", 0.0)
         sources = []
@@ -1964,6 +2001,17 @@ Return ONLY valid JSON:
 
         Delegates to StudyBrowserScraper -- browser is always closed via finally.
         """
+        # D2.1A: cached-aggregate bypass (env-gated). When D2_CACHED_SOURCES_PATH
+        # is set, phase_aggregate returns the frozen all_text string with ZERO
+        # Playwright/browser calls. Default behavior unchanged when env var is unset.
+        _d2_cache = _d2_load_cache()
+        if _d2_cache is not None:
+            _cached_text = _d2_cached_all_text(_d2_cache)
+            print(f"[D2_CACHE_HIT_AGGREGATE] chars={len(_cached_text)}  "
+                  f"hash={_d2_cache.get('hash', '?')[:23]}...")
+            self.progress.set_phase("AGGREGATE", 0.0)
+            self.progress.complete_phase("AGGREGATE")
+            return _cached_text
         max_sources = min(len(sources), 6)
         self.progress.set_phase("AGGREGATE", 0.0)
         all_text = await self.browser_scraper.scrape_sources(

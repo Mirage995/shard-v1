@@ -57,6 +57,13 @@ shard_workspace/d2_analysis_*.md
 shard_workspace/d2_baseline_snapshot/
 shard_workspace/d2_mood_history/
 
+# D2.1A / D2.1B harness validation runtime artifacts.
+shard_workspace/d2_1a_runs/
+shard_workspace/d2_1a_orchestrator.log
+shard_workspace/d2_cached_sources/
+shard_workspace/d2_1b_runs/
+shard_workspace/d2_1b_orchestrator.log
+
 # Misc root-level junk created by sandbox cwd bug
 /weight
 
