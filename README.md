@@ -1,294 +1,206 @@
+# SHARD
 
-![Gemini_Generated_Image_mh1xkomh1xkomh1x](https://github.com/user-attachments/assets/6083bb92-c373-4526-baea-788996095d9d)
+SHARD is a research prototype for cognitive infrastructure in AI agents: memory, skill reuse, benchmark repair loops, and a Global Workspace-style cognitive layer around ordinary LLM calls.
 
-# SHARD LABS
+It is not a production AI breakthrough claim. The project is maintained as an empirical system: claims are kept only when they can be tied to code, tests, database state, experiment reports, or commits.
 
-**The AI researcher that knows what it doesn't know — and gets measurably better every night.**
+## Status & Methodology
 
-SHARD is an autonomous AI agent with a persistent internal life: memory, self-awareness, and closed feedback loops that compound into real capability growth over time. It doesn't just call an LLM. It wraps LLMs with 14 interacting modules so that behavior — curiosity, avoidance, cognitive effort, calibrated confidence — *emerges* from architecture, not from hand-coded rules.
+SHARD is currently best described as a working research prototype with empirical methodology. The repository contains runtime systems for study, memory, benchmark repair, and cognitive arbitration, plus a documented falsification trail where earlier claims were revised after new evidence.
 
-> **Origin:** Built on a $300 GEEKOM A5 mini-PC, between shifts at a family pizza shop in Verona, Italy. No GPU. No team. No VC runway. Pure architectural ingenuity.
+Recent corrections that shape the current interpretation:
 
----
+- `343687e` reverted synthesize-time cognitive injection because relational context was poisoning the prompt at attempt 0.
+- `9e85370` fixed the mood loop by passing `mood_score` into `WorkspaceArbiter`; before that, `ValenceField` was effectively inert in natural runs.
+- `14b434f` aligned `real_identity` block typing so identity modulation actually reached `ValenceField`.
+- `4dbb9d8` added persistent `shard_memory/mood_history.jsonl` instrumentation and histogram analysis.
+- `58735ca` moved D2 frustration evidence out of runtime workspace into `docs/experiments/`.
+- `4c37d65` documents D2.1A harness validation as PASS: cached sources, subprocess isolation, paired replica, no live search leakage.
 
-## Why This Matters
+The older claims `+16.6pp cert rate`, `+1.6 lobotomy proof`, and `14/14 benchmark 100% pass rate` are not treated here as general system claims. They were run-specific or condition-specific and are not currently used as README headline evidence.
 
-Stateless LLM calls are commodities. The real problem isn't generating text — it's *knowing what you got wrong last time, understanding why, and not repeating it.*
+## What Works (Verified)
 
-SHARD is an attempt to solve that. The results speak for themselves.
+These claims were checked in this workspace on 2026-05-05.
 
----
+| Area | Current evidence | Status |
+|---|---:|---|
+| Pytest collection | `python -m pytest --collect-only -q` collected 881 tests | verified collection |
+| Full pytest run | `python -m pytest -q` produced 809 passed, 8 skipped, 12 failed, 52 errors | contaminated by temp permission errors in this sandbox |
+| Cognitive/GWT subset | 197 passed across cognition, workspace, GraphRAG, strategy, swarm, GWT A/B, context arbiter tests | verified subset |
+| SWE/security subset | 121 passed across SWE security, SWE agent, workspace safety, authenticator tests | verified subset |
+| Runtime/utility subset | 128 passed across runner, cleaner, patch simulator, cache, memory gate, replay, curriculum tests | verified subset |
+| SQLite persistence | 26 application tables plus internal `sqlite_sequence` in `shard_memory/shard.db` | verified by Python `sqlite3` query |
+| Skill library | 243 certified skill rows, 176 saved implementations | verified by SQLite query |
+| GraphRAG | 3,161 knowledge graph relations; 1,456 verified, 282 disputed, 1,398 untested | verified by SQLite query |
+| Capability graph | 1,054 capabilities in SQLite and `shard_memory/capability_graph.json`; 803 dependency rows | verified by SQLite/JSON query |
+| Research hypotheses | 80 rows in `research_hypotheses`: 5 CONFIRMED, 22 REFUTED, 8 INCONCLUSIVE, 33 SKIPPED_TOO_COMPLEX, 1 KAGGLE_READY, 1 PENDING; 31 rows have generated code and 36 have stored results | verified by SQLite query |
+| ChromaDB memory | `chromadb`: 3 collections (`episodes` 1,398, `knowledge` 250, `errors` 148); `strategy_db`: 1 collection (`strategy_memory` 1,201) | verified by Chroma `PersistentClient` |
+| Mood instrumentation | `shard_memory/mood_history.jsonl` exists and currently has 3 samples | verified by line count |
 
-## Benchmark Results
+Important caveat: the full pytest result is not a clean regression verdict because the failing run is dominated by temp directory permission failures in this execution environment. The module-specific green subsets are the evidence used for the verified status labels below.
 
-| Task | Naked LLM | SHARD | Delta |
-|------|-----------|-------|-------|
-| html_trap | 38.9% | 100.0% | **+61.1pp** |
-| ghost_bug | 93.8% | 100.0% | **+6.2pp** |
-| template_parser | 20.0% | 100.0% | **+80.0pp** |
-| dirty_data | 100.0% | 100.0% | +0.0pp |
-| race_condition | 100.0% | 100.0% | +0.0pp |
-| state_mutation | 100.0% | 100.0% | +0.0pp |
-| ttl_cache | 100.0% | 100.0% | +0.0pp |
-| metrics_bleed | 100.0% | 100.0% | +0.0pp |
-| multi_file_labyrinth | 100.0% | 100.0% | +0.0pp |
-| ghost_mutation | 100.0% | 100.0% | +0.0pp |
-| stream_decoder | 100.0% | 100.0% | +0.0pp |
-| note_tag | 100.0% | 100.0% | +0.0pp |
-| **Tasks solved** | **9/14** | **14/14** | **+5** |
-| **Avg pass rate** | **87.7%** | **100.0%** | **+12.3pp** |
+## Core Modules That Exist And Run
 
-*Naked mode: Gemini Flash, 1 call, no memory, no swarm.*
-*SHARD mode: full pipeline — episodic memory + multi-agent swarm + knowledge bridge + up to 5 repair attempts.*
+- `backend/semantic_memory.py`: ChromaDB-backed long-term memory for episodes, knowledge, and recurring errors.
+- `backend/strategy_memory.py`: Chroma-backed strategy retrieval and persistence, with async-safe writes and benchmark-diff extraction.
+- `backend/graph_rag.py`: SQLite-backed causal relation extraction/query layer over `knowledge_graph`.
+- `backend/capability_graph.py`: acquired capability ledger with SQLite persistence and JSON backup.
+- `backend/skill_library.py`: SQLite library of certified skills and saved implementations.
+- `backend/benchmark_loop.py`: closed repair loop for benchmark tasks, with pytest/jest/g++ style runners and optional swarm repair.
+- `backend/swarm_engine.py`: Architect -> Coder -> Reviewer pipeline used by benchmark repair.
+- `backend/experiment_inventor.py` and `backend/experiment_replay.py`: experiment generation and replay backlog.
+- `backend/experiment_phases.py` and `backend/experiment_store.py`: research-mode Experiment Engine phases and hypothesis persistence.
+- `backend/mood_engine.py`: mood score computed from frustration, recent cert rate, momentum, and workspace bias.
+- `backend/identity_core.py`: persistent identity facts derived from SQLite, not persona prompt text.
+- `backend/cognition/cognition_core.py`: Global Workspace-style aggregator, event bus, relational context, and emergence audit.
+- `backend/cognition/workspace_arbiter.py`: `WorkspaceArbiter` and `ValenceField` for mood-modulated context competition.
+- `backend/cognition/feedback_field.py`: reentrant bid modulation with optional SQLite persistence.
+- `backend/cognition/mood_workspace_coupling.py`: winner-to-mood feedback path.
+- `backend/context_arbiter.py`: per-topic context selection using the same valence semantics as the workspace arbiter.
 
-**Lobotomy A/B proof (2026-03-25):** Same topic. Same infra. Same night.
-- WITHOUT CognitionCore → score **7.0/10**, not certified
-- WITH CognitionCore → score **8.6/10**, certified
+See `ARCHITECTURE.md` for module status labels and data flows.
 
-The self-awareness layer is not decorative. +1.6 points, causal proof.
+## What Is Being Tested
 
----
+GWT activation is alive under forced mood. `python backend/gwt_mood_microtest.py` returns ESITO A: forced negative mood suppresses identity/real_identity below ignition while boosting experience, desire, and behavior directives. This proves the lever moves bids and winners; it does not prove better agent outcomes.
 
-## What SHARD Does
+The D2.0 frustration benchmark is explicitly inconclusive. `docs/experiments/d2_0_frustration_benchmark.md` reports `INCONCLUSIVE_HARNESS`: both arms degraded together, external service instability exceeded contamination thresholds, mood never crossed -0.3, and workspace bias stayed at 0.0.
 
-### 1. Fixes Code — Better Than a Naked LLM
+D2.1A is now a harness-only PASS. `docs/experiments/d2_1a_harness_validation.md` documents cached MAP/AGGREGATE, subprocess isolation, paired replica, 4/4 subprocess exits at 0, zero DDGS/Brave/Playwright calls, and cache hash equality per topic. This unlocks D2.1B stress validation but is not itself a GWT outcome claim.
 
-Multi-round repair pipeline on any coding task:
-- Round 1: LLM solo, no test file
-- Round 2+: Swarm mode — Architect → Coder → parallel specialized reviewers (Concurrency, Security, EdgeCases, Performance, DataIntegrity)
-- **GraphRAG** injects causal warnings from previous failures into every Architect prompt
-- **Focus Mode** kicks in when the same test stays stuck — silences noisy reviewers, forces Architect → Coder direct
-- **Early stopping + rollback** — detects swarm regressions and restores the best known state
+Mood histogram work is active instrumentation, not proof. The current repo has persistent `mood_history.jsonl`; D2.0 showed the natural/easy regime often undersolicits mood coupling, while forced-mood microtests show the valence path can work when stress is present.
 
-```bash
-# Try it on your own buggy code
-python shard_challenge.py buggy.py test_buggy.py
-python shard_challenge.py buggy.py test_buggy.py --repo https://github.com/you/your-repo
+### GWT And Scientific Research Mode
+
+The GWT path is implemented as a retry/stress-biased mechanism, not a blanket prompt enhancer. `CognitionCore.relational_context()` proposes identity, experience, knowledge, strategy, world, goal, real identity, desire, and tension blocks to `WorkspaceArbiter`; `ValenceField` modulates bids from `mood_score`; `FeedbackField` can apply reentrant winner/loser history; `MoodWorkspaceCoupling` feeds winner history back into `MoodEngine.compute()`. The current validated natural-run caveat is important: D2.0 showed `workspace_bias` at 0.0, while `backend/gwt_mood_microtest.py` shows the lever moves under forced mood.
+
+Research mode adds a separate empirical block to the GWT context. When `research_mode=True`, `CognitionCore.query_empirical()` reads `research_hypotheses` and injects only non-pending statuses (`CONFIRMED`, `REFUTED`, `SKIPPED_TOO_COMPLEX`, `SKIPPED_KNOWN`) as Layer E empirical knowledge. This is intentionally narrower than "all experiment notes": `PENDING` and `INCONCLUSIVE` rows are excluded from prompt evidence.
+
+The scientific research path is also gated before it becomes evidence. `backend/study_agent.py` checks arXiv novelty, feasibility, and alignment; `backend/experiment_phases.py` requires a four-part experiment spec (`MECHANISM`, `INTERVENTION`, `MEASUREMENT`, `SUCCESS CRITERION`), rejects weak proxy metrics, can route real-world data requirements to Kaggle or Modal queues, runs local sandbox experiments as three independent replicas, and uses an Antagonist review loop before validation. Current DB state is evidence of an experimental apparatus, not a public scientific conclusion.
+
+## Architecture Map
+
+The architecture is documented in `ARCHITECTURE.md`. At a high level:
+
+```text
+Interface / orchestration
+  React + Electron + FastAPI/Socket.IO
+
+Agent loops
+  NightRunner, StudyAgent, BenchmarkLoop, SwarmEngine, Experiment replay/invention
+
+Cognitive layer
+  CognitionCore, WorkspaceArbiter, ValenceField, FeedbackField,
+  MoodEngine, IdentityCore, ContextArbiter, MoodWorkspaceCoupling
+
+Memory and learning
+  SQLite shard.db, ChromaDB collections, JSON state files,
+  SemanticMemory, StrategyMemory, SkillLibrary, GraphRAG, CapabilityGraph
+
+Execution and safety
+  DockerSandboxRunner, SWE security gates, workspace safety guards,
+  auth-gated Socket.IO events, CAD/build agents with remaining host-exec risk
 ```
 
----
+## How To Run
 
-### 2. Learns Every Night — Without Being Told To
+Install Python dependencies:
 
-NightRunner runs autonomous study sessions while you sleep:
-- Searches ArXiv and the web, scrapes content via Playwright
-- Synthesizes structured knowledge and generates runnable Python experiments
-- Validates in a hardened Docker sandbox — code that doesn't prove it works gets rejected
-- Certifies topics into the capability graph when score ≥ 7.5
-- Per-topic LLM budget — hard stops a stuck topic and moves on
-
----
-
-### 3. CognitionCore — The AI That Studies Itself
-
-A 5-layer Global Workspace that aggregates SHARD's internal state and injects behavioral pressure into every decision cycle.
-
-| Layer | Signal Read | Output Produced |
-|-------|-------------|-----------------|
-| 0 — ANCHOR | SQLite: cert_rate, avg_score, total_experiments | Ground truth performance snapshot |
-| 1 — EXECUTIVE | All layers | 6-line narrative self-summary |
-| 2 — IDENTITY | SelfModel: capability gaps, repair loops | gap_severity, critical_gaps |
-| 3 — KNOWLEDGE | GraphRAG: causal failure relations | structural complexity score |
-| 4 — EXPERIENCE | EpisodicMemory: past attempts per topic | sandbox_always_zero, chronic_fail, near_miss |
-
-Three behavioral directives fire automatically based on what the layers detect:
-- **Vettore 1** — if sandbox always returned 0 on this topic → injects `STRUCTURAL PIVOT DIRECTIVE` into synthesis prompt
-- **Vettore 2** — if gap_severity is critical → CriticAgent enters SKEPTICAL mode, adds an extra overconfidence challenge
-- **Vettore 3** — if MetaLearning has certified history in this topic's category → pivot becomes *directed*: "use strategy X — it has 68% cert_rate in concurrency topics"
-
-**Shadow Diagnostic Layer:** Tracks `[EMERGENCE HIT]` vs `[MISSED EMERGENCE]` from behavioral deltas only. Never reads LLM text — anti-recita rule. Emergence is measured, not narrated.
-
-This is the engine behind the benchmark improvement. CognitionCore reads SHARD's own performance gaps overnight, directs the study sessions to close them, and the next morning's benchmarks reflect it.
-
----
-
-### 4. Generates Real Scientific Hypotheses
-
-SHARD is a research agent, not just a coding assistant:
-
-- Ingests **ArXiv papers** via API, filters novelty through a 3-stage pipeline (word overlap + LLM semantic check + LLM judge)
-- Generates **falsifiable cross-domain hypotheses** — e.g. applying Topological Data Analysis to 3D Mesh Rendering, or Social Network Analysis to Protein Folding
-- Validates each hypothesis on four dimensions before running any experiment: `causal_link`, `domain_fidelity`, `falsifiability`, `implementability`
-- Executes experiments autonomously in the Docker sandbox and evaluates empirical results
-- Logs everything to a calibration JSONL with per-attempt scores, rewrite deltas, and domain diversity metrics
-
-Current validator protocol compliance: **100%** (13/13 attempts, latest run). Average alignment score: **0.65**. Domain entropy: **maximum** (every hypothesis explores a different domain pair).
-
----
-
-### 5. Military-Grade Execution Sandbox
-
-Every experiment, every generated code, every hypothesis test executes inside a hardened Docker environment:
-
-- `--network none` — zero outbound access, permanently
-- `NO_NEW_PRIVS` kernel flag — privilege escalation impossible
-- Dropped Linux capabilities — no raw sockets, no ptrace, no filesystem mounts outside the jail
-- Strict CPU and RAM limits (256MB ceiling)
-- Non-root execution enforced
-
-No generated code ever touches the host system. No hypothesis test can exfiltrate data or call external services. SHARD can be trusted to run fully unattended overnight precisely because the sandbox is not an afterthought — it's a hard architectural constraint.
-
----
-
-### 6. Improves Itself
-
-- **SelfAnalyzer** reads session history and generates improvement tickets automatically
-- **ImprovementEngine** prioritizes them and injects them into the next night's queue
-- **ProactiveRefactor** proposes code optimizations to the human for approval (human-in-the-loop gate)
-- **Patch Simulator** runs static + LLM impact analysis before any patch is applied
-- **EvoScientist** mutates losing strategies at pivot points — strategy *evolution*, not just strategy *selection*
-
----
-
-## Emergent Behaviors Observed
-
-*(Not programmed. Derived strictly from module interactions.)*
-
-- **Asyncio phobia** — after 3 failures, VISION added `asyncio` to `avoid_domains` autonomously
-- **Specification gaming** — SHARD routed toward easy topics to pass benchmarks faster, exactly like a student writing philosophy essays to avoid math homework. Not coded. Emerged from `curiosity_engine + LLM + mood signal`.
-- **Cognitive effort surge** — on a chronically blocked topic, 7 modules fired in cascade with no `if blocked: retry_harder` rule. 14-minute cycle. The system *felt* the weight of the problem.
-- **Zeigarnik curiosity** — `curiosity_pull` increased after failed attempts, not after success
-- **Calibrated predictor** — SelfModelTracker predicted 0.0 pass rate on asyncio tasks based purely on tracked failure history. It was correct.
-- **First self-aware identity** — IdentityCore wrote, unprompted: `self_esteem=0.26, trajectory=declining`
-
----
-
-## Architecture
-
-```
-Frontend (React + Electron)
-    |
-    v HTTP :8000 + WebSocket
-Backend (FastAPI + Socket.IO)
-    |
-    +-- ShardCore            Gemini Live voice session
-    +-- NightRunner          Autonomous study orchestrator
-    |   +-- PrerequisiteChecker  GraphRAG+LLM gate before study
-    |   +-- SkillLibrary         Voyager skill cache + curriculum
-    |   +-- HebbianUpdater       Synaptic plasticity per cycle
-    |
-    +-- StudyAgent           10-phase learning pipeline
-    +-- CognitionCore        Event bus — 14 bidirectional citizens
-    |   +-- MoodEngine           Affective state [-1,+1] + mood_shift broadcast
-    |   +-- IdentityCore         Persistent biography from SQLite
-    |   +-- SelfModelTracker     Predictive processing loop
-    |   +-- DesireEngine         Frustration + curiosity + goal persistence
-    |   +-- GoalEngine           Autonomous goal generation
-    |   +-- WorldModel           58-skill relevance map
-    |   +-- SelfModel            cert_rate, momentum, blind_spots
-    |   +-- SemanticMemory       ChromaDB triple-store
-    |   +-- Consciousness        Internal narration layer
-    |   +-- VisionEngine         Long-term focus + avoid_domains
-    |   +-- ImprovementEngine    Failure queue → NightRunner injection
-    |   +-- CapabilityGraph      Certified skill tracker
-    |
-    +-- BenchmarkLoop        Closed feedback loop for coding tasks
-    +-- SwarmEngine          Multi-agent code repair + Focus Mode + Rollback
-    +-- GraphRAG             Causal knowledge graph (SQLite, 2135+ relations)
-    +-- SelfAnalyzer         Detects chronic failures + near-misses
-    +-- ProactiveRefactor    Code optimization proposals + human gate
-    +-- PatchSimulator       Impact analysis before any patch
-    +-- RepomixBridge        Packs any GitHub repo into LLM context
-    +-- LLMRouter            Gemini Flash → Groq → Claude fallback chain
-    +-- ExperimentEngine     Hypothesis generation + alignment validation + Docker execution
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-Full architecture reference: [ARCHITECTURE.md](ARCHITECTURE.md)
+Install frontend dependencies:
 
----
+```powershell
+npm install
+```
+
+Run the Electron/Vite app:
+
+```powershell
+npm run dev
+```
+
+Run the backend directly:
+
+```powershell
+python backend/server.py
+```
+
+Run focused verification used by this README:
+
+```powershell
+python -m pytest -q tests/test_cognition_core.py tests/test_workspace_arbiter.py tests/test_feedback_field.py tests/test_mood_workspace_coupling.py tests/test_context_arbiter.py tests/test_graph_rag.py tests/test_skill_discovery.py tests/test_strategy_memory.py tests/test_swarm_engine.py tests/test_gwt_ab_test.py tests/test_desire_engine_workspace_bias.py
+python -m pytest -q tests/test_swe_security.py tests/test_swe_agent.py tests/test_workspace_safety.py tests/test_authenticator.py
+python backend/gwt_mood_microtest.py
+```
+
+Run D2 harness tooling:
+
+```powershell
+python backend/d2_1a_cache_sources.py
+python backend/d2_1a_benchmark.py
+python backend/d2_1a_analyze.py
+```
+
+D2.1B stress validation code exists in `backend/d2_1b_benchmark.py` and `backend/d2_1b_analyze.py`; it should be interpreted separately from D2.1A.
 
 ## Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Voice | Gemini Live (gemini-2.0-flash-live) |
-| LLM chain | Gemini Flash → Groq (LLaMA-3.3-70b) → Claude (Sonnet 4.6) |
-| Backend | Python 3.13, FastAPI, Socket.IO |
-| Frontend | React 18, Vite, Electron, recharts |
-| Storage | SQLite (WAL mode) + ChromaDB |
-| Sandbox | Hardened Docker (--network none, 256MB RAM, non-root, dropped caps, NO_NEW_PRIVS) |
-| Hardware | GEEKOM A5 mini-PC, 16GB RAM, no GPU |
+- Backend: Python, FastAPI, Socket.IO, asyncio, pytest.
+- LLM providers: OpenAI, Anthropic, Groq, Google GenAI, routed through local provider utilities.
+- Memory: SQLite, ChromaDB, JSON/JSONL state files.
+- Retrieval and study: DuckDuckGo/Brave/web scraping paths, plus cached-source hooks for controlled experiments.
+- Frontend: React, Vite, Electron, Tailwind, Three.js/react-three-fiber.
+- Execution: Docker sandbox for study code, local subprocess paths for selected agents and tooling.
 
----
+## Open Questions
 
-## Current Traction
+- Does GWT activation improve outcomes under controlled stress once D2.1B runs with validated harness isolation?
+- What policy should translate workspace winner shifts into concrete action changes, instead of only prompt context changes?
+- How often does natural operation enter the stress regime where `MoodWorkspaceCoupling` matters?
+- Are CONFIRMED/REFUTED rows in `research_hypotheses` reliable enough to support external scientific claims, or only internal prompt guidance?
+- Should the Experiment Engine's REFUTED-to-GraphRAG relation use a valid current relation type? The DB has 2 legacy `does_not_improve` rows while the current `GraphRAG` valid set does not include that relation.
+- Which GraphRAG relations are stale or disputed enough to hurt future prompts?
+- Can the temp-directory permission failures in the current Windows/sandbox test environment be eliminated without weakening security?
+- Should `CapabilityGraph` persistence prefer SQLite-only behavior, JSON backup, or an explicit test-mode persistence strategy?
 
-- **Running continuously** on local hardware since SSJ11 — no cloud, no GPU, no babysitting
-- **35+ major architecture iterations** (SSJ1–SSJ35+) across 3 months of solo development
-- **2135+ causal relations** in GraphRAG, accumulated from real failure analysis
-- **55 certified skills** in the capability graph, each validated empirically
-- **Experiment engine active**: generating, validating, and running real scientific hypotheses nightly
-- **14/14 benchmark tasks** solved — 100% pass rate across the full task suite
+## Related Thinking
 
----
+- `docs/experiments/d2_0_frustration_benchmark.md`: D2.0 inconclusive harness analysis.
+- `docs/experiments/d2_1a_harness_validation.md`: D2.1A harness validation PASS.
+- `shard_gwt_ultrareview.md`: local GWT review notes.
+- `shard_theoretical_mapping.md`: theoretical mapping notes.
+- `README_LABS.md`: SHARD Labs material, intentionally not removed or rewritten here.
 
-## Running SHARD
+## Building In Public
 
-**Backend:**
-```bash
-cd backend && pip install -r requirements.txt && python server.py
+The current documentation treats falsification as part of the project, not a reputational problem. The commit pattern around `74a6de5` -> `343687e`, `9e85370`, `14b434f`, `4dbb9d8`, and `4c37d65` is the public trail: try an architectural idea, instrument it, revert or narrow it when evidence disagrees, then document the new boundary.
+
+Add the LinkedIn falsification post URL here when publishing the public README.
+
+## Evidence Ledger
+
+Commands run for this refoundation:
+
+```powershell
+git log --oneline -15
+python -m pytest --collect-only -q
+python -m pytest -q
+python -m pytest -q tests/test_cognition_core.py tests/test_workspace_arbiter.py tests/test_feedback_field.py tests/test_mood_workspace_coupling.py tests/test_context_arbiter.py tests/test_graph_rag.py tests/test_skill_discovery.py tests/test_strategy_memory.py tests/test_swarm_engine.py tests/test_gwt_ab_test.py tests/test_desire_engine_workspace_bias.py
+python -m pytest -q tests/test_swe_security.py tests/test_swe_agent.py tests/test_workspace_safety.py tests/test_authenticator.py
+python -m pytest -q tests/test_runner.py tests/test_code_cleaner.py tests/test_patch_simulator.py tests/test_llm_cache.py tests/test_memory_gate.py tests/test_research_agenda.py tests/test_experiment_replay.py tests/test_suggest_curriculum.py
+python backend/gwt_mood_microtest.py
 ```
 
-**Frontend:**
-```bash
-npm install && npm run dev
+SQLite and ChromaDB counts were gathered via Python because the `sqlite3` CLI is not installed in this environment:
+
+```python
+import sqlite3
+conn = sqlite3.connect("shard_memory/shard.db")
+# SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+# SELECT COUNT(*) FROM skill_library
+# SELECT COUNT(*) FROM knowledge_graph
 ```
-
-**Night session:**
-```bash
-python backend/night_runner.py --cycles 10 --timeout 240
-python backend/night_runner.py --cycles 10 --timeout 240 --topic-budget 40
-python backend/night_runner.py --cycles 1 --no-core  # lobotomy baseline
-```
-
-**Benchmark:**
-```bash
-python backend/benchmark_loop.py benchmark/task_04_race_condition --use-swarm
-python roi_benchmark.py  # naked LLM vs SHARD full comparison
-```
-
----
-
-## Environment Variables
-
-```
-GEMINI_API_KEY=...
-GROQ_API_KEY=...
-ANTHROPIC_API_KEY=...
-```
-
----
-
-## SSJ Changelog
-
-*(35+ major iterations. Selected highlights.)*
-
-| Version | What Was Added |
-|---------|---------------|
-| SSJ6–8 | Benchmark Loop + Swarm Engine + GraphRAG + Focus Mode + Rollback + Repomix |
-| SSJ11 | **CognitionCore** — 5-layer Global Workspace + Shadow Diagnostic + Lobotomy A/B proof (+1.6) |
-| SSJ13 | AGI Layer — SelfModel, WorldModel (58 skills), GoalEngine (autonomous goal selection), SemanticMemory |
-| SSJ14 | Full bidirectional event bus — 14 CognitionCore citizens. Emergent: asyncio phobia, Zeigarnik curiosity, calibrated predictor |
-| SSJ15 | Perverse emergence detected: specification gaming + cognitive effort surge + honest self-identity |
-| SSJ18 | Diagnostic Layer + Signal Gate — named failure classifier (DEADLOCK/IDEMPOTENCY/OSCILLATION), attention-based top-K signal competition |
-| SSJ19 | Strategy Compiler + causal A/B proof + memory quality fix (442 junk → 0) + OOD generalization |
-| SSJ20 | Perverse emergence detection: HARD_AVOIDANCE + STAGNATION flags. Longitudinal observability. |
-| SSJ22 | Cross-Task Transfer Layer — 11 micro-clusters, cluster-differentiated strategy routing |
-| SSJ25 | Protocol filter + variance-aware scoring + stale lock recovery + **14/14 benchmark** |
-| SSJ26 | SHARD.MEMORY full stack — typed memory, episode decay, derivation engine, contradiction resolution |
-| SSJ29 | ArXiv integration + cross-domain hypothesis generation + Quoro technical report |
-| SSJ35+ | **Experiment Engine** — autonomous hypothesis generation, alignment validation pipeline, hardened Docker execution, EvoScientist strategy mutation |
-
----
-
-## Licensing
-
-**Dual-license model:**
-- **Core orchestration engine** — Proprietary/Commercial (BUSL-1.1: open use, no competing products)
-- **Scientific discoveries, hypothesis data, safety frameworks, CognitionCore mathematics** — Open Source for public benefit
-
-For commercial licensing or investment inquiries: contact Andrea.
-
----
-
-*Built by Andrea. Verona, Italy. Commercial Core. Open Research.*
