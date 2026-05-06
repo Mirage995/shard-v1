@@ -1689,12 +1689,12 @@ Rules:
         # The previous explicit guard was redundant and is removed for clarity.
         core_block = ""
         core = getattr(ctx.agent, "cognition_core", None)
+        _mood_score = 0.0
         if core is not None and not ctx.no_l3:
             try:
                 # Close mood-to-workspace loop: fetch live mood_score from registry so
                 # ValenceField can actually modulate bids. Without this, mood_score
                 # defaults to 0.0 and the affective layer is inert.
-                _mood_score = 0.0
                 try:
                     _mood_mod = core._registry.get("mood_engine", {}).get("module")
                     if _mood_mod is not None:
@@ -1714,13 +1714,59 @@ Rules:
         elif ctx.no_l3:
             print(f"[NO-L3] relational_context skipped at attempt {ctx.attempt} (#45 A/B baseline)")
 
+        # D2.2D micro decision coupling: use the calibrated GWT/Mood signal as
+        # a retry/reflection directive only. This does not change retry limits,
+        # certification thresholds, scoring, or strategy selection logic.
+        _score_now = ctx.score or 0.0
+        repeated_failure_detected = (
+            ctx.attempt >= 1
+            and bool(gaps)
+            and _score_now < SUCCESS_SCORE_THRESHOLD
+        )
+        dominant_winner = getattr(core, "last_workspace_winner", None) if core is not None else None
+        micro_coupling_applied = (
+            core is not None
+            and not ctx.no_l3
+            and dominant_winner == "tensions"
+            and _mood_score <= -0.3
+            and repeated_failure_detected
+        )
+        reflection_directive_block = ""
+        micro_coupling_reason = "not_applied"
+        if micro_coupling_applied:
+            micro_coupling_reason = "tensions_repeated_failure"
+            reflection_directive_block = (
+                "\n\n[D2.2D REFLECTION DIRECTIVE]\n"
+                "Detected repeated failure under stress/tensions. Do not repeat the previous strategy. "
+                "Reflect on the failure mode and produce a materially different recovery plan before retrying.\n"
+            )
+        elif ctx.no_l3:
+            micro_coupling_reason = "arm_off_no_l3"
+        elif dominant_winner != "tensions":
+            micro_coupling_reason = "dominant_winner_not_tensions"
+        elif not repeated_failure_detected:
+            micro_coupling_reason = "repeated_failure_not_detected"
+        elif _mood_score > -0.3:
+            micro_coupling_reason = "mood_not_stressed"
+
+        print(
+            "[D2_2D_DECISION_COUPLING] "
+            f"applied={1 if micro_coupling_applied else 0} "
+            f"directive={1 if bool(reflection_directive_block) else 0} "
+            f"strategy_shift_directive={1 if bool(reflection_directive_block) else 0} "
+            f"repeated_failure={1 if repeated_failure_detected else 0} "
+            f"reason={micro_coupling_reason} "
+            f"attempt={ctx.attempt} "
+            f"mood_score={_mood_score:+.3f} "
+            f"winner={dominant_winner}"
+        )
+
         # Track previous strategy for audit_emergence
         prev_strategy = ctx.strategy_used
 
         # Near-miss alert: when score is close to the certification threshold (7.5),
         # inject a targeted block so the LLM knows it's close and what to improve.
         near_miss_block = ""
-        _score_now = ctx.score or 0.0
         if 5.5 <= _score_now < 7.5:
             _gap_to_cert = round(7.5 - _score_now, 1)
             near_miss_block = (
@@ -1733,7 +1779,7 @@ Rules:
         # 1. Re-synthesize theory with gap focus
         gap_prompt = f"""
 Previous study of "{ctx.topic}" had these gaps: {gaps}
-Focus area: {focus}{critique_block}{core_block}{near_miss_block}
+Focus area: {focus}{critique_block}{core_block}{reflection_directive_block}{near_miss_block}
 Re-synthesize with emphasis on filling these specific gaps.
 If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR APPROACH -- do not repeat the same strategy.
 Use the same JSON format as before.
@@ -1757,7 +1803,7 @@ Use the same JSON format as before.
 Rewrite a minimal executable Python script for: {ctx.topic}
 
 The previous attempt had these gaps: {', '.join(str(g) for g in gaps[:3])}
-Focus area: {focus}{critique_block}{core_block}
+Focus area: {focus}{critique_block}{core_block}{reflection_directive_block}
 Fix those gaps explicitly in the new implementation.
 If the critical self-evaluation or the Cognition Core signals above identify a systematic mistake, CHANGE YOUR IMPLEMENTATION APPROACH -- use a different pattern, different data structures, or different algorithm.
 
