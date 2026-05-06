@@ -11,6 +11,7 @@ This transforms SHARD from "student who studied" to "senior with experience".
 import json
 import logging
 from datetime import datetime
+from typing import Optional
 
 from constants import PROVIDERS_PRIMARY
 
@@ -406,6 +407,15 @@ def get_epistemic_profile(topic: str) -> dict:
                 "verified": 0, "unsure": 0, "untested": 0}
 
 
+_VALIDATION_TIER_WEIGHT: dict = {
+    "code_runs":           (0.20, "verified_provisional"),
+    "sandbox_replicated":  (0.35, "verified_provisional"),
+    "gpu_replicated":      (0.75, "verified"),
+    "benchmark_validated": (0.85, "verified"),
+    "external_replicated": (0.90, "verified"),
+}
+
+
 def insert_verified_relation(
     source_concept: str,
     target_concept: str,
@@ -415,12 +425,25 @@ def insert_verified_relation(
     confidence: float = 0.9,
     topic_origin: str = "",
     experiment_id: str = "",
+    validation_tier: Optional[str] = None,
 ) -> bool:
     """Upsert a causally verified (or refuted) relation into knowledge_graph.
 
     Uses ON CONFLICT DO UPDATE so duplicate triples are updated in-place.
     Requires the UNIQUE INDEX idx_kg_pair on (source_concept, target_concept, relation_type).
+
+    If validation_tier is provided and the relation is being marked "verified",
+    the tier overrides both confidence and verified_status according to
+    _VALIDATION_TIER_WEIGHT. Refuted relations keep caller-supplied values.
     """
+    # Apply tier-based confidence/status override for verified (CONFIRMED) results.
+    if validation_tier and verified_status in ("verified", "verified_provisional"):
+        tier_conf, tier_status = _VALIDATION_TIER_WEIGHT.get(
+            validation_tier, (confidence, verified_status)
+        )
+        confidence      = tier_conf
+        verified_status = tier_status
+
     try:
         from shard_db import execute
         execute("""

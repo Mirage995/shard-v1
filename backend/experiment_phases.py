@@ -1110,6 +1110,7 @@ class ExperimentValidatePhase(BasePhase):
                         confidence      = 0.9 if ctx.experiment_status == "CONFIRMED" else 0.7,
                         topic_origin    = ctx.topic,
                         experiment_id   = str(getattr(ctx, "_experiment_hypothesis_id", "")),
+                        validation_tier = "sandbox_replicated",
                     )
                     logger.info(
                         "[GRAPH_FEED] %s: %s → %s (%s)",
@@ -1150,11 +1151,14 @@ class ExperimentValidatePhase(BasePhase):
 
             if existing_id:
                 update_result(
-                    hypothesis_id     = existing_id,
-                    status            = ctx.experiment_status,
-                    experiment_code   = ctx.experiment_code,
-                    experiment_result = ctx.experiment_result,
-                    confidence_updated= ctx.hypothesis_confidence_updated,
+                    hypothesis_id      = existing_id,
+                    status             = ctx.experiment_status,
+                    experiment_code    = ctx.experiment_code,
+                    experiment_result  = ctx.experiment_result,
+                    confidence_updated = ctx.hypothesis_confidence_updated,
+                    execution_backend  = "local_sandbox",
+                    data_provenance    = "synthetic",
+                    validation_tier    = "sandbox_replicated",
                 )
                 print(f"[EXPERIMENT_VALIDATE] Persisted id={existing_id} status={ctx.experiment_status}")
         except Exception as db_exc:

@@ -50,6 +50,31 @@ def _ensure_table():
         "CREATE INDEX IF NOT EXISTS idx_hypotheses_status ON research_hypotheses(status)"
     )
     conn.commit()
+    _migrate_provenance_columns(conn)
+
+
+def _migrate_provenance_columns(conn) -> None:
+    """Add provenance columns to existing databases (idempotent, safe on re-run).
+
+    Three axes of scientific validity:
+      execution_backend : WHERE the experiment ran (local_sandbox | kaggle | modal | external | unknown)
+      data_provenance   : WHAT data was used (synthetic | toy_benchmark | public_benchmark | real_world | unknown)
+      validation_tier   : HOW STRONG the validation is
+                          (code_runs | sandbox_replicated | gpu_replicated | benchmark_validated | external_replicated)
+      manual_backfill   : True if provenance was set retroactively by a human, not the pipeline
+    """
+    cols = [
+        ("execution_backend", "TEXT    DEFAULT 'local_sandbox'"),
+        ("data_provenance",   "TEXT    DEFAULT 'synthetic'"),
+        ("validation_tier",   "TEXT    DEFAULT 'sandbox_replicated'"),
+        ("manual_backfill",   "INTEGER DEFAULT 0"),
+    ]
+    for col, definition in cols:
+        try:
+            conn.execute(f"ALTER TABLE research_hypotheses ADD COLUMN {col} {definition}")
+            conn.commit()
+        except Exception:
+            pass  # column already exists — SQLite raises OperationalError on duplicate ADD
 
 
 def _row_to_dict(row) -> Dict:
@@ -114,6 +139,10 @@ def update_result(
     experiment_code: Optional[str] = None,
     experiment_result: Optional[Dict] = None,
     confidence_updated: Optional[float] = None,
+    execution_backend: Optional[str] = None,
+    data_provenance: Optional[str] = None,
+    validation_tier: Optional[str] = None,
+    manual_backfill: bool = False,
 ) -> bool:
     """Update a hypothesis after experiment execution.
 
@@ -123,35 +152,96 @@ def update_result(
         experiment_code     : Python code that was executed
         experiment_result   : dict with stdout/stderr/exit_code/success
         confidence_updated  : empirical confidence post-test (0.0-1.0)
+        execution_backend   : where the experiment ran (local_sandbox | kaggle | modal | external | unknown)
+        data_provenance     : type of data used (synthetic | toy_benchmark | public_benchmark | real_world | unknown)
+        validation_tier     : strength of validation (code_runs | sandbox_replicated | gpu_replicated |
+                              benchmark_validated | external_replicated)
+        manual_backfill     : True if provenance was set retroactively by a human
 
     Returns:
         True on success, False on error.
     """
     try:
         conn = _get_db()
+        _migrate_provenance_columns(conn)
+
+        set_clauses = [
+            "status             = ?",
+            "experiment_code    = ?",
+            "experiment_result  = ?",
+            "confidence_updated = ?",
+            "updated_at         = datetime('now')",
+        ]
+        params: list = [
+            status,
+            experiment_code,
+            json.dumps(experiment_result) if experiment_result else None,
+            confidence_updated,
+        ]
+
+        if execution_backend is not None:
+            set_clauses.append("execution_backend = ?")
+            params.append(execution_backend)
+        if data_provenance is not None:
+            set_clauses.append("data_provenance = ?")
+            params.append(data_provenance)
+        if validation_tier is not None:
+            set_clauses.append("validation_tier = ?")
+            params.append(validation_tier)
+        if manual_backfill:
+            set_clauses.append("manual_backfill = 1")
+
+        params.append(hypothesis_id)
         conn.execute(
-            """
-            UPDATE research_hypotheses
-            SET status             = ?,
-                experiment_code    = ?,
-                experiment_result  = ?,
-                confidence_updated = ?,
-                updated_at         = datetime('now')
-            WHERE id = ?
-            """,
-            (
-                status,
-                experiment_code,
-                json.dumps(experiment_result) if experiment_result else None,
-                confidence_updated,
-                hypothesis_id,
-            ),
+            f"UPDATE research_hypotheses SET {', '.join(set_clauses)} WHERE id = ?",
+            params,
         )
         conn.commit()
         logger.info("[EXPERIMENT_STORE] Updated id=%d status=%s", hypothesis_id, status)
         return True
     except Exception as exc:
         logger.error("[EXPERIMENT_STORE] update_result failed: %s", exc)
+        return False
+
+
+def set_provenance(
+    hypothesis_id: int,
+    execution_backend: str,
+    data_provenance: str,
+    validation_tier: str,
+    manual_backfill: bool = True,
+) -> bool:
+    """Manually set provenance fields on an existing hypothesis (backfill helper).
+
+    Use for retroactive classification of results that predate automatic provenance
+    tracking. Sets manual_backfill=True by default to mark retroactive updates.
+
+    Example — Hypothesis #14 (Split-MNIST, Kaggle GPU run):
+        set_provenance(14, "kaggle", "public_benchmark", "gpu_replicated")
+    """
+    try:
+        conn = _get_db()
+        _migrate_provenance_columns(conn)
+        conn.execute(
+            """
+            UPDATE research_hypotheses
+            SET execution_backend = ?,
+                data_provenance   = ?,
+                validation_tier   = ?,
+                manual_backfill   = ?,
+                updated_at        = datetime('now')
+            WHERE id = ?
+            """,
+            (execution_backend, data_provenance, validation_tier, 1 if manual_backfill else 0, hypothesis_id),
+        )
+        conn.commit()
+        logger.info(
+            "[EXPERIMENT_STORE] Provenance set id=%d backend=%s provenance=%s tier=%s manual=%s",
+            hypothesis_id, execution_backend, data_provenance, validation_tier, manual_backfill,
+        )
+        return True
+    except Exception as exc:
+        logger.error("[EXPERIMENT_STORE] set_provenance failed: %s", exc)
         return False
 
 

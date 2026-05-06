@@ -284,7 +284,7 @@ def _classify_topic(topic: str) -> str:
 
 
 class NightRunner:
-    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = DEFAULT_TOPIC_BUDGET, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True):
+    def __init__(self, cycles: int, timeout: int, pause: int, api_limit: int, topic_budget: int = DEFAULT_TOPIC_BUDGET, forced_topic: str = "", research_mode: bool = False, no_l3: bool = False, use_affective_layer: bool = True, forced_topic_sequence: list = None):
         self.max_cycles = cycles
         self.max_runtime_minutes = timeout
         self.goal_engine = None
@@ -292,6 +292,9 @@ class NightRunner:
         self.max_api_calls = api_limit
         self.topic_budget = topic_budget
         self._forced_topic: str = forced_topic.strip()
+        # D2.1C: optional per-cycle topic sequence. If non-empty, the cycle
+        # loop overrides _forced_topic with sequence[cycle-1] each iteration.
+        self._forced_topic_sequence: list = list(forced_topic_sequence) if forced_topic_sequence else []
         self._research_mode: bool = research_mode
         self._no_l3: bool = no_l3
         self._use_affective_layer: bool = use_affective_layer
@@ -1526,7 +1529,19 @@ class NightRunner:
             if limit_reason:
                 self.logger.info(f"Session stopped: {limit_reason}")
                 break
-                
+
+            # D2.1C: per-cycle forced topic sequence (env-gated, default off).
+            # If self._forced_topic_sequence is non-empty, override the per-cycle
+            # forced_topic with sequence[cycle-1]. Wraps modulo len if cycles >
+            # len(sequence). Default behavior (sequence empty) is unchanged.
+            if getattr(self, "_forced_topic_sequence", None):
+                _seq = self._forced_topic_sequence
+                _idx = (cycle - 1) % len(_seq)
+                self._forced_topic = _seq[_idx]
+                self.logger.info(
+                    f"[FORCE-TOPIC-SEQUENCE] cycle {cycle} -> topic[{_idx}]={self._forced_topic!r}"
+                )
+
             self._transition(SessionState.SELECT, f"cycle {cycle}/{self.max_cycles}")
             topic, source, reason = await self._select_topic(capability_graph, "")
             self._record_topic(topic, source)  # agenda starvation fix #29
@@ -3001,6 +3016,7 @@ class NightRunner:
                 confidence      = 0.9 if status == "CONFIRMED" else 0.7,
                 topic_origin    = topic,
                 experiment_id   = str(hypothesis.get("id", "")),
+                validation_tier = "gpu_replicated",
             )
             self.logger.info(
                 "[GRAPH_FEED_GPU] %s: %s -> %s (%s)", status, source, target, relation
@@ -3070,6 +3086,8 @@ class NightRunner:
                         status             = new_status,
                         experiment_result  = result_dict,
                         confidence_updated = 0.9 if new_status == "CONFIRMED" else 0.3,
+                        execution_backend  = platform,
+                        validation_tier    = "gpu_replicated",
                     )
                     self.logger.info(
                         "[GPU_RUNNER] %s complete — score=%.3f -> %s",
@@ -3206,6 +3224,7 @@ if __name__ == "__main__":
     parser.add_argument("--force-topic", type=str, default="", help="Pin a specific topic, bypassing all selection logic")
     parser.add_argument("--research", action="store_true", default=False, help="Use arxiv instead of DuckDuckGo for sources (#34)")
     parser.add_argument("--no-l3", action="store_true", default=False, help="Disable L3 relational_context injection -- A/B baseline (#45)")
+    parser.add_argument("--force-topic-sequence", type=str, default="", help="Pipe-separated topic sequence to force per cycle, e.g. 'topic1|topic2'. Overrides --force-topic when set. Used by D2.1C.")
 
     args = parser.parse_args()
 
@@ -3247,6 +3266,7 @@ if __name__ == "__main__":
                 print(f"[CONTINUOUS] Session {session_n} error: {_loop_err} -- restarting in {args.session_gap}s")
             time.sleep(args.session_gap)
     else:
+        _seq = [s.strip() for s in args.force_topic_sequence.split("|") if s.strip()] if args.force_topic_sequence else []
         runner = NightRunner(
             cycles=args.cycles,
             timeout=args.timeout,
@@ -3256,6 +3276,7 @@ if __name__ == "__main__":
             forced_topic=args.force_topic,
             research_mode=args.research,
             no_l3=args.no_l3,
+            forced_topic_sequence=_seq,
         )
         try:
             asyncio.run(runner.run())
