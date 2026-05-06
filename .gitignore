@@ -75,6 +75,8 @@ shard_workspace/d2_2d_runs/
 shard_workspace/d2_2d_orchestrator.log
 shard_workspace/d2_2e_runs/
 shard_workspace/d2_2e_orchestrator.log
+shard_workspace/d2_2f_runs/
+shard_workspace/d2_2f_orchestrator.log
 
 # Misc root-level junk created by sandbox cwd bug
 /weight

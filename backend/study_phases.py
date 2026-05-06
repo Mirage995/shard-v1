@@ -1736,9 +1736,10 @@ Rules:
         if micro_coupling_applied:
             micro_coupling_reason = "tensions_repeated_failure"
             reflection_directive_block = (
-                "\n\n[D2.2D REFLECTION DIRECTIVE]\n"
-                "Detected repeated failure under stress/tensions. Do not repeat the previous strategy. "
-                "Reflect on the failure mode and produce a materially different recovery plan before retrying.\n"
+                "\n\n[D2.2F STRONGER REFLECTION DIRECTIVE]\n"
+                "Detected repeated failure under stress/tensions. You must explicitly identify the prior failed "
+                "strategy, explain why it failed, and produce a materially different recovery plan. Do not reuse "
+                "the same approach unless you justify why it should now work.\n"
             )
         elif ctx.no_l3:
             micro_coupling_reason = "arm_off_no_l3"
@@ -1754,6 +1755,7 @@ Rules:
             f"applied={1 if micro_coupling_applied else 0} "
             f"directive={1 if bool(reflection_directive_block) else 0} "
             f"strategy_shift_directive={1 if bool(reflection_directive_block) else 0} "
+            f"stronger_directive={1 if bool(reflection_directive_block) else 0} "
             f"repeated_failure={1 if repeated_failure_detected else 0} "
             f"reason={micro_coupling_reason} "
             f"attempt={ctx.attempt} "
