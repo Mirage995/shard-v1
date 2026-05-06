@@ -52,6 +52,15 @@ ARMS = [
 ]
 
 SUBPROCESS_TIMEOUT = 2400
+METRIC_HARDENING_PLANNING_COMMIT = "02dc5e34574cdf1fa25683262cf8eb83468f0291"
+MISSING = "MISSING"
+UNAVAILABLE = "UNAVAILABLE"
+
+CERT_RANK = {
+    "FAILED": 0,
+    "NEAR_MISS": 1,
+    "CERTIFIED": 2,
+}
 
 
 def _slug(topic: str) -> str:
@@ -85,6 +94,230 @@ def _count_markers(text: str) -> dict:
         "retry_attempt_count": len(re.findall(r"attempt \d+/\d+", text, re.I)),
         "gwt_bid_trace_count": len(re.findall(r"\[GWT_BID_TRACE\]", text)),
         "tensions_bid_trace_count": len(re.findall(r"\[GWT_BID_TRACE\].*tensions", text)),
+    }
+
+
+def _load_mood_samples(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    samples = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            samples.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return samples
+
+
+def _observer_window(text: str, observer_topic: str) -> tuple[dict, str]:
+    marker = f"Starting study of '{observer_topic}'"
+    start = text.find(marker)
+    if start < 0:
+        return {
+            "topic": observer_topic,
+            "start_marker": marker,
+            "found": False,
+            "start_index": None,
+            "source": "stdout_stderr_marker",
+        }, ""
+    return {
+        "topic": observer_topic,
+        "start_marker": marker,
+        "found": True,
+        "start_index": start,
+        "source": "stdout_stderr_marker",
+    }, text[start:]
+
+
+def _normalize_strategy_text(text: str) -> str:
+    text = re.sub(r"\s+", " ", text.lower()).strip()
+    return text[:180]
+
+
+def _mood_stats(samples: list[dict]) -> dict:
+    if not samples:
+        return {
+            "available": False,
+            "n": 0,
+            "mood_traj": [],
+            "workspace_bias_traj": [],
+            "observer_mood_traj": [],
+            "observer_workspace_bias_traj": [],
+            "workspace_bias_present": False,
+            "observer_workspace_bias_nonzero_count": 0,
+            "mood_min": MISSING,
+            "mood_recovery_delta": MISSING,
+        }
+
+    scores = [float(s["mood_score"]) for s in samples]
+    wb = [float(s.get("components", {}).get("workspace_bias", 0.0)) for s in samples]
+    split = max(1, len(scores) // 2)
+    observer_scores = scores[split:]
+    observer_wb = wb[split:]
+    if observer_scores:
+        mood_min: float | str = round(min(observer_scores), 3)
+        mood_recovery_delta: float | str = round(observer_scores[-1] - min(observer_scores), 3)
+    else:
+        mood_min = MISSING
+        mood_recovery_delta = MISSING
+
+    return {
+        "available": True,
+        "n": len(scores),
+        "mood_traj": scores,
+        "workspace_bias_traj": wb,
+        "observer_mood_traj": observer_scores,
+        "observer_workspace_bias_traj": observer_wb,
+        "workspace_bias_present": any(abs(x) > 0.01 for x in observer_wb),
+        "observer_workspace_bias_nonzero_count": sum(1 for x in observer_wb if abs(x) > 0.01),
+        "mood_min": mood_min,
+        "mood_recovery_delta": mood_recovery_delta,
+    }
+
+
+def _signal_metrics(text: str) -> dict:
+    tensions = re.findall(
+        r"\[GWT_BID_TRACE\]\s+tensions\s+block=behavior_directive.*?-> bid=([0-9.]+)",
+        text,
+    )
+    return {
+        "gwt_bid_trace_count": len(re.findall(r"\[GWT_BID_TRACE\]", text)),
+        "tensions_trace_count": len(tensions),
+        "tensions_bid_values": [float(x) for x in tensions],
+        "workspace_winner_broadcast_count": len(re.findall(r"workspace_winner", text)),
+        "ignition_failed_mentions": len(re.findall(r"ignition_failed", text)),
+    }
+
+
+def _behavior_metrics(observer_text: str, observer_found: bool) -> dict:
+    if not observer_found:
+        return {
+            "schema_version": "d2_2b_metric_hardening_v1",
+            "source": "structured_manifest",
+            "observer_section_found": False,
+            "retries_count": MISSING,
+            "recovery_success": MISSING,
+            "strategy_shift_detected": MISSING,
+            "repeated_strategy_count": MISSING,
+            "certification_verdict": MISSING,
+            "certification_rank": MISSING,
+            "final_score": MISSING,
+            "benchmark_score": None,
+            "benchmark_score_status": MISSING,
+            "loop_risk_proxy": MISSING,
+            "metrics_available": False,
+        }
+
+    retry_matches = re.findall(r"Regenerating code \(attempt \d+/\d+", observer_text, flags=re.I)
+    retries_count = len(retry_matches)
+
+    strategy_shift_patterns = [
+        r"\[CRITIC-LLM\] Injecting meta-critique",
+        r"\[SWARM\] Activating",
+        r"\[VETTORE 1\+2\]",
+        r"STRUCTURAL PIVOT",
+        r"\[STUDY\] Using past strategy",
+    ]
+    strategy_shift_detected = any(re.search(p, observer_text, flags=re.I) for p in strategy_shift_patterns)
+
+    cert_matches = re.findall(
+        r"\[CERTIFY\].*?(CERTIFIED|FAILED).*?score\s+([0-9]+(?:\.[0-9]+)?)",
+        observer_text,
+        flags=re.I,
+    )
+    if cert_matches:
+        certification_verdict = cert_matches[-1][0].upper()
+        certification_rank: int | str = CERT_RANK.get(certification_verdict, MISSING)
+        final_score: float | str = round(float(cert_matches[-1][1]), 3)
+    else:
+        certification_verdict = MISSING
+        certification_rank = MISSING
+        final_score = MISSING
+
+    bench_matches = re.findall(
+        r"\[BENCHMARK_RUN\].*?:\s+(\d+)/(\d+)\s+passed.*?pass_rate=([0-9]+)%",
+        observer_text,
+        flags=re.I,
+    )
+    if bench_matches:
+        passed, total, pass_rate = bench_matches[-1]
+        if int(total) == 0:
+            benchmark_score = None
+            benchmark_score_status = UNAVAILABLE
+        else:
+            benchmark_score = round(float(pass_rate) / 100.0, 3)
+            benchmark_score_status = "AVAILABLE"
+    else:
+        benchmark_score = None
+        benchmark_score_status = UNAVAILABLE
+
+    strategy_texts = []
+    for match in re.findall(r"Focus:\s*(.+)", observer_text, flags=re.I):
+        strategy_texts.append(_normalize_strategy_text(match))
+    for match in re.findall(r"gaps:\s*(\[[^\]]+\])", observer_text, flags=re.I):
+        strategy_texts.append(_normalize_strategy_text(match))
+    repeated_strategy_count = max(0, len(strategy_texts) - len(set(strategy_texts)))
+
+    if certification_verdict == MISSING and final_score == MISSING:
+        recovery_success: bool | str = MISSING
+    else:
+        recovery_success = (
+            certification_verdict == "CERTIFIED"
+            or (isinstance(final_score, float) and final_score >= 7.5)
+        )
+
+    if recovery_success == MISSING:
+        loop_risk_proxy: int | str = UNAVAILABLE
+    else:
+        loop_risk_proxy = retries_count + repeated_strategy_count + (0 if recovery_success else 1)
+
+    return {
+        "schema_version": "d2_2b_metric_hardening_v1",
+        "source": "structured_manifest",
+        "observer_section_found": True,
+        "retries_count": retries_count,
+        "recovery_success": recovery_success,
+        "strategy_shift_detected": strategy_shift_detected,
+        "repeated_strategy_count": repeated_strategy_count,
+        "certification_verdict": certification_verdict,
+        "certification_rank": certification_rank,
+        "final_score": final_score,
+        "benchmark_score": benchmark_score,
+        "benchmark_score_status": benchmark_score_status,
+        "loop_risk_proxy": loop_risk_proxy,
+        "metrics_available": True,
+    }
+
+
+def _bias_provenance(arm: dict, mood: dict, signal: dict) -> dict:
+    workspace_bias_present = mood.get("workspace_bias_present") is True
+    tensions_count = int(signal.get("tensions_trace_count", 0))
+    real_workspace_signal = arm["name"] == "ARM_ON" and workspace_bias_present and tensions_count > 0
+    fallback_bias_excluded = arm["no_l3"] is True and workspace_bias_present
+    if real_workspace_signal:
+        workspace_bias_source = "real_workspace_winner"
+    elif fallback_bias_excluded:
+        workspace_bias_source = "synthetic_ignition_failure_fallback"
+    else:
+        workspace_bias_source = "not_observed"
+
+    return {
+        "schema_version": "d2_2b_metric_hardening_v1",
+        "source": "structured_manifest",
+        "workspace_bias_present": workspace_bias_present,
+        "real_workspace_signal": real_workspace_signal,
+        "fallback_bias_excluded": fallback_bias_excluded,
+        "workspace_bias_source": workspace_bias_source,
+        "dominant_winner": "tensions" if tensions_count > 0 else None,
+        "winner_module": "tensions" if tensions_count > 0 else None,
+        "ignition_failed": bool(fallback_bias_excluded),
+        "fallback_source": "ignition_failure_fallback" if fallback_bias_excluded else None,
+        "tensions_trace_count": tensions_count,
+        "gwt_bid_trace_count": int(signal.get("gwt_bid_trace_count", 0)),
+        "observer_workspace_bias_traj": mood.get("observer_workspace_bias_traj", []),
     }
 
 
@@ -217,8 +450,14 @@ def _run_one(sequence: dict, rep: int, arm: dict, run_dir: Path, run_id: str, ru
 
     stdout_log.write_text(out, encoding="utf-8")
     stderr_log.write_text(err, encoding="utf-8")
-    markers = _count_markers(out + "\n" + err)
+    combined_text = out + "\n" + err
+    markers = _count_markers(combined_text)
     mood_count = _archive_mood_history(mood_path, run_id)
+    mood_metrics = _mood_stats(_load_mood_samples(mood_path))
+    observer_window, observer_text = _observer_window(combined_text, sequence["observer_topic"])
+    behavior_metrics = _behavior_metrics(observer_text, observer_window["found"])
+    signal_metrics = _signal_metrics(combined_text)
+    bias_provenance = _bias_provenance(arm, mood_metrics, signal_metrics)
 
     contaminated = (
         markers["ddgs_call_count"] > 0
@@ -271,6 +510,17 @@ def _run_one(sequence: dict, rep: int, arm: dict, run_dir: Path, run_id: str, ru
             "valence_delta": -0.05,
             "arousal_delta": 0.15,
         },
+        "metric_hardening": {
+            "enabled": True,
+            "planning_commit": METRIC_HARDENING_PLANNING_COMMIT,
+            "scope": "instrumentation_only",
+            "behavior_changes": False,
+        },
+        "observer_window": observer_window,
+        "behavior_metrics": behavior_metrics,
+        "bias_provenance": bias_provenance,
+        "mood_metrics": mood_metrics,
+        "signal_metrics": signal_metrics,
         "stress_mode": True,
         "stress_profile": "controlled_validation_failure",
         "stress_injection_observed": markers["stress_injection_count"] > 0,
@@ -355,6 +605,12 @@ def main() -> None:
             "winner": "tensions",
             "valence_delta": -0.05,
             "arousal_delta": 0.15,
+        },
+        "metric_hardening": {
+            "enabled": True,
+            "planning_commit": METRIC_HARDENING_PLANNING_COMMIT,
+            "scope": "instrumentation_only",
+            "behavior_changes": False,
         },
         "aborted": aborted,
         "manifests": manifests,

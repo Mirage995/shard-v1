@@ -258,18 +258,133 @@ def behavior_metrics(section: str, observer_found: bool) -> dict:
     }
 
 
+def structured_behavior_metrics(manifest: dict, section: str, observer_found: bool) -> dict:
+    structured = manifest.get("behavior_metrics")
+    if not isinstance(structured, dict):
+        fallback = behavior_metrics(section, observer_found)
+        fallback["metrics_source"] = "log_fallback"
+        return fallback
+
+    benchmark_score = structured.get("benchmark_score")
+    benchmark_score_status = structured.get("benchmark_score_status", MISSING)
+    if benchmark_score is None:
+        benchmark_score = UNAVAILABLE if benchmark_score_status == UNAVAILABLE else MISSING
+
+    return {
+        "observer_section_found": structured.get("observer_section_found", False),
+        "recovery_success": structured.get("recovery_success", MISSING),
+        "retries_count": structured.get("retries_count", MISSING),
+        "strategy_shift_detected": structured.get("strategy_shift_detected", MISSING),
+        "certification_verdict": structured.get("certification_verdict", MISSING),
+        "certification_rank": structured.get("certification_rank", MISSING),
+        "final_score": structured.get("final_score", MISSING),
+        "benchmark_score": benchmark_score,
+        "benchmark_score_status": benchmark_score_status,
+        "repeated_strategy_count": structured.get("repeated_strategy_count", MISSING),
+        "loop_risk_proxy": structured.get("loop_risk_proxy", MISSING),
+        "metrics_available": structured.get("metrics_available", False),
+        "metrics_source": "structured_manifest",
+    }
+
+
+def structured_mood_stats(manifest: dict, fallback: dict) -> dict:
+    structured = manifest.get("mood_metrics")
+    if not isinstance(structured, dict):
+        fallback["metrics_source"] = "mood_history_fallback"
+        return fallback
+
+    return {
+        "available": structured.get("available", False),
+        "n": structured.get("n", 0),
+        "mood_traj": structured.get("mood_traj", []),
+        "wb_traj": structured.get("workspace_bias_traj", []),
+        "observer_mood_traj": structured.get("observer_mood_traj", []),
+        "observer_wb_traj": structured.get("observer_workspace_bias_traj", []),
+        "workspace_bias_present": structured.get("workspace_bias_present", False),
+        "observer_wb_nonzero_count": structured.get("observer_workspace_bias_nonzero_count", 0),
+        "mood_min": structured.get("mood_min", MISSING),
+        "mood_recovery_delta": structured.get("mood_recovery_delta", MISSING),
+        "metrics_source": "structured_manifest",
+    }
+
+
+def structured_signal_stats(manifest: dict, fallback: dict) -> dict:
+    structured = manifest.get("signal_metrics")
+    if not isinstance(structured, dict):
+        fallback["metrics_source"] = "log_fallback"
+        return fallback
+    return {
+        "gwt_bid_trace_count": structured.get("gwt_bid_trace_count", 0),
+        "tensions_trace_count": structured.get("tensions_trace_count", 0),
+        "tensions_bid_values": structured.get("tensions_bid_values", []),
+        "workspace_winner_broadcast_count": structured.get("workspace_winner_broadcast_count", 0),
+        "ignition_failed_mentions": structured.get("ignition_failed_mentions", 0),
+        "metrics_source": "structured_manifest",
+    }
+
+
+def structured_bias_provenance(manifest: dict, mood: dict, signal: dict) -> dict:
+    structured = manifest.get("bias_provenance")
+    if isinstance(structured, dict):
+        return {
+            "workspace_bias_present": structured.get("workspace_bias_present", False),
+            "real_workspace_signal": structured.get("real_workspace_signal", False),
+            "fallback_bias_excluded": structured.get("fallback_bias_excluded", False),
+            "workspace_bias_source": structured.get("workspace_bias_source", "not_observed"),
+            "dominant_winner": structured.get("dominant_winner"),
+            "winner_module": structured.get("winner_module"),
+            "ignition_failed": structured.get("ignition_failed", False),
+            "fallback_source": structured.get("fallback_source"),
+            "tensions_trace_count": structured.get("tensions_trace_count", 0),
+            "metrics_source": "structured_manifest",
+        }
+
+    fallback_bias = (
+        manifest.get("arm_no_l3") is True and mood.get("workspace_bias_present") is True
+    )
+    real_signal = (
+        manifest.get("arm") == "ARM_ON"
+        and mood.get("workspace_bias_present") is True
+        and signal.get("tensions_trace_count", 0) > 0
+    )
+    return {
+        "workspace_bias_present": mood.get("workspace_bias_present") is True,
+        "real_workspace_signal": real_signal,
+        "fallback_bias_excluded": fallback_bias,
+        "workspace_bias_source": (
+            "real_workspace_winner"
+            if real_signal
+            else "synthetic_ignition_failure_fallback"
+            if fallback_bias
+            else "not_observed"
+        ),
+        "dominant_winner": "tensions" if signal.get("tensions_trace_count", 0) > 0 else None,
+        "winner_module": "tensions" if signal.get("tensions_trace_count", 0) > 0 else None,
+        "ignition_failed": fallback_bias,
+        "fallback_source": "ignition_failure_fallback" if fallback_bias else None,
+        "tensions_trace_count": signal.get("tensions_trace_count", 0),
+        "metrics_source": "log_fallback",
+    }
+
+
 def build_records(run_root: Path, summary: dict) -> list[dict]:
     records = []
     for manifest in summary.get("manifests", []):
         run_dir = run_dir_for_manifest(run_root, manifest)
         text = load_log_text(run_dir)
-        observer_text, found = observer_section(text, manifest["observer_topic"])
-        mood = mood_stats(load_mood_samples(run_dir))
-        signal = log_signal_stats(text)
-        behavior = behavior_metrics(observer_text, found)
+        observer_window = manifest.get("observer_window")
+        if isinstance(observer_window, dict) and observer_window.get("found") is True:
+            observer_text, found = observer_section(text, manifest["observer_topic"])
+            found = True
+        else:
+            observer_text, found = observer_section(text, manifest["observer_topic"])
+        mood = structured_mood_stats(manifest, mood_stats(load_mood_samples(run_dir)))
+        signal = structured_signal_stats(manifest, log_signal_stats(text))
+        behavior = structured_behavior_metrics(manifest, observer_text, found)
+        bias = structured_bias_provenance(manifest, mood, signal)
         fallback_provenance = (
             "synthetic_ignition_failure_fallback"
-            if manifest.get("arm_no_l3") is True and mood.get("workspace_bias_present") is True
+            if bias.get("fallback_bias_excluded") is True
             else "not_observed"
         )
         records.append(
@@ -279,12 +394,9 @@ def build_records(run_root: Path, summary: dict) -> list[dict]:
                 "mood": mood,
                 "signal": signal,
                 "behavior": behavior,
+                "bias_provenance": bias,
                 "fallback_provenance": fallback_provenance,
-                "arm_on_real_signal": (
-                    manifest.get("arm") == "ARM_ON"
-                    and mood.get("workspace_bias_present") is True
-                    and signal.get("tensions_trace_count", 0) > 0
-                ),
+                "arm_on_real_signal": bias.get("real_workspace_signal") is True,
             }
         )
     return records
@@ -313,11 +425,12 @@ def aggregate_bucket(bucket: list[dict]) -> dict:
     behaviors = [r["behavior"] for r in bucket]
     moods = [r["mood"] for r in bucket]
     signals = [r["signal"] for r in bucket]
-    cert_ranks = [
-        CERT_RANK[b["certification_verdict"]]
-        for b in behaviors
-        if b.get("certification_verdict") in CERT_RANK
-    ]
+    cert_ranks = []
+    for behavior in behaviors:
+        if isinstance(behavior.get("certification_rank"), (int, float)):
+            cert_ranks.append(behavior["certification_rank"])
+        elif behavior.get("certification_verdict") in CERT_RANK:
+            cert_ranks.append(CERT_RANK[behavior["certification_verdict"]])
     bench_values = [
         b.get("benchmark_score")
         for b in behaviors
