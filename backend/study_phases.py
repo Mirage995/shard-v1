@@ -426,6 +426,102 @@ class SynthesizePhase(BasePhase):
             except Exception as _nv_err:
                 pass  # non-fatal
 
+        # ── DB duplicate gate (P1) ────────────────────────────────────────────
+        # Checks new hypothesis against SHARD's own CONFIRMED/REFUTED/INCONCLUSIVE
+        # rows via SequenceMatcher. Separate from arxiv novelty: this catches
+        # intra-DB repetition that the LLM prompt injection cannot prevent.
+        if ctx.research_mode and ctx.structured and ctx.structured.get("hypothesis"):
+            try:
+                from experiment_store import store_hypothesis, update_result as _update_result
+                _hyp = ctx.structured["hypothesis"]
+                _dup = await ctx.agent._check_hypothesis_duplicate_db(_hyp)
+
+                if _dup["is_duplicate"]:
+                    # Persist SKIPPED_KNOWN with full diagnostic metadata
+                    _dup_meta = {
+                        "skip_reason":            _dup["reason"],
+                        "matched_hypothesis_id":  _dup["matched_id"],
+                        "similarity_ratio":       _dup["similarity_ratio"],
+                        "matched_status":         _dup["matched_status"],
+                        "matched_statement":      _dup["matched_statement"],
+                        "duplicate_check_source": "db_sequence_matcher",
+                    }
+                    _dup_hyp_id = store_hypothesis(
+                        ctx.topic, _hyp,
+                        source_papers=getattr(ctx, "sources", None),
+                    )
+                    if _dup_hyp_id:
+                        _update_result(
+                            hypothesis_id     = _dup_hyp_id,
+                            status            = "SKIPPED_KNOWN",
+                            experiment_result = _dup_meta,
+                        )
+                    print(
+                        f"[DEDUP_DB] Hard duplicate → SKIPPED_KNOWN "
+                        f"id={_dup_hyp_id} reason={_dup['reason']} "
+                        f"ratio={_dup['similarity_ratio']:.2f}"
+                    )
+                    # Retry synthesis: inject matched statement as hard constraint
+                    _dup_block = (
+                        f"\n[DB DUPLICATE BLOCK — MANDATORY]\n"
+                        f"The following hypothesis already exists in SHARD's DB "
+                        f"(id={_dup['matched_id']}, status={_dup['matched_status']}) "
+                        f"and must NOT be repeated:\n"
+                        f"  '{_dup['matched_statement']}'\n"
+                        f"Generate a DIFFERENT hypothesis with a materially different "
+                        f"mechanism, dataset, or parameter regime.\n"
+                    )
+                    ctx.structured = await ctx.agent.phase_synthesize(
+                        ctx.topic, ctx.raw_text,
+                        strategy_hint   = ctx.best_strategy,
+                        previous_score  = ctx.previous_score,
+                        episode_context = ctx.episode_context,
+                        pivot_directive = ctx.pivot_directive,
+                        research_mode   = ctx.research_mode,
+                        sources         = ctx.sources if ctx.research_mode else None,
+                        empirical_context = empirical_context + _dup_block,
+                    )
+                    print(
+                        f"[DEDUP_DB] Retry complete. New: "
+                        f"'{(ctx.structured or {}).get('hypothesis', {}).get('statement', 'none')[:70]}'"
+                    )
+
+                elif _dup["is_suspicious"]:
+                    # Do NOT persist yet — retry with a strong constraint
+                    _sus_block = (
+                        f"\n[DB SIMILARITY WARNING — STRONG CONSTRAINT]\n"
+                        f"Your candidate is too close to existing hypothesis "
+                        f"#{_dup['matched_id']} (similarity={_dup['similarity_ratio']:.0%}):\n"
+                        f"  '{_dup['matched_statement']}'\n"
+                        f"Build BEYOND it: use a materially different method, dataset, "
+                        f"or mechanism. Do not rephrase the same claim.\n"
+                    )
+                    ctx.structured = await ctx.agent.phase_synthesize(
+                        ctx.topic, ctx.raw_text,
+                        strategy_hint   = ctx.best_strategy,
+                        previous_score  = ctx.previous_score,
+                        episode_context = ctx.episode_context,
+                        pivot_directive = ctx.pivot_directive,
+                        research_mode   = ctx.research_mode,
+                        sources         = ctx.sources if ctx.research_mode else None,
+                        empirical_context = empirical_context + _sus_block,
+                    )
+                    print(
+                        f"[DEDUP_DB] Suspicious similarity retry complete. New: "
+                        f"'{(ctx.structured or {}).get('hypothesis', {}).get('statement', 'none')[:70]}'"
+                    )
+
+                elif _dup["domain_pair_seen"]:
+                    # Soft warning only — not a hard gate
+                    print(
+                        f"[DEDUP_DB] Domain pair ({_hyp.get('domain_from')}, "
+                        f"{_hyp.get('domain_to')}) already CONFIRMED — "
+                        f"proceeding (statement is novel)"
+                    )
+
+            except Exception as _dup_err:
+                logger.debug("[DEDUP_DB] Duplicate check failed (non-fatal): %s", _dup_err)
+
         # Cross-referencing with existing knowledge
         try:
             ctx.connections = await ctx.agent._cross_reference(ctx.topic, ctx.structured)

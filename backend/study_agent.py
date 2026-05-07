@@ -136,6 +136,104 @@ def _d2_cached_all_text(cache: Dict) -> str:
     return str(cache.get("all_text", ""))
 
 
+# ── DB-backed hypothesis dedup (pure, testable) ───────────────────────────────
+
+_DEDUP_HARD_THRESHOLD       = 0.82
+_DEDUP_SUSPICIOUS_THRESHOLD = 0.70
+
+
+def _dedup_normalize(s: str) -> str:
+    """Lowercase, collapse whitespace, strip trailing punctuation."""
+    import re as _re
+    return _re.sub(r"\s+", " ", s.lower().strip().rstrip("."))
+
+
+def _dedup_check_against_rows(hypothesis: dict, existing_rows: list) -> dict:
+    """Pure SequenceMatcher dedup check — no DB calls, fully testable.
+
+    Args:
+        hypothesis    : dict with at least 'statement', 'domain_from', 'domain_to'
+        existing_rows : list of dicts from get_all_statements()
+
+    Returns dict with 8 keys:
+        is_duplicate, is_suspicious, reason, matched_id, matched_status,
+        matched_statement, similarity_ratio, domain_pair_seen
+    """
+    from difflib import SequenceMatcher as _SM
+
+    _empty = {
+        "is_duplicate":      False,
+        "is_suspicious":     False,
+        "reason":            "",
+        "matched_id":        None,
+        "matched_status":    None,
+        "matched_statement": None,
+        "similarity_ratio":  0.0,
+        "domain_pair_seen":  False,
+    }
+
+    statement = str(hypothesis.get("statement", "") or "").strip()
+    if not statement or not existing_rows:
+        return _empty
+
+    norm_new    = _dedup_normalize(statement)
+    domain_from = str(hypothesis.get("domain_from", "") or "").lower().strip()
+    domain_to   = str(hypothesis.get("domain_to",   "") or "").lower().strip()
+
+    best_ratio = 0.0
+    best_row   = None
+    domain_pair_seen = False
+
+    for row in existing_rows:
+        # Domain pair soft-warning (not a hard gate)
+        if (domain_from and domain_to
+                and str(row.get("domain_from", "") or "").lower().strip() == domain_from
+                and str(row.get("domain_to",   "") or "").lower().strip() == domain_to
+                and row.get("status") == "CONFIRMED"):
+            domain_pair_seen = True
+
+        existing_stmt = str(row.get("statement", "") or "").strip()
+        if not existing_stmt:
+            continue
+
+        ratio = _SM(None, norm_new, _dedup_normalize(existing_stmt)).ratio()
+        if ratio > best_ratio:
+            best_ratio = ratio
+            best_row   = row
+
+    result = dict(_empty)
+    result["similarity_ratio"] = round(best_ratio, 4)
+    result["domain_pair_seen"] = domain_pair_seen
+
+    if best_row is None or best_ratio < _DEDUP_SUSPICIOUS_THRESHOLD:
+        return result
+
+    result["matched_id"]        = best_row.get("id")
+    result["matched_status"]    = best_row.get("status")
+    result["matched_statement"] = str(best_row.get("statement") or "")[:200]
+
+    if best_ratio >= _DEDUP_HARD_THRESHOLD:
+        result["is_duplicate"] = True
+        status = best_row.get("status", "")
+        if status == "CONFIRMED":
+            result["reason"] = "DUPLICATE_CONFIRMED"
+        elif status == "REFUTED":
+            result["reason"] = (
+                "DUPLICATE_REFUTED — a future variant is admissible only if it "
+                "declares a strong novelty_delta (different mechanism, dataset, or regime)"
+            )
+        else:
+            result["reason"] = f"DUPLICATE_{status}"
+    else:
+        result["is_suspicious"] = True
+        result["reason"] = (
+            f"SUSPICIOUS_SIMILARITY (ratio={best_ratio:.2f}) — "
+            f"too close to existing hypothesis #{best_row.get('id')}"
+        )
+
+    return result
+
+
 class StudyAgent:
     def __init__(self, goal_engine: GoalEngine = None):
         # LLM calls go through llm_router (Gemini -> Groq -> Claude fallback chain)
@@ -812,6 +910,41 @@ Example: ["query 1", "query 2", "query 3"]"""
         except Exception as e:
             logger.debug("[NOVELTY] check failed (defaulting to novel): %s", e)
             return True, "check failed"
+
+    async def _check_hypothesis_duplicate_db(self, hypothesis: dict) -> dict:
+        """DB-backed near-duplicate check against SHARD's own research_hypotheses table.
+
+        Wraps the pure _dedup_check_against_rows() function with a live DB read.
+        Fails open (is_duplicate=False) on any error so the pipeline is never blocked.
+        """
+        try:
+            try:
+                from experiment_store import get_all_statements
+            except ImportError:
+                from backend.experiment_store import get_all_statements
+            existing = get_all_statements()
+        except Exception as exc:
+            logger.debug("[DEDUP_DB] get_all_statements failed (defaulting no-dup): %s", exc)
+            return {
+                "is_duplicate": False, "is_suspicious": False, "reason": "",
+                "matched_id": None, "matched_status": None,
+                "matched_statement": None, "similarity_ratio": 0.0,
+                "domain_pair_seen": False,
+            }
+
+        result = _dedup_check_against_rows(hypothesis, existing)
+        logger.info(
+            "[DEDUP_DB] stmt='%s...' ratio=%.3f is_dup=%s is_sus=%s "
+            "matched_id=%s matched_status=%s domain_pair=%s",
+            str(hypothesis.get("statement", ""))[:60],
+            result["similarity_ratio"],
+            result["is_duplicate"],
+            result["is_suspicious"],
+            result["matched_id"],
+            result["matched_status"],
+            result["domain_pair_seen"],
+        )
+        return result
 
     # ------------------------------------------------------------------ #
     # Domain classifiers for experiment scaffolding                      #

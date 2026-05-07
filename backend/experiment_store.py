@@ -5,6 +5,7 @@ No LLM logic -- pure SQLite read/write following the experiment_cache.py pattern
 
 Lifecycle:
     PENDING -> CONFIRMED | REFUTED | INCONCLUSIVE | SKIPPED_TOO_COMPLEX | KAGGLE_READY
+              | SKIPPED_KNOWN (set by DB-dedup gate when statement is near-duplicate)
 """
 import json
 import logging
@@ -366,4 +367,54 @@ def get_pending_gpu_runs(limit: int = 5) -> List[Dict]:
         return [_row_to_dict(r) for r in rows]
     except Exception as exc:
         logger.error("[EXPERIMENT_STORE] get_pending_gpu_runs failed: %s", exc)
+        return []
+
+
+def get_all_statements(statuses: Optional[List[str]] = None) -> List[Dict]:
+    """Return id, status, statement, domain_from, domain_to, confidence for DB-dedup.
+
+    Used by _check_hypothesis_duplicate_db() to compare a new hypothesis statement
+    against every existing entry via SequenceMatcher.
+
+    Args:
+        statuses: list of status strings to include.
+                  Defaults to ["CONFIRMED", "REFUTED", "INCONCLUSIVE"].
+                  Pass a custom list to widen or narrow the comparison set.
+
+    Returns:
+        List of dicts with keys: id, status, statement, domain_from, domain_to,
+        confidence. Provenance columns (execution_backend, data_provenance,
+        validation_tier) are included when present (added by P0 schema).
+        Rows with empty/null statements are excluded.
+    """
+    if statuses is None:
+        statuses = ["CONFIRMED", "REFUTED", "INCONCLUSIVE"]
+    try:
+        conn = _get_db()
+        _ensure_table()
+        placeholders = ",".join("?" * len(statuses))
+        rows = conn.execute(
+            f"""
+            SELECT id, status, statement, domain_from, domain_to,
+                   COALESCE(confidence_updated, confidence_initial, 0.0) AS confidence
+            FROM research_hypotheses
+            WHERE status IN ({placeholders})
+              AND statement IS NOT NULL
+              AND TRIM(statement) != ''
+            ORDER BY created_at ASC
+            """,
+            tuple(statuses),
+        ).fetchall()
+        results = []
+        for r in rows:
+            d = dict(r)
+            for col in ("execution_backend", "data_provenance", "validation_tier"):
+                try:
+                    d[col] = r[col]
+                except (IndexError, KeyError):
+                    pass
+            results.append(d)
+        return results
+    except Exception as exc:
+        logger.error("[EXPERIMENT_STORE] get_all_statements failed: %s", exc)
         return []
