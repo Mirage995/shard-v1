@@ -47,7 +47,7 @@ Added three columns to `research_hypotheses` (migration-safe, idempotent `ALTER 
 | `manual_backfill` | Set by human retroactively | `0` |
 
 **Backfill applied:**
-- Hypothesis #14 (ANV+OGD, Split-MNIST, Kaggle GPU run): `kaggle / public_benchmark / gpu_replicated / manual_backfill=true`
+- Hypothesis #14 (ANV+OGD, Split-MNIST 2-task, Kaggle GPU run): `kaggle / public_benchmark / gpu_replicated / manual_backfill=true`
 - All other prior CONFIRMED hypotheses: honest defaults `local_sandbox / synthetic / sandbox_replicated`
 
 Helper: `experiment_store.set_provenance(id, backend, provenance, tier)` for future manual backfills.
@@ -185,7 +185,7 @@ These limitations are acknowledged honestly. They do not invalidate the implemen
 
 4. **Kaggle quota manages the queue, not execution.** `try_enqueue` gates ledger insertion. The actual execution of a Kaggle kernel, its real runtime, and result ingestion into SHARD are not yet automated end-to-end. Human operator remains in the loop.
 
-5. **Hypothesis #14 is not benchmark-validated.** It is a GPU-replicated candidate (Split-MNIST, 5-task, Kaggle run). It has not been tested against the full CLRS or Split-CIFAR benchmark suite, nor has it been replicated by an independent group. It is a promising result, not a confirmed finding.
+5. **Hypothesis #14 is not benchmark-validated.** It is a GPU-replicated candidate (Split-MNIST 2-task, classes 0–4 vs 5–9, Kaggle run). It has not been tested against the full 5-task protocol or the Split-CIFAR benchmark suite, nor has it been replicated by an independent group. It is a promising result, not a confirmed finding.
 
 6. **No guarantee of genuine scientific novelty.** SHARD's novelty filter (arXiv + LLM judge) cannot access paywalled literature, conference proceedings, or unpublished preprints. A result marked NOVEL by SHARD may still be known to domain experts.
 
@@ -224,7 +224,7 @@ ANV+OGD must beat OGD-only on mean forgetting_magnitude **and** not materially d
 > "SHARD generates, filters, tracks, and prioritizes plausible scientific hypotheses with explicit evidence provenance."
 
 **For Hypothesis #14 specifically:**
-> "Promising GPU-replicated candidate (Split-MNIST, Kaggle), not yet benchmark-validated. Requires D14-B replication pack before promotion."
+> "Promising GPU-replicated candidate (Split-MNIST 2-task, Kaggle), not yet benchmark-validated. Requires D14-B replication pack (5-task) before promotion."
 
 **For sandbox-only results:**
 > "Code runs in local sandbox on synthetic data. Proof-of-mechanism only. Not generalizable without GPU replication on public benchmark."
