@@ -834,6 +834,84 @@ def _persist_skipped(ctx, hypothesis: dict, status: str) -> None:
         logger.error("[EXPERIMENT_DESIGN] DB persist failed (non-fatal): %s", db_exc)
 
 
+# ── Antagonist review normalizer (adversarial gates) ─────────────────────────
+
+_ANTAGONIST_FATAL_CONTROL_KEYWORDS: frozenset = frozenset({
+    "hardcoded", "hard-coded", "hard coded",
+    "no baseline", "no control group", "no randomization",
+    "data leakage", "train/test contamination", "label leakage",
+    "fixed seed", "synthetic labels",
+})
+
+
+def normalize_antagonist_review(raw_review: dict) -> dict:
+    """Apply adversarial gates to an antagonist review, preventing rubber-stamp VALID verdicts.
+
+    Gate order (first match wins for verdict changes):
+      G1: malformed/missing fields         → INVALID_CORRECTABLE (INVALID_FORMAT)
+      G2: fatal keyword in missing_controls → INVALID_FATAL (any original verdict)
+      G3: VALID + confidence < 0.70        → INVALID_CORRECTABLE
+      G4: VALID + empty alternative_mechanism → INVALID_CORRECTABLE
+      G5: VALID + empty confounds          → INVALID_CORRECTABLE
+
+    Returns a copy of the review dict with possible verdict override plus two added fields:
+      forced_verdict (bool): True if any gate changed the verdict
+      force_reason   (str):  which gate triggered and why
+    """
+    out = dict(raw_review)
+    out.setdefault("confidence", 0.5)
+    out.setdefault("alternative_mechanism", "")
+    out.setdefault("confounds", [])
+    out.setdefault("missing_controls", [])
+    out.setdefault("reason", "")
+    out.setdefault("corrected_code", None)
+    out.setdefault("review_quality", "shallow")
+    out["forced_verdict"] = False
+    out["force_reason"]   = ""
+
+    verdict = out.get("verdict", "")
+
+    # G1: malformed response (parse error or unknown verdict)
+    if out.get("_parse_error") or verdict not in ("VALID", "INVALID_CORRECTABLE", "INVALID_FATAL"):
+        out["verdict"]        = "INVALID_CORRECTABLE"
+        out["forced_verdict"] = True
+        out["force_reason"]   = "G1_INVALID_FORMAT: malformed or unparseable antagonist response"
+        return out
+
+    # G2: fatal control keyword in missing_controls (applies regardless of verdict)
+    mc_text = " ".join(str(c) for c in out["missing_controls"]).lower()
+    for kw in _ANTAGONIST_FATAL_CONTROL_KEYWORDS:
+        if kw in mc_text:
+            if verdict != "INVALID_FATAL":
+                out["verdict"]        = "INVALID_FATAL"
+                out["forced_verdict"] = True
+                out["force_reason"]   = f"G2_FATAL_KEYWORD: '{kw}' in missing_controls"
+            return out
+
+    # G3-G5: rubber-stamp prevention — only fire when the LLM wants to say VALID
+    if verdict == "VALID":
+        conf = float(out["confidence"])
+        if conf < 0.70:
+            out["verdict"]        = "INVALID_CORRECTABLE"
+            out["forced_verdict"] = True
+            out["force_reason"]   = f"G3_LOW_CONFIDENCE: {conf:.2f} < 0.70 threshold"
+            return out
+
+        if not str(out["alternative_mechanism"]).strip():
+            out["verdict"]        = "INVALID_CORRECTABLE"
+            out["forced_verdict"] = True
+            out["force_reason"]   = "G4_NO_ALTERNATIVE_MECHANISM: rubber-stamp guard"
+            return out
+
+        if not out["confounds"]:
+            out["verdict"]        = "INVALID_CORRECTABLE"
+            out["forced_verdict"] = True
+            out["force_reason"]   = "G5_NO_CONFOUNDS: rubber-stamp guard"
+            return out
+
+    return out
+
+
 class ExperimentSandboxPhase(BasePhase):
     """Execute experiment_code in Docker sandbox with N=3 replication and Corrective Antagonist.
 
@@ -974,7 +1052,27 @@ class ExperimentSandboxPhase(BasePhase):
                 )
             except Exception as exc:
                 logger.warning("[ANTAGONIST] Review failed at attempt %d (non-fatal): %s", attempt, exc)
-                antagonist = {"verdict": "VALID", "reason": "review_error_bypass", "corrected_code": None}
+                antagonist = {
+                    "verdict": "INVALID_CORRECTABLE", "reason": f"review_error: {exc}",
+                    "corrected_code": None, "_parse_error": True,
+                }
+
+            # Apply adversarial gates (rubber-stamp prevention)
+            antagonist = normalize_antagonist_review(antagonist)
+
+            # Structured gate log (7 fields)
+            logger.info(
+                "[ANTAGONIST_GATE] attempt=%d verdict=%s confidence=%.2f forced=%s "
+                "force_reason=%r has_alt_mechanism=%s confound_count=%d missing_control_count=%d",
+                attempt,
+                antagonist["verdict"],
+                float(antagonist.get("confidence") or 0.0),
+                antagonist.get("forced_verdict", False),
+                antagonist.get("force_reason", ""),
+                bool(str(antagonist.get("alternative_mechanism", "")).strip()),
+                len(antagonist.get("confounds") or []),
+                len(antagonist.get("missing_controls") or []),
+            )
 
             verdict = antagonist["verdict"]
             reason  = antagonist.get("reason", "")
@@ -983,9 +1081,13 @@ class ExperimentSandboxPhase(BasePhase):
             if verdict == "VALID":
                 ctx.experiment_code = current_code
                 ctx.experiment_result.update({
-                    "antagonist_verdict":  "VALID",
-                    "antagonist_reason":   "",
-                    "antagonist_attempts": attempt,
+                    "antagonist_verdict":       "VALID",
+                    "antagonist_reason":        "",
+                    "antagonist_attempts":      attempt,
+                    "antagonist_confidence":    antagonist.get("confidence"),
+                    "antagonist_alt_mechanism": antagonist.get("alternative_mechanism"),
+                    "antagonist_confounds":     antagonist.get("confounds"),
+                    "antagonist_review_quality": antagonist.get("review_quality"),
                 })
                 await ctx.emit(
                     "EXPERIMENT_SANDBOX", 0,

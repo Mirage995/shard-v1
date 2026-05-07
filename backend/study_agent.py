@@ -862,14 +862,15 @@ Example: ["query 1", "query 2", "query 3"]"""
         replication_data: dict,
         attempt: int = 1,
     ) -> dict:
-        """Independent skeptic that audits experiment code for cheating or bugs.
+        """Independent skeptic: audits experiment for bugs, cheating, and confounds.
 
-        Returns one of:
-          {"verdict": "VALID", "reason": "", "corrected_code": None}
-          {"verdict": "INVALID_FATAL", "reason": str, "corrected_code": None}
-          {"verdict": "INVALID_CORRECTABLE", "reason": str, "corrected_code": str}
+        Returns a structured dict with 8 fields:
+          verdict, confidence, alternative_mechanism, confounds,
+          missing_controls, reason, corrected_code, review_quality
+
+        Downstream normalize_antagonist_review() applies adversarial gates.
         """
-        import re as _re
+        import json as _json
 
         statement   = hypothesis.get("statement", "")
         min_exp     = str(hypothesis.get("minimum_experiment", ""))
@@ -882,36 +883,34 @@ Example: ["query 1", "query 2", "query 3"]"""
             )
 
         system = (
-            "Sei uno scettico metodologico. Il tuo compito e':\n"
-            "1. Trovare errori, trucchi, bug o calcoli scorretti nel codice esperimento.\n"
-            "2. Se trovi errori FIXABILI (bug sintattico, calcolo sbagliato, metrica mal definita,\n"
-            "   baseline non confrontabile, seed fisso che favorisce la technique), genera il CODICE CORRETTO.\n"
-            "3. Se trovi errori GRAVI NON FIXABILI (hardcoded score, dati fittizi, meccanismo\n"
-            "   completamente diverso dall'hypothesis, hypothesis non implementabile), dichiara FATAL.\n\n"
-            "Verifica:\n"
-            "- Il codice implementa DAVVERO il meccanismo descritto nel minimum_experiment?\n"
-            "- RESULT_BASELINE, RESULT_TECHNIQUE e RESULT sono calcolati dai dati reali?\n"
-            "- Ci sono hardcoded score, dati fittizi, o seed fissi che favoriscono la technique?\n"
-            "- Baseline e technique usano lo STESSO data split?\n"
-            "- Le metriche corrispondono al SUCCESS CRITERION?\n\n"
-            "Rispondi ESATTAMENTE in uno di questi 3 formati:\n\n"
-            "Formato 1 — Tutto corretto:\n"
-            "VERDICT: VALID\n\n"
-            "Formato 2 — Errore fixabile, genera codice corretto:\n"
-            "VERDICT: INVALID_CORRECTABLE\n"
-            "REASON: <descrizione breve dell'errore>\n"
-            "CORRECTED_CODE:\n"
-            "```python\n"
-            "<codice Python corretto e completo>\n"
-            "```\n\n"
-            "Formato 3 — Errore grave, non fixabile:\n"
-            "VERDICT: INVALID_FATAL\n"
-            "REASON: <descrizione dell'errore grave>\n\n"
-            "Regole per CORRECTED_CODE:\n"
-            "- Codice Python completo e runnable, non un diff.\n"
-            "- Mantieni RESULT_BASELINE, RESULT_TECHNIQUE, RESULT triple.\n"
-            "- Nessun commento esplicativo — solo codice.\n"
-            "- Se il codice originale era >3000 char, correggi solo la parte errata ma restituisci il file completo."
+            "You are a methodological skeptic reviewing a machine learning experiment. "
+            "Audit the experiment code for bugs, cheating, confounds, and missing controls.\n\n"
+            "You MUST provide:\n"
+            "- alternative_mechanism: an alternative causal explanation (even a null hypothesis) "
+            "for the observed result — never leave this empty.\n"
+            "- confounds: at least one confounding variable not fully controlled — "
+            "a VALID verdict with an empty confound list will be rejected.\n\n"
+            "Check:\n"
+            "- Does the code implement the mechanism in minimum_experiment?\n"
+            "- Are RESULT_BASELINE, RESULT_TECHNIQUE, RESULT from real data (not hardcoded)?\n"
+            "- Hardcoded scores, fixed seeds, or synthetic data favoring the technique?\n"
+            "- Do baseline and technique use the SAME data split?\n"
+            "- Do metrics match the success criterion?\n\n"
+            "Respond ONLY with a JSON object (no markdown fences, no extra text):\n"
+            '{\n'
+            '  "verdict": "VALID" | "INVALID_CORRECTABLE" | "INVALID_FATAL",\n'
+            '  "confidence": <float 0.0-1.0>,\n'
+            '  "alternative_mechanism": "<non-empty alternative causal explanation>",\n'
+            '  "confounds": ["<confound 1>", ...],\n'
+            '  "missing_controls": ["<control 1>", ...],\n'
+            '  "reason": "<primary critique, 1-2 sentences>",\n'
+            '  "corrected_code": "<full corrected Python or null>",\n'
+            '  "review_quality": "thorough" | "shallow"\n'
+            "}\n\n"
+            "Rules for corrected_code:\n"
+            "- Full runnable Python (not a diff); null if verdict is not INVALID_CORRECTABLE.\n"
+            "- Keep RESULT_BASELINE, RESULT_TECHNIQUE, RESULT triple.\n"
+            "- If INVALID_CORRECTABLE but you cannot produce a fix, downgrade to INVALID_FATAL."
         )
 
         prompt = (
@@ -919,45 +918,52 @@ Example: ["query 1", "query 2", "query 3"]"""
             f"EXPERIMENT CODE (attempt {attempt}/3):\n```python\n{experiment_code[:4000]}\n```\n\n"
             f"SANDBOX OUTPUT:\n{experiment_stdout[:800] or '(empty)'}\n\n"
             f"REPLICATION: {rep_summary or '(not available)'}\n\n"
-            "Audit the code and respond with one of the 3 formats above."
+            "Audit the code and respond with the JSON object."
         )
 
         raw = await self._think(prompt, system=system, json_mode=False, temperature=0.2)
 
-        # Parse response
-        if _re.search(r"VERDICT:\s*VALID\b", raw):
-            return {"verdict": "VALID", "reason": "", "corrected_code": None}
+        # Parse structured JSON response
+        try:
+            text = raw.strip()
+            # Strip optional markdown fences
+            if text.startswith("```"):
+                lines = text.split("\n")
+                text = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+            start = text.find("{")
+            end   = text.rfind("}") + 1
+            if start == -1 or end == 0:
+                raise ValueError("no JSON object in response")
+            data = _json.loads(text[start:end])
 
-        fatal_m = _re.search(r"VERDICT:\s*INVALID_FATAL", raw)
-        if fatal_m:
-            reason_m = _re.search(r"REASON:\s*(.+)", raw)
-            reason = reason_m.group(1).strip() if reason_m else "Unspecified fatal error"
-            return {"verdict": "INVALID_FATAL", "reason": reason, "corrected_code": None}
+            verdict = str(data.get("verdict", "")).strip().upper()
+            if verdict not in ("VALID", "INVALID_CORRECTABLE", "INVALID_FATAL"):
+                verdict = "INVALID_FATAL"
 
-        corr_m = _re.search(r"VERDICT:\s*INVALID_CORRECTABLE", raw)
-        if corr_m:
-            reason_m = _re.search(r"REASON:\s*(.+)", raw)
-            reason = reason_m.group(1).strip() if reason_m else "Unspecified correctable error"
-            code_m = _re.search(r"```python\s*\n([\s\S]+?)\n```", raw)
-            if code_m:
-                return {
-                    "verdict": "INVALID_CORRECTABLE",
-                    "reason": reason,
-                    "corrected_code": code_m.group(1).strip(),
-                }
-            # CORRECTABLE declared but no code block → treat as FATAL
             return {
-                "verdict": "INVALID_FATAL",
-                "reason": f"CORRECTABLE declared but no corrected code provided: {reason}",
-                "corrected_code": None,
+                "verdict":               verdict,
+                "confidence":            float(data.get("confidence", 0.5)),
+                "alternative_mechanism": str(data.get("alternative_mechanism") or "").strip(),
+                "confounds":             list(data.get("confounds") or []),
+                "missing_controls":      list(data.get("missing_controls") or []),
+                "reason":                str(data.get("reason") or "").strip(),
+                "corrected_code":        data.get("corrected_code") or None,
+                "review_quality":        str(data.get("review_quality") or "shallow").strip(),
             }
 
-        # Parse failure → safe fallback
-        return {
-            "verdict": "INVALID_FATAL",
-            "reason": "Antagonist parse error — treating as unsafe",
-            "corrected_code": None,
-        }
+        except Exception as exc:
+            # JSON parse failure — flagged for G1 gate in normalize_antagonist_review
+            return {
+                "verdict":               "INVALID_CORRECTABLE",
+                "confidence":            0.0,
+                "alternative_mechanism": "",
+                "confounds":             [],
+                "missing_controls":      [],
+                "reason":                f"JSON parse error: {exc}",
+                "corrected_code":        None,
+                "review_quality":        "shallow",
+                "_parse_error":          True,
+            }
 
     async def _validate_experiment_alignment(self, hypothesis: Dict,
                                                attempt: int = 0) -> Dict:
