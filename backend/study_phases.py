@@ -1167,6 +1167,7 @@ class CertifyRetryGroup(BasePhase):
             # Also fire for benchmark-only failures (classified_error_type may be None).
             if _best >= 1.5:
                 await self._store_failure_memory(ctx)
+            await self._post_failure_strategy_update(ctx, best_score=_best)
 
     # ── Private helpers ──────────────────────────────────────────────────
 
@@ -1760,6 +1761,109 @@ Rules:
                              ctx.topic, best, error_type)
         except Exception as _mf_err:
             _logger.warning("[MEMORY_FAIL] Non-fatal store error: %s", _mf_err)
+
+    async def _post_failure_strategy_update(self, ctx: StudyContext, best_score: float | None = None) -> None:
+        """D3.0D append-only failure-learning strategy record, env-gated."""
+        import os as _os
+
+        enabled = _os.environ.get("D3_POST_FAILURE_STRATEGY_UPDATE") == "1"
+        topic = str(getattr(ctx, "topic", "") or "").strip()
+        score = best_score if best_score is not None else getattr(ctx, "best_score", None)
+        if score is None:
+            score = getattr(ctx, "score", None)
+
+        def _emit(attempted: int, success: int, skip: str, attribution: int = 0) -> None:
+            print(
+                "[D3_0D_POST_FAILURE_STRATEGY] "
+                f"attempted={attempted} success={success} skip_reason={skip} "
+                "source=post_failure_diagnostic outcome=failure_learning "
+                f"attribution={attribution} topic={topic!r} "
+                f"score={score if score is not None else 'MISSING'}"
+            )
+
+        if not enabled:
+            _emit(0, 0, "EXPERIMENT_DISABLED")
+            return
+        if getattr(ctx, "certified", False):
+            _emit(1, 0, "NOT_FAILED_SESSION")
+            return
+        if not topic:
+            _emit(1, 0, "MISSING_TOPIC")
+            return
+        try:
+            numeric_score = float(score)
+        except Exception:
+            _emit(1, 0, "MISSING_SCORE")
+            return
+
+        eval_data = ctx.eval_data if isinstance(ctx.eval_data, dict) else {}
+        gaps = [
+            str(g).strip()
+            for g in (getattr(ctx, "gaps", None) or eval_data.get("gaps", []) or [])
+            if str(g).strip()
+        ]
+        focus = str(eval_data.get("improvement_focus", "") or "").strip()
+        stance = str(eval_data.get("shard_stance", "") or "").strip()
+        failure_mode = str(getattr(ctx, "classified_error_type", "") or "").strip()
+        stderr = ""
+        if getattr(ctx, "sandbox_result", None):
+            stderr = str(ctx.sandbox_result.get("stderr", "") or "").strip()
+        if not failure_mode:
+            failure_mode = "benchmark_failure" if numeric_score > 0 else "unknown_failure"
+
+        attribution_parts = []
+        if failure_mode and failure_mode != "unknown_failure":
+            attribution_parts.append(f"failure_mode={failure_mode}")
+        if gaps:
+            attribution_parts.append("gaps=" + "; ".join(gaps[:4]))
+        if focus:
+            attribution_parts.append(f"improvement_focus={focus}")
+        if stderr:
+            attribution_parts.append(f"stderr_tail={stderr[-240:]}")
+        if stance:
+            attribution_parts.append(f"stance={stance[:240]}")
+
+        if not attribution_parts:
+            _emit(1, 0, "MISSING_FAILURE_ATTRIBUTION")
+            return
+
+        previous_strategy = str(getattr(ctx, "strategy_used", "") or "default").strip()
+        suggested = focus or (
+            "Address gaps: " + "; ".join(gaps[:3])
+            if gaps else "Create an explicit recovery plan from the recorded failure mode."
+        )
+        avoid = "; ".join(gaps[:2]) if gaps else failure_mode
+        session_id = _os.environ.get("D3_SESSION_ID", "")
+        topic_family = _os.environ.get("D3_TOPIC_FAMILY", "")
+        strategy_text = (
+            "[D3_POST_FAILURE_STRATEGY]\n"
+            f"topic: {topic}\n"
+            f"topic_family: {topic_family or 'UNAVAILABLE'}\n"
+            f"source_session_id: {session_id or 'UNAVAILABLE'}\n"
+            f"failed_strategy_summary: {previous_strategy[:300]}\n"
+            f"failure_mode: {failure_mode}\n"
+            f"final_score: {numeric_score:.3f}\n"
+            "certification_verdict: FAILED\n"
+            f"suggested_alternative_strategy: {suggested[:500]}\n"
+            f"avoid_next_time: {avoid[:500]}\n"
+            "attribution: " + " | ".join(attribution_parts)[:900]
+        )
+
+        strategy_memory = getattr(ctx.agent, "strategy_memory", None)
+        if strategy_memory is None:
+            _emit(1, 0, "STRATEGY_MEMORY_UNAVAILABLE", attribution=1)
+            return
+        try:
+            await strategy_memory.store_strategy_async(
+                topic,
+                strategy_text,
+                "failure_learning",
+                score=numeric_score,
+            )
+            _emit(1, 1, "NONE", attribution=1)
+        except Exception as exc:
+            print(f"[D3_0D_POST_FAILURE_STRATEGY_EXCEPTION] {exc}")
+            _emit(1, 0, "STORE_EXCEPTION", attribution=1)
 
     async def _retry_gap_fill(self, ctx: StudyContext) -> None:
         """Re-synthesize theory with gap focus + regenerate sandbox code for retry."""
