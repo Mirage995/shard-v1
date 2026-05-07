@@ -801,6 +801,32 @@ def _persist_kaggle_ready(ctx, hypothesis: dict, code: str) -> None:
             )
             ctx._experiment_hypothesis_id = hyp_id
             print(f"[EXPERIMENT_DESIGN] Persisted KAGGLE_READY id={hyp_id}")
+
+            # ── Kaggle quota guard (P1) ───────────────────────────────────────
+            # Check and enqueue in kaggle_quota_ledger; logs KAGGLE_QUOTA_EXCEEDED
+            # if hours are exhausted. Does NOT block persisting the KAGGLE_READY row
+            # — the hypothesis is always stored; quota only gates the dispatch queue.
+            try:
+                from kaggle_quota import try_enqueue
+                _qr = try_enqueue(
+                    hypothesis_id  = hyp_id,
+                    hypothesis     = hypothesis,
+                    validation_goal = str(hypothesis.get("minimum_experiment", ""))[:300],
+                )
+                if _qr["allowed"]:
+                    print(
+                        f"[KAGGLE_QUOTA] Enqueued run_id={_qr['run_id']} "
+                        f"est={_qr['estimated_hours']:.2f}h  "
+                        f"pending_after={_qr['pending_hours'] + _qr['estimated_hours']:.2f}h"
+                    )
+                else:
+                    print(
+                        f"[KAGGLE_QUOTA_EXCEEDED] hyp_id={hyp_id} "
+                        f"est={_qr['estimated_hours']:.2f}h  reason={_qr['reason']}"
+                    )
+            except Exception as _q_exc:
+                logger.debug("[KAGGLE_QUOTA] try_enqueue failed (non-fatal): %s", _q_exc)
+
     except Exception as db_exc:
         logger.error("[EXPERIMENT_DESIGN] DB persist (kaggle) failed (non-fatal): %s", db_exc)
 
